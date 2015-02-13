@@ -20,13 +20,3 @@ data <- list(C = num.occ, G = num.gen, O = num.ord,
 with(data, {stan_rdump(list = c('C', 'G', 'O', 'count', 
                                 'genus', 'order', 'off'),
                        file = '../data/data_dump/count_info.data.R')})
-
-#mod <- stan(file = '../stan/neg_bin_mod.stan')
-#fit <- mclapply(1:4, mc.cores = detectCores(),
-#                function(x) stan(fit = mod, 
-#                                 data = data,
-#                                 chains = 1, chain_id = x,
-#                                 refresh = -1))
-#pfit <- sflist2stanfit(fit)
-
-#save.image(file = '../data/model_out.rdata')

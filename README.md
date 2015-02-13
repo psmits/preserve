@@ -8,6 +8,4 @@ Set this up hierarchically. Each taxon is in a group (genus in order). Each
 group is part of a larger group (order in class). Final level is the super group
 (class in hard-part inverts).
 
-Hyerprior of Poisson is Gamma.
-
 Overdispersed Poisson is Negative Binomial (Gamma mixed with Poisson).
