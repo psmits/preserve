@@ -22,7 +22,7 @@ find.dur <- function(x) {
   mm <- which(gts %in% unique(x$collections.stage))
   max(mm) - min(mm) + 1
 }
-
+# generic duration
 taxon.age <- ddply(bibr, .(occurrences.genus_name), find.dur)
 taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
                      table(x$collections.stage)})
@@ -38,6 +38,7 @@ for(ii in seq(length(taxon.occur))) {
 }
 names(off) <- names(taxon.occur)
 
+# occurrences for each stage, inclusive, of generic duration
 for(ii in seq(length(taxon.occur))) {
   blank <- names(off[[ii]])
   keep <- rep(0, length(blank))

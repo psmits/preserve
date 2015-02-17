@@ -5,7 +5,7 @@ do
   for i in `seq 1 4`;
   do
     # this is the poisson model
-    ./neg_bin_mod sample num_samples=10000 num_warmup=10000 thin = 10 \\
+    ./neg_bin_mod sample num_samples=10000 num_warmup=10000 thin=10 \
       random seed=420 \
       id=$i \
       data file=$f \

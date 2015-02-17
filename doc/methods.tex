@@ -1,0 +1,41 @@
+\documentclass[12pt,letterpaper]{article}
+
+\usepackage{amsmath, amsthm, amsfonts, amssymb}
+\usepackage{graphicx,hyperref}
+\usepackage{microtype, parskip}
+\usepackage[comma,sort&compress]{natbib}
+\usepackage{docmute}
+\usepackage{subcaption, multirow, morefloats}
+\usepackage{wrapfig, rotating}
+
+\frenchspacing
+
+\captionsetup[subfigure]{position = top, labelfont = bf, textfont = normalfont, singlelinecheck = off, justification = raggedright}
+
+\begin{document}
+\section{Methods}
+
+\subsection{Fossil occurrence information}
+Foote and Miller data.
+
+\subsection{Hierarchical counting model}
+\begin{align}
+  y_{i} &= \mathrm{Poisson}(u_{i}\lambda_{i}) \\
+  \lambda_{i} &= \exp(\alpha_{j[i]}) \\
+  \alpha_{j} &\sim \mathrm{Normal}(\mu_{k[j]}, \sigma_{j}) \\
+  \mu_{k} &\sim \mathrm{Normal}(0, \sigma_{k}) \\
+  \sigma_{j} &\sim \mathrm{C^{+}}(2.5) \\
+  \sigma_{k} &\sim \mathrm{C^{+}}(2.5)
+\end{align}
+
+\begin{align}
+  y_{i} &= \mathrm{Negative\ binomial}(u_{i}\mu_{i}, \phi_{y}) \\
+  \mu_{i} &= \exp(\alpha_{j[i]}) \\
+  \phi &= \mathrm{C^{+}}(2.5) \\
+  \alpha_{j} &\sim \mathrm{Normal}(\mu_{k[j]}, \sigma_{j}) \\
+  \mu_{k} &\sim \mathrm{Normal}(0, \sigma_{k}) \\
+  \sigma_{j} &\sim \mathrm{C^{+}}(2.5) \\
+  \sigma_{k} &\sim \mathrm{C^{+}}(2.5)
+\end{align}
+
+\end{document}
