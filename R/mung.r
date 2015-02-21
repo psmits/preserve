@@ -47,6 +47,27 @@ for(ii in seq(length(taxon.occur))) {
 }
 occurs <- lapply(taxon.occur, length)
 
+# get species duration along with if died in stage before/of mass extinction
+wh.stage <- llply(off, names)
+mass.ext <- c('Masstrichtian', 'Rhaetian', 'Changhsingian', 
+              'Frasnian', 'Hirnantian', 'Calabrian')
+in.mass <- llply(wh.stage, function(x) x %in% mass.ext)
+censored <- laply(in.mass, function(x) {
+                  o <- c()
+                  if(max(which(x)) == length(x)) {
+                    o <- 1
+                  } else {
+                    o <- 0
+                  }
+                  o})
+orig <- laply(wh.stage, function(x) rev(gts[gts %in% x])[1])
+age.order <- llply(orig, function(x) which(gts %in% x))
+big.dead <- which(gts %in% mass.ext)
+regime <- laply(age.order, function(x) 
+                max(which(x > big.dead)))
+age.data <- cbind(taxon.age, censored, orig, regime)
+names(age.data) <- c('genus', 'duration', 'censored', 'orig', 'regime')
+# need to retain the class stuff too
 
 # split based on class
 ords <- unique(bibr[, c('class_reassigned', 'occurrences.genus_name')])
@@ -70,3 +91,7 @@ ords <- ords[match(occ.gen[, 2], ords[, 2]), ]
 
 dat.full <- cbind(occ.gen, ords[, 1], offset = off.melt$value)
 names(dat.full) <- c('count', 'genus', 'order', 'offset')
+
+# finish up the duration stuff
+age.data <- age.data[age.data$genus %in% ords[, 2], ]
+age.data$class <- ords[match(age.data$genus, ords[, 2]), 1]
