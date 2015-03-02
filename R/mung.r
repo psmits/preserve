@@ -95,3 +95,23 @@ names(dat.full) <- c('count', 'genus', 'order', 'offset')
 # finish up the duration stuff
 age.data <- age.data[age.data$genus %in% ords[, 2], ]
 age.data$class <- ords[match(age.data$genus, ords[, 2]), 1]
+
+
+# get the subset that corresponds to the sepkoski fauna
+sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya', 
+                              'Lingulata'),
+                 paleozoic = c('Rhynchonellata', 'Crinoidea', 'Ostracoda', 
+                               'Cephalopoda', 'Anthozoa', 'Cyclocystoidea', 
+                               'Asteroidea', 'Ophiuroidea'),
+                 modern = c('Gastropoda', 'Bivalvia', 'Osteichtyes', 
+                            'Malacostraca', 'Echinoidea', 'Gymnolaemata', 
+                            'Demospongea', 'Chondrichthyes'))
+
+fauna <- age.data$class
+ws <- llply(sepkoski, function(x) age.data$class %in% x)
+
+for(ii in seq(length(ws))) {
+  fauna[ws[[ii]]] <- names(sepkoski)[ii]
+}
+sepkoski.data <- cbind(age.data, fauna)[fauna %in% names(sepkoski), ]
+sepkoski.data$fauna <- as.character(sepkoski.data$fauna)
