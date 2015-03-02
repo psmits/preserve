@@ -4,15 +4,23 @@ library(parallel)
 
 source('../R/mung.r')
 
+# sub sample to test model
+#library(caret)
+#age.data <- age.data[createDataPartition(age.data$orig, p = 0.25)[[1]], ]
+
 # age.data
 num.samp <- nrow(age.data)
-num.orig <- length(unique(age.data$orig))
-num.regime <- length(unique(age.data$regime))
+
+con.orig <- match(as.character(age.data$orig), gts)
+con.orig <- mapvalues(con.orig, from = unique(con.orig), 
+                      to = rank(unique(con.orig)))
+num.orig <- length(unique(con.orig))
+
+con.class <- as.numeric(as.factor(age.data$class))
 num.class <- length(unique(age.data$class))
 
-con.orig <- match(age.data$orig, gts)
-con.class <- as.numeric(as.factor(age.data$class))
 con.regime <- as.numeric(age.data$regime)
+num.regime <- length(unique(age.data$regime))
 
 
 data <- list(duration = age.data$duration, group = con.class,
@@ -44,16 +52,10 @@ data$R <- num.regime
 data$C <- num.class
 data$regime <- unique(age.data[, c('orig', 'regime')])[, 2]
 
-
-stan(file = '../stan/survival_model.stan')
-
-# remove youngest cohort?
-
-# stan model
-# duration ~ Weibull(alpha, exp(-(intercept + class membership + cohort)
-# intercept ~ Normal(0, 10)
-#
-# class membership ~ Normal(0, sigma)
-#
-# cohort ~ Normal(regime, sigma)
-# regime ~ Normal(0, 10)
+with(data, {stan_rdump(list = c('dur_unc', 'group_unc', 'cohort_unc', 
+                                'regime_unc', 'N_unc', 'dur_cen', 'group_cen', 
+                                'cohort_cen', 'regime_cen', 'N_cen', 'samp_unc', 
+                                'samp_cen', 'N', 'O', 'R', 'C', 'regime'),
+                       file = '../data/data_dump/survival_info.data.R')})
+#marine.survival <- stan(file = '../stan/survival_model.stan')
+#attempt.one <- stan(fit = marine.survival, data = data)
