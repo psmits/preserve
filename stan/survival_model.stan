@@ -26,9 +26,9 @@ parameters {
   real<lower=0> sigma_group;
 
   real cohort[O];
-    real cohort_mu[R];
+  real cohort_mu[R];
   real<lower=0> sigma_cohort;
-    real<lower=0> sigma_regime;
+  real<lower=0> sigma_regime;
 }
 model {
   alpha ~ cauchy(0, 2.5);
@@ -52,8 +52,13 @@ model {
   sigma_regime ~ cauchy(0, 2.5);
 
   for(i in 1:N_unc) {
-    increment_log_prob(weibull_log(dur_unc[i], alpha, 
-          exp(-(intercept + group[group_unc[i]] + cohort[cohort_unc[i]])/ alpha)));
+    if(dur_unc[i] == 1) {
+      increment_log_prob(weibull_cdf_log(dur_unc[i], alpha, 
+            exp(-(intercept + group[group_unc[i]] + cohort[cohort_unc[i]])/ alpha)));
+    } else {
+      increment_log_prob(weibull_log(dur_unc[i], alpha, 
+            exp(-(intercept + group[group_unc[i]] + cohort[cohort_unc[i]])/ alpha)));
+    }
   }
 
   for(i in 1:N_cen) {

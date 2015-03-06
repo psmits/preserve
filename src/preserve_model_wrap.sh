@@ -1,5 +1,5 @@
 #!/bin/bash
-FILES=../data/data_dump/*
+FILES=../data/data_dump/count*
 for f in $FILES;
 do
   for i in `seq 1 4`;

@@ -10,14 +10,25 @@ nsim <- 1000
 
 
 # empirical data sent to stan
-souce('../R/mung.r')  # raw data
+source('../R/mung.r')  # raw data
 emp <- read_rdump('../data/data_dump/count_info.data.R')
 
 # csv of marginal posteriors from stan
 np <- list.files('../data/mcmc_out/', pattern = 'samp', full.names = TRUE)
 preserve.fit <- read_stan_csv(np)
 
+for(ii in seq(nsim)) {
+  n <- emp$C
+  off <- emp$off
+  
+  phi.est <- sample(preserve.fit$phi, 1)
 
-# for ii in seq(nsim))
-#   extract random draw from marginal posteriors
-#   generate fake data given known covariates
+  # for each observation estimate the sighting
+  # get genus membership for each observation
+  # get that genus posterior estimate
+
+  oo <- c()
+  for(jj in seq(n)) {
+    #oo[jj] <- rnbinom(n = 1, mu = , size = phi.est)
+  }
+}
