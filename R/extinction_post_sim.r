@@ -1,6 +1,5 @@
 library(rstan)
 library(plyr)
-stan(file = '../stan/survival_model.stan')
 RNGkind(kind = "L'Ecuyer-CMRG")
 seed <- 420
 nsim <- 1000

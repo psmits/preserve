@@ -25,14 +25,20 @@ parameters {
   real intercept;
 
   real group[C];
-  real<lower=0> sigma_group;
+  real<lower=0> sigma_group[C];
+
   real group_mu[F];
   real<lower=0> sigma_fauna;
+  
+  real<lower=0> sigma_faufau;
 
   real cohort[O];
-  real<lower=0> sigma_cohort;
+  real<lower=0> sigma_cohort[O];
+
   real cohort_mu[R];
   real<lower=0> sigma_regime;
+
+  real<lower=0> sigma_cohcoh;
 }
 model {
   alpha ~ cauchy(0, 2.5);  // let this vary by group (and by fauna)?
@@ -40,9 +46,10 @@ model {
 
   // class effect
   for(c in 1:C) {
-    group[c] ~ normal(group_mu[fauna[c]], sigma_group);
+    group[c] ~ normal(group_mu[fauna[c]], sigma_group[c]);
+    sigma_group[c] ~ lognormal(0, sigma_faufau);
   }
-  sigma_group ~ cauchy(0, 2.5);  // let this vary by group?
+  sigma_faufau ~ cauchy(0, 2.5);  // let this vary by group?
 
   for(f in 1:F) {
     group_mu[f] ~ normal(0, sigma_fauna);
@@ -51,9 +58,10 @@ model {
 
   // temporal effect
   for(o in 1:O) {
-    cohort[o] ~ normal(cohort_mu[regime[o]], sigma_cohort);
+    cohort[o] ~ normal(cohort_mu[regime[o]], sigma_cohort[o]);
+    sigma_cohort ~ lognormal(0, sigma_cohcoh);
   }
-  sigma_cohort ~ cauchy(0, 2.5);
+  sigma_cohcoh ~ cauchy(0, 2.5);
 
   for(r in 1:R) {
     cohort_mu[r] ~ normal(0, sigma_regime);
@@ -77,3 +85,4 @@ model {
 }
 generated quantities {
 }
+
