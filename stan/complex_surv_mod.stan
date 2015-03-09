@@ -26,7 +26,7 @@ parameters {
   real<lower=0> sigma_group;
 
   real cohort[O];
-  real<lower=0> sigma_cohort[O];
+  real<lower=0> sigma_cohort[R];
   
   real cohort_mu[R];
   real<lower=0> sigma_regime;
@@ -45,16 +45,15 @@ model {
 
   // temporal effect
   for(o in 1:O) {
-    cohort[o] ~ normal(cohort_mu[regime[o]], sigma_cohort[o]);
-    sigma_cohort[o] ~ lognormal(0, sigma_cohcoh);
+    cohort[o] ~ normal(cohort_mu[regime[o]], sigma_cohort[regime[o]]);
   }
-  sigma_cohcoh ~ cauchy(0, 2.5);
-
 
   for(r in 1:R) {
     cohort_mu[r] ~ normal(0, sigma_regime);
+    sigma_cohort[r] ~ lognormal(0, sigma_cohcoh);
   }
   sigma_regime ~ cauchy(0, 2.5);
+  sigma_cohcoh ~ cauchy(0, 2.5);
 
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {

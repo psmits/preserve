@@ -25,7 +25,7 @@ parameters {
   real intercept;
 
   real group[C];
-  real<lower=0> sigma_group[C];
+  real<lower=0> sigma_group[F];
 
   real group_mu[F];
   real<lower=0> sigma_fauna;
@@ -33,7 +33,7 @@ parameters {
   real<lower=0> sigma_faufau;
 
   real cohort[O];
-  real<lower=0> sigma_cohort[O];
+  real<lower=0> sigma_cohort[R];
 
   real cohort_mu[R];
   real<lower=0> sigma_regime;
@@ -46,27 +46,27 @@ model {
 
   // class effect
   for(c in 1:C) {
-    group[c] ~ normal(group_mu[fauna[c]], sigma_group[c]);
-    sigma_group[c] ~ lognormal(0, sigma_faufau);
+    group[c] ~ normal(group_mu[fauna[c]], sigma_group[fauna[c]]);
   }
-  sigma_faufau ~ cauchy(0, 2.5);  // let this vary by group?
 
   for(f in 1:F) {
     group_mu[f] ~ normal(0, sigma_fauna);
+    sigma_group[f] ~ lognormal(0, sigma_faufau);
   }
   sigma_fauna ~ cauchy(0, 2.5);
+  sigma_faufau ~ cauchy(0, 2.5); 
 
   // temporal effect
   for(o in 1:O) {
-    cohort[o] ~ normal(cohort_mu[regime[o]], sigma_cohort[o]);
-    sigma_cohort ~ lognormal(0, sigma_cohcoh);
+    cohort[o] ~ normal(cohort_mu[regime[o]], sigma_cohort[regime[o]]);
   }
-  sigma_cohcoh ~ cauchy(0, 2.5);
 
   for(r in 1:R) {
     cohort_mu[r] ~ normal(0, sigma_regime);
+    sigma_cohort[r] ~ lognormal(0, sigma_cohcoh);
   }
   sigma_regime ~ cauchy(0, 2.5);
+  sigma_cohcoh ~ cauchy(0, 2.5);
 
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {
