@@ -37,7 +37,6 @@ model {
     mu[g] ~ normal(mu_gen[order[g]], sigma_gen[order[g]]);
   }
   // each individual belongs to a genus. classes of genera have different means, 
-  // but assumed to have homogeneous variance.
 
   // individual
   phi ~ cauchy(0, 2.5);
@@ -45,4 +44,10 @@ model {
     count[i] ~ neg_binomial_2_log(mu[genus[i]] + log(off[i]), phi);
   }
 }
+generated quantities {
+  vector[N] log_lik;
 
+  for(i in 1:N) {
+    log_lik[i] <- neg_binomial_2_log_log(mu[genus[i]], phi);
+  }
+}

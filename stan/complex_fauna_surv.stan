@@ -4,6 +4,7 @@ data {
   int R;  // background regime
   int C;  // classes/group
   int F;  // sepkoski fauna
+  // all these are really shitty
   int N_unc;
   int N_cen;
   int samp_unc[N_unc];
@@ -21,24 +22,24 @@ data {
 transformed data {
 }
 parameters {
-  real<lower=0> alpha;
+  real<lower=0> alpha;  // allow to vary by fauna?
   real intercept;
 
   real group[C];
-  real<lower=0> sigma_group[F];
+  real<lower=0> sigma_group[F];  // each fauna gets its own variance
 
   real group_mu[F];
   real<lower=0> sigma_fauna;
   
-  real<lower=0> sigma_faufau;
+  real<lower=0> sigma_faufau;  // mean variance of fauna
 
   real cohort[O];
-  real<lower=0> sigma_cohort[R];
+  real<lower=0> sigma_cohort[R];  // each regime gets its own variance
 
   real cohort_mu[R];
   real<lower=0> sigma_regime;
 
-  real<lower=0> sigma_cohcoh;
+  real<lower=0> sigma_cohcoh;  // mean variance of regimes
 }
 model {
   alpha ~ cauchy(0, 2.5);  // let this vary by group (and by fauna)?
@@ -51,7 +52,9 @@ model {
 
   for(f in 1:F) {
     group_mu[f] ~ normal(0, sigma_fauna);
-    sigma_group[f] ~ lognormal(0, sigma_faufau);
+   
+    sigma_group[f] ~ lognormal(0, sigma_faufau);  
+    // equivalent to putting normal on exp(val)
   }
   sigma_fauna ~ cauchy(0, 2.5);
   sigma_faufau ~ cauchy(0, 2.5); 
@@ -85,4 +88,3 @@ model {
 }
 generated quantities {
 }
-
