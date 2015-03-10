@@ -1,0 +1,192 @@
+\documentclass[12pt,letterpaper]{article}
+
+\usepackage{amsmath, amsthm, amsfonts, amssymb}
+\usepackage{graphicx,hyperref}
+\usepackage{microtype, parskip}
+\usepackage[comma,sort&compress]{natbib}
+\usepackage{docmute}
+
+\frenchspacing
+
+\begin{document}
+\section{Methods}
+
+\subsection{Fossil occurrence information}
+Foote and Miller data.
+
+
+\subsection{Survival model}
+Define \(y\) as a vector of length \(n\) where the \(i\)th element is the duration in geologic stages of genus \(i\), where \(i = 1, \dots, n\).
+
+The simplest parametric suvival model is where species durations are assumed to be distributed exponentially with a single inverse-scale (``rate'') parameter \(\lambda\)
+\begin{equation}
+  \begin{aligned}
+    p(y | \lambda) &= \lambda \exp(-\lambda y) \nonumber \\
+    y_{i} &\sim \mathrm{Exponential}(\lambda).
+  \end{aligned}
+  \label{eq:exp}
+\end{equation}
+Given a parameteric model of survival, two key functions can be defined: survival \(S(t)\) and hazard \(h(t)\). \(S(t)\) corresponds to the probability that a species having existed for \(t\) will not have gone extinct while \(h(t)\) corresponds to the instantaneous extinction rate per unit age given taxon age \(t\) \citep{Klein2003}. For an exponential model, \(S(t)\) is defined
+\begin{equation}
+  S(t) = \exp(-\lambda t)
+  \label{eq:exp_surv}
+\end{equation}
+and \(h(t)\) is defined
+\begin{equation}
+  h(t) = \lambda
+  \label{eq:exp_haz}
+\end{equation}
+An exponential model of duration is the parameteric representation of \citet{VanValen1973} because the right side of Eq. \ref{eq:exp_haz} does not include any \(t\) terms.
+
+In order to allow species duration to vary with individual covariate information \(\lambda\) can be reparameterized as a regression \citep{Klein2003}. Given that \(\lambda\) is only defined for all non-negative reals, I use a log-link function. More specifically, this is written out as 
+\begin{equation}
+  \lambda = \exp(\beta).
+  \label{eq:lambda}
+\end{equation}
+\(\beta\) can then be expanded to included covariates of interest.
+
+We can relax assumption of the exponential model that extinction risk is independent of species age by instead assuming that species durations follow a Weibull distribution. The Weibull distribution has a shape parameter \(\alpha\) and a scale parameter \(\sigma\). Note that, by definition, \(\sigma = 1 / \lambda\). The Weibull distribution and sampling statement wre defined
+\begin{equation}
+  \begin{aligned}
+    p(y | \alpha, \sigma) &= \frac{\alpha}{\sigma} \left(\frac{y}{\sigma}\right)^{\alpha - 1} \exp\left(-\left(\frac{y}{\sigma}\right)^{\alpha}\right) \nonumber \\
+    y &\sim \mathrm{Weibull}(\alpha, \sigma).
+  \end{aligned}
+  \label{eq:weibull}
+\end{equation}
+The corresponding \(S(t)\) and \(h(t)\) functions are defined
+\begin{align}
+  S(t) &= \exp\left(-\left(\frac{t}{\sigma}\right)^{\alpha}\right) \label{eq:wei_surv} \\
+  h(t) &= \frac{\alpha}{\sigma}\left(\frac{t}{\sigma}\right)^{\alpha - 1} \label{eq:wei_haz}.
+\end{align}
+
+Similar to the exponential model, to allow for species duration to vary with individual covariate information \(\sigma\) can be reparameterized as a regression \citep{Klein2003} using a log-link function. \(\alpha\) can also be allowed to vary by, for example, hierarchical effects (see below), though it is normally assumed constant for all observations \citep{Klein2003}.
+
+\subsubsection{Hierarchical modeling}
+\uppercase{Explain the advantages of hierarchical modeling. The partial pooling effect and how this improves the estimation of low sample size groups.}
+
+\subsubsection{Temporal effects}
+
+By definition, a genus originates during a single geologic stage. Define an origination cohort, \(c_{j}\), as the set of all genera that origination during the same geologic stage \(j\) where \(j = 1, \dots, J\), \(J\) being the total number of origination cohorts \citep{Raup1978}. Origination cohort is modeled as a hierarchical effect where cohorts are considered exchangeable and drawn from a shared normal distribution. This is written as 
+\begin{equation}
+  c_{j} \sim \mathcal{N}(0, \sigma_{c})
+  \label{eq:cohort}
+\end{equation}
+where the scale parameter \(\sigma_{c}\) is estimated from the data. This term is incorporated in to Eq. \ref{eq:lambda} as follows
+\begin{equation}
+  \lambda = \exp(\beta + c_{j[i]})
+  \label{eq:lambda_cohort}
+\end{equation}
+
+This approach for handling temporal effects can be further expanded, allowing for more temporal structure to be included. For example, each geologic stage can be considered a member of a specific period of ``background extinction,'' or temporal range between two mass extinction events. Effectively, this means modeling the macroevolutionary regime membership of each cohort \citep{Jablonski1987}. Define regime \(r_{k}\) as the set of all origination cohorts within the temporal span between two mass extinctions \(k\) where \(k = 1, \dots, K\), \(K\) being the total number of regimes. Regime is then modeled as a hierarchical one ``level'' above origination cohort, and is also considered exchangeable and drawn from a shared normal distribution. Equation \ref{eq:cohort} is then expanded as follows
+\begin{equation}
+  \begin{aligned}
+    c_{j} &\sim \mathcal{N}(\mu_{k[j]}, \sigma_{c}) \\
+    \mu_{k} &\sim \mathcal{N}(0, \sigma_{\mu}).
+  \end{aligned}
+  \label{eq:cohort_regime}
+\end{equation}
+As above, both \(\sigma_{c}\) and \(\sigma_{\mu}\) are estimated from the data.
+
+The current formulation (Eq. \ref{eq:cohort_regime}) assumes that variance is homogeneous between regimes, or that each regime is considered to have equal variance. To allow for each \(\sigma_{c}\) to vary by regime, Eq. \ref{eq:cohort_regime} is further expanded as follows
+\begin{equation}
+  \begin{aligned}
+    c_{j} &\sim \mathcal{N}(\mu_{k[j]}, \sigma_{k[j]}) \\
+    \mu_{k} &\sim \mathcal{N}(0, \sigma_{\mu}) \\
+    \sigma_{k} &\sim \log\mathcal{N}(0, \varsigma_{\sigma}).
+  \end{aligned}
+  \label{eq:temporal_complex}
+\end{equation}
+Similar to both previous states, now \(\sigma_{\mu}\) and \(\varsigma_{\sigma}\) are estimated from the data.
+
+
+\subsubsection{Taxonomic effects}
+
+By definition, each genus belongs to a single higher-level taxonomic grouping. Define a higher-level taxonomic grouping \(l_{g}\) as the set of all genera belonging to a shared Linnean classification of approximately class level where \(g = 1, \dots, G\), \(G\) being the total number of observed groupings. I model taxonomic groupings as a hierarchical effect where groups are conspired exchangeable and drawn from a shared normal distribution. I consider this approach appropriate because there is no comprehensive phylogenetic hypothesis including all genera from major marine groups across the entire Phanerozoic. In cases where there is a more detailed phylogenetic hypothesis, it would be possible to model phylogenetic effect as an individual hierarchical effect modeled as a multivariate normal distribution with covariance matrix known up to a constant \citep{Lynch1991,Housworth2004}.
+
+Given the above assumptions, \(l\) is modeled as
+\begin{equation}
+  l_{g} \sim \mathcal{N}(0, \sigma_{l})
+  \label{eq:taxon}
+\end{equation}
+where \(\sigma_{l}\) is estimated from the data. Just as with temporal effect, this term is incorporated into Eq. \ref{eq:lambda} as
+\begin{equation}
+  \lambda = \exp(\beta + l_{g[i]}).
+  \label{eq:lambda_taxon}
+\end{equation}
+Incorporating both temporal and taxonomic effects into Eq. \ref{eq:lambda} as simply
+\begin{equation}
+  \lambda = \exp(\beta + c_{j[i]} + l_{g[i]}).
+  \label{eq:lambda_full}
+\end{equation}
+
+It is possible to increase the complexity of Eq \ref{eq:taxon} by including increasingly more taxonomic levels both above and below the class level. However, I chose to not do this as it adds what is probably an unnecessary amount of complexity and makes interpretation of results extremely difficult.
+
+What is of interest, however, are Sepkoski's three fauna \citep{SepkoskiJr.1981a} which divide select higher-level classifications into Cambrian, Paleozoic, and Modern fauna (Table \ref{tab:sepkoski}). In many ways these fauna for the empirical basis of Sepkoski's kinetic model of Phanerozoic diversity \citep{Sepkoski1978,Sepkoski1979,Sepkoski1984}, with each fauna being replaced or out-competed by the subsequent fauna. % move to intro as this is just background information
+
+To model taxonomic groups as samples from a fauna, first I define a fauna \(f_{h}\) as the set of all taxonomic groups assigned by \citet{SepkoskiJr.1981a} where \(h = 1, \dots, H\), \(H\) bing the number of fauna (3). Fauna are considered exchangeable and drawn from a shared normal distribution. Eq. \ref{eq:taxon} is then rewritten as
+\begin{equation}
+  \begin{aligned}
+    l_{g} &\sim \mathcal{N}(\omega_{h[g]}, \sigma_{l})\\
+    \omega_{h} &\sim \mathcal{N}(0, \sigma_{\omega})
+  \end{aligned}
+  \label{eq:taxon_fauna}
+\end{equation}
+where both \(\sigma_{l}\) and \(\sigma_{\omega}\) are estimated from the data.
+
+Just as with an earlier model of temporal effect (Eq. \ref{eq:cohort_regime}), the current model of taxonomic effect assumes equal variance between fauna (Eq. \ref{eq:taxon_fauna}). To relax that assumption, I allow \(\sigma_{l}\) to vary by fauna. Eq. \ref{eq:taxon_fauna} is then rewritten as
+\begin{equation}
+  \begin{aligned}
+    l_{g} &\sim \mathcal{N}(\omega_{h[g]}, \sigma_{h[g]})\\
+    \omega_{h} &\sim \mathcal{N}(0, \sigma_{\omega}) \\
+    \sigma_{h} &\sim \log\mathcal{N}(0, \phi_{\sigma})
+  \end{aligned}
+  \label{eq:taxon_complex}
+\end{equation}
+where \(\sigma_{\omega}\) and \(\phi_{\sigma}\) are estimated from the data.
+
+
+\subsubsection{Priors}
+Given the Bayesian framework used here, what remains is the important step of assigning priors probability statements to all estimated parameters. While many of the (hyper)parameters have already been given (hyper)priors, there currently remain a few improper priors.
+
+The intercept term \(\beta\) is given a weakly informative prior \(\beta \sim \mathcal{N}(0, 10)\) reflecting that while little information is directly known, the value is most likely not extremely large or small.
+
+The prior terms for the various scale parameters of the hierarchical effects (Eq. \ref{eq:temporal_complex} and \ref{eq:taxon_complex}) I use a weakly informative half-Cauchy (C\(^{+}\)) distribution in order to better constrain all parameter estimates \citep{Gelman2013d}. This is especially appropriate in the case of of Eq. \ref{eq:taxon_complex} as there are only three factors at the fauna level. 
+\begin{equation}
+  \begin{aligned}
+    \sigma_{\mu} &\sim \mathrm{C}^{+}(2.5) \\
+    \varsigma_{\sigma} &\sim \mathrm{C}^{+}(2.5) \\
+    \sigma_{\omega} &\sim \mathrm{C}^{+}(2.5) \\
+    \phi_{\sigma} &\sim \mathrm{C}^{+}(2.5)
+  \end{aligned}
+  \label{eq:scale_priors}
+\end{equation}
+The half-Cauchy distribution is equivalent to a folded \textit{t}-distribution with 1 degree-of-freedom \citep{Gelman2013d}.
+
+Finally, the Weibull shape parameter \(\alpha\) is also given a weakly informative half-Cauchy prior \(\alpha \sim \mathrm{C}^{+}(2.5)\). 
+% Maybe this is the time to include the very strong Van Valen prior on \alpha?
+
+\subsection{Parameter estimation}
+
+
+%\subsection{Model selection} WAIC
+
+\subsection{Posterior predictive checks}
+
+
+\begin{table}
+  \centering
+  \begin{tabular}{r | p{0.75\textwidth}}
+    \hline
+    Fauna & Taxa \\
+    \hline
+    \hline
+    Cambrian & Trilobita, Polychaeta, Monoplacophora (Tergomya), Inarticulata (Lingulata)\\[0.1cm]
+    Paleozoic & Articulata (Rhynchonellata), Crinodea, Ostracoda, Cephalopoda, Anthozoa, Stenolaemata (Cyclocystoidea), Stelleroidea (Asteroidea, Ophiuridea) \\[0.1cm]
+    Modern & Gastropoda, Bivalvia, Osteichthyes, Malacostraca, Echinoidea, Gymnolaemata, Demospongea, Chondrichthyes \\
+    \hline
+  \end{tabular}
+  \caption{Sepkoski's three evolutionary fauna. In parentheses are the taxonomic names used in this study when there was a conflict between Sepkoski's designations and mine.}
+  \label{tab:sepkoski}
+\end{table}
+
+\end{document}

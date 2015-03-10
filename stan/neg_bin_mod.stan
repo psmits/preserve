@@ -42,9 +42,9 @@ model {
   }
 }
 generated quantities {
-  vector[N] log_lik;
+  vector[C] log_lik;
 
-  for(i in 1:N) {
-    log_lik[i] <- neg_binomial_2_log_log(mu[genus[i]], phi);
+  for(i in 1:C) {
+    log_lik[i] <- neg_binomial_2_log_log(count[i], mu[genus[i]], phi);
   }
 }

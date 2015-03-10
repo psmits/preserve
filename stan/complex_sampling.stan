@@ -28,7 +28,7 @@ model {
   sigma_gengen ~ cauchy(0, 2.5);
   for(o in 1:O) {
     mu_gen[o] ~ normal(mu_ord, sigma_ord);
-    sigma_gen[o] ~ lognormal(0, sigma_gengen)
+    sigma_gen[o] ~ lognormal(0, sigma_gengen);
   }
   
   // genera
@@ -45,9 +45,9 @@ model {
   }
 }
 generated quantities {
-  vector[N] log_lik;
+  vector[C] log_lik;
 
-  for(i in 1:N) {
-    log_lik[i] <- neg_binomial_2_log_log(mu[genus[i]], phi);
+  for(i in 1:C) {
+    log_lik[i] <- neg_binomial_2_log_log(count[i], mu[genus[i]], phi);
   }
 }
