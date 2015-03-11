@@ -12,13 +12,14 @@
 \section{Methods}
 
 \subsection{Fossil occurrence information}
-Foote and Miller data.
+I analyzed the exact data set used by \citet{Foote2013} in their analysis of the early survival of marine genera. This data set is a highly pruned and vetted set of all occurrences of important marine groups for the entire Phanerozoic as sampled in the Paleobiology Database (http://www.paleodb.org).
 
+I analyzed a subset of the \citet{Foote2013} data set of only genera belonging to one of the three Sepkoski Fauna (Table \ref{tab:sepkoski}).
 
 \subsection{Survival model}
 Define \(y\) as a vector of length \(n\) where the \(i\)th element is the duration in geologic stages of genus \(i\), where \(i = 1, \dots, n\).
 
-The simplest parametric suvival model is where species durations are assumed to be distributed exponentially with a single inverse-scale (``rate'') parameter \(\lambda\)
+The simplest parametric survival model is where species durations are assumed to be distributed exponentially with a single inverse-scale (``rate'') parameter \(\lambda\)
 \begin{equation}
   \begin{aligned}
     p(y | \lambda) &= \lambda \exp(-\lambda y) \nonumber \\
@@ -45,21 +46,6 @@ In order to allow species duration to vary with individual covariate information
 \end{equation}
 \(\beta\) can then be expanded to included covariates of interest.
 
-We can relax assumption of the exponential model that extinction risk is independent of species age by instead assuming that species durations follow a Weibull distribution. The Weibull distribution has a shape parameter \(\alpha\) and a scale parameter \(\sigma\). Note that, by definition, \(\sigma = 1 / \lambda\). The Weibull distribution and sampling statement wre defined
-\begin{equation}
-  \begin{aligned}
-    p(y | \alpha, \sigma) &= \frac{\alpha}{\sigma} \left(\frac{y}{\sigma}\right)^{\alpha - 1} \exp\left(-\left(\frac{y}{\sigma}\right)^{\alpha}\right) \nonumber \\
-    y &\sim \mathrm{Weibull}(\alpha, \sigma).
-  \end{aligned}
-  \label{eq:weibull}
-\end{equation}
-The corresponding \(S(t)\) and \(h(t)\) functions are defined
-\begin{align}
-  S(t) &= \exp\left(-\left(\frac{t}{\sigma}\right)^{\alpha}\right) \label{eq:wei_surv} \\
-  h(t) &= \frac{\alpha}{\sigma}\left(\frac{t}{\sigma}\right)^{\alpha - 1} \label{eq:wei_haz}.
-\end{align}
-
-Similar to the exponential model, to allow for species duration to vary with individual covariate information \(\sigma\) can be reparameterized as a regression \citep{Klein2003} using a log-link function. \(\alpha\) can also be allowed to vary by, for example, hierarchical effects (see below), though it is normally assumed constant for all observations \citep{Klein2003}.
 
 \subsubsection{Hierarchical modeling}
 \uppercase{Explain the advantages of hierarchical modeling. The partial pooling effect and how this improves the estimation of low sample size groups.}
@@ -73,11 +59,11 @@ By definition, a genus originates during a single geologic stage. Define an orig
 \end{equation}
 where the scale parameter \(\sigma_{c}\) is estimated from the data. This term is incorporated in to Eq. \ref{eq:lambda} as follows
 \begin{equation}
-  \lambda = \exp(\beta + c_{j[i]})
+  \lambda_{i} = \exp(\beta + c_{j[i]})
   \label{eq:lambda_cohort}
 \end{equation}
 
-This approach for handling temporal effects can be further expanded, allowing for more temporal structure to be included. For example, each geologic stage can be considered a member of a specific period of ``background extinction,'' or temporal range between two mass extinction events. Effectively, this means modeling the macroevolutionary regime membership of each cohort \citep{Jablonski1987}. Define regime \(r_{k}\) as the set of all origination cohorts within the temporal span between two mass extinctions \(k\) where \(k = 1, \dots, K\), \(K\) being the total number of regimes. Regime is then modeled as a hierarchical one ``level'' above origination cohort, and is also considered exchangeable and drawn from a shared normal distribution. Equation \ref{eq:cohort} is then expanded as follows
+This approach for handling temporal effects can be further expanded, allowing for more temporal structure to be included. For example, each geologic stage can be considered a member of a specific period of ``background extinction,'' or temporal range between two mass extinction events. Effectively, this means modeling the macroevolutionary regime membership of each cohort \citep{Jablonski1987}. Define regime \(r_{k}\) as the set of all origination cohorts within the temporal span between two mass extinctions \(k\) where \(k = 1, \dots, K\), \(K\) being the total number of regimes. Regime is then modeled as a hierarchical one ``level'' above origination cohort, and is also considered exchangeable and drawn from a shared normal distribution. Eq. \ref{eq:cohort} is then expanded as follows
 \begin{equation}
   \begin{aligned}
     c_{j} &\sim \mathcal{N}(\mu_{k[j]}, \sigma_{c}) \\
@@ -91,8 +77,8 @@ The current formulation (Eq. \ref{eq:cohort_regime}) assumes that variance is ho
 \begin{equation}
   \begin{aligned}
     c_{j} &\sim \mathcal{N}(\mu_{k[j]}, \sigma_{k[j]}) \\
-    \mu_{k} &\sim \mathcal{N}(0, \sigma_{\mu}) \\
-    \sigma_{k} &\sim \log\mathcal{N}(0, \varsigma_{\sigma}).
+    \mu_{k} &\sim \mathcal{N}(0, \exp(\sigma_{\mu})) \\
+    \sigma_{k} &\sim \mathcal{N}(0, \varsigma_{\sigma}).
   \end{aligned}
   \label{eq:temporal_complex}
 \end{equation}
@@ -110,16 +96,16 @@ Given the above assumptions, \(l\) is modeled as
 \end{equation}
 where \(\sigma_{l}\) is estimated from the data. Just as with temporal effect, this term is incorporated into Eq. \ref{eq:lambda} as
 \begin{equation}
-  \lambda = \exp(\beta + l_{g[i]}).
+  \lambda_{i} = \exp(\beta + l_{g[i]}).
   \label{eq:lambda_taxon}
 \end{equation}
-Incorporating both temporal and taxonomic effects into Eq. \ref{eq:lambda} as simply
+Incorporating both temporal and taxonomic effects into Eq. \ref{eq:lambda} is simply
 \begin{equation}
-  \lambda = \exp(\beta + c_{j[i]} + l_{g[i]}).
+  \lambda_{i} = \exp(\beta + c_{j[i]} + l_{g[i]}).
   \label{eq:lambda_full}
 \end{equation}
 
-It is possible to increase the complexity of Eq \ref{eq:taxon} by including increasingly more taxonomic levels both above and below the class level. However, I chose to not do this as it adds what is probably an unnecessary amount of complexity and makes interpretation of results extremely difficult.
+It is possible to increase the complexity of Eq. \ref{eq:taxon} by including increasingly more taxonomic levels both above and below the class level. However, I chose to not do this as it adds what is probably an unnecessary amount of complexity and makes interpretation of results extremely difficult.
 
 What is of interest, however, are Sepkoski's three fauna \citep{SepkoskiJr.1981a} which divide select higher-level classifications into Cambrian, Paleozoic, and Modern fauna (Table \ref{tab:sepkoski}). In many ways these fauna for the empirical basis of Sepkoski's kinetic model of Phanerozoic diversity \citep{Sepkoski1978,Sepkoski1979,Sepkoski1984}, with each fauna being replaced or out-competed by the subsequent fauna. % move to intro as this is just background information
 
@@ -137,20 +123,40 @@ Just as with an earlier model of temporal effect (Eq. \ref{eq:cohort_regime}), t
 \begin{equation}
   \begin{aligned}
     l_{g} &\sim \mathcal{N}(\omega_{h[g]}, \sigma_{h[g]})\\
-    \omega_{h} &\sim \mathcal{N}(0, \sigma_{\omega}) \\
-    \sigma_{h} &\sim \log\mathcal{N}(0, \phi_{\sigma})
+    \omega_{h} &\sim \mathcal{N}(0, \exp(\sigma_{\omega})) \\
+    \sigma_{h} &\sim \mathcal{N}(0, \phi_{\sigma})
   \end{aligned}
   \label{eq:taxon_complex}
 \end{equation}
 where \(\sigma_{\omega}\) and \(\phi_{\sigma}\) are estimated from the data.
 
+We can relax assumption of the exponential model that extinction risk is independent of species age by instead assuming that species durations follow a Weibull distribution. The Weibull distribution has a shape parameter \(\alpha\) and a scale parameter \(\sigma\). Note that, by definition, \(\sigma = 1 / \lambda\). The Weibull distribution and sampling statement are defined
+\begin{equation}
+  \begin{aligned}
+    p(y | \alpha, \sigma) &= \frac{\alpha}{\sigma} \left(\frac{y}{\sigma}\right)^{\alpha - 1} \exp\left(-\left(\frac{y}{\sigma}\right)^{\alpha}\right) \\
+    y &\sim \mathrm{Weibull}(\alpha, \sigma).
+  \end{aligned}
+  \label{eq:weibull}
+\end{equation}
+The corresponding \(S(t)\) and \(h(t)\) functions are defined
+\begin{align}
+  S(t) &= \exp\left(-\left(\frac{t}{\sigma}\right)^{\alpha}\right) \label{eq:wei_surv} \\
+  h(t) &= \frac{\alpha}{\sigma}\left(\frac{t}{\sigma}\right)^{\alpha - 1} \label{eq:wei_haz}.
+\end{align}
 
-\subsubsection{Priors}
+Similar to the exponential model, to allow for species duration to vary with individual covariate information \(\sigma\) can be reparameterized as a regression \citep{Klein2003} using a log-link function. This reparameterization takes a different form than for the exponential (Eq. \ref{eq:lambda} and \ref{eq:lambda_full}) and, incorporating temporal and taxonomic effects, is written
+\begin{equation}
+  \sigma = \exp\left(\frac{-(\beta + c_{j[i]} + l_{g[i]})}{\alpha}\right).
+  \label{eq:sigma_full}
+\end{equation}
+Incidentally, this is the formulation for an accelerated time failure model \citep{Klein2003}. \(\alpha\) can also be allowed to vary by, for example, hierarchical effects though it is normally assumed constant for all observations \citep{Klein2003}.
+
+
 Given the Bayesian framework used here, what remains is the important step of assigning priors probability statements to all estimated parameters. While many of the (hyper)parameters have already been given (hyper)priors, there currently remain a few improper priors.
 
-The intercept term \(\beta\) is given a weakly informative prior \(\beta \sim \mathcal{N}(0, 10)\) reflecting that while little information is directly known, the value is most likely not extremely large or small.
+The intercept term \(\beta\) is given a weakly informative prior, \(\beta \sim \mathcal{N}(0, 10)\), reflecting that while little information is directly known, the value is most likely not extremely large or small.
 
-The prior terms for the various scale parameters of the hierarchical effects (Eq. \ref{eq:temporal_complex} and \ref{eq:taxon_complex}) I use a weakly informative half-Cauchy (C\(^{+}\)) distribution in order to better constrain all parameter estimates \citep{Gelman2013d}. This is especially appropriate in the case of of Eq. \ref{eq:taxon_complex} as there are only three factors at the fauna level. 
+The prior terms for the various scale parameters of the hierarchical effects (Eq. \ref{eq:temporal_complex} and \ref{eq:taxon_complex}) I use a weakly informative, regularizing half-Cauchy (C\(^{+}\)) prior distribution in order to better constrain all parameter estimates \citep{Gelman2013d}. This is especially appropriate in the case of Eq. \ref{eq:taxon_complex} as there are only three factors at the fauna level. 
 \begin{equation}
   \begin{aligned}
     \sigma_{\mu} &\sim \mathrm{C}^{+}(2.5) \\
@@ -162,20 +168,38 @@ The prior terms for the various scale parameters of the hierarchical effects (Eq
 \end{equation}
 The half-Cauchy distribution is equivalent to a folded \textit{t}-distribution with 1 degree-of-freedom \citep{Gelman2013d}.
 
-Finally, the Weibull shape parameter \(\alpha\) is also given a weakly informative half-Cauchy prior \(\alpha \sim \mathrm{C}^{+}(2.5)\). 
+Finally, the Weibull shape parameter \(\alpha\) is also given a weakly informative half-Cauchy prior, \(\alpha \sim \mathrm{C}^{+}(2.5)\). 
 % Maybe this is the time to include the very strong Van Valen prior on \alpha?
 
-\subsection{Parameter estimation}
+\subsection{Censored observations}
+A key aspect of survival analysis is the inclusion of censored, or incompletely observed, data points \citep{Ibrahim2001,Klein2003}. The two classes of censored observations encountered in this study were right and left censored observations. Right censoring is when a species does not go extinct during the window of observation, or species that are still extant. Left censored observations are those species that it is only known when a species was extinct by. To put another way, this is a species that went extinct but the observed duration is an over estimate of the actual duration. 
 
+In the context of this study, I considered all genera that had a duration of only one geologic stage to be left censored as we do not have a finer degree of resolution. Conceptually, this is similar to if I was studying, say, survival patterns in rats and an individual had died between the start of the experiment and next time the rats were observed. We know the rat lived no more than day.
+
+The key function for modeling censored observations is \(S(t)\) (Eq. \ref{eq:exp_surv} and \ref{eq:wei_surv}). \(S(t)\) is equivalent to the complementary cumulative distribution function, \(1 - F(t)\) \citep{Klein2003}. For right censored observations, instead of calculating the likelihood as normal (Eq. \ref{eq:exp} or \ref{eq:weibull}) the likelihood of an observation is evaluated using \(S(t)\). Conceptually, this approach calculates the likelihood of observing a species that existed for at least that long. For left censored data, instead the likelihood is calculated using \(1 - S(t)\) which corresponds to the likelihood of observing a species that existed no longer than \(t\).
+
+The full likelihood statements incorporating fully observed, right censored, and left censored observations are then
+\begin{equation}
+  \begin{aligned}
+    \mathcal{L} &\propto \prod_{i \in C} \mathrm{Exponential}(y_{i} | \lambda) \prod_{j \in R} S(y_{j} | \lambda) \prod_{k \in L} \left(1 - S(y_{k} | \lambda)\right) \\
+    \mathcal{L} &\propto \prod_{i \in C} \mathrm{Weibull}(y_{i} | \alpha, \sigma) \prod_{j \in R} S(y_{j} | \alpha, \sigma) \prod_{k \in L} \left(1 - S(y_{k} | \alpha, \sigma)\right)
+  \end{aligned}
+  \label{eq:censored_likelihood}
+\end{equation}
+where \(C\) is the set of all fully observed species, \(R\) the set of all right censored species, and \(L\) the set of all left-censored species.
+
+
+\subsection{Parameter estimation}
+Given the above likelihood and prior statements, the posterior probabilities of all parameters was approximated using a Markov-chain Monte Carlo routine using a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{stan-software:2014}. The marginal posterior estimates were approximated from four parallel chains run for XXX draws split half warm-up and half sampling thinned to every XXX sample for a total of XXX samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1, or less than or equal to 1.1, indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
 %\subsection{Model selection} WAIC
 
-\subsection{Posterior predictive checks}
+%\subsection{Posterior predictive checks}
 
 
 \begin{table}
   \centering
-  \begin{tabular}{r | p{0.75\textwidth}}
+  \begin{tabular}{l | p{0.75\textwidth}}
     \hline
     Fauna & Taxa \\
     \hline

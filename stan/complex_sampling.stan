@@ -27,8 +27,8 @@ model {
   sigma_ord ~ cauchy(0, 2.5);
   sigma_gengen ~ cauchy(0, 2.5);
   for(o in 1:O) {
-    mu_gen[o] ~ normal(mu_ord, sigma_ord);
-    sigma_gen[o] ~ lognormal(0, sigma_gengen);
+    mu_gen[o] ~ normal(mu_ord, exp(sigma_ord));
+    sigma_gen[o] ~ normal(0, sigma_gengen);
   }
   
   // genera

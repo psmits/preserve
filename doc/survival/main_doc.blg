@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: main_doc.aux
+The style file: abbrvnat.bst
+Database file #1: biblio.bib
+Warning--I didn't find a database entry for "stan-software:2014"
+You've used 14 entries,
+            2773 wiz_defined-function locations,
+            698 strings with 6662 characters,
+and the built_in function-call counts, 5964 in all, are:
+= -- 557
+> -- 260
+< -- 11
++ -- 92
+- -- 78
+* -- 476
+:= -- 931
+add.period$ -- 49
+call.type$ -- 14
+change.case$ -- 67
+chr.to.int$ -- 14
+cite$ -- 28
+duplicate$ -- 283
+empty$ -- 532
+format.name$ -- 98
+if$ -- 1235
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 17
+newline$ -- 85
+num.names$ -- 56
+pop$ -- 119
+preamble$ -- 1
+purify$ -- 54
+quote$ -- 0
+skip$ -- 196
+stack$ -- 0
+substring$ -- 285
+swap$ -- 16
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 139
+warning$ -- 0
+while$ -- 64
+width$ -- 0
+write$ -- 205
+(There was 1 warning)

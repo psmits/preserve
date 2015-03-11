@@ -5,8 +5,8 @@ library(parallel)
 source('../R/mung.r')
 
 # sub sample to test model
-#library(caret)
-#age.data <- age.data[createDataPartition(age.data$orig, p = 0.25)[[1]], ]
+library(caret)
+sepkoski.data <- sepkoski.data[createDataPartition(sepkoski.data$fauna, p = 0.25)[[1]], ]
 
 # age.data
 # sepkoski.data
@@ -88,13 +88,13 @@ cen <- llply(data, function(x) x[!dead])
 
 data <- list(dur_unc = unc$duration,
              group_unc = unc$group,
-             fauna_unc <- unc$fauna,
+             fauna_unc = unc$fauna,
              cohort_unc = unc$cohort,
              regime_unc = unc$regime,
              N_unc = length(unc$duration),
              dur_cen = cen$duration,
              group_cen = cen$group,
-             fauna_cen <- cen$fauna,
+             fauna_cen = cen$fauna,
              cohort_cen = cen$cohort,
              regime_cen = cen$regime,
              N_cen = length(cen$duration))
@@ -120,3 +120,5 @@ with(data, {stan_rdump(list = c('dur_unc', 'group_unc', 'cohort_unc',
                                 'samp_cen', 'N', 'O', 'R', 'C', 'F',
                                 'fauna', 'regime'),
                        file = '../data/data_dump/fauna_info.data.R')})
+
+fit <- stan(file = '../stan/complex_fauna_surv.stan', data = data)

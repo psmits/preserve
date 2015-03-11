@@ -51,9 +51,9 @@ model {
   }
 
   for(f in 1:F) {
-    group_mu[f] ~ normal(0, sigma_fauna);
+    group_mu[f] ~ normal(0, exp(sigma_fauna));
    
-    sigma_group[f] ~ lognormal(0, sigma_faufau);  
+    sigma_group[f] ~ normal(0, sigma_faufau);  
     // equivalent to putting normal on exp(val)
   }
   sigma_fauna ~ cauchy(0, 2.5);
@@ -65,8 +65,8 @@ model {
   }
 
   for(r in 1:R) {
-    cohort_mu[r] ~ normal(0, sigma_regime);
-    sigma_cohort[r] ~ lognormal(0, sigma_cohcoh);
+    cohort_mu[r] ~ normal(0, exp(sigma_regime));
+    sigma_cohort[r] ~ normal(0, sigma_cohcoh);
   }
   sigma_regime ~ cauchy(0, 2.5);
   sigma_cohcoh ~ cauchy(0, 2.5);
