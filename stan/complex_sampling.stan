@@ -27,14 +27,14 @@ model {
   sigma_ord ~ cauchy(0, 2.5);
   sigma_gengen ~ cauchy(0, 2.5);
   for(o in 1:O) {
-    mu_gen[o] ~ normal(mu_ord, exp(sigma_ord));
+    mu_gen[o] ~ normal(mu_ord, sigma_ord);
     sigma_gen[o] ~ normal(0, sigma_gengen);
   }
   
   // genera
   sigma_gen ~ cauchy(0, 2.5);
   for(g in 1:G) {
-    mu[g] ~ normal(mu_gen[order[g]], sigma_gen[order[g]]);
+    mu[g] ~ normal(mu_gen[order[g]], exp(sigma_gen[order[g]]));
   }
   // each individual belongs to a genus. classes of genera have different means, 
 

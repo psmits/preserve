@@ -47,11 +47,11 @@ model {
 
   // class effect
   for(c in 1:C) {
-    group[c] ~ normal(group_mu[fauna[c]], sigma_group[fauna[c]]);
+    group[c] ~ normal(group_mu[fauna[c]], exp(sigma_group[fauna[c]]));
   }
 
   for(f in 1:F) {
-    group_mu[f] ~ normal(0, exp(sigma_fauna));
+    group_mu[f] ~ normal(0, sigma_fauna);
    
     sigma_group[f] ~ normal(0, sigma_faufau);  
     // equivalent to putting normal on exp(val)
@@ -61,11 +61,11 @@ model {
 
   // temporal effect
   for(o in 1:O) {
-    cohort[o] ~ normal(cohort_mu[regime[o]], sigma_cohort[regime[o]]);
+    cohort[o] ~ normal(cohort_mu[regime[o]], exp(sigma_cohort[regime[o]]));
   }
 
   for(r in 1:R) {
-    cohort_mu[r] ~ normal(0, exp(sigma_regime));
+    cohort_mu[r] ~ normal(0, sigma_regime);
     sigma_cohort[r] ~ normal(0, sigma_cohcoh);
   }
   sigma_regime ~ cauchy(0, 2.5);

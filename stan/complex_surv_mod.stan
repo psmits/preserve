@@ -45,12 +45,12 @@ model {
 
   // temporal effect
   for(o in 1:O) {
-    cohort[o] ~ normal(cohort_mu[regime[o]], sigma_cohort[regime[o]]);
+    cohort[o] ~ normal(cohort_mu[regime[o]], exp(sigma_cohort[regime[o]]));
   }
 
   for(r in 1:R) {
     cohort_mu[r] ~ normal(0, sigma_regime);
-    sigma_cohort[r] ~ lognormal(0, sigma_cohcoh);
+    sigma_cohort[r] ~ normal(0, sigma_cohcoh);
   }
   sigma_regime ~ cauchy(0, 2.5);
   sigma_cohcoh ~ cauchy(0, 2.5);
