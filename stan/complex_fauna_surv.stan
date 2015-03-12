@@ -26,19 +26,21 @@ parameters {
   real intercept;
 
   real group[C];
-  real<lower=0> sigma_group[F];  // each fauna gets its own variance
+  real sigma_group[F];  // each fauna gets its own exp(variance)
 
   real group_mu[F];
   real<lower=0> sigma_fauna;
   
+  real gro_var_med;
   real<lower=0> sigma_faufau;  // mean variance of fauna
 
   real cohort[O];
-  real<lower=0> sigma_cohort[R];  // each regime gets its own variance
+  real sigma_cohort[R];  // each regime gets its own exp(variance)
 
   real cohort_mu[R];
   real<lower=0> sigma_regime;
 
+  real coh_var_med;
   real<lower=0> sigma_cohcoh;  // mean variance of regimes
 }
 model {
@@ -53,9 +55,10 @@ model {
   for(f in 1:F) {
     group_mu[f] ~ normal(0, sigma_fauna);
    
-    sigma_group[f] ~ normal(0, sigma_faufau);  
+    sigma_group[f] ~ normal(gro_var_med, sigma_faufau);  
     // equivalent to putting normal on exp(val)
   }
+  gro_var_med ~ normal(0, 10);
   sigma_fauna ~ cauchy(0, 2.5);
   sigma_faufau ~ cauchy(0, 2.5); 
 
@@ -66,8 +69,9 @@ model {
 
   for(r in 1:R) {
     cohort_mu[r] ~ normal(0, sigma_regime);
-    sigma_cohort[r] ~ normal(0, sigma_cohcoh);
+    sigma_cohort[r] ~ normal(coh_var_med, sigma_cohcoh);
   }
+  coh_var_med ~ normal(0, 10);
   sigma_regime ~ cauchy(0, 2.5);
   sigma_cohcoh ~ cauchy(0, 2.5);
 

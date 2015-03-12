@@ -26,11 +26,12 @@ parameters {
   real<lower=0> sigma_group;
 
   real cohort[O];
-  real<lower=0> sigma_cohort[R];
+  real sigma_cohort[R];
   
   real cohort_mu[R];
   real<lower=0> sigma_regime;
 
+  real coh_var_med;
   real<lower=0> sigma_cohcoh;
 }
 model {
@@ -50,8 +51,9 @@ model {
 
   for(r in 1:R) {
     cohort_mu[r] ~ normal(0, sigma_regime);
-    sigma_cohort[r] ~ normal(0, sigma_cohcoh);
+    sigma_cohort[r] ~ normal(coh_var_med, sigma_cohcoh);
   }
+  coh_var_med ~ normal(0, 10);
   sigma_regime ~ cauchy(0, 2.5);
   sigma_cohcoh ~ cauchy(0, 2.5);
 

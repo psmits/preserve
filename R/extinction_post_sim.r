@@ -36,6 +36,9 @@ for(ii in 1:nsim) {
 }
 
 duration <- c(data$dur_unc, data$dur_cen)
+#par(mfrow = c(5, 4), mar = c(4, 4, 2, 2))
+#hist(duration, xlab = '', main = 'y')
+#for(s in 1:19) hist(ph[[s]], xlab = '', main = paste('y_rep', s))
 tstat.mean <- sum(laply(ph, mean) > mean(duration))
 tstat.med <- sum(laply(ph, median) > median(duration))
 tstat.75 <- sum(laply(ph, function(x) quantile(x, .75)) > quantile(duration, .75))

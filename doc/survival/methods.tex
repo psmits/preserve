@@ -77,12 +77,12 @@ The current formulation (Eq. \ref{eq:cohort_regime}) assumes that variance is ho
 \begin{equation}
   \begin{aligned}
     c_{j} &\sim \mathcal{N}(\mu_{k[j]}, \sigma_{k[j]}) \\
-    \mu_{k} &\sim \mathcal{N}(0, \exp(\sigma_{\mu})) \\
-    \sigma_{k} &\sim \mathcal{N}(0, \varsigma_{\sigma}).
+    \mu_{k} &\sim \mathcal{N}(0, \sigma_{\mu}) \\
+    \exp(\sigma_{k}) &\sim \mathcal{N}(\psi, \varsigma).
   \end{aligned}
   \label{eq:temporal_complex}
 \end{equation}
-Similar to both previous states, now \(\sigma_{\mu}\) and \(\varsigma_{\sigma}\) are estimated from the data.
+Similar to both previous states \(\psi\), \(\sigma_{\mu}\) and \(\varsigma\) are estimated from the data.
 
 
 \subsubsection{Taxonomic effects}
@@ -123,12 +123,12 @@ Just as with an earlier model of temporal effect (Eq. \ref{eq:cohort_regime}), t
 \begin{equation}
   \begin{aligned}
     l_{g} &\sim \mathcal{N}(\omega_{h[g]}, \sigma_{h[g]})\\
-    \omega_{h} &\sim \mathcal{N}(0, \exp(\sigma_{\omega})) \\
-    \sigma_{h} &\sim \mathcal{N}(0, \phi_{\sigma})
+    \omega_{h} &\sim \mathcal{N}(0, \sigma_{\omega}) \\
+    \exp(\sigma_{h}) &\sim \mathcal{N}(\pi, \phi)
   \end{aligned}
   \label{eq:taxon_complex}
 \end{equation}
-where \(\sigma_{\omega}\) and \(\phi_{\sigma}\) are estimated from the data.
+where \(\pi\), \(\sigma_{\omega}\) and \(\phi\) are estimated from the data.
 
 We can relax assumption of the exponential model that extinction risk is independent of species age by instead assuming that species durations follow a Weibull distribution. The Weibull distribution has a shape parameter \(\alpha\) and a scale parameter \(\sigma\). Note that, by definition, \(\sigma = 1 / \lambda\). The Weibull distribution and sampling statement are defined
 \begin{equation}
@@ -156,13 +156,22 @@ Given the Bayesian framework used here, what remains is the important step of as
 
 The intercept term \(\beta\) is given a weakly informative prior, \(\beta \sim \mathcal{N}(0, 10)\), reflecting that while little information is directly known, the value is most likely not extremely large or small.
 
+The two location parameters for the hyperpriors for the by-regime and by-fauna scale parameters (Eq. \ref{eq:temporal_complex} and \ref{eq:taxon_complex}) are given similar wealky informative priors, principally for regulatory purposes as I do not expect very large or small overall mean standard deviation.
+\begin{equation}
+  \begin{aligned}
+    \psi &\sim \mathcal{N}(0, 10) \\
+    \pi &\sim \mathcal{N}(0, 10) 
+  \end{aligned}
+  \label{eq:location_priors}
+\end{equation}
+
 The prior terms for the various scale parameters of the hierarchical effects (Eq. \ref{eq:temporal_complex} and \ref{eq:taxon_complex}) I use a weakly informative, regularizing half-Cauchy (C\(^{+}\)) prior distribution in order to better constrain all parameter estimates \citep{Gelman2013d}. This is especially appropriate in the case of Eq. \ref{eq:taxon_complex} as there are only three factors at the fauna level. 
 \begin{equation}
   \begin{aligned}
     \sigma_{\mu} &\sim \mathrm{C}^{+}(2.5) \\
-    \varsigma_{\sigma} &\sim \mathrm{C}^{+}(2.5) \\
+    \varsigma &\sim \mathrm{C}^{+}(2.5) \\
     \sigma_{\omega} &\sim \mathrm{C}^{+}(2.5) \\
-    \phi_{\sigma} &\sim \mathrm{C}^{+}(2.5)
+    \phi &\sim \mathrm{C}^{+}(2.5)
   \end{aligned}
   \label{eq:scale_priors}
 \end{equation}
