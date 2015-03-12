@@ -12,9 +12,7 @@
 \section{Methods}
 
 \subsection{Fossil occurrence information}
-I analyzed the exact data set used by \citet{Foote2013} in their analysis of the early survival of marine genera. This data set is a highly pruned and vetted set of all occurrences of important marine groups for the entire Phanerozoic as sampled in the Paleobiology Database (http://www.paleodb.org).
-
-I analyzed a subset of the \citet{Foote2013} data set of only genera belonging to one of the three Sepkoski Fauna (Table \ref{tab:sepkoski}).
+I analyzed the exact data set used by \citet{Foote2013} in their analysis of the early survival of marine genera. This data set is a highly pruned and vetted set of all occurrences of important marine groups for the entire Phanerozoic as sampled in the Paleobiology Database (http://www.paleodb.org). Specifically, I analyzed a subset of the \citet{Foote2013} data set of only genera belonging to a higher-taxonomic level assigned to one of the three Sepkoski Fauna (Table \ref{tab:sepkoski}).
 
 \subsection{Survival model}
 Define \(y\) as a vector of length \(n\) where the \(i\)th element is the duration in geologic stages of genus \(i\), where \(i = 1, \dots, n\).
@@ -48,7 +46,16 @@ In order to allow species duration to vary with individual covariate information
 
 
 \subsubsection{Hierarchical modeling}
-\uppercase{Explain the advantages of hierarchical modeling. The partial pooling effect and how this improves the estimation of low sample size groups.}
+Hierarchical or multilevel models are for when data are structured in known groups and parameters are allowed to vary by groupings \citep{Gelman2007,Gelman2013d}. This approach allows for inference to be couched directly in terms of the structure of the data. In a hierarchical model, these groups are considered exchangeable samples from a population distribution \citep{Gelman2013d}. By setting up a hierarchical model we can improve predictive accuracy by allowing for more sources of variance.
+
+While a hierarchical modeling approach increases the overall complexity of the model, there are numerous advantages not available to single-level modeling as well as being a more realistic model of the data-generating process \citep{Gelman2007,Gelman2013d}.
+
+For example, if we were studying mortality rates across multiple hospitals we might consider each hospital as a sample from a shared ``hospital-level'' distribution describing the expected ``hospital effect.'' Additionally, we are able to estimate the hospital-level variance which allows for inference about how consistent effects may be across all hospitals.
+
+Hierarchical modeling can be viewed as a compromise between inference from completely pooled data and from data separated by group or no pooling. Mathematically, complete pooling is when we assume that between group variance is zero while no pooling is when we assume that between group variance is infinite. Compromise is accomplished, for example, by letting the scale hyperparameter of the shared prior be estimated from the data \citep{Gelman2013d}. This is effectively a weighted mean of these two extremes where the weighting depends on the sample size of each group.
+
+Groups with small samples sizes or little power are drawn towards the population mean, while groups with larger samples sizes or possibly stronger effects are estimated as necessary. This means that groups with smaller sample sizes borrow power from the larger groups.
+
 
 \subsubsection{Temporal effects}
 
