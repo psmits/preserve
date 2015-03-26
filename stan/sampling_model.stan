@@ -27,9 +27,9 @@ model {
   for(g in 1:G) {
     mu[g] ~ normal(nu[order[g]], sigma);
   }
-  sigma ~ cauchy(0, 25);
+  sigma ~ cauchy(0, 2.5);
 
-  theta ~ uniform(0, 1);
+  theta ~ beta(1, 1);
 
   for(i in 1:N) {
     if(count[i] == 0){ 
@@ -42,10 +42,10 @@ model {
     }
   }
 }
-#generated quantities {
-#  vector[C] log_lik;
-#
-#  for(i in 1:C) {
-#    log_lik[i] <- poisson_log(count[i], mu[genus[i]]);
-#  }
-#}
+generated quantities {
+  vector[C] log_lik;
+
+  for(i in 1:C) {
+    log_lik[i] <- poisson_log(count[i], intercept + mu[genus[i]]);
+  }
+}
