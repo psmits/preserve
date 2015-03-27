@@ -38,18 +38,18 @@ model {
   for(c in 1:C) {
     group[c] ~ normal(0, sigma_group);
   }
-  sigma_group ~ cauchy(0, 2.5);
+  sigma_group ~ cauchy(0, 1);
 
   // temporal effect
   for(o in 1:O) {
     cohort[o] ~ normal(cohort_mu[regime[o]], sigma_cohort);
   }
-  sigma_cohort ~ cauchy(0, 2.5);
+  sigma_cohort ~ cauchy(0, 1);
 
   for(r in 1:R) {
     cohort_mu[r] ~ normal(0, sigma_regime);
   }
-  sigma_regime ~ cauchy(0, 2.5);
+  sigma_regime ~ cauchy(0, 1);
 
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {
@@ -67,4 +67,22 @@ model {
   }
 }
 generated quantities {
+  vector[N] log_lik;
+
+  for(i in 1:N_unc) {
+    if(dur_unc[i] == 1) {
+      log_lik[i] <- weibull_cdf_log(dur_unc[i], alpha,
+          exp(-(intercept + group[group_unc[i]] + 
+              cohort[cohort_unc[i]])/ alpha));
+    } else {
+      log_lik[i] <- weibull_log(dur_unc[i], alpha,
+          exp(-(intercept + group[group_unc[i]] + 
+              cohort[cohort_unc[i]])/ alpha));
+    }
+  }
+  for(j in 1:N_cen) {
+    log_lik[N_unc + j] <- weibull_ccdf_log(dur_cen[j], alpha,
+        exp(-(intercept + group[group_cen[j]] + 
+            cohort[cohort_cen[j]])/ alpha));
+  }
 }
