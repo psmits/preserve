@@ -5,6 +5,17 @@ library(scales)
 library(rstan)
 library(survival)
 library(stringr)
+library(grid)
+
+theme_set(theme_bw())
+cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
+         '#0072B2', '#D55E00', '#CC79A7')
+theme_update(axis.text = element_text(size = 20),
+             axis.title = element_text(size = 30),
+             legend.text = element_text(size = 25),
+             legend.title = element_text(size = 26),
+             legend.key.size = unit(2, 'cm'),
+             strip.text = element_text(size = 20))
 
 fossil <- read_rdump('../data/data_dump/survival_info.data.R')
 sepkoski <- read_rdump('../data/data_dump/fauna_info.data.R')
@@ -83,8 +94,6 @@ by.inter <- cbind(by.inter,
                   Reduce(rbind, str_split(as.character(by.inter$label), 
                                           '\\.')))
 names(by.inter) <- c('time', 'surv', 'label', 'taxon', 'cohort')
-by.inter$regime <- as.factor(sepkoski$fauna[by.inter$taxon])
-by.inter$fauna <- as.factor(sepkoski$regime[by.inter$cohort])
 
 by.inter$taxon <- factor(as.numeric(as.character(by.inter$taxon)), 
                          levels = sort(unique(as.numeric(
@@ -92,11 +101,17 @@ by.inter$taxon <- factor(as.numeric(as.character(by.inter$taxon)),
 by.inter$cohort <- factor(as.numeric(as.character(by.inter$cohort)), 
                          levels = sort(unique(as.numeric(
                                   as.character(by.inter$cohort)))))
+by.inter$fauna <- as.factor(sepkoski$fauna[by.inter$taxon])
+by.inter$regime <- as.factor(sepkoski$regime[by.inter$cohort])
 
-time.surv.a <- ggplot(by.inter, aes(x = time, y = surv, colour = regime, group = label))
-time.surv.a <- time.surv.a + geom_step(direction = 'hv')
-time.surv.a <- time.surv.a + facet_wrap(~ fauna)
+time.surv.a <- ggplot(by.inter, aes(x = time, y = surv, 
+                                    group = label))
+time.surv.a <- time.surv.a + geom_step(direction = 'hv', alpha = 0.5)
+time.surv.a <- time.surv.a + facet_grid(regime ~ fauna)
+time.surv.a <- time.surv.a + scale_colour_manual(values = cbp)
 
-time.surv.b <- ggplot(by.inter, aes(x = time, y = surv, colour = fauna, group = label))
-time.surv.b <- time.surv.b + geom_step(direction = 'hv')
-time.surv.b <- time.surv.b + facet_wrap(~ regime)
+time.surv.b <- ggplot(by.inter, aes(x = time, y = surv, 
+                                    group = label))
+time.surv.b <- time.surv.b + geom_step(direction = 'hv', alpha = 0.5)
+time.surv.b <- time.surv.b + facet_grid(fauna ~ regime)
+time.surv.b <- time.surv.b + scale_colour_manual(values = cbp)
