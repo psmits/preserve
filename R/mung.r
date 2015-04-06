@@ -13,11 +13,14 @@ bibr <- fossil#[fossil$class_reassigned %in% c('Bivalvia', 'Rhynchonellata'), ]
 bins <- c('collections.stage')
 
 bibr <- bibr[!is.na(bibr[, bins]), ]
+bibr <- bibr[!is.na(bibr$EO_5_1_2014), ]
 
 bibr <- bibr[bibr$collections.stage %in% gts, ] 
 bibr$collections.stage <- as.character(bibr$collections.stage)
 collec.stage <- table(bibr$collections.stage)
 
+
+# this section is all about finding duration
 find.dur <- function(x) {
   mm <- which(gts %in% unique(x$collections.stage))
   max(mm) - min(mm) + 1
@@ -30,6 +33,26 @@ taxon.nstage <- unlist(llply(taxon.occur, length))
 
 nzero <- taxon.age[, 2] - taxon.nstage
 
+# want to find the number of epicontinental versus offshore
+# these are the occurrences
+onoff <- ddply(bibr, .(occurrences.genus_name), summarize,
+               epi = sum(EO_5_1_2014 == 'E'),
+               off = sum(EO_5_1_2014 == 'O'))
+# now for each stage, get the epi and off
+big.onoff <- ddply(bibr, .(collections.stage), summarize,
+                   epi = sum(EO_5_1_2014 == 'E'),
+                   off = sum(EO_5_1_2014 == 'O'))
+for(ii in seq(length(taxon.occur))) {
+  app <- which(gts %in% names(taxon.occur[[ii]]))
+  wh <- gts[seq(min(app), max(app))]
+  background <- big.onoff[big.onoff[, 1] %in% wh, ]
+  epi.back <- sum(background$epi) - onoff[ii, 2]
+  off.back <- sum(background$off) - onoff[ii, 3]
+  onoff[ii, 4] <- epi.back
+  onoff[ii, 5] <- off.back
+}
+
+# the number of collections to offset each observation by 
 off <- list()
 for(ii in seq(length(taxon.occur))) {
   app <- which(gts %in% names(taxon.occur[[ii]]))
@@ -65,8 +88,9 @@ age.order <- llply(orig, function(x) which(gts %in% x))
 big.dead <- which(gts %in% mass.ext)
 regime <- laply(age.order, function(x) 
                 max(which(x > big.dead)))
-age.data <- cbind(taxon.age, censored, orig, regime)
-names(age.data) <- c('genus', 'duration', 'censored', 'orig', 'regime')
+age.data <- cbind(taxon.age, censored, orig, regime, onoff[, -1])
+names(age.data) <- c('genus', 'duration', 'censored', 'orig', 'regime', 
+                     'epi', 'off', 'epi.bck', 'off.bck')
 # need to retain the class stuff too
 
 # split based on class

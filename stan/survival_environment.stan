@@ -14,6 +14,15 @@ data {
   int group_cen[N_cen];
   int cohort_cen[N_cen];
 
+  int epi_unc[N_unc];
+  int off_unc[N_unc];
+  int epi_bck_unc[N_unc];
+  int off_bck_unc[N_unc];
+  int epi_cen[N_cen];
+  int off_cen[N_cen];
+  int epi_bck_cen[N_cen];
+  int off_bck_cen[N_cen];
+
   int regime[O];
 }
 transformed data {
@@ -21,6 +30,9 @@ transformed data {
 parameters {
   real<lower=0> alpha;
   real intercept;
+  real beta;
+  real x_unc[N_unc];
+  real x_cen[N_cen];
 
   real group[C];
   real<lower=0> sigma_group;
@@ -33,6 +45,14 @@ parameters {
 model {
   alpha ~ cauchy(0, 2.5);
   intercept ~ normal(0, 10);
+  beta ~ normal(0, 5);
+
+  for(i in 1:N_unc) {
+    x_unc[i] ~ beta(epi_unc[i] + epi_bck_unc[i], off_unc[i] + off_bck_unc[i]);
+  }
+  for(i in 1:N_cen) {
+    x_cen[i] ~ beta(epi_cen[i] + epi_bck_cen[i], off_cen[i] + off_bck_cen[i]);
+  }
 
   // class effect
   for(c in 1:C) {
@@ -54,18 +74,18 @@ model {
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {
       increment_log_prob(weibull_cdf_log(dur_unc[i], alpha, 
-            exp(-(intercept + 
+            exp(-(intercept + beta * x_unc[i] + 
             group[group_unc[i]] + cohort[cohort_unc[i]])/ alpha)));
     } else {
       increment_log_prob(weibull_log(dur_unc[i], alpha, 
-            exp(-(intercept + 
+            exp(-(intercept + beta * x_unc[i] + 
             group[group_unc[i]] + cohort[cohort_unc[i]])/ alpha)));
     }
   }
 
   for(i in 1:N_cen) {
     increment_log_prob(weibull_ccdf_log(dur_cen[i], alpha,
-          exp(-(intercept + 
+          exp(-(intercept + beta * x_cen[i] + 
             group[group_cen[i]] + cohort[cohort_cen[i]])/ alpha)));
   }
 }
@@ -75,17 +95,17 @@ generated quantities {
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {
       log_lik[i] <- weibull_cdf_log(dur_unc[i], alpha,
-          exp(-(intercept + 
+          exp(-(intercept + beta * x_unc[i] + 
               group[group_unc[i]] + cohort[cohort_unc[i]])/ alpha));
     } else {
       log_lik[i] <- weibull_log(dur_unc[i], alpha,
-          exp(-(intercept + 
+          exp(-(intercept + beta * x_unc[i] + 
               group[group_unc[i]] + cohort[cohort_unc[i]])/ alpha));
     }
   }
   for(j in 1:N_cen) {
     log_lik[N_unc + j] <- weibull_ccdf_log(dur_cen[j], alpha,
-        exp(-(intercept + 
+        exp(-(intercept + beta * x_cen[j] + 
               group[group_cen[j]] + cohort[cohort_cen[j]])/ alpha));
   }
 }
