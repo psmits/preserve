@@ -4,31 +4,36 @@ RNGkind(kind = "L'Ecuyer-CMRG")
 seed <- 420
 nsim <- 1000
 
-data <- read_rdump('../data/data_dump/survival_info.data.R')
+data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
 # this is for the total model
-pat <- paste0('surv_', '[0-9].csv')
+pat <- paste0('faun_surv_', '[0-9].csv')
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 fit <- read_stan_csv(outs)
+txts <- summary(fit)[[1]]
+head(txts)
+all(txts[, ncol(txts)] < 1.1)
 
 # extract values and do posterior predictive simulations
-
 extract.fit <- extract(fit, permuted = TRUE)
 
 coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 
+environ <- cbind(extract.fit$x_unc, extract.fit$x_cen)
+taxon <- extract.fit$group
 ph <- list()
 for(ii in 1:nsim) {
   n <- data$N
   inter <- sample(extract.fit$intercept, 1)
-  group <- extract.fit$group[sample(nrow(extract.fit$group), 1), ]
-  cohort <- extract.fit$cohort[sample(nrow(extract.fit$cohort), 1), ]
   alpha <- sample(extract.fit$alpha, 1)
+  slope <- sample(extract.fit$slope, 1)
+  x <- environ[sample(nrow(environ), 1), ]
+  gg <- taxon[sample(nrow(taxon), 1), ]
 
   oo <- c()
   for(jj in seq(n)) {
-    reg <- inter + group[gro[jj]] + cohort[coh[jj]]
+    reg <- inter + gg[gro[jj]] + slope * x[jj]
     oo[jj] <- rweibull(1, scale = exp(-(reg) / alpha), shape = alpha)
   }
 

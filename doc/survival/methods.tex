@@ -80,17 +80,6 @@ This approach for handling temporal effects can be further expanded, allowing fo
 \end{equation}
 As above, both \(\sigma_{c}\) and \(\sigma_{\mu}\) are estimated from the data.
 
-The current formulation (Eq. \ref{eq:cohort_regime}) assumes that variance is homogeneous between regimes, or that each regime is considered to have equal variance. To allow for each \(\sigma_{c}\) to vary by regime, Eq. \ref{eq:cohort_regime} is further expanded as follows
-\begin{equation}
-  \begin{aligned}
-    c_{j} &\sim \mathcal{N}(\mu_{k[j]}, \sigma_{k[j]}) \\
-    \mu_{k} &\sim \mathcal{N}(0, \sigma_{\mu}) \\
-    \exp(\sigma_{k}) &\sim \mathcal{N}(\psi, \varsigma).
-  \end{aligned}
-  \label{eq:temporal_complex}
-\end{equation}
-Similar to both previous states \(\psi\), \(\sigma_{\mu}\) and \(\varsigma\) are estimated from the data.
-
 
 \subsubsection{Taxonomic effects}
 
@@ -114,9 +103,7 @@ Incorporating both temporal and taxonomic effects into Eq. \ref{eq:lambda} is si
 
 It is possible to increase the complexity of Eq. \ref{eq:taxon} by including increasingly more taxonomic levels both above and below the class level. However, I chose to not do this as it adds what is probably an unnecessary amount of complexity and makes interpretation of results extremely difficult.
 
-What is of interest, however, are Sepkoski's three fauna \citep{SepkoskiJr.1981a} which divide select higher-level classifications into Cambrian, Paleozoic, and Modern fauna (Table \ref{tab:sepkoski}). In many ways these fauna for the empirical basis of Sepkoski's kinetic model of Phanerozoic diversity \citep{Sepkoski1978,Sepkoski1979,Sepkoski1984}, with each fauna being replaced or out-competed by the subsequent fauna. % move to intro as this is just background information
-
-To model taxonomic groups as samples from a fauna, first I define a fauna \(f_{h}\) as the set of all taxonomic groups assigned by \citet{SepkoskiJr.1981a} where \(h = 1, \dots, H\), \(H\) bing the number of fauna (3). Fauna are considered exchangeable and drawn from a shared normal distribution. Eq. \ref{eq:taxon} is then rewritten as
+What is of interest, however, are Sepkoski's three fauna \citep{SepkoskiJr.1981a} which divide select higher-level classifications into Cambrian, Paleozoic, and Modern fauna (Table \ref{tab:sepkoski}). To model taxonomic groups as samples from a fauna, first I define a fauna \(f_{h}\) as the set of all taxonomic groups assigned by \citet{SepkoskiJr.1981a} where \(h = 1, \dots, H\), \(H\) bing the number of fauna (3). Fauna are considered exchangeable and drawn from a shared normal distribution. Eq. \ref{eq:taxon} is then rewritten as
 \begin{equation}
   \begin{aligned}
     l_{g} &\sim \mathcal{N}(\omega_{h[g]}, \sigma_{l})\\
@@ -126,16 +113,8 @@ To model taxonomic groups as samples from a fauna, first I define a fauna \(f_{h
 \end{equation}
 where both \(\sigma_{l}\) and \(\sigma_{\omega}\) are estimated from the data.
 
-Just as with an earlier model of temporal effect (Eq. \ref{eq:cohort_regime}), the current model of taxonomic effect assumes equal variance between fauna (Eq. \ref{eq:taxon_fauna}). To relax that assumption, I allow \(\sigma_{l}\) to vary by fauna. Eq. \ref{eq:taxon_fauna} is then rewritten as
-\begin{equation}
-  \begin{aligned}
-    l_{g} &\sim \mathcal{N}(\omega_{h[g]}, \sigma_{h[g]})\\
-    \omega_{h} &\sim \mathcal{N}(0, \sigma_{\omega}) \\
-    \exp(\sigma_{h}) &\sim \mathcal{N}(\pi, \phi)
-  \end{aligned}
-  \label{eq:taxon_complex}
-\end{equation}
-where \(\pi\), \(\sigma_{\omega}\) and \(\phi\) are estimated from the data.
+
+\subsubsection{Age-dependent extinction}
 
 We can relax assumption of the exponential model that extinction risk is independent of species age by instead assuming that species durations follow a Weibull distribution. The Weibull distribution has a shape parameter \(\alpha\) and a scale parameter \(\sigma\). Note that, by definition, \(\sigma = 1 / \lambda\). The Weibull distribution and sampling statement are defined
 \begin{equation}
@@ -159,30 +138,52 @@ Similar to the exponential model, to allow for species duration to vary with ind
 Incidentally, this is the formulation for an accelerated time failure model \citep{Klein2003}. \(\alpha\) can also be allowed to vary by, for example, hierarchical effects though it is normally assumed constant for all observations \citep{Klein2003}.
 
 
-Given the Bayesian framework used here, what remains is the important step of assigning priors probability statements to all estimated parameters. While many of the (hyper)parameters have already been given (hyper)priors, there currently remain a few improper priors.
+\subsubsection{Biological covariates}
 
-The intercept term \(\beta\) is given a weakly informative prior, \(\beta \sim \mathcal{N}(0, 10)\), reflecting that while little information is directly known, the value is most likely not extremely large or small.
+We cannot directly observe if a fossil taxon had occurrence restricted to any single environmental type, instead we estimate a probability with uncertainty based on proxies. One advantage of using a Bayesian analytical context is that both parameters and data are considered random samples from some underlying distribution, which means it is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. In this case, this is the probability that a genus will occur in an epicontiental sea or not. 
+A genus' probability of occurring in an epicontinental environment, \(\theta\), was calculated using a fully Bayesian extension of \citep{Simpson2009} where occurrence probability (e.g. affinity) is defined as a distribution and not a point estimate. The reasoning behind this approach is that it allows for our uncertainty to properly propagate through our model.
 
-The two location parameters for the hyperpriors for the by-regime and by-fauna scale parameters (Eq. \ref{eq:temporal_complex} and \ref{eq:taxon_complex}) are given similar wealky informative priors, principally for regulatory purposes as I do not expect very large or small overall mean standard deviation.
+Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. offshore). Because the value of inters is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a beta distribution. We can then define our sampling statement as
 \begin{equation}
-  \begin{aligned}
-    \psi &\sim \mathcal{N}(0, 10) \\
-    \pi &\sim \mathcal{N}(0, 10) 
-  \end{aligned}
-  \label{eq:location_priors}
+  \theta \sim \mathrm{Beta}(e_{i}, o_{i}).
+  \label{eq:epi_lik}
 \end{equation}
 
-The prior terms for the various scale parameters of the hierarchical effects (Eq. \ref{eq:temporal_complex} and \ref{eq:taxon_complex}) I use a weakly informative, regularizing half-Cauchy (C\(^{+}\)) prior distribution in order to better constrain all parameter estimates \citep{Gelman2013d}. This is especially appropriate in the case of Eq. \ref{eq:taxon_complex} as there are only three factors at the fauna level. 
+It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an informative beta prior, which is conveniently the conjugate prior for the beta distribution. Define \(\eta_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(\pi_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define a prior for \(\theta\) as
+\begin{equation}
+  \theta \sim \mathrm{Beta}(\eta_{i}, \pi_{i}).
+  \label{eq:epi_prior}
+\end{equation}
+
+Given the likelihood (Eq. \ref{eq:epi_lik}) and the prior (Eq. \ref{eq:epi_prior}), the conjugacy of the prior can be taken advantage of to calculate the full posterior distribution
 \begin{equation}
   \begin{aligned}
-    \sigma_{\mu} &\sim \mathrm{C}^{+}(2.5) \\
-    \varsigma &\sim \mathrm{C}^{+}(2.5) \\
-    \sigma_{\omega} &\sim \mathrm{C}^{+}(2.5) \\
-    \phi &\sim \mathrm{C}^{+}(2.5)
+    p(\theta | y) &= p(y | \theta) p(\theta) \\
+    p(\theta | y) &= \mathrm{Beta}(e_{i} + \eta_{i}, o_{i} + \pi_{i}).
+  \end{aligned}
+  \label{eq:epi_post}
+\end{equation}
+Now given the full definition of \(\theta\) (Eq. \ref{eq:epi_post}), it can then be included in the definition of \(\sigma\) (Eq. \ref{eq:sigma_full}) as a covariate with its own slope,
+\begin{equation}
+  \sigma = \exp\left(\frac{-(\beta_{0} + \beta_{1}\theta + c_{j[i]} + l_{g[i]})}{\alpha}\right).
+  \label{eq:sigma_updated}
+\end{equation}
+
+
+\subsubsection{Priors}
+Given the Bayesian framework used here, what remains is the important step of assigning priors probability statements to all estimated parameters. While many of the (hyper)parameters have already been given (hyper)priors, there currently remain a few improper priors.
+
+The intercept term \(\beta_{0}\) is given a weakly informative prior, \(\beta_{0} \sim \mathcal{N}(0, 10)\), reflecting that while little information is directly known, the value is most likely not extremely large or small. The environmental slope term \(\beta_{1}\) is given a slightly more informative prior (\(\beta_{1} \mathcal{N}(0, 5)\)) for similar reasons.
+
+The prior terms for the various scale parameters of the hierarchical effects (Eq. \ref{eq:cohort_regime} and \ref{eq:taxon_fauna}) I use a weakly informative, regularizing half-Cauchy (C\(^{+}\)) prior distribution in order to better constrain all parameter estimates \citep{Gelman2013d}. This is especially appropriate in the case of Eq. \ref{eq:taxon_fauna} as there are only three factors at the fauna level. 
+\begin{equation}
+  \begin{aligned}
+    \sigma_{\mu} &\sim \mathrm{C}^{+}(1) \\
+    \sigma_{\omega} &\sim \mathrm{C}^{+}(1) \\
   \end{aligned}
   \label{eq:scale_priors}
 \end{equation}
-The half-Cauchy distribution is equivalent to a folded \textit{t}-distribution with 1 degree-of-freedom \citep{Gelman2013d}.
+Note that the half-Cauchy distribution is equivalent to a folded \textit{t}-distribution with 1 degree-of-freedom \citep{Gelman2013d}.
 
 Finally, the Weibull shape parameter \(\alpha\) is also given a weakly informative half-Cauchy prior, \(\alpha \sim \mathrm{C}^{+}(2.5)\). 
 % Maybe this is the time to include the very strong Van Valen prior on \alpha?
