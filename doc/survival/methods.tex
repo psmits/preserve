@@ -141,6 +141,7 @@ Incidentally, this is the formulation for an accelerated time failure model \cit
 \subsubsection{Biological covariates}
 
 We cannot directly observe if a fossil taxon had occurrence restricted to any single environmental type, instead we estimate a probability with uncertainty based on proxies. One advantage of using a Bayesian analytical context is that both parameters and data are considered random samples from some underlying distribution, which means it is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. In this case, this is the probability that a genus will occur in an epicontiental sea or not. 
+
 A genus' probability of occurring in an epicontinental environment, \(\theta\), was calculated using a fully Bayesian extension of \citep{Simpson2009} where occurrence probability (e.g. affinity) is defined as a distribution and not a point estimate. The reasoning behind this approach is that it allows for our uncertainty to properly propagate through our model.
 
 Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. offshore). Because the value of inters is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a beta distribution. We can then define our sampling statement as
@@ -149,7 +150,9 @@ Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental
   \label{eq:epi_lik}
 \end{equation}
 
-It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an informative beta prior, which is conveniently the conjugate prior for the beta distribution. Define \(\eta_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(\pi_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define a prior for \(\theta\) as
+It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an informative beta prior, which is conveniently the conjugate prior for the beta distribution. 
+
+Define \(\eta_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(\pi_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define a prior for \(\theta\) as
 \begin{equation}
   \theta \sim \mathrm{Beta}(\eta_{i}, \pi_{i}).
   \label{eq:epi_prior}
@@ -158,7 +161,7 @@ It is extremely important, however, to take into account the overall environment
 Given the likelihood (Eq. \ref{eq:epi_lik}) and the prior (Eq. \ref{eq:epi_prior}), the conjugacy of the prior can be taken advantage of to calculate the full posterior distribution
 \begin{equation}
   \begin{aligned}
-    p(\theta | y) &= p(y | \theta) p(\theta) \\
+    p(\theta | y) &\propto p(y | \theta) p(\theta) \\
     p(\theta | y) &= \mathrm{Beta}(e_{i} + \eta_{i}, o_{i} + \pi_{i}).
   \end{aligned}
   \label{eq:epi_post}
@@ -173,7 +176,7 @@ Now given the full definition of \(\theta\) (Eq. \ref{eq:epi_post}), it can then
 \subsubsection{Priors}
 Given the Bayesian framework used here, what remains is the important step of assigning priors probability statements to all estimated parameters. While many of the (hyper)parameters have already been given (hyper)priors, there currently remain a few improper priors.
 
-The intercept term \(\beta_{0}\) is given a weakly informative prior, \(\beta_{0} \sim \mathcal{N}(0, 10)\), reflecting that while little information is directly known, the value is most likely not extremely large or small. The environmental slope term \(\beta_{1}\) is given a slightly more informative prior (\(\beta_{1} \mathcal{N}(0, 5)\)) for similar reasons.
+The intercept term \(\beta_{0}\) is given a weakly informative prior, \(\beta_{0} \sim \mathcal{N}(0, 10)\), reflecting that while little information is directly known, the value is most likely not extremely large or small. The environmental slope term \(\beta_{1}\) is given a slightly more informative \(\beta_{1} \sim \mathcal{N}(0, 5)\) prior for similar reasons.
 
 The prior terms for the various scale parameters of the hierarchical effects (Eq. \ref{eq:cohort_regime} and \ref{eq:taxon_fauna}) I use a weakly informative, regularizing half-Cauchy (C\(^{+}\)) prior distribution in order to better constrain all parameter estimates \citep{Gelman2013d}. This is especially appropriate in the case of Eq. \ref{eq:taxon_fauna} as there are only three factors at the fauna level. 
 \begin{equation}
@@ -207,7 +210,7 @@ where \(C\) is the set of all fully observed species, \(R\) the set of all right
 
 
 \subsection{Parameter estimation}
-Given the above likelihood and prior statements, the posterior probabilities of all parameters was approximated using a Markov-chain Monte Carlo routine using a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{stan-software:2014}. The estimate of the posterior distribution were approximated from four parallel chains run for XXX draws split half warm-up and half sampling thinned to every XXX sample for a total of XXX samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1, or less than or equal to 1.1, indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
+Given the above likelihood and prior statements, the posterior probabilities of all parameters was approximated using a Markov-chain Monte Carlo routine using a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{stan-software:2014}. The estimate of the posterior distribution were approximated from four parallel chains run for XXX draws split half warm-up and half sampling thinned to every XXX sample for a total of XXX samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
 %\subsection{Model selection} WAIC
 
