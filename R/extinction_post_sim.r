@@ -10,15 +10,16 @@ data <- read_rdump('../data/data_dump/fauna_info.data.R')
 pat <- paste0('faun_surv_', '[0-9].csv')
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 fit <- read_stan_csv(outs)
-txts <- summary(fit)[[1]]
-head(txts, 50)
-all(txts[, ncol(txts)] < 1.1, na.rm = TRUE)
+txt <- summary(fit)[[1]]
+all(txt[, ncol(txt)] < 1.1, na.rm = TRUE)
 
 # extract values and do posterior predictive simulations
 extract.fit <- extract(fit, permuted = TRUE)
 
 coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
+rage <- c(data$occupy_unc, data$occupy_cen)
+envs <- c(data$env_unc, data$env_cen)
 
 environ <- cbind(extract.fit$x_unc, extract.fit$x_cen)
 coefs <- extract.fit$coef
@@ -28,11 +29,10 @@ for(ii in 1:nsim) {
   alpha <- sample(extract.fit$alpha, 1)
   int <- coefs[sample(nrow(coefs), 1), , 1]
   slp <- coefs[sample(nrow(coefs), 1), , 2]
-  x <- environ[sample(nrow(environ), 1), ]
 
   oo <- c()
   for(jj in seq(n)) {
-    reg <- int[gro[jj]] + slp[gro[jj]] * x[jj]
+    reg <- int[coh[jj]] + slp[coh[jj]] * rage[jj]
     oo[jj] <- rweibull(1, scale = exp(-(reg) / alpha), shape = alpha)
   }
 

@@ -1,8 +1,11 @@
 library(rstan)
-library(boot)
+library(arm)
 library(parallel)
 
 source('../R/mung.r')
+sepkoski.data <- sepkoski.data[sepkoski.data$class == 'Rhynchonellata', ]
+incl <- sepkoski.data$orig %in% gts[which(gts == 'Changhsingian'):length(gts)]
+sepkoski.data <- sepkoski.data[incl, ]
 
 # sepkoski.data
 num.samp <- nrow(sepkoski.data)
@@ -21,10 +24,15 @@ num.regime <- length(unique(sepkoski.data$regime))
 con.fauna <- as.numeric(as.factor(sepkoski.data$fauna))
 num.fauna <- length(unique(sepkoski.data$fauna))
 
+# beta distribution of genus envrionmental occurrence
+beta.a <- sepkoski.data$epi + sepkoski.data$epi.bck
+beta.b <- sepkoski.data$off + sepkoski.data$off.bck
+ml <- (beta.a - 1) / (beta.a + beta.b - 2)
+
 data <- list(duration = sepkoski.data$duration, group = con.class,
              cohort = con.orig, regime = con.regime, fauna = con.fauna,
-             epi = sepkoski.data$epi, off = sepkoski.data$off,
-             epi_bck = sepkoski.data$epi.bck, off_bck = sepkoski.data$off.bck)
+             env = rescale(logit(ml)),
+             occupy = rescale(logit(sepkoski.data$occupy)))
 
 dead <- sepkoski.data$censored != 1
 unc <- llply(data, function(x) x[dead])
@@ -35,20 +43,16 @@ data <- list(dur_unc = unc$duration,
              fauna_unc = unc$fauna,
              cohort_unc = unc$cohort,
              regime_unc = unc$regime,
-             epi_unc = unc$epi,
-             off_unc = unc$off,
-             epi_bck_unc = unc$epi_bck,
-             off_bck_unc = unc$off_bck,
+             occupy_unc = unc$occupy,
+             env_unc = unc$env,
              N_unc = length(unc$duration),
              dur_cen = cen$duration,
              group_cen = cen$group,
              fauna_cen = cen$fauna,
              cohort_cen = cen$cohort,
              regime_cen = cen$regime,
-             epi_cen = cen$epi,
-             off_cen = cen$off,
-             epi_bck_cen = cen$epi_bck,
-             off_bck_cen = cen$off_bck,
+             occupy_cen = cen$occupy,
+             env_cen = cen$env,
              N_cen = length(cen$duration))
 
 data$samp_unc <- seq(data$N_unc)
@@ -69,91 +73,8 @@ data$fauna <- unique(sepkoski.data[, c('class', 'fauna')])[, 2]
 with(data, {stan_rdump(list = c('dur_unc', 'group_unc', 'cohort_unc', 
                                 'regime_unc', 'N_unc', 'dur_cen', 'group_cen', 
                                 'cohort_cen', 'regime_cen', 'N_cen', 'samp_unc', 
-                                'epi_unc', 'off_unc', 
-                                'epi_bck_unc', 'off_bck_unc',
-                                'epi_cen', 'off_cen', 
-                                'epi_bck_cen', 'off_bck_cen',
                                 'samp_cen', 'N', 'O', 'R', 'C', 'F',
+                                'occupy_unc', 'occupy_cen',
+                                'env_unc', 'env_cen',
                                 'fauna', 'regime'),
                        file = '../data/data_dump/fauna_info.data.R')})
-
-# sub sample to test model
-#library(caret)
-#age.data <- age.data[createDataPartition(age.data$orig, p = 0.1)[[1]], ]
-
-
-## age.data
-#num.samp <- nrow(age.data)
-#
-#con.orig <- match(as.character(age.data$orig), gts)
-#con.orig <- mapvalues(con.orig, from = unique(con.orig), 
-#                      to = rank(unique(con.orig)))
-#num.orig <- length(unique(con.orig))
-#
-#con.class <- as.numeric(as.factor(age.data$class))
-#num.class <- length(unique(age.data$class))
-#
-#con.regime <- as.numeric(age.data$regime)
-#num.regime <- length(unique(age.data$regime))
-#
-#data <- list(duration = age.data$duration, group = con.class,
-#             cohort = con.orig, regime = con.regime,
-#             epi = age.data$epi, off = age.data$off,
-#             epi_bck = age.data$epi.bck, off_bck = age.data$off.bck)
-#
-#dead <- age.data$censored != 1
-#unc <- llply(data, function(x) x[dead])
-#cen <- llply(data, function(x) x[!dead])
-#
-#data <- list(dur_unc = unc$duration,
-#             group_unc = unc$group,
-#             cohort_unc = unc$cohort,
-#             regime_unc = unc$regime,
-#             epi_unc = unc$epi,
-#             off_unc = unc$off,
-#             epi_bck_unc = unc$epi_bck,
-#             off_bck_unc = unc$off_bck,
-#             N_unc = length(unc$duration),
-#             dur_cen = cen$duration,
-#             group_cen = cen$group,
-#             cohort_cen = cen$cohort,
-#             regime_cen = cen$regime,
-#             epi_cen = cen$epi,
-#             off_cen = cen$off,
-#             epi_bck_cen = cen$epi_bck,
-#             off_bck_cen = cen$off_bck,
-#             N_cen = length(cen$duration))
-#
-#data$samp_unc <- seq(data$N_unc)
-#data$samp_cen <- seq(from = data$N_unc + 1,
-#                     to = data$N_unc + data$N_cen,
-#                     by = 1)
-#
-#data$N <- num.samp
-#data$O <- num.orig
-#data$R <- num.regime
-#data$C <- num.class
-#data$regime <- unique(age.data[, c('orig', 'regime')])[, 2]
-#
-##fit <- stan(file = '../stan/survival_environment.stan')
-##fit.list <- mclapply(1:4, mc.cores = detectCores(),
-##                     function(x) stan(fit = fit,
-##                                      data = data,
-##                                      seed = 420,
-##                                      chains = 1, chain_id = x,
-##                                      refresh = -1))
-##fit.attempt <- sflist2stanfit(fit.list)
-#
-#
-#with(data, {stan_rdump(list = c('dur_unc', 'group_unc', 'cohort_unc', 
-#                                'regime_unc', 'N_unc', 'dur_cen', 'group_cen', 
-#                                'cohort_cen', 'regime_cen', 'N_cen', 'samp_unc', 
-#                                'epi_unc', 'off_unc', 
-#                                'epi_bck_unc', 'off_bck_unc',
-#                                'epi_cen', 'off_cen', 
-#                                'epi_bck_cen', 'off_bck_cen',
-#                                'samp_cen', 'N', 'O', 'R', 'C', 'regime'),
-#                       file = '../data/data_dump/survival_info.data.R')})
-
-
-

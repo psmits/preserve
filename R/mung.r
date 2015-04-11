@@ -1,23 +1,32 @@
 library(reshape2)
 library(plyr)
 library(stringr)
+library(dismo)
+library(raster)
+library(sp)
+library(XML)
+library(maptools)
+library(foreign)
+library(rgdal)
 
 source('../R/gts.r')
 
 data.file <- list.files('../data', pattern = 'Occs')
 fossil <- read.csv(paste0('../data/', data.file))
-
-bibr <- fossil#[fossil$class_reassigned %in% c('Bivalvia', 'Rhynchonellata'), ]
+bibr <- fossil
 
 # i need to have good bin information, either stage 10my or fr2my
 bins <- c('collections.stage')
 
 bibr <- bibr[!is.na(bibr[, bins]), ]
 bibr <- bibr[!is.na(bibr$EO_5_1_2014), ]
+bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
+bibr <- bibr[!is.na(bibr$collections.paleolatdec), ]
 
 bibr <- bibr[bibr$collections.stage %in% gts, ] 
 bibr$collections.stage <- as.character(bibr$collections.stage)
 collec.stage <- table(bibr$collections.stage)
+bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
 
 
 # this section is all about finding duration
@@ -32,6 +41,30 @@ taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
 taxon.nstage <- unlist(llply(taxon.occur, length))
 
 nzero <- taxon.age[, 2] - taxon.nstage
+
+
+# this is about geographic range size
+eq <- CRS("+proj=cea +lat_0=0 +lon_0=0 +lat_ts=30 +a=6371228.0 +units=m")
+globe.map <- readShapeSpatial('../data/ne_10m_coastline.shp')  # from natural earth
+proj4string(globe.map) <- eq
+spatialref <- SpatialPoints(coords = bibr[, c('collections.lngdec',
+                                              'collections.latdec')],
+                            proj4string = eq)  # wgs1984.proj
+r <- raster(globe.map, nrows = 70, ncols = 34)
+sp.ras <- rasterize(spatialref, r)
+bibr$membership <- cellFromXY(sp.ras, xy = bibr[, c('collections.lngdec', 
+                                                    'collections.latdec')])
+ncell <- ddply(bibr, .(occurrences.genus_name, collections.stage), 
+               summarize, tt = length(unique(membership)))
+big.ncell <- ddply(bibr, .(collections.stage), summarize,
+                   total = length(unique(membership)))
+
+ncell.bygenus <- split(ncell, ncell$occurrences.genus_name)
+occupy <- llply(ncell.bygenus, function(x) {
+                xx <- match(x[, 2], big.ncell$collections.stage)
+                xx <- x$tt / big.ncell[xx, 2]
+                mean(xx)})
+
 
 # want to find the number of epicontinental versus offshore
 # these are the occurrences
@@ -139,3 +172,4 @@ for(ii in seq(length(ws))) {
 }
 sepkoski.data <- cbind(age.data, fauna)[fauna %in% names(sepkoski), ]
 sepkoski.data$fauna <- as.character(sepkoski.data$fauna)
+sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])

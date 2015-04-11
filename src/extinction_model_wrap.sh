@@ -6,7 +6,7 @@ for f in $FILES;
 do
   for i in `seq 1 4`;
   do
-    ./survival_environment sample num_samples=1000 num_warmup=1000 \
+    ./survival_environment sample num_samples=5000 num_warmup=5000 \
       random seed=420 \
       id=$i \
       data file=$f \
