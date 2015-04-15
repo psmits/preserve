@@ -6,27 +6,32 @@ nsim <- 1000
 
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
-# this is for the total model
-pat <- paste0('faun_surv_', '[0-9].csv')
+# this is for the weibull model
+pat <- paste0('faun_expo_', '[0-9].csv')
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
-fit <- read_stan_csv(outs)
-txt <- summary(fit)[[1]]
-all(txt[, ncol(txt)] < 1.1, na.rm = TRUE)
+efit <- read_stan_csv(outs)
 
-# extract values and do posterior predictive simulations
-extract.fit <- extract(fit, permuted = TRUE)
+# this is for the weibull model
+pat <- paste0('faun_weib_', '[0-9].csv')
+outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
+wfit <- read_stan_csv(outs)
 
+# data setup
 coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 rage <- c(data$occupy_unc, data$occupy_cen)
 envs <- c(data$env_unc, data$env_cen)
 size<- c(data$size_unc, data$size_cen)
+duration <- c(data$dur_unc, data$dur_cen)
 
-betas <- extract.fit$beta
-ph <- list()
+# weibull model
+# extract values and do posterior predictive simulations
+wei.fit <- extract(wfit, permuted = TRUE)
+betas <- wei.fit$beta
+wr <- list()
 for(ii in 1:nsim) {
   n <- data$N
-  alp <- sample(extract.fit$alpha, 1)
+  alp <- sample(wei.fit$alpha, 1)
   int <- betas[sample(nrow(betas), 1), , 1]
   bet.1 <- betas[sample(nrow(betas), 1), , 2]
   bet.2 <- betas[sample(nrow(betas), 1), , 3]
@@ -35,21 +40,48 @@ for(ii in 1:nsim) {
   oo <- c()
   for(jj in seq(n)) {
     reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
-           bet.2[coh[jj]] * envs[jj] + 
-           bet.3[coh[jj]] * size[jj]
+    bet.2[coh[jj]] * envs[jj] + 
+    bet.3[coh[jj]] * size[jj]
     oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
   }
 
-  ph[[ii]] <- oo
+  wr[[ii]] <- oo
 }
 
-duration <- c(data$dur_unc, data$dur_cen)
-#par(mfrow = c(5, 4), mar = c(4, 4, 2, 2))
-#hist(duration, xlab = '', main = 'y')
-#for(s in 1:19) hist(ph[[s]], xlab = '', main = paste('y_rep', s))
-tstat.mean <- sum(laply(ph, mean) > mean(duration))
-tstat.med <- sum(laply(ph, median) > median(duration))
-tstat.75 <- sum(laply(ph, function(x) quantile(x, .75)) > 
-                quantile(duration, .75))
-tstat.25 <- sum(laply(ph, function(x) quantile(x, .25)) > 
-                quantile(duration, .25))
+wei.mean <- sum(laply(wr, mean) > mean(duration))
+wei.med <- sum(laply(wr, median) > median(duration))
+wei.75 <- sum(laply(wr, function(x) quantile(x, .75)) > 
+              quantile(duration, .75))
+wei.25 <- sum(laply(wr, function(x) quantile(x, .25)) > 
+              quantile(duration, .25))
+
+
+# exponential model
+# extract values and do posterior predictive simulations
+exp.fit <- extract(efit, permuted = TRUE)
+betas <- exp.fit$beta
+er <- list()
+for(ii in 1:nsim) {
+  n <- data$N
+  int <- betas[sample(nrow(betas), 1), , 1]
+  bet.1 <- betas[sample(nrow(betas), 1), , 2]
+  bet.2 <- betas[sample(nrow(betas), 1), , 3]
+  bet.3 <- betas[sample(nrow(betas), 1), , 4]
+
+  oo <- c()
+  for(jj in seq(n)) {
+    reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
+    bet.2[coh[jj]] * envs[jj] + 
+    bet.3[coh[jj]] * size[jj]
+    oo[jj] <- rexp(1, rate = exp(reg))
+  }
+
+  er[[ii]] <- oo
+}
+
+exp.mean <- sum(laply(er, mean) > mean(duration))
+exp.med <- sum(laply(er, median) > median(duration))
+exp.75 <- sum(laply(er, function(x) quantile(x, .75)) > 
+              quantile(duration, .75))
+exp.25 <- sum(laply(er, function(x) quantile(x, .25)) > 
+              quantile(duration, .25))
