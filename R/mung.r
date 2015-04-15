@@ -11,6 +11,7 @@ library(foreign)
 library(rgdal)
 
 source('../R/gts.r')
+source('../R/clean_funcs.r')
 sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya', 
                               'Lingulata'),
                  paleozoic = c('Rhynchonellata', 'Crinoidea', 'Ostracoda', 
@@ -45,6 +46,17 @@ bibr <- bibr[bibr$collections.stage %in% paleozoic, ]
 collec.stage <- table(bibr$collections.stage)
 bibr <- bibr[bibr$occurrences.class_name == 'Rhynchonellata', ]
 bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
+
+# lithology
+# high chance of removing occurrences
+#lith <- as.character(bibr$collections.lithology1)
+#lith <- gsub(pattern = '[\\"?]',
+#             replacement = '',
+#             lith,
+#             perl = TRUE)
+
+#clean.lith
+
 
 # this section is all about finding duration
 find.dur <- function(x) {
@@ -101,6 +113,8 @@ for(ii in seq(length(taxon.occur))) {
   onoff[ii, 4] <- epi.back
   onoff[ii, 5] <- off.back
 }
+
+
 
 # the number of collections to offset each observation by 
 off <- list()
