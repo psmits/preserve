@@ -1,4 +1,5 @@
 library(reshape2)
+library(arm)
 library(plyr)
 library(stringr)
 library(dismo)
@@ -10,10 +11,22 @@ library(foreign)
 library(rgdal)
 
 source('../R/gts.r')
+sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya', 
+                              'Lingulata'),
+                 paleozoic = c('Rhynchonellata', 'Crinoidea', 'Ostracoda', 
+                               'Cephalopoda', 'Anthozoa', 'Cyclocystoidea', 
+                               'Asteroidea', 'Ophiuroidea'),
+                 modern = c('Gastropoda', 'Bivalvia', 'Osteichtyes', 
+                            'Malacostraca', 'Echinoidea', 'Gymnolaemata', 
+                            'Demospongea', 'Chondrichthyes'))
+
 
 data.file <- list.files('../data', pattern = 'Occs')
 fossil <- read.csv(paste0('../data/', data.file))
 bibr <- fossil
+
+payne <- read.table('../data/payne_bodysize/Occurrence_PaleoDB.txt',
+                    header = TRUE, stringsAsFactors = FALSE)
 
 # i need to have good bin information, either stage 10my or fr2my
 bins <- c('collections.stage')
@@ -22,12 +35,16 @@ bibr <- bibr[!is.na(bibr[, bins]), ]
 bibr <- bibr[!is.na(bibr$EO_5_1_2014), ]
 bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
 bibr <- bibr[!is.na(bibr$collections.paleolatdec), ]
-
 bibr <- bibr[bibr$collections.stage %in% gts, ] 
 bibr$collections.stage <- as.character(bibr$collections.stage)
-collec.stage <- table(bibr$collections.stage)
 bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
 
+paleozoic <- gts[which(gts == 'Changhsingian'):length(gts)]
+bibr <- bibr[bibr$collections.stage %in% paleozoic, ]
+
+collec.stage <- table(bibr$collections.stage)
+bibr <- bibr[bibr$occurrences.class_name == 'Rhynchonellata', ]
+bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
 
 # this section is all about finding duration
 find.dur <- function(x) {
@@ -153,17 +170,7 @@ names(dat.full) <- c('count', 'genus', 'order', 'offset')
 age.data <- age.data[age.data$genus %in% ords[, 2], ]
 age.data$class <- ords[match(age.data$genus, ords[, 2]), 1]
 
-
 # get the subset that corresponds to the sepkoski fauna
-sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya', 
-                              'Lingulata'),
-                 paleozoic = c('Rhynchonellata', 'Crinoidea', 'Ostracoda', 
-                               'Cephalopoda', 'Anthozoa', 'Cyclocystoidea', 
-                               'Asteroidea', 'Ophiuroidea'),
-                 modern = c('Gastropoda', 'Bivalvia', 'Osteichtyes', 
-                            'Malacostraca', 'Echinoidea', 'Gymnolaemata', 
-                            'Demospongea', 'Chondrichthyes'))
-
 fauna <- age.data$class
 ws <- llply(sepkoski, function(x) age.data$class %in% x)
 
@@ -172,4 +179,6 @@ for(ii in seq(length(ws))) {
 }
 sepkoski.data <- cbind(age.data, fauna)[fauna %in% names(sepkoski), ]
 sepkoski.data$fauna <- as.character(sepkoski.data$fauna)
-sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
+sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, 
+                                            names(occupy))])
+sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]

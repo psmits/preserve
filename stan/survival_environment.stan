@@ -9,56 +9,62 @@ data {
   real<lower=0> dur_unc[N_unc];
   int group_unc[N_unc];
   int cohort_unc[N_unc];
+  real occupy_unc[N_unc];
   real env_unc[N_unc];
+  real size_unc[N_unc];
   real<lower=0> dur_cen[N_cen];
   int group_cen[N_cen];
   int cohort_cen[N_cen];
-  real env_cen[N_cen];
-
-  real occupy_unc[N_unc];
   real occupy_cen[N_cen];
+  real env_cen[N_cen];
+  real size_cen[N_cen];
 }
 parameters {
   real<lower=0> alpha;
-  vector[2] coef[O];
-  vector[2] mu_prior;
-  vector<lower=0>[2] sigma;
-  corr_matrix[2] Omega;
+  vector[4] mu_prior;
+  vector[4] beta[O];  // betas
+  corr_matrix[4] Omega;
+  vector<lower=0>[4] sigma;
 }
 transformed parameters {
-  cov_matrix[2] Sigma;
+  cov_matrix[4] Sigma;
 
   Sigma <- quad_form_diag(Omega, sigma);
 }
 model {
   alpha ~ cauchy(0, 2);
-
   // varying slopes, varying intercepts
   // done by cohort
   Omega ~ lkj_corr(2);
   sigma ~ cauchy(0, 1);
-  for(i in 1:2) {
+  for(i in 1:4) {
     mu_prior[i] ~ normal(0, 5);
   }
   for(i in 1:O) {
-    coef[i] ~ multi_normal(mu_prior, Sigma);
+    beta[i] ~ multi_normal(mu_prior, Sigma);
   }
 
   // likelihood
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {
       increment_log_prob(weibull_cdf_log(dur_unc[i], alpha, 
-            exp(-(coef[cohort_unc[i], 1] +
-                coef[cohort_unc[i], 2] * occupy_unc[i])/ alpha)));
+            exp(-(beta[cohort_unc[i], 1] +
+                beta[cohort_unc[i], 2] * occupy_unc[i] +
+                beta[cohort_unc[i], 3] * env_unc[i] +
+                beta[cohort_unc[i], 4] * size_unc[i]) / alpha)));
     } else {
-      increment_log_prob(weibull_log(dur_unc[i], alpha, 
-            exp(-(coef[cohort_unc[i], 1] +
-                coef[cohort_unc[i], 2] * occupy_unc[i])/ alpha)));
+      increment_log_prob(weibull_log(dur_unc[i], alpha,
+            exp(-(beta[cohort_unc[i], 1] +
+                beta[cohort_unc[i], 2] * occupy_unc[i] +
+                beta[cohort_unc[i], 3] * env_unc[i] +
+                beta[cohort_unc[i], 4] * size_unc[i]) / alpha)));
     }
   }
   for(i in 1:N_cen) {
     increment_log_prob(weibull_ccdf_log(dur_cen[i], alpha,
-          exp(-(coef[cohort_cen[i], 1] +
-              coef[cohort_cen[i], 2] * occupy_cen[i])/ alpha)));
+          exp(-(beta[cohort_cen[i], 1] +
+              beta[cohort_cen[i], 2] * occupy_cen[i] +
+              beta[cohort_cen[i], 3] * env_cen[i] +
+              beta[cohort_cen[i], 4] * size_cen[i]) / alpha)));
   }
 }

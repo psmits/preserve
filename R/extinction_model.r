@@ -3,9 +3,6 @@ library(arm)
 library(parallel)
 
 source('../R/mung.r')
-sepkoski.data <- sepkoski.data[sepkoski.data$class == 'Rhynchonellata', ]
-incl <- sepkoski.data$orig %in% gts[which(gts == 'Changhsingian'):length(gts)]
-sepkoski.data <- sepkoski.data[incl, ]
 
 # sepkoski.data
 num.samp <- nrow(sepkoski.data)
@@ -32,7 +29,8 @@ ml <- (beta.a - 1) / (beta.a + beta.b - 2)
 data <- list(duration = sepkoski.data$duration, group = con.class,
              cohort = con.orig, regime = con.regime, fauna = con.fauna,
              env = rescale(logit(ml)),
-             occupy = rescale(logit(sepkoski.data$occupy)))
+             occupy = rescale(logit(sepkoski.data$occupy)),
+             size = rescale(log(sepkoski.data$size)))
 
 dead <- sepkoski.data$censored != 1
 unc <- llply(data, function(x) x[dead])
@@ -45,6 +43,7 @@ data <- list(dur_unc = unc$duration,
              regime_unc = unc$regime,
              occupy_unc = unc$occupy,
              env_unc = unc$env,
+             size_unc = unc$size,
              N_unc = length(unc$duration),
              dur_cen = cen$duration,
              group_cen = cen$group,
@@ -53,6 +52,7 @@ data <- list(dur_unc = unc$duration,
              regime_cen = cen$regime,
              occupy_cen = cen$occupy,
              env_cen = cen$env,
+             size_cen = cen$size,
              N_cen = length(cen$duration))
 
 data$samp_unc <- seq(data$N_unc)
@@ -76,5 +76,6 @@ with(data, {stan_rdump(list = c('dur_unc', 'group_unc', 'cohort_unc',
                                 'samp_cen', 'N', 'O', 'R', 'C', 'F',
                                 'occupy_unc', 'occupy_cen',
                                 'env_unc', 'env_cen',
+                                'size_unc', 'size_cen',
                                 'fauna', 'regime'),
                        file = '../data/data_dump/fauna_info.data.R')})

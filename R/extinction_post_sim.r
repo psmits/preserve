@@ -20,20 +20,24 @@ coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 rage <- c(data$occupy_unc, data$occupy_cen)
 envs <- c(data$env_unc, data$env_cen)
+size<- c(data$size_unc, data$size_cen)
 
-environ <- cbind(extract.fit$x_unc, extract.fit$x_cen)
-coefs <- extract.fit$coef
+betas <- extract.fit$beta
 ph <- list()
 for(ii in 1:nsim) {
   n <- data$N
-  alpha <- sample(extract.fit$alpha, 1)
-  int <- coefs[sample(nrow(coefs), 1), , 1]
-  slp <- coefs[sample(nrow(coefs), 1), , 2]
+  alp <- sample(extract.fit$alpha, 1)
+  int <- betas[sample(nrow(betas), 1), , 1]
+  bet.1 <- betas[sample(nrow(betas), 1), , 2]
+  bet.2 <- betas[sample(nrow(betas), 1), , 3]
+  bet.3 <- betas[sample(nrow(betas), 1), , 4]
 
   oo <- c()
   for(jj in seq(n)) {
-    reg <- int[coh[jj]] + slp[coh[jj]] * rage[jj]
-    oo[jj] <- rweibull(1, scale = exp(-(reg) / alpha), shape = alpha)
+    reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
+           bet.2[coh[jj]] * envs[jj] + 
+           bet.3[coh[jj]] * size[jj]
+    oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
   }
 
   ph[[ii]] <- oo
@@ -45,5 +49,7 @@ duration <- c(data$dur_unc, data$dur_cen)
 #for(s in 1:19) hist(ph[[s]], xlab = '', main = paste('y_rep', s))
 tstat.mean <- sum(laply(ph, mean) > mean(duration))
 tstat.med <- sum(laply(ph, median) > median(duration))
-tstat.75 <- sum(laply(ph, function(x) quantile(x, .75)) > quantile(duration, .75))
-tstat.25 <- sum(laply(ph, function(x) quantile(x, .25)) > quantile(duration, .25))
+tstat.75 <- sum(laply(ph, function(x) quantile(x, .75)) > 
+                quantile(duration, .75))
+tstat.25 <- sum(laply(ph, function(x) quantile(x, .25)) > 
+                quantile(duration, .25))
