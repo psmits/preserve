@@ -141,15 +141,25 @@ sigma.plot <- sigma.plot + labs(x = '', y = '')
 
 # histogram of posterior of correlation between inter and env
 baseline.covar <- data.frame(value = c(exp.fit$Omega[, 1, 3], 
-                                       wei.fit$Omega[, 1, 3]),
+                                       wei.fit$Omega[, 1, 3],
+                                       exp.fit$Omega[, 1, 4], 
+                                       wei.fit$Omega[, 1, 4]),
                              lab = c(rep('Exponential', 
                                          length(exp.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
+                                         length(exp.fit$Omega[, 1, 3])),
+                                     rep('Exponential', 
+                                         length(wei.fit$Omega[, 1, 3])),
+                                     rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3]))))
+baseline.covar$var <- c(rep('Cor(beta[intercept], beta[environment])',
+                            2 * length(exp.fit$Omega[, 1, 3])),
+                        rep('Cor(beta[intercept], beta[mass])',
+                            2 * length(exp.fit$Omega[, 1, 3])))
+
 tb.cv <- ggplot(baseline.covar, aes(x = value))
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
-tb.cv <- tb.cv + facet_grid(. ~ lab, labeller = label_parsed)
-tb.cv <- tb.cv + labs(x = 'Covariates', y = 'Covariates')
+tb.cv <- tb.cv + facet_grid(var ~ lab, labeller = label_parsed)
 
 
 # change in baseline through time
