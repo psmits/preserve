@@ -12,15 +12,22 @@ source('../R/extinction_post_sim.r')
 theme_set(theme_bw())
 cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
          '#0072B2', '#D55E00', '#CC79A7')
-theme_update(axis.text = element_text(size = 20),
-             axis.title = element_text(size = 30),
-             legend.text = element_text(size = 25),
-             legend.title = element_text(size = 26),
+theme_update(axis.text = element_text(size = 10),
+             axis.title = element_text(size = 20),
+             legend.text = element_text(size = 15),
+             legend.title = element_text(size = 16),
              legend.key.size = unit(2, 'cm'),
-             strip.text = element_text(size = 20))
+             strip.text = element_text(size = 10))
+
+# data setup
+coh <- c(data$cohort_unc, data$cohort_cen)
+gro <- c(data$group_unc, data$group_cen)
+rage <- c(data$occupy_unc, data$occupy_cen)
+envs <- c(data$env_unc, data$env_cen)
+size <- c(data$size_unc, data$size_cen)
+duration <- c(data$dur_unc, data$dur_cen)
 
 # lets make survival curves
-duration <- c(data$dur_unc, data$dur_cen)
 condition <- c(rep(1, data$N_unc), rep(0, data$N_cen))
 condition[duration == 1 & condition == 1] <- 2
 
@@ -67,6 +74,8 @@ surv.plot <- surv.plot + geom_line(size = 1)
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
+ggsave(surv.plot, filename = '../doc/survival/figure/suvival_curves.png',
+       width = 8, height = 5)
 
 # make plot of correlation and covariance matrices
 # row is sample
@@ -125,6 +134,8 @@ omega.plot <- omega.plot + scale_fill_gradient2(name = 'Correlation',
                                                 high = 'red')
 omega.plot <- omega.plot + relab.x + relab.y
 omega.plot <- omega.plot + labs(x = '', y = '')
+ggsave(omega.plot, filename = '../doc/survival/figure/correlation_heatmap.png',
+       width = 10, height = 5)
 
 # covariance matrix
 sigma.med <- melt(list(Exponential = exp.covcor[[5]], 
@@ -138,6 +149,8 @@ sigma.plot <- sigma.plot + scale_fill_gradient2(name = 'Covariance',
                                                 high = 'red')
 sigma.plot <- sigma.plot + relab.x + relab.y
 sigma.plot <- sigma.plot + labs(x = '', y = '')
+ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_headmap.png',
+       width = 10, height = 5)
 
 # histogram of posterior of correlation between inter and env
 baseline.covar <- data.frame(value = c(exp.fit$Omega[, 1, 3], 
@@ -160,7 +173,8 @@ baseline.covar$var <- c(rep('Cor(beta[intercept], beta[environment])',
 tb.cv <- ggplot(baseline.covar, aes(x = value))
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
 tb.cv <- tb.cv + facet_grid(var ~ lab, labeller = label_parsed)
-
+ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.png',
+       width = 10, height = 5)
 
 # change in baseline through time
 # weibull
@@ -221,3 +235,5 @@ base.line <- base.line + geom_segment(data = grand,
 base.line <- base.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 base.line <- base.line + facet_grid(label ~ ., labeller = label_parsed)
 base.line <- base.line + labs(x = 'Stage', y = expression(beta[intercept]))
+ggsave(base.line, filename = '../doc/survival/figure/intercept_cohort.png',
+       width = 10, height = 5)

@@ -12,133 +12,21 @@
 \section{Methods}
 
 \subsection{Fossil occurrence information}
-I analyzed the exact data set used by \citet{Foote2013} in their analysis of the early survival of marine genera. This data set is a highly pruned and vetted set of all occurrences of important marine groups for the entire Phanerozoic as sampled in the Paleobiology Database (http://www.paleodb.org). Specifically, I analyzed a subset of the \citet{Foote2013} data set of only genera belonging to a higher-taxonomic level assigned to one of the three Sepkoski Fauna (Table \ref{tab:sepkoski}).
 
-\subsection{Survival model}
-Define \(y\) as a vector of length \(n\) where the \(i\)th element is the duration in geologic stages of genus \(i\), where \(i = 1, \dots, n\).
-
-The simplest parametric survival model is where species durations are assumed to be distributed exponentially with a single inverse-scale (``rate'') parameter \(\lambda\)
-\begin{equation}
-  \begin{aligned}
-    p(y | \lambda) &= \lambda \exp(-\lambda y) \nonumber \\
-    y_{i} &\sim \mathrm{Exponential}(\lambda).
-  \end{aligned}
-  \label{eq:exp}
-\end{equation}
-Given a parameteric model of survival, two key functions can be defined: survival \(S(t)\) and hazard \(h(t)\). \(S(t)\) corresponds to the probability that a species having existed for \(t\) will not have gone extinct while \(h(t)\) corresponds to the instantaneous extinction rate per unit age given taxon age \(t\) \citep{Klein2003}. For an exponential model, \(S(t)\) is defined
-\begin{equation}
-  S(t) = \exp(-\lambda t)
-  \label{eq:exp_surv}
-\end{equation}
-and \(h(t)\) is defined
-\begin{equation}
-  h(t) = \lambda
-  \label{eq:exp_haz}
-\end{equation}
-An exponential model of duration is the parameteric representation of \citet{VanValen1973} because the right side of Eq. \ref{eq:exp_haz} does not include any \(t\) terms.
-
-In order to allow species duration to vary with individual covariate information \(\lambda\) can be reparameterized as a regression \citep{Klein2003}. Given that \(\lambda\) is only defined for all non-negative reals, I use a log-link function. More specifically, this is written out as 
-\begin{equation}
-  \lambda = \exp(\beta).
-  \label{eq:lambda}
-\end{equation}
-\(\beta\) can then be expanded to included covariates of interest.
+% data is based on Foote2013
+%   select taxonomic groups Brachiopods(, Bivalves)
+%   filtered heavily; requires
+%     latitude/longitude
+%     environment
+%     body size Payne2014 paper
+% duration is number of stages observed
 
 
-\subsubsection{Hierarchical modeling}
-Hierarchical or multilevel models are for when data are structured in known groups and parameters are allowed to vary by groupings \citep{Gelman2007,Gelman2013d}. This approach allows for inference to be couched directly in terms of the structure of the data. In a hierarchical model, these groups are considered exchangeable samples from a population distribution \citep{Gelman2013d}. By setting up a hierarchical model we can improve predictive accuracy by allowing for more sources of variance.
+%I analyzed the exact data set used by \citet{Foote2013} in their analysis of the early survival of marine genera. This data set is a highly pruned and vetted set of all occurrences of important marine groups for the entire Phanerozoic as sampled in the Paleobiology Database (http://www.paleodb.org). Specifically, I analyzed a subset of the \citet{Foote2013} data set of only genera belonging to a higher-taxonomic level assigned to one of the three Sepkoski Fauna (Table \ref{tab:sepkoski}).
 
-While a hierarchical modeling approach increases the overall complexity of the model, there are numerous advantages not available to single-level modeling as well as being a more realistic model of the data-generating process \citep{Gelman2007,Gelman2013d}.
+Prior to analysis all covariates were transformed to be defined on the entire real line. Geographic range size and environmental preferences, because they are defined as values only between 0 and 1, were logit transformed. Body size, which is defined for all positive real values was natural log transformed. All of these covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
 
-For example, if we were studying mortality rates across multiple hospitals we might consider each hospital as a sample from a shared ``hospital-level'' distribution describing the expected ``hospital effect.'' Additionally, we are able to estimate the hospital-level variance which allows for inference about how consistent effects may be across all hospitals.
-
-Hierarchical modeling can be viewed as a compromise between inference from completely pooled data and from data separated by group or no pooling. Mathematically, complete pooling is when we assume that between group variance is zero while no pooling is when we assume that between group variance is infinite. Compromise is accomplished, for example, by letting the scale hyperparameter of the shared prior be estimated from the data \citep{Gelman2013d}. This is effectively a weighted mean of these two extremes where the weighting depends on the sample size of each group.
-
-Groups with small samples sizes or little power are drawn towards the population mean, while groups with larger samples sizes or possibly stronger effects are estimated as necessary. This means that groups with smaller sample sizes borrow power from the larger groups.
-
-
-\subsubsection{Temporal effects}
-
-By definition, a genus originates during a single geologic stage. Define an origination cohort, \(c_{j}\), as the set of all genera that origination during the same geologic stage \(j\) where \(j = 1, \dots, J\), \(J\) being the total number of origination cohorts \citep{Raup1978}. Origination cohort is modeled as a hierarchical effect where cohorts are considered exchangeable and drawn from a shared normal distribution. This is written as 
-\begin{equation}
-  c_{j} \sim \mathcal{N}(0, \sigma_{c})
-  \label{eq:cohort}
-\end{equation}
-where the scale parameter \(\sigma_{c}\) is estimated from the data. This term is incorporated in to Eq. \ref{eq:lambda} as follows
-\begin{equation}
-  \lambda_{i} = \exp(\beta + c_{j[i]})
-  \label{eq:lambda_cohort}
-\end{equation}
-
-This approach for handling temporal effects can be further expanded, allowing for more temporal structure to be included. For example, each geologic stage can be considered a member of a specific period of ``background extinction,'' or temporal range between two mass extinction events. Effectively, this means modeling the macroevolutionary regime membership of each cohort \citep{Jablonski1987}. Define regime \(r_{k}\) as the set of all origination cohorts within the temporal span between two mass extinctions \(k\) where \(k = 1, \dots, K\), \(K\) being the total number of regimes. Regime is then modeled as a hierarchical one ``level'' above origination cohort, and is also considered exchangeable and drawn from a shared normal distribution. Eq. \ref{eq:cohort} is then expanded as follows
-\begin{equation}
-  \begin{aligned}
-    c_{j} &\sim \mathcal{N}(\mu_{k[j]}, \sigma_{c}) \\
-    \mu_{k} &\sim \mathcal{N}(0, \sigma_{\mu}).
-  \end{aligned}
-  \label{eq:cohort_regime}
-\end{equation}
-As above, both \(\sigma_{c}\) and \(\sigma_{\mu}\) are estimated from the data.
-
-
-\subsubsection{Taxonomic effects}
-
-By definition, each genus belongs to a single higher-level taxonomic grouping. Define a higher-level taxonomic grouping \(l_{g}\) as the set of all genera belonging to a shared Linnean classification of approximately class level where \(g = 1, \dots, G\), \(G\) being the total number of observed groupings. I model taxonomic groupings as a hierarchical effect where groups are conspired exchangeable and drawn from a shared normal distribution. I consider this approach appropriate because there is no comprehensive phylogenetic hypothesis including all genera from major marine groups across the entire Phanerozoic. In cases where there is a more detailed phylogenetic hypothesis, it would be possible to model phylogenetic effect as an individual hierarchical effect modeled as a multivariate normal distribution with covariance matrix known up to a constant \citep{Lynch1991,Housworth2004}.
-
-Given the above assumptions, \(l\) is modeled as
-\begin{equation}
-  l_{g} \sim \mathcal{N}(0, \sigma_{l})
-  \label{eq:taxon}
-\end{equation}
-where \(\sigma_{l}\) is estimated from the data. Just as with temporal effect, this term is incorporated into Eq. \ref{eq:lambda} as
-\begin{equation}
-  \lambda_{i} = \exp(\beta + l_{g[i]}).
-  \label{eq:lambda_taxon}
-\end{equation}
-Incorporating both temporal and taxonomic effects into Eq. \ref{eq:lambda} is simply
-\begin{equation}
-  \lambda_{i} = \exp(\beta + c_{j[i]} + l_{g[i]}).
-  \label{eq:lambda_full}
-\end{equation}
-
-It is possible to increase the complexity of Eq. \ref{eq:taxon} by including increasingly more taxonomic levels both above and below the class level. However, I chose to not do this as it adds what is probably an unnecessary amount of complexity and makes interpretation of results extremely difficult.
-
-What is of interest, however, are Sepkoski's three fauna \citep{SepkoskiJr.1981a} which divide select higher-level classifications into Cambrian, Paleozoic, and Modern fauna (Table \ref{tab:sepkoski}). To model taxonomic groups as samples from a fauna, first I define a fauna \(f_{h}\) as the set of all taxonomic groups assigned by \citet{SepkoskiJr.1981a} where \(h = 1, \dots, H\), \(H\) bing the number of fauna (3). Fauna are considered exchangeable and drawn from a shared normal distribution. Eq. \ref{eq:taxon} is then rewritten as
-\begin{equation}
-  \begin{aligned}
-    l_{g} &\sim \mathcal{N}(\omega_{h[g]}, \sigma_{l})\\
-    \omega_{h} &\sim \mathcal{N}(0, \sigma_{\omega})
-  \end{aligned}
-  \label{eq:taxon_fauna}
-\end{equation}
-where both \(\sigma_{l}\) and \(\sigma_{\omega}\) are estimated from the data.
-
-
-\subsubsection{Age-dependent extinction}
-
-We can relax assumption of the exponential model that extinction risk is independent of species age by instead assuming that species durations follow a Weibull distribution. The Weibull distribution has a shape parameter \(\alpha\) and a scale parameter \(\sigma\). Note that, by definition, \(\sigma = 1 / \lambda\). The Weibull distribution and sampling statement are defined
-\begin{equation}
-  \begin{aligned}
-    p(y | \alpha, \sigma) &= \frac{\alpha}{\sigma} \left(\frac{y}{\sigma}\right)^{\alpha - 1} \exp\left(-\left(\frac{y}{\sigma}\right)^{\alpha}\right) \\
-    y &\sim \mathrm{Weibull}(\alpha, \sigma).
-  \end{aligned}
-  \label{eq:weibull}
-\end{equation}
-The corresponding \(S(t)\) and \(h(t)\) functions are defined
-\begin{align}
-  S(t) &= \exp\left(-\left(\frac{t}{\sigma}\right)^{\alpha}\right) \label{eq:wei_surv} \\
-  h(t) &= \frac{\alpha}{\sigma}\left(\frac{t}{\sigma}\right)^{\alpha - 1} \label{eq:wei_haz}.
-\end{align}
-
-Similar to the exponential model, to allow for species duration to vary with individual covariate information \(\sigma\) can be reparameterized as a regression \citep{Klein2003} using a log-link function. This reparameterization takes a different form than for the exponential (Eq. \ref{eq:lambda} and \ref{eq:lambda_full}) and, incorporating temporal and taxonomic effects, is written
-\begin{equation}
-  \sigma = \exp\left(\frac{-(\beta + c_{j[i]} + l_{g[i]})}{\alpha}\right).
-  \label{eq:sigma_full}
-\end{equation}
-Incidentally, this is the formulation for an accelerated time failure model \citep{Klein2003}. \(\alpha\) can also be allowed to vary by, for example, hierarchical effects though it is normally assumed constant for all observations \citep{Klein2003}.
-
-
-\subsubsection{Biological covariates}
+\subsubsection{Uncertainty in covariates}
 
 We cannot directly observe if a fossil taxon had occurrence restricted to any single environmental type, instead we estimate a probability with uncertainty based on proxies. One advantage of using a Bayesian analytical context is that both parameters and data are considered random samples from some underlying distribution, which means it is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. In this case, this is the probability that a genus will occur in an epicontiental sea or not. 
 
@@ -152,9 +40,9 @@ Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental
 
 It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an informative beta prior, which is conveniently the conjugate prior for the beta distribution. 
 
-Define \(\eta_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(\pi_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define a prior for \(\theta\) as
+Define \(E_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(O_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define a prior for \(\theta\) as
 \begin{equation}
-  \theta \sim \mathrm{Beta}(\eta_{i}, \pi_{i}).
+  \theta \sim \mathrm{Beta}(E_{i}, O_{i}).
   \label{eq:epi_prior}
 \end{equation}
 
@@ -162,41 +50,102 @@ Given the likelihood (Eq. \ref{eq:epi_lik}) and the prior (Eq. \ref{eq:epi_prior
 \begin{equation}
   \begin{aligned}
     p(\theta | y) &\propto p(y | \theta) p(\theta) \\
-    p(\theta | y) &= \mathrm{Beta}(e_{i} + \eta_{i}, o_{i} + \pi_{i}).
+    p(\theta | y) &= \mathrm{Beta}(e_{i} + E_{i}, o_{i} + O_{i}).
   \end{aligned}
   \label{eq:epi_post}
 \end{equation}
-Now given the full definition of \(\theta\) (Eq. \ref{eq:epi_post}), it can then be included in the definition of \(\sigma\) (Eq. \ref{eq:sigma_full}) as a covariate with its own slope,
-\begin{equation}
-  \sigma = \exp\left(\frac{-(\beta_{0} + \beta_{1}\theta + c_{j[i]} + l_{g[i]})}{\alpha}\right).
-  \label{eq:sigma_updated}
-\end{equation}
 
 
-\subsubsection{Priors}
-Given the Bayesian framework used here, what remains is the important step of assigning priors probability statements to all estimated parameters. While many of the (hyper)parameters have already been given (hyper)priors, there currently remain a few improper priors.
 
-The intercept term \(\beta_{0}\) is given a weakly informative prior, \(\beta_{0} \sim \mathcal{N}(0, 10)\), reflecting that while little information is directly known, the value is most likely not extremely large or small. The environmental slope term \(\beta_{1}\) is given a slightly more informative \(\beta_{1} \sim \mathcal{N}(0, 5)\) prior for similar reasons.
+\subsection{Survival model}
 
-The prior terms for the various scale parameters of the hierarchical effects (Eq. \ref{eq:cohort_regime} and \ref{eq:taxon_fauna}) I use a weakly informative, regularizing half-Cauchy (C\(^{+}\)) prior distribution in order to better constrain all parameter estimates \citep{Gelman2013d}. This is especially appropriate in the case of Eq. \ref{eq:taxon_fauna} as there are only three factors at the fauna level. 
+Genus durations were modeled in a Bayesian parameteric survival analysis framework. Durations were assumed to follow either an exponential or Weibull distribution. Each of these distributions makes strong assumptions about how duration may effect extinction risk. Use of the exponential distribution assumes that extinction risk is independent of duration. In contrast, use of the Weibull distribution allows for age dependent extinction via the shape parameter \(\alpha\), though only as a monotonic function of duration. Importantly, the Weibull distribution is equivalent to the exponential distribution when \(\alpha = 1\). In general, the notation used here follows \citet{Gelman2007}, \citet{Gelman2013d}, and \uppercase{stan manual}.
+
+The simplest model of genus duration includes no covariate or structural information. Define \(y_{i}\) as the duration in stages of genus \(i\), where \(i = 1, \dots, n\) and \(n\) is the number of observed genera. These two models are them simply defined as
 \begin{equation}
   \begin{aligned}
-    \sigma_{\mu} &\sim \mathrm{C}^{+}(1) \\
-    \sigma_{\omega} &\sim \mathrm{C}^{+}(1) \\
+    y_{i} \sim \mathrm{Exponential}(\lambda) \\
+    y_{i} \sim \mathrm{Weibull}(\alpha, \sigma).
   \end{aligned}
-  \label{eq:scale_priors}
+  \label{eq:simple}
 \end{equation}
-Note that the half-Cauchy distribution is equivalent to a folded \textit{t}-distribution with 1 degree-of-freedom \citep{Gelman2013d}.
+Note that \(\lambda\) is a ``rate'' or inverse-scale while \(\sigma\) is a scale parameter, meaning that \(\frac{1}{\lambda} = \sigma\).
 
-Finally, the Weibull shape parameter \(\alpha\) is also given a weakly informative half-Cauchy prior, \(\alpha \sim \mathrm{C}^{+}(2.5)\). 
-% Maybe this is the time to include the very strong Van Valen prior on \alpha?
+% this is where i include the hazard and survival functions
+
+These current simple models can then be expanded to include covariate information as predictors by reparameterizing \(\lambda\) and \(\sigma\) as a regression \citep{Klein2003}. Each of the covariates of interest is given its own regression coefficient (e.g. \(\beta_{range}\) along with an intercept term \(\beta_{0}\). There are some additional complications to the parameterization of \(\sigma\) associated with the inclusion of \(\alpha\) as well as interpretability \citep{Klein2003}. Both of these cases are written more fully as
+\begin{equation}
+  \begin{aligned}
+    \lambda_{i} &= \exp(\beta_{0} + \beta_{range} r_{i} + \beta_{environment} e_{i} + \beta_{mass} m_{i}) \\
+    \sigma_{i} &= \exp\left(\frac{-(\beta_{0} + \beta_{range} r_{i} + \beta_{environment} e_{i} + \beta_{mass} m_{i})}{\alpha}\right).
+  \end{aligned}
+  \label{eq:regression}
+\end{equation}
+The regression equations are exponentiated because both \(\lambda\) and \(\sigma\) are only defined for positive reals.
+
+The current model which incorporates both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 4\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a columns of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts.
+
+Using the above hierarchical expansion to the model, we then rewrite \(\lambda\) and \(\sigma\) in matrix notation as
+\begin{equation}
+  \begin{aligned}
+    \lambda_{i} &= \exp(\mathbf{X}_{i} \mathbf{B}_{j[i]}) \\
+    \sigma_{i} &= \exp\left(\frac{-(\mathbf{X}_{i} \mathbf{B}_{j[i]})}{\alpha}\right). 
+  \end{aligned}
+  \label{eq:multivariate}
+\end{equation}
+
+At face value, the above parameterization (Eq. \ref{eq:multivariate}) is opaque as to how the covariance and correlation between elements of \(\mathbf{B}\) are estimated. This becomes more apparent after defining the prior distribution of \(\mathbf{B}\). Because \(\mathbf{B}\) is a matrix, I used a multivariate normal prior with unknown vector of means \(\mu\) and covariance matrix \(\mathbf{\Sigma}\). This is written as 
+\begin{equation}
+  \mathbf{B} \sim \mathrm{MVN}(\mu_{\mathbf{B}}, \Sigma_{\mathbf{B}}).
+  \label{eq:beta_prior}
+\end{equation}
+\(\mu_{\mathbf{B}}\) is length \(k\) vector representing the overall mean of the distributions of \(\beta\) coefficients. \(\Sigma_{\mathbf{B}}\) is a \(k \times k\) covariance matrix of the \(\beta\) coefficients.
+
+What remains is assigning priors the elements of \(\mu_{\mathbf{B}}\) and the covariance matrix \(\Sigma_{\mathbf{B}}\). Each of the elements of vector \(\mu_{\mathbf{B}}\) were given independent, weakly-informative normal priors. The prior for \(\Sigma_{\mathbf{B}}\) is a bit more complicated. While the conjugate prior distribution for a covariance matrix is the inverse-Wishart \citep{Gelman2013d}, because I am using a variant for Hamiltonian Monte Carlo (HMC) called No U-Turn Sampling (NUTS) for posterior estimation as opposed to Gibbs sampling there is not benefit for using a conjugate prior \uppercase{stan manual}. Additionally, the inverse-Wishart distribution strongly constraints the off-diagonal elements of the covariance matrix. Instead, it is better to model the correlation matrix and separate variance terms for each of the \(k\) coefficients. This is possible because of the relationship between a covariance and a correlation matrix, defined as 
+\begin{equation}
+  \Sigma_{\mathbf{B}} = \text{Diag}(\tau_{B}) \Omega_{\mathbf{B}} \text{Diag}(\tau_{B})
+  \label{eq:covcor}
+\end{equation}
+where \(\tau_{B}\) is a length \(k\) vector of variances and Diag(\(\tau_{B}\)) is a diagonal matrix.
+
+I used a LKJ prior distribution for \(\Omega_{\mathbf{B}}\) as recommended by \uppercase{stan manual}. An LKJ is a single parameter multivariate distribution where values of \(\eta\) greater than 1 concentrate density at the unit correlation matrix, which corresponds to no correlation between the \(\beta\) coefficients. The scale parameter, \(\tau_{B}\), is given a weakly informative half-Cauchy (C\(^{+}\)) prior following \citep{Gelman2006a}.
+
+Given all the above, the exponential distribution based model is then defined, including priors, as 
+\begin{equation}
+  \begin{aligned}
+    y_{i} &\sim \mathrm{Exponential}(\lambda) \\
+    \lambda_{i} &= \exp(\mathbf{X}_{i} \mathbf{B}_{j[i]}) \\
+    \mathbf{B} &\sim \mathrm{MVN}(\mu_{\mathbf{B}}, \Sigma_{\mathbf{B}}) \\
+    \Sigma_{\mathbf{B}} &= \text{Diag}(\tau_{B}) \Omega_{\mathbf{B}} \text{Diag}(\tau_{B}) \\
+    \mu_{\kappa} &\sim \mathcal{N}(0, 5) \text{ for } \kappa \in 1:k \\
+    \tau_{\kappa} &\sim \mathrm{C^{+}}(1) \text{ for } \kappa \in 1:k \\
+    \Omega &\sim \text{LKJ}(2).
+  \end{aligned}
+  \label{eq:exp_total}
+\end{equation}
+The Weibull distribution based model is then also defined as
+\begin{equation}
+  \begin{aligned}
+    y_{i} &\sim \mathrm{Weibull}(\alpha, \sigma) \\
+    \sigma_{i} &= \exp\left(\frac{-(\mathbf{X}_{i} \mathbf{B}_{j[i]})}{\alpha}\right) \\
+    \mathbf{B} &\sim \mathrm{MVN}(\mu_{\mathbf{B}}, \Sigma_{\mathbf{B}}) \\
+    \Sigma_{\mathbf{B}} &= \text{Diag}(\tau_{B}) \Omega_{\mathbf{B}} \text{Diag}(\tau_{B}) \\
+    \alpha &\sim \mathrm{C^{+}}(2) \\
+    \mu_{\kappa} &\sim \mathcal{N}(0, 5) \text{ for } \kappa \in 1:k \\
+    \tau_{\kappa} &\sim \mathrm{C^{+}}(1) \text{ for } \kappa \in 1:k \\
+    \Omega &\sim \text{LKJ}(2).
+  \end{aligned}
+  \label{eq:wei_total}
+\end{equation}
+Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) does not include censored observations. How these are included is defined in the next section.
+
 
 \subsection{Censored observations}
 A key aspect of survival analysis is the inclusion of censored, or incompletely observed, data points \citep{Ibrahim2001,Klein2003}. The two classes of censored observations encountered in this study were right and left censored observations. Right censoring is when a species does not go extinct during the window of observation, or species that are still extant. Left censored observations are those species that it is only known when a species was extinct by. To put another way, this is a species that went extinct but the observed duration is an over estimate of the actual duration. 
 
 In the context of this study, I considered all genera that had a duration of only one geologic stage to be left censored as we do not have a finer degree of resolution. Conceptually, this is similar to if I was studying, say, survival patterns in rats and an individual had died between the start of the experiment and next time the rats were observed. We know the rat lived no more than day.
 
-The key function for modeling censored observations is \(S(t)\) (Eq. \ref{eq:exp_surv} and \ref{eq:wei_surv}). \(S(t)\) is equivalent to the complementary cumulative distribution function, \(1 - F(t)\) \citep{Klein2003}. For right censored observations, instead of calculating the likelihood as normal (Eq. \ref{eq:exp} or \ref{eq:weibull}) the likelihood of an observation is evaluated using \(S(t)\). Conceptually, this approach calculates the likelihood of observing a species that existed for at least that long. For left censored data, instead the likelihood is calculated using \(1 - S(t)\) which corresponds to the likelihood of observing a species that existed no longer than \(t\).
+The key function for modeling censored observations is \(S(t)\) (Eq. \ref{eq:exp_surv} and \ref{eq:wei_surv}). \(S(t)\) is equivalent to the complementary cumulative distribution function, \(1 - F(t)\) \citep{Klein2003}. For right censored observations, instead of calculating the likelihood as normal (Eq. \ref{eq:multivariate}) the likelihood of an observation is evaluated using \(S(t)\). Conceptually, this approach calculates the likelihood of observing a species that existed for at least that long. For left censored data, instead the likelihood is calculated using \(1 - S(t)\) which corresponds to the likelihood of observing a species that existed no longer than \(t\).
 
 The full likelihood statements incorporating fully observed, right censored, and left censored observations are then
 \begin{equation}
@@ -217,20 +166,20 @@ Given the above likelihood and prior statements, the posterior probabilities of 
 %\subsection{Posterior predictive checks}
 
 
-\begin{table}
-  \centering
-  \begin{tabular}{l | p{0.75\textwidth}}
-    \hline
-    Fauna & Taxa \\
-    \hline
-    \hline
-    Cambrian & Trilobita, Polychaeta, Monoplacophora (Tergomya), Inarticulata (Lingulata)\\[0.1cm]
-    Paleozoic & Articulata (Rhynchonellata), Crinodea, Ostracoda, Cephalopoda, Anthozoa, Stenolaemata (Cyclocystoidea), Stelleroidea (Asteroidea, Ophiuridea) \\[0.1cm]
-    Modern & Gastropoda, Bivalvia, Osteichthyes, Malacostraca, Echinoidea, Gymnolaemata, Demospongea, Chondrichthyes \\
-    \hline
-  \end{tabular}
-  \caption{Sepkoski's three evolutionary fauna. In parentheses are the taxonomic names used in this study when there was a conflict between Sepkoski's designations and mine.}
-  \label{tab:sepkoski}
-\end{table}
+%\begin{table}
+%  \centering
+%  \begin{tabular}{l | p{0.75\textwidth}}
+%    \hline
+%    Fauna & Taxa \\
+%    \hline
+%    \hline
+%    Cambrian & Trilobita, Polychaeta, Monoplacophora (Tergomya), Inarticulata (Lingulata)\\[0.1cm]
+%    Paleozoic & Articulata (Rhynchonellata), Crinodea, Ostracoda, Cephalopoda, Anthozoa, Stenolaemata (Cyclocystoidea), Stelleroidea (Asteroidea, Ophiuridea) \\[0.1cm]
+%    Modern & Gastropoda, Bivalvia, Osteichthyes, Malacostraca, Echinoidea, Gymnolaemata, Demospongea, Chondrichthyes \\
+%    \hline
+%  \end{tabular}
+%  \caption{Sepkoski's three evolutionary fauna. In parentheses are the taxonomic names used in this study when there was a conflict between Sepkoski's designations and mine.}
+%  \label{tab:sepkoski}
+%\end{table}
 
 \end{document}

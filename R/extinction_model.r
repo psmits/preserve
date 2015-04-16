@@ -1,8 +1,18 @@
 library(rstan)
 library(arm)
 library(parallel)
+source('../R/gts.r')
+
+data.file <- list.files('../data', pattern = 'Occs')
+fossil <- read.csv(paste0('../data/', data.file))
+bibr <- fossil
+
+payne <- read.table('../data/payne_bodysize/Occurrence_PaleoDB.txt',
+                    header = TRUE, stringsAsFactors = FALSE)
+
 
 source('../R/mung.r')
+sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata')
 
 # sepkoski.data
 num.samp <- nrow(sepkoski.data)

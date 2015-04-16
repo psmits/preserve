@@ -7,12 +7,12 @@ nsim <- 1000
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
 # this is for the weibull model
-pat <- paste0('faun_expo_', '[0-9].csv')
+pat <- 'faun_expo_[0-9].csv'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 efit <- read_stan_csv(outs)
 
 # this is for the weibull model
-pat <- paste0('faun_weib_', '[0-9].csv')
+pat <- 'faun_weib_[0-9].csv'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 wfit <- read_stan_csv(outs)
 
@@ -21,7 +21,7 @@ coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 rage <- c(data$occupy_unc, data$occupy_cen)
 envs <- c(data$env_unc, data$env_cen)
-size<- c(data$size_unc, data$size_cen)
+size <- c(data$size_unc, data$size_cen)
 duration <- c(data$dur_unc, data$dur_cen)
 
 # weibull model
@@ -48,12 +48,12 @@ for(ii in 1:nsim) {
   wr[[ii]] <- oo
 }
 
-wei.mean <- sum(laply(wr, mean) > mean(duration))
-wei.med <- sum(laply(wr, median) > median(duration))
-wei.75 <- sum(laply(wr, function(x) quantile(x, .75)) > 
-              quantile(duration, .75))
-wei.25 <- sum(laply(wr, function(x) quantile(x, .25)) > 
-              quantile(duration, .25))
+#wei.mean <- sum(laply(wr, mean) > mean(duration))
+#wei.med <- sum(laply(wr, median) > median(duration))
+#wei.75 <- sum(laply(wr, function(x) quantile(x, .75)) > 
+#              quantile(duration, .75))
+#wei.25 <- sum(laply(wr, function(x) quantile(x, .25)) > 
+#              quantile(duration, .25))
 
 
 # exponential model
@@ -79,9 +79,9 @@ for(ii in 1:nsim) {
   er[[ii]] <- oo
 }
 
-exp.mean <- sum(laply(er, mean) > mean(duration))
-exp.med <- sum(laply(er, median) > median(duration))
-exp.75 <- sum(laply(er, function(x) quantile(x, .75)) > 
-              quantile(duration, .75))
-exp.25 <- sum(laply(er, function(x) quantile(x, .25)) > 
-              quantile(duration, .25))
+#exp.mean <- sum(laply(er, mean) > mean(duration))
+#exp.med <- sum(laply(er, median) > median(duration))
+#exp.75 <- sum(laply(er, function(x) quantile(x, .75)) > 
+#              quantile(duration, .75))
+#exp.25 <- sum(laply(er, function(x) quantile(x, .25)) > 
+#              quantile(duration, .25))
