@@ -13,6 +13,10 @@
 
 \subsection{Fossil occurrence information}
 
+The dataset analyzed here is derived from the a combination of the occurrence information from \citet{Miller2009a} and the body size data from \citet{Payne2014}. The \citet{Miller2009a} dataset is based on the Paleobiology Database (http://www.paleodb.org); see \citet{Miller2009a} for a full description of the inclusion criterion. Sampled occurences were restricted to those with latitude and longitude coordinates, assignment to either epicontinental or open-ocean environment, and being of a genus present in the body size dataset. Genus duration was calculated as the number of geologic stages from first apperance to last apperance, inclusive. Genera who's last apperance was in a stage preceeding a mass extinction were right censored, and genera with a duration of only one stage and were left censored (see below for explination of censoring). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(\theta\)), and body size (\(m\)). 
+
+Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells of a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). Following this, for each stage, the total number of grid cells occupied is calculated. The number of grid cells that each genus present occurs in was then calculated and made relative by dividing by the total number of possible cells. Finally, mean relative genus occupancy was calculated as the mean of per stage relative occupancy.
+
 % data is based on Foote2013
 %   select taxonomic groups Brachiopods(, Bivalves)
 %   filtered heavily; requires
@@ -24,17 +28,14 @@
 
 %I analyzed the exact data set used by \citet{Foote2013} in their analysis of the early survival of marine genera. This data set is a highly pruned and vetted set of all occurrences of important marine groups for the entire Phanerozoic as sampled in the Paleobiology Database (http://www.paleodb.org). Specifically, I analyzed a subset of the \citet{Foote2013} data set of only genera belonging to a higher-taxonomic level assigned to one of the three Sepkoski Fauna (Table \ref{tab:sepkoski}).
 
-Prior to analysis all covariates were transformed to be defined on the entire real line. Geographic range size and environmental preferences, because they are defined as values only between 0 and 1, were logit transformed. Body size, which is defined for all positive real values was natural log transformed. All of these covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
 
-\subsubsection{Uncertainty in covariates}
-
-We cannot directly observe if a fossil taxon had occurrence restricted to any single environmental type, instead we estimate a probability with uncertainty based on proxies. One advantage of using a Bayesian analytical context is that both parameters and data are considered random samples from some underlying distribution, which means it is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. In this case, this is the probability that a genus will occur in an epicontiental sea or not. 
+The calculation and inclusion of environmental affinity in the subsequent survival model is a more complicated statistical procedure that takes into account our uncertainty. Because we cannot directly observe if a fossil taxon had occurrences restricted to only a single environmental, instead we can only estimate a probability of occurrence with some amount of uncertainty. One advantage of using a Bayesian analytical context is that both parameters and data are considered random samples from some underlying distribution, which means it is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. In this case, this is the probability that a genus will occur in an epicontiental sea or not. 
 
 A genus' probability of occurring in an epicontinental environment, \(\theta\), was calculated using a fully Bayesian extension of \citep{Simpson2009} where occurrence probability (e.g. affinity) is defined as a distribution and not a point estimate. The reasoning behind this approach is that it allows for our uncertainty to properly propagate through our model.
 
-Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. offshore). Because the value of inters is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a beta distribution. We can then define our sampling statement as
+Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. open ocean). Because the value of inters is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a beta distribution. We can then define our sampling statement as
 \begin{equation}
-  \theta \sim \mathrm{Beta}(e_{i}, o_{i}).
+  \theta_{i} \sim \mathrm{Beta}(e_{i}, o_{i}).
   \label{eq:epi_lik}
 \end{equation}
 
@@ -42,19 +43,23 @@ It is extremely important, however, to take into account the overall environment
 
 Define \(E_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(O_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define a prior for \(\theta\) as
 \begin{equation}
-  \theta \sim \mathrm{Beta}(E_{i}, O_{i}).
+  \theta_{i} \sim \mathrm{Beta}(E_{i}, O_{i}).
   \label{eq:epi_prior}
 \end{equation}
 
 Given the likelihood (Eq. \ref{eq:epi_lik}) and the prior (Eq. \ref{eq:epi_prior}), the conjugacy of the prior can be taken advantage of to calculate the full posterior distribution
 \begin{equation}
   \begin{aligned}
-    p(\theta | y) &\propto p(y | \theta) p(\theta) \\
-    p(\theta | y) &= \mathrm{Beta}(e_{i} + E_{i}, o_{i} + O_{i}).
+    p(\theta_{i} | y_{i}) &\propto p(y_{i} | \theta) p(\theta) \\
+    p(\theta_{i} | y_{i}) &= \mathrm{Beta}(e_{i} + E_{i}, o_{i} + O_{i}).
   \end{aligned}
   \label{eq:epi_post}
 \end{equation}
+\(p(\theta_{i} | y_{i})\) is the full posterior describing the probability that genus \(i\) occurs on an epicontinental sea, where higher values indicate increased affinity for epicontinental seas over open-ocean environments.
 
+Body size data was sourced directly from \citet{Payne2014}. Because those measurements are presented with out quantified error, a measurement error model similar to the one for environmental affinity could not be implemented.
+
+Prior to analysis all covariates were transformed to be defined on the entire real line. Geographic range size and environmental preferences, because they are defined as values only between 0 and 1, were logit transformed. Body size, which is defined for all positive real values was natural log transformed. All of these covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
 
 
 \subsection{Survival model}
@@ -64,8 +69,8 @@ Genus durations were modeled in a Bayesian parameteric survival analysis framewo
 The simplest model of genus duration includes no covariate or structural information. Define \(y_{i}\) as the duration in stages of genus \(i\), where \(i = 1, \dots, n\) and \(n\) is the number of observed genera. These two models are them simply defined as
 \begin{equation}
   \begin{aligned}
-    y_{i} \sim \mathrm{Exponential}(\lambda) \\
-    y_{i} \sim \mathrm{Weibull}(\alpha, \sigma).
+    y_{i} &\sim \mathrm{Exponential}(\lambda) \\
+    y_{i} &\sim \mathrm{Weibull}(\alpha, \sigma).
   \end{aligned}
   \label{eq:simple}
 \end{equation}
@@ -73,15 +78,15 @@ Note that \(\lambda\) is a ``rate'' or inverse-scale while \(\sigma\) is a scale
 
 % this is where i include the hazard and survival functions
 
-These current simple models can then be expanded to include covariate information as predictors by reparameterizing \(\lambda\) and \(\sigma\) as a regression \citep{Klein2003}. Each of the covariates of interest is given its own regression coefficient (e.g. \(\beta_{range}\) along with an intercept term \(\beta_{0}\). There are some additional complications to the parameterization of \(\sigma\) associated with the inclusion of \(\alpha\) as well as interpretability \citep{Klein2003}. Both of these cases are written more fully as
+These current simple models can then be expanded to include covariate information as predictors by reparameterizing \(\lambda\) and \(\sigma\) as a regression \citep{Klein2003}. Each of the covariates of interest is given its own regression coefficient (e.g. \(\beta_{range}\)) along with an intercept term \(\beta_{0}\). There are some additional complications to the parameterization of \(\sigma\) associated with the inclusion of \(\alpha\) as well as interpretability \citep{Klein2003}. Both of these cases are written more fully as
 \begin{equation}
   \begin{aligned}
-    \lambda_{i} &= \exp(\beta_{0} + \beta_{range} r_{i} + \beta_{environment} e_{i} + \beta_{mass} m_{i}) \\
-    \sigma_{i} &= \exp\left(\frac{-(\beta_{0} + \beta_{range} r_{i} + \beta_{environment} e_{i} + \beta_{mass} m_{i})}{\alpha}\right).
+    \lambda_{i} &= \exp(\beta_{0} + \beta_{range} r_{i} + \beta_{environment} \theta_{i} + \beta_{size} m_{i}) \\
+    \sigma_{i} &= \exp\left(\frac{-(\beta_{0} + \beta_{range} r_{i} + \beta_{environment} \theta_{i} + \beta_{size} m_{i})}{\alpha}\right).
   \end{aligned}
   \label{eq:regression}
 \end{equation}
-The regression equations are exponentiated because both \(\lambda\) and \(\sigma\) are only defined for positive reals.
+The regression equations are exponentiated because both \(\lambda\) and \(\sigma\) are only defined for positive reals. Remember that \(\theta_{i}\) is the environmental affinity, as defined above, of genus \(i\).
 
 The current model which incorporates both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 4\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a columns of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts.
 
@@ -108,7 +113,7 @@ What remains is assigning priors the elements of \(\mu_{\mathbf{B}}\) and the co
 \end{equation}
 where \(\tau_{B}\) is a length \(k\) vector of variances and Diag(\(\tau_{B}\)) is a diagonal matrix.
 
-I used a LKJ prior distribution for \(\Omega_{\mathbf{B}}\) as recommended by \uppercase{stan manual}. An LKJ is a single parameter multivariate distribution where values of \(\eta\) greater than 1 concentrate density at the unit correlation matrix, which corresponds to no correlation between the \(\beta\) coefficients. The scale parameter, \(\tau_{B}\), is given a weakly informative half-Cauchy (C\(^{+}\)) prior following \citep{Gelman2006a}.
+I used a LKJ prior distribution for \(\Omega_{\mathbf{B}}\) as recommended by \uppercase{stan manual}. An LKJ is a single parameter multivariate distribution where values of \(\eta\) greater than 1 concentrate density at the unit correlation matrix, which corresponds to no correlation between the \(\beta\) coefficients. The scale parameter, \(\tau_{B}\), is given a weakly informative half-Cauchy (C\(^{+}\)) prior following \citet{Gelman2006a}.
 
 Given all the above, the exponential distribution based model is then defined, including priors, as 
 \begin{equation}
@@ -137,7 +142,7 @@ The Weibull distribution based model is then also defined as
   \end{aligned}
   \label{eq:wei_total}
 \end{equation}
-Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) does not include censored observations. How these are included is defined in the next section.
+Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) does not include how the uncertainty in environmental affinity (Eq. \ref{eq:epi_post}) is included nor how censored observations are included. An explination of including censored observations follows.
 
 
 \subsection{Censored observations}
@@ -145,7 +150,17 @@ A key aspect of survival analysis is the inclusion of censored, or incompletely 
 
 In the context of this study, I considered all genera that had a duration of only one geologic stage to be left censored as we do not have a finer degree of resolution. Conceptually, this is similar to if I was studying, say, survival patterns in rats and an individual had died between the start of the experiment and next time the rats were observed. We know the rat lived no more than day.
 
-The key function for modeling censored observations is \(S(t)\) (Eq. \ref{eq:exp_surv} and \ref{eq:wei_surv}). \(S(t)\) is equivalent to the complementary cumulative distribution function, \(1 - F(t)\) \citep{Klein2003}. For right censored observations, instead of calculating the likelihood as normal (Eq. \ref{eq:multivariate}) the likelihood of an observation is evaluated using \(S(t)\). Conceptually, this approach calculates the likelihood of observing a species that existed for at least that long. For left censored data, instead the likelihood is calculated using \(1 - S(t)\) which corresponds to the likelihood of observing a species that existed no longer than \(t\).
+The key function for modeling censored observations is the survival function, or \(S(t)\). \(S(t)\) corresponds to the probability that a species having existed for \(t\) 2 My bins will not have gone extinct while \(h(t)\) corresponds to the instantaneous extinction rate for some taxon age \(t\) \cite{Klein2003}. For an exponential model, \(S(t)\) is defined as
+\begin{equation}
+  S(t) = \exp(-\lambda t),
+\end{equation}
+and for the Weibull distribution \(S(t)\) is defined as
+\begin{equation}
+  S(t) = \exp\left(-\left(\frac{t}{\sigma}\right)^{\alpha}\right).
+\end{equation}
+\(S(t)\) is equivalent to the complementary cumulative distribution function, \(1 - F(t)\) \citep{Klein2003}. 
+
+For right censored observations, instead of calculating the likelihood as normal (Eq. \ref{eq:multivariate}) the likelihood of an observation is evaluated using \(S(t)\). Conceptually, this approach calculates the likelihood of observing a species that existed for at least that long. For left censored data, instead the likelihood is calculated using \(1 - S(t)\) which corresponds to the likelihood of observing a species that existed no longer than \(t\).
 
 The full likelihood statements incorporating fully observed, right censored, and left censored observations are then
 \begin{equation}

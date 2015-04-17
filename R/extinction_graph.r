@@ -117,18 +117,18 @@ exp.covcor <- get.covcor(exp.fit)
 relab.x <- scale_x_discrete(labels = c('i' = expression(beta[intercept]), 
                                        'r' = expression(beta[range]),
                                        'e' = expression(beta[environment]), 
-                                       'm' = expression(beta[mass])))
+                                       'm' = expression(beta[size])))
 relab.y <- scale_y_discrete(labels = c('i' = expression(beta[intercept]), 
                                        'r' = expression(beta[range]),
                                        'e' = expression(beta[environment]), 
-                                       'm' = expression(beta[mass])))
+                                       'm' = expression(beta[size])))
 # correlation matrix
 omega.med <- melt(list(Exponential = exp.covcor[[1]], 
                        Weibull = wei.covcor[[1]]))
 omega.plot <- ggplot(omega.med, aes(x = Var1, y = Var2, fill = value))
 omega.plot <- omega.plot + geom_tile()
 omega.plot <- omega.plot + facet_grid(. ~ L1, labeller = label_parsed)
-omega.plot <- omega.plot + scale_fill_gradient2(name = 'Correlation',
+omega.plot <- omega.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
                                                 low = 'blue', 
                                                 mid = 'white', 
                                                 high = 'red')
@@ -143,13 +143,13 @@ sigma.med <- melt(list(Exponential = exp.covcor[[5]],
 sigma.plot <- ggplot(sigma.med, aes(x = Var1, y = Var2, fill = value))
 sigma.plot <- sigma.plot + geom_tile()
 sigma.plot <- sigma.plot + facet_grid(. ~ L1, labeller = label_parsed)
-sigma.plot <- sigma.plot + scale_fill_gradient2(name = 'Covariance', 
+sigma.plot <- sigma.plot + scale_fill_gradient2(name = 'Median\nCovariance', 
                                                 low = 'blue', 
                                                 mid = 'white', 
                                                 high = 'red')
 sigma.plot <- sigma.plot + relab.x + relab.y
 sigma.plot <- sigma.plot + labs(x = '', y = '')
-ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_headmap.png',
+ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_heatmap.png',
        width = 10, height = 5)
 
 # histogram of posterior of correlation between inter and env
@@ -167,10 +167,11 @@ baseline.covar <- data.frame(value = c(exp.fit$Omega[, 1, 3],
                                          length(wei.fit$Omega[, 1, 3]))))
 baseline.covar$var <- c(rep('Cor(beta[intercept], beta[environment])',
                             2 * length(exp.fit$Omega[, 1, 3])),
-                        rep('Cor(beta[intercept], beta[mass])',
+                        rep('Cor(beta[intercept], beta[size])',
                             2 * length(exp.fit$Omega[, 1, 3])))
 
 tb.cv <- ggplot(baseline.covar, aes(x = value))
+tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
 tb.cv <- tb.cv + facet_grid(var ~ lab, labeller = label_parsed)
 ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.png',
