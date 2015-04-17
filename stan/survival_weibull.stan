@@ -38,21 +38,21 @@ parameters {
 transformed parameters {
   cov_matrix[4] Sigma;
   real pref_trans[N];
+  real env[N];
 
   Sigma <- quad_form_diag(Omega, sigma);
   
   for(i in 1:N) {
     pref_trans[i] <- logit(pref[i]);
   }
+  for(i in 1:N) {
+    env[i] <- (pref_trans[i] - mean(pref_trans)) / (2 * sd(pref_trans));
+  }
 
   // uncertainty in environment
   // logit transform then rescale
 }
 model {
-  real env[N];
-  for(i in 1:N) {
-    env[i] <- (pref_trans[i] - mean(pref_trans)) / (2 * sd(pref_trans));
-  }
 
   alpha ~ cauchy(0, 2);
   // varying slopes, varying intercepts
@@ -81,13 +81,13 @@ model {
       increment_log_prob(weibull_cdf_log(dur_unc[i], alpha, 
             exp(-(beta[cohort_unc[i], 1] +
                 beta[cohort_unc[i], 2] * occupy_unc[i] +
-                beta[cohort_unc[i], 3] * pref_trans[i] +
+                beta[cohort_unc[i], 3] * env[i] +
                 beta[cohort_unc[i], 4] * size_unc[i]) / alpha)));
     } else {
       increment_log_prob(weibull_log(dur_unc[i], alpha,
             exp(-(beta[cohort_unc[i], 1] +
                 beta[cohort_unc[i], 2] * occupy_unc[i] +
-                beta[cohort_unc[i], 3] * pref_trans[i] +
+                beta[cohort_unc[i], 3] * env[i] +
                 beta[cohort_unc[i], 4] * size_unc[i]) / alpha)));
     }
   }
@@ -95,7 +95,7 @@ model {
     increment_log_prob(weibull_ccdf_log(dur_cen[i], alpha,
           exp(-(beta[cohort_cen[i], 1] +
               beta[cohort_cen[i], 2] * occupy_cen[i] +
-              beta[cohort_cen[i], 3] * pref_trans[N_unc + i] +
+              beta[cohort_cen[i], 3] * env[N_unc + i] +
               beta[cohort_cen[i], 4] * size_cen[i]) / alpha)));
   }
 }
@@ -107,13 +107,13 @@ generated quantities {
       log_lik[i] <- weibull_cdf_log(dur_unc[i], alpha, 
           exp(-(beta[cohort_unc[i], 1] +
               beta[cohort_unc[i], 2] * occupy_unc[i] +
-              beta[cohort_unc[i], 3] * pref_trans[i] +
+              beta[cohort_unc[i], 3] * env[i] +
               beta[cohort_unc[i], 4] * size_unc[i]) / alpha));
     } else {
       log_lik[i] <- weibull_log(dur_unc[i], alpha,
           exp(-(beta[cohort_unc[i], 1] +
               beta[cohort_unc[i], 2] * occupy_unc[i] +
-              beta[cohort_unc[i], 3] * pref_trans[i] +
+              beta[cohort_unc[i], 3] * env[i] +
               beta[cohort_unc[i], 4] * size_unc[i]) / alpha));
     }
   }
@@ -121,7 +121,7 @@ generated quantities {
     log_lik[i + N_unc] <- weibull_ccdf_log(dur_cen[i], alpha,
         exp(-(beta[cohort_cen[i], 1] +
             beta[cohort_cen[i], 2] * occupy_cen[i] +
-            beta[cohort_cen[i], 3] * pref_trans[N_unc + i] +
+            beta[cohort_cen[i], 3] * env[N_unc + i] +
             beta[cohort_cen[i], 4] * size_cen[i]) / alpha));
   }
 }

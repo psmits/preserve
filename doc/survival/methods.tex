@@ -17,19 +17,7 @@ The dataset analyzed here is derived from the a combination of the occurrence in
 
 Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells of a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). Following this, for each stage, the total number of grid cells occupied is calculated. The number of grid cells that each genus present occurs in was then calculated and made relative by dividing by the total number of possible cells. Finally, mean relative genus occupancy was calculated as the mean of per stage relative occupancy.
 
-% data is based on Foote2013
-%   select taxonomic groups Brachiopods(, Bivalves)
-%   filtered heavily; requires
-%     latitude/longitude
-%     environment
-%     body size Payne2014 paper
-% duration is number of stages observed
-
-
-%I analyzed the exact data set used by \citet{Foote2013} in their analysis of the early survival of marine genera. This data set is a highly pruned and vetted set of all occurrences of important marine groups for the entire Phanerozoic as sampled in the Paleobiology Database (http://www.paleodb.org). Specifically, I analyzed a subset of the \citet{Foote2013} data set of only genera belonging to a higher-taxonomic level assigned to one of the three Sepkoski Fauna (Table \ref{tab:sepkoski}).
-
-
-The calculation and inclusion of environmental affinity in the subsequent survival model is a more complicated statistical procedure that takes into account our uncertainty. Because we cannot directly observe if a fossil taxon had occurrences restricted to only a single environmental, instead we can only estimate a probability of occurrence with some amount of uncertainty. One advantage of using a Bayesian analytical context is that both parameters and data are considered random samples from some underlying distribution, which means it is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. In this case, this is the probability that a genus will occur in an epicontiental sea or not. 
+The calculation and inclusion of environmental affinity in the subsequent survival model is a statistical procedure that takes into account our uncertainty based on where fossils tend to occur. Because we cannot directly observe if a fossil taxon had occurrences restricted to only a single environmental, instead we can only estimate a probability of occurrence with some amount of uncertainty. One advantage of using a Bayesian analytical context is that both parameters and data are considered random samples from some underlying distribution, which means it is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. In this case, this is the probability that a genus will occur in an epicontiental sea or not. 
 
 A genus' probability of occurring in an epicontinental environment, \(\theta\), was calculated using a fully Bayesian extension of \citep{Simpson2009} where occurrence probability (e.g. affinity) is defined as a distribution and not a point estimate. The reasoning behind this approach is that it allows for our uncertainty to properly propagate through our model.
 
@@ -176,25 +164,9 @@ where \(C\) is the set of all fully observed species, \(R\) the set of all right
 \subsection{Parameter estimation}
 Given the above likelihood and prior statements, the posterior probabilities of all parameters was approximated using a Markov-chain Monte Carlo routine using a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{stan-software:2014}. The estimate of the posterior distribution were approximated from four parallel chains run for XXX draws split half warm-up and half sampling thinned to every XXX sample for a total of XXX samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
-%\subsection{Model selection} WAIC
+\subsection{Model selection} WAIC
 
-%\subsection{Posterior predictive checks}
+\subsection{Posterior predictive checks}
 
-
-%\begin{table}
-%  \centering
-%  \begin{tabular}{l | p{0.75\textwidth}}
-%    \hline
-%    Fauna & Taxa \\
-%    \hline
-%    \hline
-%    Cambrian & Trilobita, Polychaeta, Monoplacophora (Tergomya), Inarticulata (Lingulata)\\[0.1cm]
-%    Paleozoic & Articulata (Rhynchonellata), Crinodea, Ostracoda, Cephalopoda, Anthozoa, Stenolaemata (Cyclocystoidea), Stelleroidea (Asteroidea, Ophiuridea) \\[0.1cm]
-%    Modern & Gastropoda, Bivalvia, Osteichthyes, Malacostraca, Echinoidea, Gymnolaemata, Demospongea, Chondrichthyes \\
-%    \hline
-%  \end{tabular}
-%  \caption{Sepkoski's three evolutionary fauna. In parentheses are the taxonomic names used in this study when there was a conflict between Sepkoski's designations and mine.}
-%  \label{tab:sepkoski}
-%\end{table}
 
 \end{document}
