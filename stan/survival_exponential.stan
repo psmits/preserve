@@ -36,18 +36,19 @@ parameters {
 }
 transformed parameters {
   cov_matrix[4] Sigma;
+  real pref_trans[N];
 
   Sigma <- quad_form_diag(Omega, sigma);
+  
+  for(i in 1:N) {
+    pref_trans[i] <- logit(pref[i]);
+  }
 
   // uncertainty in environment
   // logit transform then rescale
 }
 model {
   real env[N];
-  real pref_trans[N];
-  for(i in 1:N) {
-    pref_trans[i] <- logit(pref[i]);
-  }
   for(i in 1:N) {
     env[i] <- (pref_trans[i] - mean(pref_trans)) / (2 * sd(pref_trans));
   }
@@ -62,8 +63,8 @@ model {
     beta[i] ~ multi_normal(mu_prior, Sigma);
   }
 
-  # uncertainty in environmental preference
-  # here is the full posterior
+# uncertainty in environmental preference
+# here is the full posterior
   for(n in 1:N_unc) {
     pref[n] ~ beta(epi_unc[n] + epi_bck_unc[n], off_unc[n] + off_bck_unc[n]);
   }
@@ -93,5 +94,31 @@ model {
             beta[cohort_cen[i], 2] * occupy_cen[i] +
             beta[cohort_cen[i], 3] * pref_trans[N_unc + i] +
             beta[cohort_cen[i], 4] * size_cen[i])));
+  }
+}
+generated quantities {
+  vector[N] log_lik;
+
+  for(i in 1:N_unc) {
+    if(dur_unc[i] == 1) {
+      log_lik[i] <- exponential_cdf_log(dur_unc[i],
+          exp(beta[cohort_unc[i], 1] +
+            beta[cohort_unc[i], 2] * occupy_unc[i] +
+            beta[cohort_unc[i], 3] * pref_trans[i] +
+            beta[cohort_unc[i], 4] * size_unc[i]));
+    } else {
+      log_lik[i] <- exponential_log(dur_unc[i],
+          exp(beta[cohort_unc[i], 1] +
+            beta[cohort_unc[i], 2] * occupy_unc[i] +
+            beta[cohort_unc[i], 3] * pref_trans[i] +
+            beta[cohort_unc[i], 4] * size_unc[i]));
+    }
+  }
+  for(i in 1:N_cen) {
+    log_lik[i + N_unc] <- exponential_ccdf_log(dur_cen[i],
+        exp(beta[cohort_cen[i], 1] +
+          beta[cohort_cen[i], 2] * occupy_cen[i] +
+          beta[cohort_cen[i], 3] * pref_trans[N_unc + i] +
+          beta[cohort_cen[i], 4] * size_cen[i]));
   }
 }

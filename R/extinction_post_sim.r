@@ -48,13 +48,6 @@ for(ii in 1:nsim) {
   wr[[ii]] <- oo
 }
 
-#wei.mean <- sum(laply(wr, mean) > mean(duration))
-#wei.med <- sum(laply(wr, median) > median(duration))
-#wei.75 <- sum(laply(wr, function(x) quantile(x, .75)) > 
-#              quantile(duration, .75))
-#wei.25 <- sum(laply(wr, function(x) quantile(x, .25)) > 
-#              quantile(duration, .25))
-
 
 # exponential model
 # extract values and do posterior predictive simulations
@@ -78,10 +71,3 @@ for(ii in 1:nsim) {
 
   er[[ii]] <- oo
 }
-
-#exp.mean <- sum(laply(er, mean) > mean(duration))
-#exp.med <- sum(laply(er, median) > median(duration))
-#exp.75 <- sum(laply(er, function(x) quantile(x, .75)) > 
-#              quantile(duration, .75))
-#exp.25 <- sum(laply(er, function(x) quantile(x, .25)) > 
-#              quantile(duration, .25))
