@@ -20,7 +20,7 @@ wfit <- read_stan_csv(outs)
 coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 rage <- c(data$occupy_unc, data$occupy_cen)
-envs <- c(data$env_unc, data$env_cen)
+#envs <- c(data$env_unc, data$env_cen)
 size <- c(data$size_unc, data$size_cen)
 duration <- c(data$dur_unc, data$dur_cen)
 
@@ -28,6 +28,7 @@ duration <- c(data$dur_unc, data$dur_cen)
 # extract values and do posterior predictive simulations
 wei.fit <- extract(wfit, permuted = TRUE)
 betas <- wei.fit$beta
+envs <- wei.fit$env
 wr <- list()
 for(ii in 1:nsim) {
   n <- data$N
@@ -36,11 +37,12 @@ for(ii in 1:nsim) {
   bet.1 <- betas[sample(nrow(betas), 1), , 2]
   bet.2 <- betas[sample(nrow(betas), 1), , 3]
   bet.3 <- betas[sample(nrow(betas), 1), , 4]
+  ee <- envs[sample(nrow(envs), 1), ]
 
   oo <- c()
   for(jj in seq(n)) {
     reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
-    bet.2[coh[jj]] * envs[jj] + 
+    bet.2[coh[jj]] * ee[jj] + 
     bet.3[coh[jj]] * size[jj]
     oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
   }
@@ -53,6 +55,7 @@ for(ii in 1:nsim) {
 # extract values and do posterior predictive simulations
 exp.fit <- extract(efit, permuted = TRUE)
 betas <- exp.fit$beta
+envs <- exp.fit$env
 er <- list()
 for(ii in 1:nsim) {
   n <- data$N
@@ -60,11 +63,12 @@ for(ii in 1:nsim) {
   bet.1 <- betas[sample(nrow(betas), 1), , 2]
   bet.2 <- betas[sample(nrow(betas), 1), , 3]
   bet.3 <- betas[sample(nrow(betas), 1), , 4]
+  ee <- envs[sample(nrow(envs), 1), ]
 
   oo <- c()
   for(jj in seq(n)) {
     reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
-    bet.2[coh[jj]] * envs[jj] + 
+    bet.2[coh[jj]] * ee[jj] + 
     bet.3[coh[jj]] * size[jj]
     oo[jj] <- rexp(1, rate = exp(reg))
   }

@@ -23,7 +23,7 @@ theme_update(axis.text = element_text(size = 10),
 coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 rage <- c(data$occupy_unc, data$occupy_cen)
-envs <- c(data$env_unc, data$env_cen)
+envs <- c(data$env_unc, data$env_cen)  # maximum a posteriori estimate
 size <- c(data$size_unc, data$size_cen)
 duration <- c(data$dur_unc, data$dur_cen)
 
