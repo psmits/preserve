@@ -13,7 +13,9 @@
 
 \subsection{Fossil occurrence information}
 
-The dataset analyzed here is derived from the a combination of the occurrence information from \citet{Miller2009a} and the body size data from \citet{Payne2014}. The \citet{Miller2009a} dataset is based on the Paleobiology Database (http://www.paleodb.org); see \citet{Miller2009a} for a full description of the inclusion criterion. Sampled occurences were restricted to those with latitude and longitude coordinates, assignment to either epicontinental or open-ocean environment, and being of a genus present in the body size dataset. Genus duration was calculated as the number of geologic stages from first apperance to last apperance, inclusive. Genera who's last apperance was in a stage preceeding a mass extinction were right censored, and genera with a duration of only one stage and were left censored (see below for explination of censoring). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(\theta\)), and body size (\(m\)). 
+The dataset analyzed here is derived from the a combination of the occurrence information from \citet{Miller2009a} and the body size data from \citet{Payne2014}. The \citet{Miller2009a} dataset is based on the Paleobiology Database (http://www.paleodb.org); see \citet{Miller2009a} for a full description of the inclusion criterion. 
+
+Sampled occurrences were restricted to those with latitude and longitude coordinates, assignment to either epicontinental or open-ocean environment, and being of a genus present in the body size dataset. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Genera who's last appearance was in a stage preceding a mass extinction were right censored, and genera with a duration of only one stage and were left censored (see below for explanation of censoring). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(\theta\)), and body size (\(m\)). 
 
 Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells of a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). Following this, for each stage, the total number of grid cells occupied is calculated. The number of grid cells that each genus present occurs in was then calculated and made relative by dividing by the total number of possible cells. Finally, mean relative genus occupancy was calculated as the mean of per stage relative occupancy.
 
@@ -134,11 +136,11 @@ Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:
 
 
 \subsection{Censored observations}
-A key aspect of survival analysis is the inclusion of censored, or incompletely observed, data points \citep{Ibrahim2001,Klein2003}. The two classes of censored observations encountered in this study were right and left censored observations. Right censoring is when a species does not go extinct during the window of observation, or species that are still extant. Left censored observations are those species that it is only known when a species was extinct by. To put another way, this is a species that went extinct but the observed duration is an over estimate of the actual duration. 
+A key aspect of survival analysis is the inclusion of censored, or incompletely observed, data points \citep{Ibrahim2001,Klein2003}. The two classes of censored observations encountered in this study were right and left censored observations. Right censored genera are those that did not go extinct during the window of observation, or genera that are still extant. Left censored observations are those species that it is only known when a species was extinct by. To put another way, this is a species that went extinct but the observed duration is an over estimate of the actual duration. 
 
 In the context of this study, I considered all genera that had a duration of only one geologic stage to be left censored as we do not have a finer degree of resolution. Conceptually, this is similar to if I was studying, say, survival patterns in rats and an individual had died between the start of the experiment and next time the rats were observed. We know the rat lived no more than day.
 
-The key function for modeling censored observations is the survival function, or \(S(t)\). \(S(t)\) corresponds to the probability that a species having existed for \(t\) 2 My bins will not have gone extinct while \(h(t)\) corresponds to the instantaneous extinction rate for some taxon age \(t\) \cite{Klein2003}. For an exponential model, \(S(t)\) is defined as
+The key function for modeling censored observations is the survival function, or \(S(t)\). \(S(t)\) corresponds to the probability that a genus having existed for \(t\) stages will not have gone extinct while \(h(t)\) corresponds to the instantaneous extinction rate at taxon age \(t\) \cite{Klein2003}. For an exponential model, \(S(t)\) is defined as
 \begin{equation}
   S(t) = \exp(-\lambda t),
 \end{equation}
@@ -164,9 +166,42 @@ where \(C\) is the set of all fully observed species, \(R\) the set of all right
 \subsection{Parameter estimation}
 Given the above likelihood and prior statements, the posterior probabilities of all parameters was approximated using a Markov-chain Monte Carlo routine using a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{stan-software:2014}. The estimate of the posterior distribution were approximated from four parallel chains run for XXX draws split half warm-up and half sampling thinned to every XXX sample for a total of XXX samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
-\subsection{Model selection} WAIC
 
-\subsection{Posterior predictive checks}
+\subsection{Model evaluation}
+
+Models were evaluated using both a series of multiple posterior predictive checks and an estimate of out-of-sample predictive accuracy. 
+
+%\subsection{Posterior predictive checks}
+The motivation behind posterior predictive checks as tools for determining model adequacy is that replicated data sets using the fitted model should be similar to the original data \citep{Gelman2013d}. Systematic differences between the simulations and observed indicate weaknesses of the currently fit model. An example of a technique that is very similar would be inspecting the residuals and Q-Q plots from a linear regression.
+
+The strategy behind posterior predictive checks is to draw simulated values from the joint posterior predictive distribution, \(p(y^{rep} | y\), and then compared to the original observed values \citep{Gelman2013d}. To accomplish this, for each replicate, a single value is drawn from the marginal posterior distributions of each regression coefficient from the final model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}). Then, given the covariate information for each of the observations \(\mathbf{X}\), a new set of \(n\) genus durations are generated giving a single replicated data set \(y^{rep}\). This is repeated 1000 times in order to provide a distribution of possible values that could have been observed given the model. 
+
+In order to compare the fitted model to the observed data, various graphical comparisons or test quantities need to be defined. The principal comparison used here is a comparison between non-parameteric approximation of the survival function \(S(t)\) as estimated from both the observed data and each of the replicated data sets. The purpose of this comparison is to determine if the model approximates the same survival/extinction pattern as the original data. 
+
+
+%\subsection{Model selection} WAIC
+The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. Because the Weibull model reduces to the exponential model when \(\alpha = 0\), our interest is not in choosing between these models. Instead comparison of WAIC values is useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to ``WAIC 2'' formulation recommended by \citet{Gelman2013d}.
+
+WAIC can be considered fully Bayesian alternative to the Akaike information criterion, where WAIC acts as an approximation of leave-one-out cross-validation which acts as a measure of out-of-sample predictive accuracy. WAIC is calculated starting with the log pointwise posterior predictive density calculated as
+\begin{equation}
+  \mathrm{lppd} = \sum_{i = 1}^{n} \log \left(\frac{1}{S} \sum_{s = 1}^{S} p(y_{i}|\Theta^{S})\right),
+  \label{eq:lppd}
+\end{equation}
+where \(n\) is sample size, \(S\) is the number posterior simulation draws, and \(\Theta\) represents all of the estimated parameters of the model. This is similar to calculating the likelihood of each observation given the entire posterior. A correction for the effective number of parameters is then added to lppd to adjust for overfitting. The effective number of parameters is calculated, following derivation and recommendations of \citep{Gelman2013d}, as
+\begin{equation}
+  p_{\mathrm{WAIC}} = \sum_{i = 1}^{n} V_{s = 1}^{S} (\log p(y_{i}|\Theta^{S})).
+  \label{eq:pwaic}
+\end{equation}
+where \(V\) is the sample posterior variance of the log predictive density for each data point.
+
+Given both equations \ref{eq:lppd} and \ref{eq:pwaic}, WAIC is then calculated
+\begin{equation}
+  \mathrm{WAIC} = \mathrm{lppd} - p_{\mathrm{WAIC}}.
+  \label{eq:waic}
+\end{equation}
+When comparing two or more models, lower WAIC values indicate better out-of-sample predictive accuracy. Importantly, WAIC is just one way of comparing models. When combined with posterior predictive checks it is possible to get a more complete understanding of model fit.
+
+
 
 
 \end{document}
