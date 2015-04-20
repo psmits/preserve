@@ -4,45 +4,45 @@ The top-level auxiliary file: main_doc.aux
 The style file: abbrvnat.bst
 Database file #1: biblio.bib
 Warning--I didn't find a database entry for "stan-software:2014"
-You've used 10 entries,
+You've used 22 entries,
             2773 wiz_defined-function locations,
-            674 strings with 6437 characters,
-and the built_in function-call counts, 4543 in all, are:
-= -- 408
-> -- 251
-< -- 7
-+ -- 85
-- -- 75
-* -- 373
-:= -- 718
-add.period$ -- 36
-call.type$ -- 10
-change.case$ -- 53
-chr.to.int$ -- 10
-cite$ -- 20
-duplicate$ -- 203
-empty$ -- 373
-format.name$ -- 95
-if$ -- 938
+            769 strings with 8508 characters,
+and the built_in function-call counts, 9384 in all, are:
+= -- 904
+> -- 393
+< -- 19
++ -- 139
+- -- 117
+* -- 743
+:= -- 1474
+add.period$ -- 88
+call.type$ -- 22
+change.case$ -- 102
+chr.to.int$ -- 22
+cite$ -- 44
+duplicate$ -- 439
+empty$ -- 823
+format.name$ -- 153
+if$ -- 1949
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 14
-newline$ -- 64
-num.names$ -- 40
-pop$ -- 100
+missing$ -- 25
+newline$ -- 140
+num.names$ -- 88
+pop$ -- 169
 preamble$ -- 1
-purify$ -- 45
+purify$ -- 83
 quote$ -- 0
-skip$ -- 150
+skip$ -- 306
 stack$ -- 0
-substring$ -- 178
-swap$ -- 12
+substring$ -- 450
+swap$ -- 29
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 90
+type$ -- 222
 warning$ -- 0
-while$ -- 41
+while$ -- 99
 width$ -- 0
-write$ -- 151
+write$ -- 339
 (There was 1 warning)
