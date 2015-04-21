@@ -82,6 +82,11 @@ data <- list(dur_unc = unc$duration,
              off_cen = cen$off,
              epi_bck_cen = cen$epi.bck,
              off_bck_cen = cen$off.bck,
+             lit_cen = cen$lit,
+             car_cen = cen$car,
+             cla_cen = cen$cla,
+             car_bck_cen = cen$car.bck,
+             cla_bck_cen = cen$cla.bck,
              size_cen = cen$size,
              N_cen = length(cen$duration))
 
