@@ -11,6 +11,7 @@ library(foreign)
 library(rgdal)
 
 source('../R/clean_funcs.r')
+source('../R/gts.r')
 sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya', 
                               'Lingulata'),
                  paleozoic = c('Rhynchonellata', 'Crinoidea', 'Ostracoda', 
@@ -25,12 +26,13 @@ sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya',
 # argument: bibr data frame for all the general occurrence shit
 # argument: payne body size data
 # argument: taxonomic group
+# argument: gts global temporal scale by stages
 # (argument: temporal unit; currently it is set up for pre-P/T boundary)
 #
 # this function cleans the data completely as document in my mung routine
 # at the end, spit out the sepkoski.data file
 
-sort.data <- function(bibr, payne, taxon = 'Rhynchonellata') {
+sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
 
   # i need to have good bin information, either stage 10my or fr2my
   bins <- c('collections.stage')
@@ -45,23 +47,20 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata') {
   paleozoic <- gts[which(gts == 'Changhsingian'):length(gts)]
   bibr <- bibr[bibr$collections.stage %in% paleozoic, ]
 
-  collec.stage <- table(bibr$collections.stage)
-
   bibr <- bibr[bibr$occurrences.class_name == taxon, ]
   bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
 
   # lithology
   # high chance of removing occurrences
-  #lith <- as.character(bibr$collections.lithology1)
-  #lith <- gsub(pattern = '[\\"?]',
-  #             replacement = '',
-  #             lith,
-  #             perl = TRUE)
-
-  #clean.lith
-
+  bibr$collections.lithology1 <- as.character(bibr$collections.lithology1)
+  bibr <- bibr[!is.na(bibr$collections.lithology1), ]
+  lith <- bibr$collections.lithology1
+  lith <- gsub(pattern = '[\\"?]', replacement = '', lith, perl = TRUE)
+  bibr$collections.lithology1 <- clean.lith(lith)
+  bibr <- bibr[!(bibr$collections.lithology1 %in% c('', 'mixed')), ]
 
   # this section is all about finding duration
+  collec.stage <- table(bibr$collections.stage)
   find.dur <- function(x) {
     mm <- which(gts %in% unique(x$collections.stage))
     max(mm) - min(mm) + 1
@@ -78,10 +77,13 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata') {
   eq <- CRS("+proj=cea +lat_0=0 +lon_0=0 +lat_ts=30 +a=6371228.0 +units=m")
   globe.map <- readShapeSpatial('../data/ne_10m_coastline.shp')  # from natural earth
   proj4string(globe.map) <- eq
-  spatialref <- SpatialPoints(coords = bibr[, c('collections.lngdec', 'collections.latdec')], proj4string = eq)  # wgs1984.proj
+  spatialref <- SpatialPoints(coords = bibr[, c('collections.lngdec', 
+                                                'collections.latdec')], 
+                              proj4string = eq)  # wgs1984.proj
   r <- raster(globe.map, nrows = 70, ncols = 34)
   sp.ras <- rasterize(spatialref, r)
-  bibr$membership <- cellFromXY(sp.ras, xy = bibr[, c('collections.lngdec', 'collections.latdec')])
+  bibr$membership <- cellFromXY(sp.ras, xy = bibr[, c('collections.lngdec', 
+                                                      'collections.latdec')])
   ncell <- ddply(bibr, .(occurrences.genus_name, collections.stage), 
                  summarize, tt = length(unique(membership)))
   big.ncell <- ddply(bibr, .(collections.stage), summarize,
@@ -113,6 +115,23 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata') {
     onoff[ii, 5] <- off.back
   }
 
+  # do the above based on lithology
+  litho <- ddply(bibr, .(occurrences.genus_name), summarize,
+                 carbonate = sum(collections.lithology1 == 'carbonate'),
+                 clastic = sum(collections.lithology1 == 'clastic'))
+  # now for each stage, get the epi and off
+  big.litho <- ddply(bibr, .(collections.stage), summarize,
+                     carbonate = sum(collections.lithology1 == 'carbonate'),
+                     clastic = sum(collections.lithology1 == 'clastic'))
+  for(ii in seq(length(taxon.occur))) {
+    app <- which(gts %in% names(taxon.occur[[ii]]))
+    wh <- gts[seq(min(app), max(app))]
+    background <- big.litho[big.litho[, 1] %in% wh, ]
+    car.back <- sum(background$car) - litho[ii, 2]
+    cla.back <- sum(background$cla) - litho[ii, 3]
+    litho[ii, 4] <- car.back
+    litho[ii, 5] <- cla.back
+  }
 
 
   # the number of collections to offset each observation by 
@@ -151,9 +170,10 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata') {
   big.dead <- which(gts %in% mass.ext)
   regime <- laply(age.order, function(x) 
                   max(which(x > big.dead)))
-  age.data <- cbind(taxon.age, censored, orig, regime, onoff[, -1])
+  age.data <- cbind(taxon.age, censored, orig, regime, onoff[, -1], litho[, -1])
   names(age.data) <- c('genus', 'duration', 'censored', 'orig', 'regime', 
-                       'epi', 'off', 'epi.bck', 'off.bck')
+                       'epi', 'off', 'epi.bck', 'off.bck',
+                       'car', 'cla', 'car.bck', 'cla.bck')
   # need to retain the class stuff too
 
   # split based on class
@@ -194,6 +214,5 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata') {
   sepkoski.data$fauna <- as.character(sepkoski.data$fauna)
   sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
   sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]
-
   sepkoski.data
 }
