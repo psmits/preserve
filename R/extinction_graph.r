@@ -8,11 +8,9 @@ library(stringr)
 library(grid)
 source('../R/waic.r')
 
-#waic(wfit)$waic < waic(efit)$waic
-
 map <- TRUE
-error <- FALSE
 source('../R/extinction_post_sim.r')
+#waic(wfit)$waic < waic(efit)$waic
 
 theme_set(theme_bw())
 cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
@@ -21,8 +19,8 @@ theme_update(axis.text = element_text(size = 10),
              axis.title = element_text(size = 20),
              legend.text = element_text(size = 15),
              legend.title = element_text(size = 16),
-             legend.key.size = unit(2, 'cm'),
-             strip.text = element_text(size = 10))
+             legend.key.size = unit(1, 'cm'),
+             strip.text = element_text(size = 7))
 
 # data setup
 coh <- c(data$cohort_unc, data$cohort_cen)
@@ -32,6 +30,74 @@ envs <- c(data$env_unc, data$env_cen)  # maximum a posteriori estimate
 lits <- c(data$lit_unc, data$lit_cen)  # maximum a posteriori estimate
 size <- c(data$size_unc, data$size_cen)
 duration <- c(data$dur_unc, data$dur_cen)
+
+
+# example of how the environmental posterior is calculated
+epi.bck <- c(data$epi_bck_unc, data$epi_bck_cen)
+off.bck <- c(data$off_bck_unc, data$off_bck_cen)
+epi <- c(data$epi_unc, data$epi_cen)
+off <- c(data$off_unc, data$off_cen)
+beta.a <- epi + epi.bck
+beta.b <- off + off.bck
+
+base <- data.frame(x = seq(0, 1, by = 0.0001))
+environ <- ggplot(base, aes(x = x))
+environ <- environ + stat_function(fun = dbeta, 
+                                   colour = 'black',
+                                   args = list(shape1 = epi.bck[820], 
+                                               shape2 = off.bck[820]))
+environ <- environ + stat_function(fun = dbeta, 
+                                   colour = 'blue',
+                                   args = list(shape1 = epi[820], 
+                                               shape2 = off[820]))
+environ <- environ + stat_function(fun = dbeta,
+                                   colour = 'goldenrod',
+                                   args = list(shape1 = beta.a[820],
+                                               shape2 = beta.b[820]))
+environ <- environ + theme(axis.text = element_text(size = 5),
+                           axis.title = element_text(size = 10),
+                           legend.text = element_text(size = 7.5),
+                           legend.title = element_text(size = 8),
+                           legend.key.size = unit(2, 'cm'),
+                           strip.text = element_text(size = 5))
+environ <- environ + labs(y = 'density')
+ggsave(environ, filename = '../doc/survival/figure/environ_dist.png',
+       width = 4, height = 2.5)
+
+
+# lets make survival curves
+condition <- c(rep(1, data$N_unc), rep(0, data$N_cen))
+condition[duration == 1 & condition == 1] <- 2
+
+emp.surv <- survfit(Surv(time = duration, time2 = duration, 
+                         event = condition, type = 'interval') ~ 1)
+emp.surv <- data.frame(cbind(time = emp.surv$time, surv = emp.surv$surv))
+emp.surv <- rbind(c(0, 1), emp.surv)
+
+# weibull model
+wei.surv <- llply(wr, function(x) survfit(Surv(x) ~ 1))
+wei.surv <- llply(wei.surv, function(x) {
+                  y <- data.frame(time = x$time, surv = x$surv)
+                  rbind(c(0, 1), y)
+                  y})
+wei.surv <- Reduce(rbind, Map(function(x, y) {
+                              x$group <- y
+                              x}, 
+                              x = wei.surv, 
+                              y = seq(length(wei.surv))))
+wei.surv$label <- 'Weibull'
+
+# exponential model
+exp.surv <- llply(er, function(x) survfit(Surv(x) ~ 1))
+exp.surv <- llply(exp.surv, function(x) {
+                  y <- data.frame(time = x$time, surv = x$surv)
+                  rbind(c(0, 1), y)
+                  y})
+exp.surv <- Reduce(rbind, Map(function(x, y) {
+                              x$group <- y
+                              x}, 
+                              x = exp.surv, 
+                              y = seq(length(exp.surv))))
 
 # lets make survival curves
 condition <- c(rep(1, data$N_unc), rep(0, data$N_cen))
@@ -80,7 +146,7 @@ surv.plot <- surv.plot + geom_line(size = 1)
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
-ggsave(surv.plot, filename = '../doc/survival/figure/suvival_curves.png',
+ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves.png',
        width = 8, height = 5)
 
 # make plot of correlation and covariance matrices
@@ -140,6 +206,7 @@ omega.plot <- omega.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
                                                 high = 'red')
 omega.plot <- omega.plot + relab.x + relab.y
 omega.plot <- omega.plot + labs(x = '', y = '')
+omega.plot <- omega.plot + theme(axis.text = element_text(size = 15))
 ggsave(omega.plot, filename = '../doc/survival/figure/correlation_heatmap.png',
        width = 10, height = 5)
 
@@ -155,8 +222,39 @@ sigma.plot <- sigma.plot + scale_fill_gradient2(name = 'Median\nCovariance',
                                                 high = 'red')
 sigma.plot <- sigma.plot + relab.x + relab.y
 sigma.plot <- sigma.plot + labs(x = '', y = '')
+sigma.plot <- sigma.plot + theme(axis.text = element_text(size = 15))
 ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_heatmap.png',
        width = 10, height = 5)
+
+
+# mean of all coefficients
+mid <- c(apply(exp.fit$mu_prior, 2, median),
+         apply(wei.fit$mu_prior, 2, median))
+top <- c(apply(exp.fit$mu_prior, 2, function(x) quantile(x, probs = 0.9)), 
+         apply(wei.fit$mu_prior, 2, function(x) quantile(x, probs = 0.9)))
+bot <- c(apply(exp.fit$mu_prior, 2, function(x) quantile(x, probs = 0.1)), 
+         apply(wei.fit$mu_prior, 2, function(x) quantile(x, probs = 0.1)))
+mids <- data.frame(mid, top, bot)
+mids$var <- rep(c('i', 'r', 'e', 'm'), 2)
+mids$var <- factor(mids$var, levels = unique(mids$var))
+mids$mod <- rep(c('Exponential', 'Weibull'), each = 4)
+coef.mean <- ggplot(mids, aes(x = var, y = mid))
+coef.mean <- coef.mean + geom_hline(aes(yintercept = 0), 
+                                    colour = 'grey', size = 2)
+coef.mean <- coef.mean + 
+             geom_pointrange(aes(ymin = bot, ymax = top, 
+                                 colour = mod), size = 0.75,
+                             position = position_jitter(width = 0.1, 
+                                                        height = 0))
+coef.mean <- coef.mean + relab.x + labs(x = '', y = expression(hat(beta)))
+coef.mean <- coef.mean + scale_colour_manual(values = cbp, name = '')
+coef.mean <- coef.mean + theme(axis.text.y = element_text(size = 10),
+                               axis.title.y = element_text(angle = 0),
+                               axis.text.x = element_text(size = 15),
+                               legend.text = element_text(size = 10))
+ggsave(coef.mean, filename = '../doc/survival/figure/coef_means.png',
+       width = 8, height = 5)
+
 
 # histogram of posterior of correlation between inter and env
 baseline.covar <- data.frame(value = c(exp.fit$Omega[, 1, 2], 
@@ -190,6 +288,7 @@ tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
 tb.cv <- tb.cv + facet_grid(var ~ lab, labeller = label_parsed)
 ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.png',
        width = 10, height = 5)
+
 
 # change in baseline through time
 # weibull

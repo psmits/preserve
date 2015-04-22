@@ -76,10 +76,7 @@ if(map) {
 
     er[[ii]] <- oo
   }
-}
-
-
-if(error) {
+} else {
   # for measurement error models
   # this is for the weibull model
   pat <- 'faun_expo_[0-9].csv'
