@@ -42,16 +42,12 @@ if(map) {
     bet.1 <- betas[sample(nrow(betas), 1), , 2]
     bet.2 <- betas[sample(nrow(betas), 1), , 3]
     bet.3 <- betas[sample(nrow(betas), 1), , 4]
-    bet.4 <- betas[sample(nrow(betas), 1), , 5]
-    bet.5 <- betas[sample(nrow(betas), 1), , 6]
 
     oo <- c()
     for(jj in seq(n)) {
       reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
       bet.2[coh[jj]] * envs[jj] + 
-      bet.3[coh[jj]] * lits[jj] + 
-      bet.4[coh[jj]] * (envs[jj] * lits[jj]) + 
-      bet.5[coh[jj]] * size[jj]
+      bet.3[coh[jj]] * size[jj]
       oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
     }
 
@@ -69,16 +65,12 @@ if(map) {
     bet.1 <- betas[sample(nrow(betas), 1), , 2]
     bet.2 <- betas[sample(nrow(betas), 1), , 3]
     bet.3 <- betas[sample(nrow(betas), 1), , 4]
-    bet.4 <- betas[sample(nrow(betas), 1), , 5]
-    bet.5 <- betas[sample(nrow(betas), 1), , 6]
 
     oo <- c()
     for(jj in seq(n)) {
       reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
       bet.2[coh[jj]] * envs[jj] + 
-      bet.3[coh[jj]] * lits[jj] + 
-      bet.4[coh[jj]] * (envs[jj] * lits[jj]) + 
-      bet.5[coh[jj]] * size[jj]
+      bet.3[coh[jj]] * size[jj]
       oo[jj] <- rexp(1, rate = exp(reg))
     }
 

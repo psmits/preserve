@@ -50,14 +50,14 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
   bibr <- bibr[bibr$occurrences.class_name == taxon, ]
   bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
 
-  # lithology
-  # high chance of removing occurrences
-  bibr$collections.lithology1 <- as.character(bibr$collections.lithology1)
-  bibr <- bibr[!is.na(bibr$collections.lithology1), ]
-  lith <- bibr$collections.lithology1
-  lith <- gsub(pattern = '[\\"?]', replacement = '', lith, perl = TRUE)
-  bibr$collections.lithology1 <- clean.lith(lith)
-  bibr <- bibr[!(bibr$collections.lithology1 %in% c('', 'mixed')), ]
+  ## lithology
+  ## high chance of removing occurrences
+  #bibr$collections.lithology1 <- as.character(bibr$collections.lithology1)
+  #bibr <- bibr[!is.na(bibr$collections.lithology1), ]
+  #lith <- bibr$collections.lithology1
+  #lith <- gsub(pattern = '[\\"?]', replacement = '', lith, perl = TRUE)
+  #bibr$collections.lithology1 <- clean.lith(lith)
+  #bibr <- bibr[!(bibr$collections.lithology1 %in% c('', 'mixed')), ]
 
   # this section is all about finding duration
   collec.stage <- table(bibr$collections.stage)
@@ -115,23 +115,23 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
     onoff[ii, 5] <- off.back
   }
 
-  # do the above based on lithology
-  litho <- ddply(bibr, .(occurrences.genus_name), summarize,
-                 carbonate = sum(collections.lithology1 == 'carbonate'),
-                 clastic = sum(collections.lithology1 == 'clastic'))
-  # now for each stage, get the epi and off
-  big.litho <- ddply(bibr, .(collections.stage), summarize,
-                     carbonate = sum(collections.lithology1 == 'carbonate'),
-                     clastic = sum(collections.lithology1 == 'clastic'))
-  for(ii in seq(length(taxon.occur))) {
-    app <- which(gts %in% names(taxon.occur[[ii]]))
-    wh <- gts[seq(min(app), max(app))]
-    background <- big.litho[big.litho[, 1] %in% wh, ]
-    car.back <- sum(background$car) - litho[ii, 2]
-    cla.back <- sum(background$cla) - litho[ii, 3]
-    litho[ii, 4] <- car.back
-    litho[ii, 5] <- cla.back
-  }
+  ## do the above based on lithology
+  #litho <- ddply(bibr, .(occurrences.genus_name), summarize,
+  #               carbonate = sum(collections.lithology1 == 'carbonate'),
+  #               clastic = sum(collections.lithology1 == 'clastic'))
+  ## now for each stage, get the epi and off
+  #big.litho <- ddply(bibr, .(collections.stage), summarize,
+  #                   carbonate = sum(collections.lithology1 == 'carbonate'),
+  #                   clastic = sum(collections.lithology1 == 'clastic'))
+  #for(ii in seq(length(taxon.occur))) {
+  #  app <- which(gts %in% names(taxon.occur[[ii]]))
+  #  wh <- gts[seq(min(app), max(app))]
+  #  background <- big.litho[big.litho[, 1] %in% wh, ]
+  #  car.back <- sum(background$car) - litho[ii, 2]
+  #  cla.back <- sum(background$cla) - litho[ii, 3]
+  #  litho[ii, 4] <- car.back
+  #  litho[ii, 5] <- cla.back
+  #}
 
 
   # the number of collections to offset each observation by 
@@ -170,10 +170,10 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
   big.dead <- which(gts %in% mass.ext)
   regime <- laply(age.order, function(x) 
                   max(which(x > big.dead)))
-  age.data <- cbind(taxon.age, censored, orig, regime, onoff[, -1], litho[, -1])
+  age.data <- cbind(taxon.age, censored, orig, regime, onoff[, -1])#, litho[, -1])
   names(age.data) <- c('genus', 'duration', 'censored', 'orig', 'regime', 
-                       'epi', 'off', 'epi.bck', 'off.bck',
-                       'car', 'cla', 'car.bck', 'cla.bck')
+                       'epi', 'off', 'epi.bck', 'off.bck')
+                       #'car', 'cla', 'car.bck', 'cla.bck')
   # need to retain the class stuff too
 
   # split based on class

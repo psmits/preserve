@@ -6,7 +6,7 @@ for f in $FILES;
 do
   for i in `seq 1 4`;
   do
-    ./survival_exp_map sample num_samples=7500 num_warmup=7500 \
+    ./survival_exp_map sample num_samples=5000 num_warmup=5000 \
       random seed=420 \
       id=$i \
       data file=$f \
@@ -15,7 +15,7 @@ do
   wait
   for i in `seq 1 4`;
   do
-    ./survival_wei_map sample num_samples=7500 num_warmup=7500 \
+    ./survival_wei_map sample num_samples=5000 num_warmup=5000 \
       random seed=420 \
       id=$i \
       data file=$f \

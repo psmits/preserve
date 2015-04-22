@@ -27,29 +27,29 @@ beta.a <- sepkoski.data$epi + sepkoski.data$epi.bck
 beta.b <- sepkoski.data$off + sepkoski.data$off.bck
 env.ml <- (beta.a - 1) / (beta.a + beta.b - 2)
 
-# beta distribution of genus lithological occurrence
-beta.a <- sepkoski.data$car + sepkoski.data$car.bck
-beta.b <- sepkoski.data$cla + sepkoski.data$cla.bck
-lit.ml <- (beta.a - 1) / (beta.a + beta.b - 2)
+## beta distribution of genus lithological occurrence
+#beta.a <- sepkoski.data$car + sepkoski.data$car.bck
+#beta.b <- sepkoski.data$cla + sepkoski.data$cla.bck
+#lit.ml <- (beta.a - 1) / (beta.a + beta.b - 2)
 
 # do it so i can propegate error
 idv.epi <- sepkoski.data$epi
 idv.off <- sepkoski.data$off
 tot.epi <- sepkoski.data$epi.bck
 tot.off <- sepkoski.data$off.bck
-idv.car <- sepkoski.data$car
-idv.cla <- sepkoski.data$cla
-tot.car <- sepkoski.data$car.bck
-tot.cla <- sepkoski.data$cla.bck
+#idv.car <- sepkoski.data$car
+#idv.cla <- sepkoski.data$cla
+#tot.car <- sepkoski.data$car.bck
+#tot.cla <- sepkoski.data$cla.bck
 
 data <- list(duration = sepkoski.data$duration, group = con.class,
              cohort = con.orig, 
              env = rescale(logit(env.ml)),
-             lit = rescale(logit(lit.ml)),
+             #lit = rescale(logit(lit.ml)),
              epi = idv.epi, off = idv.off, 
              epi.bck = tot.epi, off.bck = tot.epi,
-             car = idv.car, cla = idv.cla, 
-             car.bck = tot.car, cla.bck = tot.cla,
+             #car = idv.car, cla = idv.cla, 
+             #car.bck = tot.car, cla.bck = tot.cla,
              occupy = rescale(logit(sepkoski.data$occupy)),
              size = rescale(log(sepkoski.data$size)))
 
@@ -66,11 +66,11 @@ data <- list(dur_unc = unc$duration,
              off_unc = unc$off,
              epi_bck_unc = unc$epi.bck,
              off_bck_unc = unc$off.bck,
-             lit_unc = unc$lit,
-             car_unc = unc$car,
-             cla_unc = unc$cla,
-             car_bck_unc = unc$car.bck,
-             cla_bck_unc = unc$cla.bck,
+#             lit_unc = unc$lit,
+#             car_unc = unc$car,
+#             cla_unc = unc$cla,
+#             car_bck_unc = unc$car.bck,
+#             cla_bck_unc = unc$cla.bck,
              size_unc = unc$size,
              N_unc = length(unc$duration),
              dur_cen = cen$duration,
@@ -82,11 +82,11 @@ data <- list(dur_unc = unc$duration,
              off_cen = cen$off,
              epi_bck_cen = cen$epi.bck,
              off_bck_cen = cen$off.bck,
-             lit_cen = cen$lit,
-             car_cen = cen$car,
-             cla_cen = cen$cla,
-             car_bck_cen = cen$car.bck,
-             cla_bck_cen = cen$cla.bck,
+#             lit_cen = cen$lit,
+#             car_cen = cen$car,
+#             cla_cen = cen$cla,
+#             car_bck_cen = cen$car.bck,
+#             cla_bck_cen = cen$cla.bck,
              size_cen = cen$size,
              N_cen = length(cen$duration))
 
@@ -105,14 +105,14 @@ with(data, {stan_rdump(list = c('dur_unc', 'group_unc', 'cohort_unc',
                                 'samp_cen', 'N', 'O', 'R', 'C', 'F',
                                 'occupy_unc', 'occupy_cen',
                                 'env_unc', 'env_cen',
-                                'lit_unc', 'lit_cen',
+                                #'lit_unc', 'lit_cen',
                                 'epi_unc', 'epi_cen', 
                                 'off_unc', 'off_cen',
                                 'epi_bck_unc', 'epi_bck_cen', 
                                 'off_bck_unc', 'off_bck_cen', 
-                                'car_unc', 'car_cen', 
-                                'cla_unc', 'cla_cen',
-                                'car_bck_unc', 'car_bck_cen', 
-                                'cla_bck_unc', 'cla_bck_cen', 
+                                #'car_unc', 'car_cen', 
+                                #'cla_unc', 'cla_cen',
+                                #'car_bck_unc', 'car_bck_cen', 
+                                #'cla_bck_unc', 'cla_bck_cen', 
                                 'size_unc', 'size_cen'),
                        file = '../data/data_dump/fauna_info.data.R')})

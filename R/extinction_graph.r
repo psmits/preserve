@@ -6,6 +6,9 @@ library(rstan)
 library(survival)
 library(stringr)
 library(grid)
+source('../R/waic.r')
+
+#waic(wfit)$waic < waic(efit)$waic
 
 map <- TRUE
 error <- FALSE
@@ -26,6 +29,7 @@ coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 rage <- c(data$occupy_unc, data$occupy_cen)
 envs <- c(data$env_unc, data$env_cen)  # maximum a posteriori estimate
+lits <- c(data$lit_unc, data$lit_cen)  # maximum a posteriori estimate
 size <- c(data$size_unc, data$size_cen)
 duration <- c(data$dur_unc, data$dur_cen)
 
@@ -84,16 +88,16 @@ ggsave(surv.plot, filename = '../doc/survival/figure/suvival_curves.png',
 # dim 2 is row
 # dim 3 is col
 get.covcor <- function(stanfit) {
-  cor.median <- matrix(, ncol = 5, nrow = 5)
-  cor.mean <- matrix(, ncol = 5, nrow = 5)
-  cor.10 <- matrix(, ncol = 5, nrow = 5)
-  cor.90 <- matrix(, ncol = 5, nrow = 5)
-  cov.median <- matrix(, ncol = 5, nrow = 5)
-  cov.mean <- matrix(, ncol = 5, nrow = 5)
-  cov.10 <- matrix(, ncol = 5, nrow = 5)
-  cov.90 <- matrix(, ncol = 5, nrow = 5)
-  for(ii in seq(5)) {
-    for(jj in seq(5)) {
+  cor.median <- matrix(, ncol = 4, nrow = 4)
+  cor.mean <- matrix(, ncol = 4, nrow = 4)
+  cor.10 <- matrix(, ncol = 4, nrow = 4)
+  cor.90 <- matrix(, ncol = 4, nrow = 4)
+  cov.median <- matrix(, ncol = 4, nrow = 4)
+  cov.mean <- matrix(, ncol = 4, nrow = 4)
+  cov.10 <- matrix(, ncol = 4, nrow = 4)
+  cov.90 <- matrix(, ncol = 4, nrow = 4)
+  for(ii in seq(4)) {
+    for(jj in seq(4)) {
       cor.median[ii, jj] <- median(stanfit$Omega[, ii, jj])
       cor.mean[ii, jj] <- mean(stanfit$Omega[, ii, jj])
       cor.10[ii, jj] <- quantile(stanfit$Omega[, ii, jj], probs = .1)
@@ -108,8 +112,8 @@ get.covcor <- function(stanfit) {
   out <- list(cor.median, cor.mean, cor.10, cor.90, 
               cov.median, cov.mean, cov.10, cov.90)
   out <- llply(out, function(x) {
-               rownames(x) <- c('i', 'r', 'e', 'l', 'm')
-               colnames(x) <- c('i', 'r', 'e', 'l', 'm')
+               rownames(x) <- c('i', 'r', 'e', 'm')
+               colnames(x) <- c('i', 'r', 'e', 'm')
                x})
   out
 }
@@ -119,12 +123,10 @@ exp.covcor <- get.covcor(exp.fit)
 relab.x <- scale_x_discrete(labels = c('i' = expression(beta[intercept]), 
                                        'r' = expression(beta[range]),
                                        'e' = expression(beta[environment]), 
-                                       'l' = expression(beta[lithology]), 
                                        'm' = expression(beta[size])))
 relab.y <- scale_y_discrete(labels = c('i' = expression(beta[intercept]), 
                                        'r' = expression(beta[range]),
                                        'e' = expression(beta[environment]), 
-                                       'l' = expression(beta[lithology]), 
                                        'm' = expression(beta[size])))
 # correlation matrix
 omega.med <- melt(list(Exponential = exp.covcor[[1]], 
@@ -157,12 +159,12 @@ ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_heatmap.png',
        width = 10, height = 5)
 
 # histogram of posterior of correlation between inter and env
-baseline.covar <- data.frame(value = c(exp.fit$Omega[, 1, 3], 
+baseline.covar <- data.frame(value = c(exp.fit$Omega[, 1, 2], 
+                                       wei.fit$Omega[, 1, 2],
+                                       exp.fit$Omega[, 1, 3], 
                                        wei.fit$Omega[, 1, 3],
                                        exp.fit$Omega[, 1, 4], 
-                                       wei.fit$Omega[, 1, 4],
-                                       exp.fit$Omega[, 1, 5], 
-                                       wei.fit$Omega[, 1, 5]),
+                                       wei.fit$Omega[, 1, 4]),
                              lab = c(rep('Exponential', 
                                          length(exp.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
@@ -175,9 +177,9 @@ baseline.covar <- data.frame(value = c(exp.fit$Omega[, 1, 3],
                                          length(wei.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3]))))
-baseline.covar$var <- c(rep('Cor(beta[intercept], beta[environment])',
+baseline.covar$var <- c(rep('Cor(beta[intercept], beta[range])',
                             2 * length(exp.fit$Omega[, 1, 3])),
-                        rep('Cor(beta[intercept], beta[lithology])',
+                        rep('Cor(beta[intercept], beta[environment])',
                             2 * length(exp.fit$Omega[, 1, 3])),
                         rep('Cor(beta[intercept], beta[size])',
                             2 * length(exp.fit$Omega[, 1, 3])))
