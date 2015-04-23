@@ -199,6 +199,7 @@ omega.med <- melt(list(Exponential = exp.covcor[[1]],
                        Weibull = wei.covcor[[1]]))
 omega.plot <- ggplot(omega.med, aes(x = Var1, y = Var2, fill = value))
 omega.plot <- omega.plot + geom_tile()
+omega.plot <- omega.plot + geom_text(aes(label = round(value, 2)))
 omega.plot <- omega.plot + facet_grid(. ~ L1, labeller = label_parsed)
 omega.plot <- omega.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
                                                 low = 'blue', 
@@ -210,11 +211,27 @@ omega.plot <- omega.plot + theme(axis.text = element_text(size = 15))
 ggsave(omega.plot, filename = '../doc/survival/figure/correlation_heatmap.png',
        width = 10, height = 5)
 
+# just for the weibull
+omega.wei <- melt(list(Weibull = wei.covcor[[1]]))
+weicor.plot <- ggplot(omega.wei, aes(x = Var1, y = Var2, fill = value))
+weicor.plot <- weicor.plot + geom_tile()
+weicor.plot <- weicor.plot + geom_text(aes(label = round(value, 2)))
+weicor.plot <- weicor.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
+                                                  low = 'blue', 
+                                                  mid = 'white', 
+                                                  high = 'red')
+weicor.plot <- weicor.plot + relab.x + relab.y
+weicor.plot <- weicor.plot + labs(x = '', y = '')
+weicor.plot <- weicor.plot + theme(axis.text = element_text(size = 15))
+ggsave(weicor.plot, filename = '../doc/survival/figure/wei_cor_heatmap.png',
+       width = 7, height = 5)
+
 # covariance matrix
 sigma.med <- melt(list(Exponential = exp.covcor[[5]], 
                        Weibull = wei.covcor[[5]]))
 sigma.plot <- ggplot(sigma.med, aes(x = Var1, y = Var2, fill = value))
 sigma.plot <- sigma.plot + geom_tile()
+sigma.plot <- sigma.plot + geom_text(aes(label = round(value, 2)))
 sigma.plot <- sigma.plot + facet_grid(. ~ L1, labeller = label_parsed)
 sigma.plot <- sigma.plot + scale_fill_gradient2(name = 'Median\nCovariance', 
                                                 low = 'blue', 
@@ -238,22 +255,63 @@ mids <- data.frame(mid, top, bot)
 mids$var <- rep(c('i', 'r', 'e', 'm'), 2)
 mids$var <- factor(mids$var, levels = unique(mids$var))
 mids$mod <- rep(c('Exponential', 'Weibull'), each = 4)
+
+relab.x <- scale_x_discrete(labels = c('i' = expression(mu[intercept]), 
+                                       'r' = expression(mu[range]),
+                                       'e' = expression(mu[environment]), 
+                                       'm' = expression(mu[size])))
+
 coef.mean <- ggplot(mids, aes(x = var, y = mid))
 coef.mean <- coef.mean + geom_hline(aes(yintercept = 0), 
                                     colour = 'grey', size = 2)
-coef.mean <- coef.mean + 
-             geom_pointrange(aes(ymin = bot, ymax = top, 
-                                 colour = mod), size = 0.75,
-                             position = position_jitter(width = 0.1, 
-                                                        height = 0))
-coef.mean <- coef.mean + relab.x + labs(x = '', y = expression(hat(beta)))
+coef.mean <- coef.mean + geom_pointrange(aes(ymin = bot, ymax = top, 
+                                             colour = mod), size = 0.75,
+                                         position = position_jitter(width = 0.1, 
+                                                                    height = 0))
+coef.mean <- coef.mean + relab.x + labs(x = '', y = expression(hat(mu)))
 coef.mean <- coef.mean + scale_colour_manual(values = cbp, name = '')
 coef.mean <- coef.mean + theme(axis.text.y = element_text(size = 10),
                                axis.title.y = element_text(angle = 0),
                                axis.text.x = element_text(size = 15),
-                               legend.text = element_text(size = 10))
+                               legend.text = element_text(size = 10),
+                               legend.position = 'left')
 ggsave(coef.mean, filename = '../doc/survival/figure/coef_means.png',
-       width = 8, height = 5)
+       width = 8, height = 4)
+
+
+# variance vector for covariates
+mid <- c(apply(exp.fit$sigma, 2, median),
+         apply(wei.fit$sigma, 2, median))
+top <- c(apply(exp.fit$sigma, 2, function(x) quantile(x, probs = 0.9)), 
+         apply(wei.fit$sigma, 2, function(x) quantile(x, probs = 0.9)))
+bot <- c(apply(exp.fit$sigma, 2, function(x) quantile(x, probs = 0.1)), 
+         apply(wei.fit$sigma, 2, function(x) quantile(x, probs = 0.1)))
+vars <- data.frame(mid, top, bot)
+vars$var <- rep(c('i', 'r', 'e', 'm'), 2)
+vars$var <- factor(vars$var, levels = unique(vars$var))
+vars$mod <- rep(c('Exponential', 'Weibull'), each = 4)
+
+relab.x <- scale_x_discrete(labels = c('i' = expression(tau[intercept]), 
+                                       'r' = expression(tau[range]),
+                                       'e' = expression(tau[environment]), 
+                                       'm' = expression(tau[size])))
+
+coef.var <- ggplot(vars, aes(x = var, y = mid))
+coef.var <- coef.var + geom_hline(aes(yintercept = 0), 
+                                  colour = 'grey', size = 2)
+coef.var <- coef.var + geom_pointrange(aes(ymin = bot, ymax = top, 
+                                           colour = mod), size = 0.75,
+                                       position = position_jitter(width = 0.1, 
+                                                                  height = 0))
+coef.var <- coef.var + relab.x + labs(x = '', y = expression(hat(tau)))
+coef.var <- coef.var + scale_colour_manual(values = cbp, name = '')
+coef.var <- coef.var + theme(axis.text.y = element_text(size = 10),
+                             axis.title.y = element_text(angle = 0),
+                             axis.text.x = element_text(size = 15),
+                             legend.text = element_text(size = 10),
+                             legend.position = 'left')
+ggsave(coef.var, filename = '../doc/survival/figure/coef_var.png',
+       width = 8, height = 4)
 
 
 # histogram of posterior of correlation between inter and env
@@ -281,7 +339,10 @@ baseline.covar$var <- c(rep('Cor(beta[intercept], beta[range])',
                             2 * length(exp.fit$Omega[, 1, 3])),
                         rep('Cor(beta[intercept], beta[size])',
                             2 * length(exp.fit$Omega[, 1, 3])))
-
+baseline.covar$var <- factor(baseline.covar$var, 
+                             levels = c('Cor(beta[intercept], beta[range])',
+                                        'Cor(beta[intercept], beta[environment])',
+                                        'Cor(beta[intercept], beta[size])'))
 tb.cv <- ggplot(baseline.covar, aes(x = value))
 tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
