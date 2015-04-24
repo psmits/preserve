@@ -66,9 +66,8 @@ The simplest model of genus duration includes no covariate or structural informa
 \end{equation}
 Note that \(\lambda\) is a ``rate'' or inverse-scale while \(\sigma\) is a scale parameter, meaning that \(\frac{1}{\lambda} = \sigma\).
 
-% this is where i include the hazard and survival functions
 
-These current simple models can then be expanded to include covariate information as predictors by reparameterizing \(\lambda\) and \(\sigma\) as a regression \citep{Klein2003}. Each of the covariates of interest is given its own regression coefficient (e.g. \(\beta_{range}\)) along with an intercept term \(\beta_{0}\). There are some additional complications to the parameterization of \(\sigma\) associated with the inclusion of \(\alpha\) as well as interpretability \citep{Klein2003}. Both of these cases are written more fully as
+These simple models can then be expanded to include covariate information as predictors by reparameterizing \(\lambda\) and \(\sigma\) as a regression \citep{Klein2003}. Each of the covariates of interest is given its own regression coefficient (e.g. \(\beta_{range}\)) along with an intercept term \(\beta_{0}\). There are some additional complications to the parameterization of \(\sigma\) associated with the inclusion of \(\alpha\) as well as interpretability \citep{Klein2003}. Both of these cases are written more fully as
 \begin{equation}
   \begin{aligned}
     \lambda_{i} &= \exp(\beta_{0} + \beta_{range} r_{i} + \beta_{environment} \theta_{i} + \beta_{size} m_{i}) \\
@@ -78,7 +77,10 @@ These current simple models can then be expanded to include covariate informatio
 \end{equation}
 The regression equations are exponentiated because both \(\lambda\) and \(\sigma\) are only defined for positive reals. Remember that \(\theta_{i}\) is the environmental affinity, as defined above, of genus \(i\).
 
-The current model which incorporates both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 4\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a columns of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts.
+% quadratic term for environment
+%   addresses the possible nonlinearity caused by ``survival of the nonspecialized''
+
+The models which incorporate both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 4\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a columns of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts.
 
 Using the above hierarchical expansion to the model, we then rewrite \(\lambda\) and \(\sigma\) in matrix notation as
 \begin{equation}

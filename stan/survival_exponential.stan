@@ -36,16 +36,12 @@ parameters {
 }
 transformed parameters {
   cov_matrix[4] Sigma;
-  real pref_trans[N];
   real env[N];
 
   Sigma <- quad_form_diag(Omega, sigma);
   
   for(i in 1:N) {
-    pref_trans[i] <- logit(pref[i]);
-  }
-  for(i in 1:N) {
-    env[i] <- (pref_trans[i] - mean(pref_trans)) / (2 * sd(pref_trans));
+    env[i] <- (pref[i] - mean(pref)) / (2 * sd(pref));
   }
 
   // uncertainty in environment

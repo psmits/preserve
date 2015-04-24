@@ -23,14 +23,22 @@ con.class <- as.numeric(as.factor(sepkoski.data$class))
 num.class <- length(unique(sepkoski.data$class))
 
 # beta distribution of genus envrionmental occurrence
-beta.a <- sepkoski.data$epi + sepkoski.data$epi.bck
-beta.b <- sepkoski.data$off + sepkoski.data$off.bck
-env.ml <- (beta.a - 1) / (beta.a + beta.b - 2)
+a <- sepkoski.data$epi
+a2 <- sepkoski.data$epi.bck
+b <- sepkoski.data$off
+b2 <- sepkoski.data$off.bck
+tax.ml <- ((a + 1) - 1) / ((a + 1) + (b + 1) - 2)
+bck.ml <- ((a2 + 1) - 1) / ((a2 + 1) + (b2 + 1) - 2)
+env.ml <- tax.ml - bck.ml
 
 ## beta distribution of genus lithological occurrence
-#beta.a <- sepkoski.data$car + sepkoski.data$car.bck
-#beta.b <- sepkoski.data$cla + sepkoski.data$cla.bck
-#lit.ml <- (beta.a - 1) / (beta.a + beta.b - 2)
+#a <- sepkoski.data$car
+#b <- sepkoski.data$cla
+#a2 <- sepkoski.data$car.bck
+#b2 <- sepkoski.data$cla.bck
+#tax.ml <- ((a + 1) - 1) / ((a + 1) + (b + 1) - 2)
+#bck.ml <- ((a2 + 1) - 1) / ((a2 + 1) + (b2 + 1) - 2)
+#lit.ml <- tax.ml - bck.ml
 
 # do it so i can propegate error
 idv.epi <- sepkoski.data$epi
@@ -44,8 +52,8 @@ tot.off <- sepkoski.data$off.bck
 
 data <- list(duration = sepkoski.data$duration, group = con.class,
              cohort = con.orig, 
-             env = rescale(logit(env.ml)),
-             #lit = rescale(logit(lit.ml)),
+             env = rescale(env.ml),
+             #lit = rescale(lit.ml),
              epi = idv.epi, off = idv.off, 
              epi.bck = tot.epi, off.bck = tot.off,
              #car = idv.car, cla = idv.cla, 

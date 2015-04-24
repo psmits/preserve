@@ -18,16 +18,20 @@
 
 How do differences in taxon traits effect differences in extinction risk? \citet{Jablonski1987} hypothesizes that as baseline extinction risk increases, the importance of taxon traits, such as ecology or environmental preference, should decrease in importance. The only trait that should buck this trend is geographic range \citep{Jablonski1987}. This hypothesis has strong implications for any model of extinction risk: the effect of taxon traits, except for geographic range size, should decrease when baseline extinction intensity increases. This can be stated in a discrete background versus mass extinction framework \citep{Jablonski1987} or a continuous rate variation framework \citep{Wang2003}.% I favor the continuous framework as this hypothesis and prediction are then redly translated into a generalized linear model (GLM) of taxon survival.
 
-Geographic range is widely considered the most important taxon trait for estimating differences extinction risk at nearly all times \citep{Jablonski1986,Jablonski1987,Jablonski2003,Payne2007}. This is logical because if mortality is randomly distributed spatially, a taxon with a large geographic range is less likely to be completely wiped out than a taxon with restricted range.This is a very strong prediction that should be incorporated into taxon survival models.
+Geographic range is widely considered the most important taxon trait for estimating differences extinction risk at nearly all times \citep{Jablonski1986,Jablonski1987,Jablonski2003,Payne2007}. This is logical because if mortality is randomly distributed spatially, a taxon with a large geographic range is less likely to be completely wiped out than a taxon with restricted range. This is a strong prediction based on strong prior evidence. % (N(1, 1)) prior to reflect this certainty?
 
 \citet{Miller2009a} demonstrated that, during mass extinctions, taxa which are associated with off-shore environments have a greater extinction risk than those favoring epicontinental seas. During periods of background extinction, however, they found no consistent difference between taxa favoring either environment. Because of this study, the following prediction for survival patterns can be made: as extinction risk increases, taxa associated with off-shore environments should increase in extinction risk.
 
-% lithology
-%   Foote 2006, Paleozoic, extinction higher for carbonate
-%   Kiessling and Aberhan 2007, Mesozoic, turnover higher for carbonate, though due to origination not extinction
-
 % potential nonlinear effects?
-%   generalists as opposed to specialists? Nurnberg and Aberhan Paleobio 2013, Nurnberg and Aberhan Nat Comm 2015
+%   survival of the nonspecialized
+%     expectation is that generalists lower risk than specialists
+%     Simpson 1944
+%     Liow Am Nat 2004
+%     Nurnberg and Aberhan Paleobio 2013, Nurnberg and Aberhan Nat Comm 2015
+%   allow for this with explicit non-linearity
+%     e.g. beta * env + beta * env^{2}
+%     expectation is that quadratic term coef is negative 
+%       (N(-1, 1) prior to push in that direction?)
 
 I adopt a hierarchical Bayesian survival modelling approach for multiple reasons, one being that it represents a conceptual and statistical unification of the paleontological dynamic and cohort survivorship approaches \citep{VanValen1973,VanValen1979,Raup1978,Raup1975,Foote1988,Baumiller1993,Simpson2006}. Hierarchical modelling, sometimes called ``mixed-effects modeling,'' is a statistical approach which explicitly takes into account the structure of the observed data in order to model both the with and between group structure \citep{Gelman2013d,Gelman2007}. In this case, origination cohorts are the groups and the mean survival model corresponds to the dynamic survivorship model.By using a Bayesian framework I am best able to quantify the uncertainty inherent in the estimates of the effects of taxon traits on survival while also incorporating important prior information.
 

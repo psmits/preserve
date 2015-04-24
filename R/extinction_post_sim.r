@@ -16,10 +16,16 @@ if(map) {
   outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
   efit <- read_stan_csv(outs)
 
+  #a <- summary(efit)[[1]]
+  #all(a[, ncol(a)] < 1.1, na.rm = TRUE)
+
   # this is for the weibull model
   pat <- 'faun_weib_map_[0-9].csv'
   outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
   wfit <- read_stan_csv(outs)
+
+  #a <- summary(wfit)[[1]]
+  #all(a[, ncol(a)] < 1.1, na.rm = TRUE)
 
   # data setup
   coh <- c(data$cohort_unc, data$cohort_cen)
@@ -42,12 +48,14 @@ if(map) {
     bet.1 <- betas[sample(nrow(betas), 1), , 2]
     bet.2 <- betas[sample(nrow(betas), 1), , 3]
     bet.3 <- betas[sample(nrow(betas), 1), , 4]
+    bet.4 <- betas[sample(nrow(betas), 1), , 5]
 
     oo <- c()
     for(jj in seq(n)) {
       reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
       bet.2[coh[jj]] * envs[jj] + 
-      bet.3[coh[jj]] * size[jj]
+      bet.3[coh[jj]] * (envs[jj] * envs[jj]) + 
+      bet.4[coh[jj]] * size[jj]
       oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
     }
 
@@ -65,12 +73,14 @@ if(map) {
     bet.1 <- betas[sample(nrow(betas), 1), , 2]
     bet.2 <- betas[sample(nrow(betas), 1), , 3]
     bet.3 <- betas[sample(nrow(betas), 1), , 4]
+    bet.4 <- betas[sample(nrow(betas), 1), , 5]
 
     oo <- c()
     for(jj in seq(n)) {
       reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
       bet.2[coh[jj]] * envs[jj] + 
-      bet.3[coh[jj]] * size[jj]
+      bet.3[coh[jj]] * (envs[jj] * envs[jj]) + 
+      bet.4[coh[jj]] * size[jj]
       oo[jj] <- rexp(1, rate = exp(reg))
     }
 

@@ -22,13 +22,13 @@ data {
   real size_cen[N_cen];
 }
 parameters {
-  vector[4] mu_prior;
-  vector[4] beta[O];  // betas
-  corr_matrix[4] Omega;
-  vector<lower=0>[4] sigma;
+  vector[5] mu_prior;
+  vector[5] beta[O];  // betas
+  corr_matrix[5] Omega;
+  vector<lower=0>[5] sigma;
 }
 transformed parameters {
-  cov_matrix[4] Sigma;
+  cov_matrix[5] Sigma;
 
   Sigma <- quad_form_diag(Omega, sigma);
 }
@@ -37,7 +37,7 @@ model {
   // done by cohort
   Omega ~ lkj_corr(2);
   sigma ~ cauchy(0, 1);
-  for(i in 1:4) {
+  for(i in 1:5) {
     mu_prior[i] ~ normal(0, 5);
   }
   for(i in 1:O) {
@@ -51,13 +51,15 @@ model {
             exp(beta[cohort_unc[i], 1] +
               beta[cohort_unc[i], 2] * occupy_unc[i] +
               beta[cohort_unc[i], 3] * env_unc[i] +
-              beta[cohort_unc[i], 4] * size_unc[i])));
+              beta[cohort_unc[i], 4] * (env_unc[i] * env_unc[i]) +
+              beta[cohort_unc[i], 5] * size_unc[i])));
     } else {
       increment_log_prob(exponential_log(dur_unc[i],
             exp(beta[cohort_unc[i], 1] +
               beta[cohort_unc[i], 2] * occupy_unc[i] +
               beta[cohort_unc[i], 3] * env_unc[i] +
-              beta[cohort_unc[i], 4] * size_unc[i])));
+              beta[cohort_unc[i], 4] * (env_unc[i] * env_unc[i]) +
+              beta[cohort_unc[i], 5] * size_unc[i])));
     }
   }
   for(i in 1:N_cen) {
@@ -65,7 +67,8 @@ model {
           exp(beta[cohort_cen[i], 1] +
             beta[cohort_cen[i], 2] * occupy_cen[i] +
             beta[cohort_cen[i], 3] * env_cen[i] +
-            beta[cohort_cen[i], 4] * size_cen[i])));
+            beta[cohort_cen[i], 4] * (env_cen[i] * env_cen[i]) +
+            beta[cohort_cen[i], 5] * size_cen[i])));
   }
 }
 generated quantities {
@@ -77,13 +80,15 @@ generated quantities {
           exp(beta[cohort_unc[i], 1] +
             beta[cohort_unc[i], 2] * occupy_unc[i] +
             beta[cohort_unc[i], 3] * env_unc[i] +
-            beta[cohort_unc[i], 4] * size_unc[i]));
+            beta[cohort_unc[i], 4] * (env_unc[i] * env_unc[i]) +
+            beta[cohort_unc[i], 5] * size_unc[i]));
     } else {
       log_lik[i] <- exponential_log(dur_unc[i],
           exp(beta[cohort_unc[i], 1] +
             beta[cohort_unc[i], 2] * occupy_unc[i] +
             beta[cohort_unc[i], 3] * env_unc[i] +
-            beta[cohort_unc[i], 4] * size_unc[i]));
+            beta[cohort_unc[i], 4] * (env_unc[i] * env_unc[i]) +
+            beta[cohort_unc[i], 5] * size_unc[i]));
     }
   }
   for(i in 1:N_cen) {
@@ -91,6 +96,7 @@ generated quantities {
         exp(beta[cohort_cen[i], 1] +
           beta[cohort_cen[i], 2] * occupy_cen[i] +
           beta[cohort_cen[i], 3] * env_cen[i] +
-          beta[cohort_cen[i], 4] * size_cen[i]));
+          beta[cohort_cen[i], 4] * (env_cen[i] * env_cen[i]) +
+          beta[cohort_cen[i], 5] * size_cen[i]));
   }
 }
