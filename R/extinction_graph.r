@@ -8,6 +8,7 @@ library(survival)
 library(stringr)
 library(grid)
 source('../R/waic.r')
+source('../R/multiplot.r')
 
 map <- TRUE
 source('../R/extinction_post_sim.r')
@@ -458,3 +459,79 @@ rage.line <- rage.line + facet_grid(label ~ ., labeller = label_parsed)
 rage.line <- rage.line + labs(x = 'Stage', y = expression(beta[range]))
 ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.png',
        width = 10, height = 5)
+
+
+# quadratics plot
+sam <- sample(nrow(exp.fit$mu_prior), 1000)
+coefs <- data.frame(first = wei.fit$mu_prior[sam, 3], 
+                    second = wei.fit$mu_prior[sam, 4],
+                    alpha = wei.fit$alpha[sam])
+coefplot <- alply(as.matrix(coefs), 1, function(coef) {
+                  stat_function(fun = function(x) {
+                                exp(-(coef[1] * x + coef[2] * x^2) / 
+                                    coef[3])},
+                                colour = 'grey',
+                                alpha = 0.2)})
+lab <- round(sum(coefs[, 2] > 0) / nrow(coefs), 2)
+x <- data.frame(x = seq(-1, 1, 0.001))
+quad <- ggplot(x, aes(x = x)) + coefplot
+quad <- quad + stat_function(fun = function(x) {
+                             cc <- colMeans(coefs)
+                             exp(-(cc[1] * x + cc[2] * x^2) /
+                                 cc[3])}, size = 1)
+quad <- quad + geom_text(y = 1.75, x = 0, 
+                         label = paste(lab), size = 10)
+quad <- quad + coord_cartesian(ylim = c(-0.5, 2))
+quad <- quad + labs(x = expression(v[i]), 
+                    y = expression(paste(tilde(sigma[i])/tilde(sigma))))
+ggsave(quad, filename = '../doc/survival/figure/environ_quad.png',
+       width = 7, height = 5)
+
+# now do quadratics plot with facet for each cohort
+# cohort one
+sam <- sample(nrow(exp.fit$mu_prior), 1000)
+coef.list <- list()
+plotlist <- list()
+for(ii in seq(unique(coh))) {
+  coefs <- data.frame(first = wei.fit$beta[sam, ii, 3],
+                      second = wei.fit$beta[sam, ii, 4],
+                      alpha = wei.fit$alpha[sam])
+  lab <- round(sum(coefs[, 2] > 0) / nrow(coefs), 2)
+  cols <- ifelse(mean(coefs[, 2]) < 0, 'red', 'black')
+  coef.list[[ii]] <- coefs
+  ss <- sample(nrow(exp.fit$mu_prior), 100)
+  coefs <- data.frame(first = wei.fit$beta[ss, ii, 3],
+                      second = wei.fit$beta[ss, ii, 4],
+                      alpha = wei.fit$alpha[ss])
+  coefplot <- alply(as.matrix(coefs), 1, function(coef) {
+                    stat_function(fun = function(x) {
+                                  exp(-(coef[1] * x + coef[2] * x^2) / 
+                                      coef[3])},
+                                  colour = 'grey',
+                                  alpha = 0.75)})
+  quadcoh <- ggplot(x, aes(x = x)) + coefplot
+  quadcoh <- quadcoh + geom_hline(yintercept = 1)
+  quadcoh <- quadcoh + geom_text(y = 1.75, x = 0, 
+                                 label = paste(lab), size = 10, colour = cols)
+  quadcoh <- quadcoh + coord_cartesian(ylim = c(-0.5, 2))
+  quadcoh <- quadcoh + labs(x = paste(ii), 
+                            y = expression(paste(tilde(sigma[i])/tilde(sigma))))
+  plotlist[[ii]] <- quadcoh
+}
+png(filename = '../doc/survival/figure/cohort_quads.png', 
+    width = 3000, height = 1500)
+multiplot(plotlist = plotlist, 
+          layout = matrix(c(rev(seq(unique(coh))), NA), 
+                          ncol = 8, byrow = TRUE))
+dev.off()
+
+# do the derivative of the coefficients; get the inflection points
+# percent of inflection points greater than 0
+#   towards epicontinental
+p.epi.best <- laply(coef.list, function(x) 
+                    sum((-x[1]) / (x[2] * 2) > 0) / nrow(x))
+# which are, on average, up ward facing parabolas
+wh.meanworst <- which(laply(coef.list, function(x) mean(x[, 2])) < 0)
+wh.midworst <- which(laply(coef.list, function(x) median(x[, 2])) < 0)
+# percent of draws with up ward facing parabolas
+per.worst <- laply(coef.list, function(x) sum(x[, 2] > 0) / nrow(x))

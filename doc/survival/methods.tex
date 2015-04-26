@@ -15,41 +15,31 @@
 
 The dataset analyzed here is derived from the a combination of the occurrence information from \citet{Miller2009a} and the body size data from \citet{Payne2014}. The \citet{Miller2009a} dataset is based on the Paleobiology Database (http://www.paleodb.org); see \citet{Miller2009a} for a full description of the inclusion criterion. 
 
-Sampled occurrences were restricted to those with latitude and longitude coordinates, assignment to either epicontinental or open-ocean environment, and being of a genus present in the body size dataset. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Genera who's last appearance was in a stage preceding a mass extinction were right censored, and genera with a duration of only one stage and were left censored (see below for explanation of censoring). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(\theta\)), and body size (\(m\)). 
+Sampled occurrences were restricted to those with latitude and longitude coordinates, assignment to either epicontinental or open-ocean environment, and being of a genus present in the body size dataset. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Genera who's last appearance was in a stage preceding a mass extinction were right censored, and genera with a duration of only one stage and were left censored (see below for explanation of censoring). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v\)), and body size (\(m\)). 
 
 Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells of a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). Following this, for each stage, the total number of grid cells occupied is calculated. The number of grid cells that each genus present occurs in was then calculated and made relative by dividing by the total number of possible cells. Finally, mean relative genus occupancy was calculated as the mean of per stage relative occupancy.
 
-The calculation and inclusion of environmental affinity in the subsequent survival model is a statistical procedure that takes into account our uncertainty based on where fossils tend to occur. Because we cannot directly observe if a fossil taxon had occurrences restricted to only a single environmental, instead we can only estimate a probability of occurrence with some amount of uncertainty. One advantage of using a Bayesian analytical context is that both parameters and data are considered random samples from some underlying distribution, which means it is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. In this case, this is the probability that a genus will occur in an epicontiental sea or not. 
+The calculation and inclusion of environmental affinity in the subsequent survival model is a statistical procedure that takes into account our uncertainty based on where fossils tend to occur. Because we cannot directly observe if a fossil taxon had occurrences restricted to only a single environmental, instead we can only get an of affinity with some amount of uncertainty. One advantage of using a Bayesian analytical context is that both parameters and data are considered random samples from some underlying distribution, which means it is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. In this case, this is the genus affnity to either epicontiental settings or not. This approach is conceptually similar to \citet{Simpson2009} but instead of obtaining a single point estimate, an entire posterior distribution is estimated.
 
-A genus' probability of occurring in an epicontinental environment, \(\theta\), was calculated using a fully Bayesian extension of \citet{Simpson2009} where occurrence probability (e.g. affinity) is defined as a distribution and not a point estimate. The reasoning behind this approach is that it allows for our uncertainty to properly propagate through our model.
-
-Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. open ocean). Because the value of inters is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a beta distribution. We can then define our sampling statement as
+The first step is to determine the probability \(\theta\) at which genus \(i\) occurs in an epicontinental settings based on its own pattern of occurrences. Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. open ocean). Because the value of inters is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a beta distribution. We can then define our sampling statement as
 \begin{equation}
-  \theta_{i} \sim \mathrm{Beta}(e_{i}, o_{i}).
+  e_{i} \sim \mathrm{Binomail}(e_{i} + o_{i}, \theta_{i}).
   \label{eq:epi_lik}
 \end{equation}
+I used a flat prior of \(\theta_{i}\) defined as \(\theta_{i} \sim \mathrm{Beta}(1, 1)\).
 
-It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an informative beta prior, which is conveniently the conjugate prior for the beta distribution. 
-
-Define \(E_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(O_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define a prior for \(\theta\) as
+It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an additional probability \(\Theta\). Define \(E_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(O_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define the sampling statement as
 \begin{equation}
-  \theta_{i} \sim \mathrm{Beta}(E_{i}, O_{i}).
-  \label{eq:epi_prior}
+  E_{i} \sim \mathrm{Binomial}(E_{i} + O_{i}, \Theta_{i}).
+  \label{eq:bck_lik}
 \end{equation}
+Again, I used a flat prior of \(\Theta_{i}\) defined as \(\Theta_{i} \sim \mathrm{Beta}(1, 1)\).
 
-Given the likelihood (Eq. \ref{eq:epi_lik}) and the prior (Eq. \ref{eq:epi_prior}), the conjugacy of the prior can be taken advantage of to calculate the full posterior distribution
-\begin{equation}
-  \begin{aligned}
-    p(\theta_{i} | y_{i}) &\propto p(y_{i} | \theta) p(\theta) \\
-    p(\theta_{i} | y_{i}) &= \mathrm{Beta}(e_{i} + E_{i}, o_{i} + O_{i}).
-  \end{aligned}
-  \label{eq:epi_post}
-\end{equation}
-\(p(\theta_{i} | y_{i})\) is the full posterior describing the probability that genus \(i\) occurs on an epicontinental sea, where higher values indicate increased affinity for epicontinental seas over open-ocean environments.
+I then define the environmental affinity of genus \(i\) as \(v_{i} = \theta_{i} - \Theta_{i}\). \(v_{i}\) is a value that can range between -1 and 1, where negative values indicate that genus \(i\) tends to occur in open ocean environments while positive values indicate that genus \(i\) tends to occur in epicontiental environments.
 
 Body size data was sourced directly from \citet{Payne2014}. Because those measurements are presented with out quantified error, a measurement error model similar to the one for environmental affinity could not be implemented.
 
-Prior to analysis all covariates were transformed to be defined on the entire real line. Geographic range size and environmental preferences, because they are defined as values only between 0 and 1, were logit transformed. Body size, which is defined for all positive real values was natural log transformed. All of these covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
+Prior to analysis some covariates were transformed in order to improve interpretation. Geographic range size, which can only have between 0 and 1, was logit transformed. Body size, which is defined for all positive real values was natural log transformed. All covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
 
 
 \subsection{Survival model}
@@ -66,21 +56,17 @@ The simplest model of genus duration includes no covariate or structural informa
 \end{equation}
 Note that \(\lambda\) is a ``rate'' or inverse-scale while \(\sigma\) is a scale parameter, meaning that \(\frac{1}{\lambda} = \sigma\).
 
-
 These simple models can then be expanded to include covariate information as predictors by reparameterizing \(\lambda\) and \(\sigma\) as a regression \citep{Klein2003}. Each of the covariates of interest is given its own regression coefficient (e.g. \(\beta_{range}\)) along with an intercept term \(\beta_{0}\). There are some additional complications to the parameterization of \(\sigma\) associated with the inclusion of \(\alpha\) as well as interpretability \citep{Klein2003}. Both of these cases are written more fully as
 \begin{equation}
   \begin{aligned}
-    \lambda_{i} &= \exp(\beta_{0} + \beta_{range} r_{i} + \beta_{environment} \theta_{i} + \beta_{size} m_{i}) \\
-    \sigma_{i} &= \exp\left(\frac{-(\beta_{0} + \beta_{range} r_{i} + \beta_{environment} \theta_{i} + \beta_{size} m_{i})}{\alpha}\right).
+    \lambda_{i} &= \exp(\beta_{0} + \beta_{r} r_{i} + \beta_{v} v_{i} + \beta_{v^{2}} v_{i}^{2} + \beta_{m} m_{i}) \\
+    \sigma_{i} &= \exp\left(\frac{-(\beta_{0} + \beta_{r} r_{i} + \beta_{v} v_{i} + \beta_{v^{2}} v_{i}^{2} + \beta_{m} m_{i})}{\alpha}\right).
   \end{aligned}
   \label{eq:regression}
 \end{equation}
-The regression equations are exponentiated because both \(\lambda\) and \(\sigma\) are only defined for positive reals. Remember that \(\theta_{i}\) is the environmental affinity, as defined above, of genus \(i\).
+The regression equations are exponentiated because both \(\lambda\) and \(\sigma\) are only defined for positive reals. The quadratic term for environmental affinity \(v\) is to allow for the possiblity of a nonlinear relationship between environmental affinity and extinction risk.
 
-% quadratic term for environment
-%   addresses the possible nonlinearity caused by ``survival of the nonspecialized''
-
-The models which incorporate both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 4\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a columns of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts.
+The models which incorporate both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 5\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a columns of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts.
 
 Using the above hierarchical expansion to the model, we then rewrite \(\lambda\) and \(\sigma\) in matrix notation as
 \begin{equation}
@@ -134,7 +120,7 @@ The Weibull distribution based model is then also defined as
   \end{aligned}
   \label{eq:wei_total}
 \end{equation}
-Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) does not include how the uncertainty in environmental affinity (Eq. \ref{eq:epi_post}) is included nor how censored observations are included. An explination of including censored observations follows.
+Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) does not include how the uncertainty in environmental affinity is included nor how censored observations are included. An explination of including censored observations follows.
 
 
 \subsection{Censored observations}
@@ -179,7 +165,7 @@ The strategy behind posterior predictive checks is to draw simulated values from
 
 In order to compare the fitted model to the observed data, various graphical comparisons or test quantities need to be defined. The principal comparison used here is a comparison between non-parameteric approximation of the survival function \(S(t)\) as estimated from both the observed data and each of the replicated data sets. The purpose of this comparison is to determine if the model approximates the same survival/extinction pattern as the original data. 
 
-The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. Because the Weibull model reduces to the exponential model when \(\alpha = 0\), our interest is not in choosing between these models. Instead comparison of WAIC values is useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to ``WAIC 2'' formulation recommended by \citet{Gelman2013d}.
+The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. Because the Weibull model reduces to the exponential model when \(\alpha = 0\), our interest is not in choosing between these models. Instead comparison of WAIC values is useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}.
 
 WAIC can be considered fully Bayesian alternative to the Akaike information criterion, where WAIC acts as an approximation of leave-one-out cross-validation which acts as a measure of out-of-sample predictive accuracy. WAIC is calculated starting with the log pointwise posterior predictive density calculated as
 \begin{equation}
@@ -200,7 +186,9 @@ Given both equations \ref{eq:lppd} and \ref{eq:pwaic}, WAIC is then calculated
 \end{equation}
 When comparing two or more models, lower WAIC values indicate better out-of-sample predictive accuracy. Importantly, WAIC is just one way of comparing models. When combined with posterior predictive checks it is possible to get a more complete understanding of model fit.
 
-
+% posterior inference
+%   in addition to interpreting parameters, i can use my model to ask questions
+%   given the estimate for quadratic formula of environmental effect
 
 
 \end{document}

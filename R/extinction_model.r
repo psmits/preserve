@@ -52,7 +52,7 @@ tot.off <- sepkoski.data$off.bck
 
 data <- list(duration = sepkoski.data$duration, group = con.class,
              cohort = con.orig, 
-             env = rescale(env.ml),
+             env = env.ml,
              #lit = rescale(lit.ml),
              epi = idv.epi, off = idv.off, 
              epi.bck = tot.epi, off.bck = tot.off,
