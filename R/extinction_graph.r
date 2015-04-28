@@ -158,11 +158,11 @@ get.covcor <- function(stanfit) {
 wei.covcor <- get.covcor(wei.fit)
 exp.covcor <- get.covcor(exp.fit)
 
-relab.x <- scale_x_discrete(labels = c('i' = expression(beta[intercept]), 
-                                       'r' = expression(beta[range]),
-                                       'e' = expression(beta[env]), 
-                                       'e2' = expression(beta[env^2]), 
-                                       'm' = expression(beta[size])))
+relab.x <- scale_x_discrete(labels = c('i' = expression(beta[0]), 
+                                       'r' = expression(beta[r]),
+                                       'e' = expression(beta[v]), 
+                                       'e2' = expression(beta[v^2]), 
+                                       'm' = expression(beta[m])))
 relab.y <- scale_y_discrete(labels = c('i' = expression(beta[intercept]), 
                                        'r' = expression(beta[range]),
                                        'e' = expression(beta[environment]), 
@@ -315,19 +315,19 @@ baseline.covar <- data.frame(value = c(exp.fit$Omega[, 1, 2],
                                          length(wei.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3]))))
-baseline.covar$var <- c(rep('Cor(beta[intercept], beta[range])',
+baseline.covar$var <- c(rep('Cor(beta[0], beta[r])',
                             2 * length(exp.fit$Omega[, 1, 3])),
-                        rep('Cor(beta[intercept], beta[environment])',
+                        rep('Cor(beta[0], beta[v])',
                             2 * length(exp.fit$Omega[, 1, 3])),
-                        rep('Cor(beta[intercept], beta[environment^2])',
+                        rep('Cor(beta[0], beta[v^2])',
                             2 * length(exp.fit$Omega[, 1, 3])),
-                        rep('Cor(beta[intercept], beta[size])',
+                        rep('Cor(beta[0], beta[m])',
                             2 * length(exp.fit$Omega[, 1, 3])))
 baseline.covar$var <- factor(baseline.covar$var, 
-                             levels = c('Cor(beta[intercept], beta[range])',
-                                        'Cor(beta[intercept], beta[environment])',
-                                        'Cor(beta[intercept], beta[environment^2])',
-                                        'Cor(beta[intercept], beta[size])'))
+                             levels = c('Cor(beta[0], beta[r])',
+                                        'Cor(beta[0], beta[v])',
+                                        'Cor(beta[0], beta[v^2])',
+                                        'Cor(beta[0], beta[m])'))
 tb.cv <- ggplot(baseline.covar, aes(x = value))
 tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))

@@ -80,7 +80,7 @@ The estimates of the standard deviation of between cohort coefficient estimates 
 %     correlations with baseline extinction risk of of major interest
 %     high/positive values of intercept --> high extinction risk
 %     low/negative values of intercept --> low extinction risk
-The correlation matrix \(\Omega\) shows a few important correlations between the coefficients (Fig. \ref{fig:omega}). The correlation terms describe the relationship between the coefficients and how their estimates may vary together across cohorts. Of particular note are the correlations between the intercept term \(\beta_{intercept}\), or expected extinction risk, and the biological covariates (Fig. \ref{fig:omega} first column/last row). Keep in mind that when \(\beta_{intercept}\) is low, extinction risk is low; and conversely, when \(\beta_{intercept}\) is high, then extinction risk is high.
+The correlation matrix \(\Omega\) shows a few important correlations between the coefficients (Fig. \ref{fig:omega}). The correlation terms describe the relationship between the coefficients and how their estimates may vary together across cohorts. Of particular note are the correlations between the intercept term \(\beta_{0}\), or expected extinction risk, and the biological covariates (Fig. \ref{fig:omega} first column/last row). Keep in mind that when \(\beta_{0}\) is low, extinction risk is low; and conversely, when \(\beta_{0}\) is high, then extinction risk is high.
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_heatmap}
@@ -88,7 +88,7 @@ The correlation matrix \(\Omega\) shows a few important correlations between the
   \label{fig:omega}
 \end{figure}
 
-Inspection of the marginal posterior estimates for the correlations between estimates of the \(\beta_{intercept}\) and the effects of the biological covariates indicates that only the relationships between expected extinction risk and either geographic range \(\beta_{range}\) and the quadratic effect of environmental preference \(\beta_{v^{2}}\) are of note (Fig. \ref{fig:corr}). The negative correlation between \(\beta_{intercept}\) and \(\beta_{range}\) implies that as extinction risk increases, the effect/importance of geographic range on genus duration increases. Similarly, the negative correlation between \(\beta_{intercept}\) and \(\beta_{v^{2}}\) implies that as extinction risk increases, the function describing the effect of environmental preference flattens (and potentially inverts).
+Inspection of the marginal posterior estimates for the correlations between estimates of the \(\beta_{0}\) and the effects of the biological covariates indicates that only the relationships between expected extinction risk and either geographic range \(\beta_{r}\) and the quadratic effect of environmental preference \(\beta_{v^{2}}\) are of note (Fig. \ref{fig:corr}). The negative correlation between \(\beta_{0}\) and \(\beta_{r}\) implies that as extinction risk increases, the effect/importance of geographic range on genus duration increases. Similarly, the negative correlation between \(\beta_{0}\) and \(\beta_{v^{2}}\) implies that as extinction risk increases, the function describing the effect of environmental preference flattens (and potentially inverts).
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_marginal}
@@ -99,7 +99,7 @@ Inspection of the marginal posterior estimates for the correlations between esti
 % effects varying between cohorts
 In addition to just analyzing the covariance matrix between the coefficient estimates, it is important to also observe the individual origination cohort level estimates. 
 
-In comparison to the overall mean extinction risk \(\mu_{intercept}\), cohort level estimates \(\beta_{intercept}\) show some amount of variation through time as expected by estimates of \(\tau_{intercept}\) (Fig. \ref{fig:cohort_intercept}). A similar, if slightly greater, amount of variation is also observable in cohort estimates of the effect of geographic range \(\beta_{range}\) (Fig. \ref{fig:cohort_range}). Again, smaller values of \(\beta_{intercept}\) correspond to lower expected extinction risk. Similarly, smaller values of \(\beta_{intercept}\) correspond to greater decrease in extinction risk with increasing geographic range 
+In comparison to the overall mean extinction risk \(\mu_{intercept}\), cohort level estimates \(\beta_{0}\) show some amount of variation through time as expected by estimates of \(\tau_{intercept}\) (Fig. \ref{fig:cohort_intercept}). A similar, if slightly greater, amount of variation is also observable in cohort estimates of the effect of geographic range \(\beta_{0}\) (Fig. \ref{fig:cohort_range}). Again, smaller values of \(\beta_{0}\) correspond to lower expected extinction risk. Similarly, smaller values of \(\beta_{0}\) correspond to greater decrease in extinction risk with increasing geographic range 
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/intercept_cohort}
