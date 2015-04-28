@@ -11,14 +11,12 @@ data {
   int cohort_unc[N_unc];
   real occupy_unc[N_unc];
   real env_unc[N_unc];
-//  real lit_unc[N_unc];
   real size_unc[N_unc];
   real<lower=0> dur_cen[N_cen];
   int group_cen[N_cen];
   int cohort_cen[N_cen];
   real occupy_cen[N_cen];
   real env_cen[N_cen];
-//  real lit_cen[N_cen];
   real size_cen[N_cen];
 }
 parameters {

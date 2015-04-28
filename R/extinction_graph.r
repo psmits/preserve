@@ -10,7 +10,7 @@ library(grid)
 source('../R/waic.r')
 source('../R/multiplot.r')
 
-map <- TRUE
+map <- FALSE
 source('../R/extinction_post_sim.r')
 waic(wfit)$waic < waic(efit)$waic
 
@@ -47,7 +47,7 @@ emp.surv <- rbind(c(0, 1), emp.surv)
 wei.surv <- llply(wr, function(x) survfit(Surv(x) ~ 1))
 wei.surv <- llply(wei.surv, function(x) {
                   y <- data.frame(time = x$time, surv = x$surv)
-                  rbind(c(0, 1), y)
+                  y <- rbind(c(0, 1), y)
                   y})
 wei.surv <- Reduce(rbind, Map(function(x, y) {
                               x$group <- y
@@ -60,41 +60,7 @@ wei.surv$label <- 'Weibull'
 exp.surv <- llply(er, function(x) survfit(Surv(x) ~ 1))
 exp.surv <- llply(exp.surv, function(x) {
                   y <- data.frame(time = x$time, surv = x$surv)
-                  rbind(c(0, 1), y)
-                  y})
-exp.surv <- Reduce(rbind, Map(function(x, y) {
-                              x$group <- y
-                              x}, 
-                              x = exp.surv, 
-                              y = seq(length(exp.surv))))
-
-# lets make survival curves
-condition <- c(rep(1, data$N_unc), rep(0, data$N_cen))
-condition[duration == 1 & condition == 1] <- 2
-
-emp.surv <- survfit(Surv(time = duration, time2 = duration, 
-                         event = condition, type = 'interval') ~ 1)
-emp.surv <- data.frame(cbind(time = emp.surv$time, surv = emp.surv$surv))
-emp.surv <- rbind(c(0, 1), emp.surv)
-
-# weibull model
-wei.surv <- llply(wr, function(x) survfit(Surv(x) ~ 1))
-wei.surv <- llply(wei.surv, function(x) {
-                  y <- data.frame(time = x$time, surv = x$surv)
-                  rbind(c(0, 1), y)
-                  y})
-wei.surv <- Reduce(rbind, Map(function(x, y) {
-                              x$group <- y
-                              x}, 
-                              x = wei.surv, 
-                              y = seq(length(wei.surv))))
-wei.surv$label <- 'Weibull'
-
-# exponential model
-exp.surv <- llply(er, function(x) survfit(Surv(x) ~ 1))
-exp.surv <- llply(exp.surv, function(x) {
-                  y <- data.frame(time = x$time, surv = x$surv)
-                  rbind(c(0, 1), y)
+                  y <- rbind(c(0, 1), y)
                   y})
 exp.surv <- Reduce(rbind, Map(function(x, y) {
                               x$group <- y
@@ -117,6 +83,43 @@ surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
 ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves.png',
        width = 8, height = 5)
+
+
+# deviance residuals
+# change this to be x = duration, y = residual
+std.res <- melt(wr.res)
+std.res <- std.res[std.res$L1 %in% 1:12, ]
+std.res$index <- rep(duration, 12)
+res <- ggplot(std.res, aes(x = index, y = value))
+res <- res + geom_hline(aes(yintercept = 0), colour = 'grey', size = 1)
+res <- res + geom_hline(aes(yintercept = 2), colour = 'grey', size = 1, 
+                        linetype = 'dashed')
+res <- res + geom_hline(aes(yintercept = -2), colour = 'grey', size = 1, 
+                        linetype = 'dashed')
+res <- res + geom_point(alpha = 0.5, size = 1, position = 'jitter')
+res <- res + facet_wrap( ~ L1, nrow = 3, ncol = 4)
+res <- res + labs(x = 'Duration in stages', y = 'Deviance residual')
+ggsave(res, filename = '../doc/survival/figure/residual_plot.png',
+       width = 8, height = 5)
+
+
+# posterior predictive point checks
+quant <- laply(wr, function(x) c(mean = mean(x), quantile(x, c(.25, .5, .75))))
+quant <- melt(quant)
+quant.dur <- c(mean = mean(duration), quantile(duration, c(.25, .5, .75)))
+quant.dur <- melt(quant.dur)
+quant.dur$Var2 <- rownames(quant.dur)
+
+# all four of the major point checks
+quant <- ggplot(quant, aes(x = value))
+quant <- quant + geom_histogram(aes(y = ..density..), binwidth = .2)
+quant <- quant + geom_vline(data = quant.dur, aes(xintercept = value), 
+                            colour = 'blue', size = 2)
+quant <- quant + labs(x = 'Duration in stages', y = 'Prob. Density')
+quant <- quant + facet_wrap(~ Var2, ncol = 2)
+ggsave(ppc.quant, filename = '../doc/survival/figure/quant_ppc.png',
+       width = 8, height = 5)
+
 
 # make plot of correlation and covariance matrices
 # row is sample
@@ -390,7 +393,7 @@ base.line <- base.line + geom_segment(data = grand,
                                                     y = grand.med, 
                                                     yend = grand.med))
 base.line <- base.line + geom_pointrange(aes(ymax = q9, ymin = q1))
-base.line <- base.line + geom_line()
+#base.line <- base.line + geom_line()
 base.line <- base.line + facet_grid(label ~ ., labeller = label_parsed)
 base.line <- base.line + labs(x = 'Stage', y = expression(beta[intercept]))
 ggsave(base.line, filename = '../doc/survival/figure/intercept_cohort.png',
@@ -454,7 +457,7 @@ rage.line <- rage.line + geom_segment(data = grand,
                                                     y = grand.med, 
                                                     yend = grand.med))
 rage.line <- rage.line + geom_pointrange(aes(ymax = q9, ymin = q1))
-rage.line <- rage.line + geom_line()
+#rage.line <- rage.line + geom_line()
 rage.line <- rage.line + facet_grid(label ~ ., labeller = label_parsed)
 rage.line <- rage.line + labs(x = 'Stage', y = expression(beta[range]))
 ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.png',

@@ -23,17 +23,25 @@ The calculation and inclusion of environmental affinity in the subsequent surviv
 
 The first step is to determine the probability \(\theta\) at which genus \(i\) occurs in an epicontinental settings based on its own pattern of occurrences. Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. open ocean). Because the value of inters is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a beta distribution. We can then define our sampling statement as
 \begin{equation}
-  e_{i} \sim \mathrm{Binomail}(e_{i} + o_{i}, \theta_{i}).
+  e_{i} \sim \mathrm{Binomial}(e_{i} + o_{i}, \theta_{i}).
   \label{eq:epi_lik}
 \end{equation}
-I used a flat prior of \(\theta_{i}\) defined as \(\theta_{i} \sim \mathrm{Beta}(1, 1)\).
+I used a flat prior of \(\theta_{i}\) defined as \(\theta_{i} \sim \mathrm{Beta}(1, 1)\). Because the beta distribution is the conjugate prior for the binomial distribution, the posterior is easy to compute in closed form. The posterior probability of \(\theta\) is then 
+\begin{equation}
+  \theta_{i} \sim \mathrm{Beta}(e_{i} + 1, o_{i} + 1)
+  \label{eq:epi_post}
+\end{equation}
 
 It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an additional probability \(\Theta\). Define \(E_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(O_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define the sampling statement as
 \begin{equation}
   E_{i} \sim \mathrm{Binomial}(E_{i} + O_{i}, \Theta_{i}).
   \label{eq:bck_lik}
 \end{equation}
-Again, I used a flat prior of \(\Theta_{i}\) defined as \(\Theta_{i} \sim \mathrm{Beta}(1, 1)\).
+Again, I used a flat prior of \(\Theta_{i}\) defined as \(\Theta_{i} \sim \mathrm{Beta}(1, 1)\). The posterior of \(\Theta\) is then simply defined as
+\begin{equation}
+  \Theta_{i} \sim \mathrm{Beta}(E_{i} + 1, O_{i} + 1)
+  \label{eq:bck_post}
+\end{equation}
 
 I then define the environmental affinity of genus \(i\) as \(v_{i} = \theta_{i} - \Theta_{i}\). \(v_{i}\) is a value that can range between -1 and 1, where negative values indicate that genus \(i\) tends to occur in open ocean environments while positive values indicate that genus \(i\) tends to occur in epicontiental environments.
 
@@ -124,21 +132,23 @@ Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:
 
 
 \subsection{Censored observations}
-A key aspect of survival analysis is the inclusion of censored, or incompletely observed, data points \citep{Ibrahim2001,Klein2003}. The two classes of censored observations encountered in this study were right and left censored observations. Right censored genera are those that did not go extinct during the window of observation, or genera that are still extant. Left censored observations are those species that it is only known when a species was extinct by. To put another way, this is a species that went extinct but the observed duration is an over estimate of the actual duration. 
+A key aspect of survival analysis is the inclusion of censored, or incompletely observed, data points \citep{Ibrahim2001,Klein2003}. The two classes of censored observations encountered in this study were right and left censored observations. Right censored genera are those that did not go extinct during the window of observation, or genera that are still extant. Left censored observations are those taxa that it is only known when it was extinct by. To put another way, this is a taxon that went extinct but the observed duration is an over estimate of the actual duration. 
 
 In the context of this study, I considered all genera that had a duration of only one geologic stage to be left censored as we do not have a finer degree of resolution. Conceptually, this is similar to if I was studying, say, survival patterns in rats and an individual had died between the start of the experiment and next time the rats were observed. We know the rat lived no more than day.
 
 The key function for modeling censored observations is the survival function, or \(S(t)\). \(S(t)\) corresponds to the probability that a genus having existed for \(t\) stages will not have gone extinct while \(h(t)\) corresponds to the instantaneous extinction rate at taxon age \(t\) \cite{Klein2003}. For an exponential model, \(S(t)\) is defined as
 \begin{equation}
   S(t) = \exp(-\lambda t),
+  \label{eq:exp_surv}
 \end{equation}
 and for the Weibull distribution \(S(t)\) is defined as
 \begin{equation}
   S(t) = \exp\left(-\left(\frac{t}{\sigma}\right)^{\alpha}\right).
+  \label{eq:wei_surv}
 \end{equation}
 \(S(t)\) is equivalent to the complementary cumulative distribution function, \(1 - F(t)\) \citep{Klein2003}. 
 
-For right censored observations, instead of calculating the likelihood as normal (Eq. \ref{eq:multivariate}) the likelihood of an observation is evaluated using \(S(t)\). Conceptually, this approach calculates the likelihood of observing a species that existed for at least that long. For left censored data, instead the likelihood is calculated using \(1 - S(t)\) which corresponds to the likelihood of observing a species that existed no longer than \(t\).
+For right censored observations, instead of calculating the likelihood as normal (Eq. \ref{eq:multivariate}) the likelihood of an observation is evaluated using \(S(t)\). Conceptually, this approach calculates the likelihood of observing a taxon that existed for at least that long. For left censored data, instead the likelihood is calculated using \(1 - S(t)\) which corresponds to the likelihood of observing a taxon that existed no longer than \(t\).
 
 The full likelihood statements incorporating fully observed, right censored, and left censored observations are then
 \begin{equation}
@@ -148,11 +158,11 @@ The full likelihood statements incorporating fully observed, right censored, and
   \end{aligned}
   \label{eq:censored_likelihood}
 \end{equation}
-where \(C\) is the set of all fully observed species, \(R\) the set of all right censored species, and \(L\) the set of all left-censored species.
+where \(C\) is the set of all fully observed taxa, \(R\) the set of all right censored taxa, and \(L\) the set of all left-censored taxa.
 
 
 \subsection{Parameter estimation}
-Given the above likelihood and prior statements, the posterior probabilities of all parameters was approximated using a Markov-chain Monte Carlo routine using a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{stan-software:2014}. The estimate of the posterior distribution were approximated from four parallel chains run for XXX draws split half warm-up and half sampling thinned to every XXX sample for a total of XXX samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
+Given the above likelihood and prior statements, the posterior probabilities of all parameters was approximated using a Markov-chain Monte Carlo routine using a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{stan-software:2014}. The estimate of the posterior distribution were approximated from four parallel chains run for 10000 draws split half warm-up and half sampling thinned to every 10 sample for a total of 5000 samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
 
 \subsection{Model evaluation}
@@ -161,9 +171,26 @@ Models were evaluated using both a series of multiple posterior predictive check
 
 The motivation behind posterior predictive checks as tools for determining model adequacy is that replicated data sets using the fitted model should be similar to the original data \citep{Gelman2013d}. Systematic differences between the simulations and observed indicate weaknesses of the currently fit model. An example of a technique that is very similar would be inspecting the residuals and Q-Q plots from a linear regression.
 
-The strategy behind posterior predictive checks is to draw simulated values from the joint posterior predictive distribution, \(p(y^{rep} | y\), and then compared to the original observed values \citep{Gelman2013d}. To accomplish this, for each replicate, a single value is drawn from the marginal posterior distributions of each regression coefficient from the final model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}). Then, given the covariate information for each of the observations \(\mathbf{X}\), a new set of \(n\) genus durations are generated giving a single replicated data set \(y^{rep}\). This is repeated 1000 times in order to provide a distribution of possible values that could have been observed given the model. 
+The strategy behind posterior predictive checks is to draw simulated values from the joint posterior predictive distribution, \(p(y^{rep} | y)\), and then compared to the original observed values \citep{Gelman2013d}. To accomplish this, for each replicate, a single value is drawn from the marginal posterior distributions of each regression coefficient from the final model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}). Then, given the covariate information for each of the observations \(\mathbf{X}\), a new set of \(n\) genus durations are generated giving a single replicated data set \(y^{rep}\). This is repeated 1000 times in order to provide a distribution of possible values that could have been observed given the model. 
 
 In order to compare the fitted model to the observed data, various graphical comparisons or test quantities need to be defined. The principal comparison used here is a comparison between non-parameteric approximation of the survival function \(S(t)\) as estimated from both the observed data and each of the replicated data sets. The purpose of this comparison is to determine if the model approximates the same survival/extinction pattern as the original data. 
+
+I also did a graphical examination of the deviance residuals. While normal residuals are defined as \(y_{i}^{rep} - y_{i}\), deviance residuals are a specific class of residuals derived with non-normal errors in mind. The definition of deviance residuals for a Weibull regression, of which the above models can be considered, is as follows. First define the cumulative hazard function \(\Lambda(t)\) for the Weibull distribution \citep{Klein2003}. Given \(S(t)\) (Eq. \ref{eq:wei_surv}), the cumulative hazard function is 
+\begin{equation}
+  \Lambda(t) = -log\left(S\left(t\right)\right).
+\end{equation}
+
+Next, define martingale residuals \(m\) as
+\begin{equation}
+  m_{i} = I_{i} - \Lambda(t_i).
+\end{equation}
+\(I\), called the inclusion vector, is vector of length \(n\) where \(I_{i} = 1\) means the observation is completely observed and \(I_{i} = 0\) means the observation is censored. Martingale residuals have a mean of 0, range between 1 and \(-\infty\), and can be viewed as the difference between the observed number of deaths between 0 and \(t_{i}\) and the expected number of deaths based on the model. However, martingale residuals are asymmetrically distributed, and can not be interpreted in the same manner as standard residuals. 
+
+The solution to this is to use deviance residuals, \(D\), which are defined as a function of martingale residuals and takes the form
+\begin{equation}
+  D_{i} = \text{sign}(m_{i}) \sqrt{-2[m_{i} + I_{i}log(I_{i} - m_{i})]}.
+\end{equation}
+Deviance residuals have a mean of 0 and a standard deviation of 1 by definition \citep{Klein2003}.
 
 The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. Because the Weibull model reduces to the exponential model when \(\alpha = 0\), our interest is not in choosing between these models. Instead comparison of WAIC values is useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}.
 
@@ -185,10 +212,6 @@ Given both equations \ref{eq:lppd} and \ref{eq:pwaic}, WAIC is then calculated
   \label{eq:waic}
 \end{equation}
 When comparing two or more models, lower WAIC values indicate better out-of-sample predictive accuracy. Importantly, WAIC is just one way of comparing models. When combined with posterior predictive checks it is possible to get a more complete understanding of model fit.
-
-% posterior inference
-%   in addition to interpreting parameters, i can use my model to ask questions
-%   given the estimate for quadratic formula of environmental effect
 
 
 \end{document}

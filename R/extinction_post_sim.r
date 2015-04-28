@@ -7,6 +7,29 @@ nsim <- 1000
 #map <- TRUE
 #error <- FALSE
 
+# functions for calculating the residuals
+wei.surv <- function(time, scale, shape) {
+  exp(-((1 / scale) * time)**shape)
+}
+
+cum.haz <- function(time, scale, shape) {
+  -log(wei.surv(time, scale, shape))
+}
+
+martingale.res <- function(time, scale, shape, inclusion) {
+  inclusion - cum.haz(time, scale, shape)
+}
+
+deviance.res <- function(time, scale, shape, inclusion) {
+  martin <- martingale.res(time, scale, shape, inclusion)
+  si <- sign(martin)
+  inn <- martin + (inclusion * log(inclusion - martin))
+  under <- -2 * inn
+  out <- si * sqrt(under)
+  out
+}
+
+# bring in data
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
 if(map) {
@@ -35,12 +58,14 @@ if(map) {
   lits <- c(data$lit_unc, data$lit_cen)
   size <- c(data$size_unc, data$size_cen)
   duration <- c(data$dur_unc, data$dur_cen)
+  extinct <- c(rep(1, data$N_unc), rep(0, data$N_cen))
 
   # weibull model
   # extract values and do posterior predictive simulations
   wei.fit <- extract(wfit, permuted = TRUE)
   betas <- wei.fit$beta
   wr <- list()
+  wr.res <- list()
   for(ii in 1:nsim) {
     n <- data$N
     alp <- sample(wei.fit$alpha, 1)
@@ -57,9 +82,14 @@ if(map) {
       bet.3[coh[jj]] * (envs[jj] * envs[jj]) + 
       bet.4[coh[jj]] * size[jj]
       oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
+      rr[jj] <- deviance.res(duration[jj], 
+                            scale = exp(reg), 
+                            shape = alp, 
+                            inclusion = extinct[jj])
     }
 
     wr[[ii]] <- oo
+    wr.res[[ii]] <- rr
   }
 
   # exponential model
@@ -67,6 +97,7 @@ if(map) {
   exp.fit <- extract(efit, permuted = TRUE)
   betas <- exp.fit$beta
   er <- list()
+  er.res <- list()
   for(ii in 1:nsim) {
     n <- data$N
     int <- betas[sample(nrow(betas), 1), , 1]
@@ -82,9 +113,14 @@ if(map) {
       bet.3[coh[jj]] * (envs[jj] * envs[jj]) + 
       bet.4[coh[jj]] * size[jj]
       oo[jj] <- rexp(1, rate = exp(reg))
+      rr[jj] <- deviance.res(duration[jj], 
+                            scale = 1 / exp(reg), 
+                            shape = 1, 
+                            inclusion = extinct[jj])
     }
 
     er[[ii]] <- oo
+    er.res[[ii]] <- rr
   }
 } else {
   # for measurement error models
@@ -112,6 +148,7 @@ if(map) {
   betas <- wei.fit$beta
   envs <- wei.fit$env
   wr <- list()
+  wr.res <- list()
   for(ii in 1:nsim) {
     n <- data$N
     alp <- sample(wei.fit$alpha, 1)
@@ -127,9 +164,14 @@ if(map) {
       bet.2[coh[jj]] * ee[jj] + 
       bet.3[coh[jj]] * size[jj]
       oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
+      rr[jj] <- deviance.res(duration[jj], 
+                            scale = exp(reg), 
+                            shape = alp, 
+                            inclusion = extinct[jj])
     }
 
     wr[[ii]] <- oo
+    wr.res[[ii]] <- rr
   }
 
 
@@ -139,6 +181,7 @@ if(map) {
   betas <- exp.fit$beta
   envs <- exp.fit$env
   er <- list()
+  er.res <- list()
   for(ii in 1:nsim) {
     n <- data$N
     int <- betas[sample(nrow(betas), 1), , 1]
@@ -153,8 +196,13 @@ if(map) {
       bet.2[coh[jj]] * ee[jj] + 
       bet.3[coh[jj]] * size[jj]
       oo[jj] <- rexp(1, rate = exp(reg))
+      rr[jj] <- deviance.res(duration[jj], 
+                            scale = 1 / exp(reg), 
+                            shape = 1, 
+                            inclusion = extinct[jj])
     }
 
     er[[ii]] <- oo
+    er.res[[ii]] <- rr
   }
 }
