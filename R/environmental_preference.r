@@ -1,5 +1,6 @@
 library(rstan)
 library(arm)
+library(plyr)
 library(parallel)
 library(ggplot2)
 library(reshape2)
@@ -35,7 +36,7 @@ beta.mode <- function(n, N, a, b) {
   mod
 }
 
-set.seed(420)
+set.seed(37)
 bck.epi <- 500
 bck.off <- 500
 bck.theta <- rbeta(bck.epi + bck.off, bck.epi, bck.off)  # background
@@ -91,10 +92,10 @@ for(ii in seq(length(samp))) {
   gg <- ggplot(xx, aes(x = x)) 
   gg <- gg + stat_function(fun = dbeta, args = list(shape1 = post.a,
                                                     shape2 = post.b), 
-                           size = 1)
+                           size = 1, colour = 'goldenrod')
   gg <- gg + stat_function(fun = dbeta, args = list(shape1 = bck.epi, 
                                                     shape2 = bck.off), 
-                           size = 1)
+                           size = 1, colour = 'skyblue')
   gg <- gg + geom_vline(xintercept = mod)
   gg <- gg + labs(x = paste(samp[ii]))
   gg.list[[ii]] <- gg
