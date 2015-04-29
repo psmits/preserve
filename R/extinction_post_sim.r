@@ -4,8 +4,7 @@ RNGkind(kind = "L'Ecuyer-CMRG")
 seed <- 420
 nsim <- 1000
 
-#map <- TRUE
-#error <- FALSE
+map <- FALSE
 
 # functions for calculating the residuals
 wei.surv <- function(time, scale, shape) {
@@ -76,6 +75,7 @@ if(map) {
     bet.4 <- betas[sample(nrow(betas), 1), , 5]
 
     oo <- c()
+    rr <- c()
     for(jj in seq(n)) {
       reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
       bet.2[coh[jj]] * envs[jj] + 
@@ -83,9 +83,9 @@ if(map) {
       bet.4[coh[jj]] * size[jj]
       oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
       rr[jj] <- deviance.res(duration[jj], 
-                            scale = exp(reg), 
-                            shape = alp, 
-                            inclusion = extinct[jj])
+                             scale = exp(reg), 
+                             shape = alp, 
+                             inclusion = extinct[jj])
     }
 
     wr[[ii]] <- oo
@@ -107,6 +107,7 @@ if(map) {
     bet.4 <- betas[sample(nrow(betas), 1), , 5]
 
     oo <- c()
+    rr <- c()
     for(jj in seq(n)) {
       reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
       bet.2[coh[jj]] * envs[jj] + 
@@ -114,9 +115,9 @@ if(map) {
       bet.4[coh[jj]] * size[jj]
       oo[jj] <- rexp(1, rate = exp(reg))
       rr[jj] <- deviance.res(duration[jj], 
-                            scale = 1 / exp(reg), 
-                            shape = 1, 
-                            inclusion = extinct[jj])
+                             scale = 1 / exp(reg), 
+                             shape = 1, 
+                             inclusion = extinct[jj])
     }
 
     er[[ii]] <- oo
@@ -141,6 +142,7 @@ if(map) {
   #envs <- c(data$env_unc, data$env_cen)
   size <- c(data$size_unc, data$size_cen)
   duration <- c(data$dur_unc, data$dur_cen)
+  extinct <- c(rep(1, data$N_unc), rep(0, data$N_cen))
 
   # weibull model
   # extract values and do posterior predictive simulations
@@ -159,15 +161,16 @@ if(map) {
     ee <- envs[sample(nrow(envs), 1), ]
 
     oo <- c()
+    rr <- c()
     for(jj in seq(n)) {
       reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
       bet.2[coh[jj]] * ee[jj] + 
       bet.3[coh[jj]] * size[jj]
       oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
       rr[jj] <- deviance.res(duration[jj], 
-                            scale = exp(reg), 
-                            shape = alp, 
-                            inclusion = extinct[jj])
+                             scale = exp(reg), 
+                             shape = alp, 
+                             inclusion = extinct[jj])
     }
 
     wr[[ii]] <- oo
@@ -191,15 +194,16 @@ if(map) {
     ee <- envs[sample(nrow(envs), 1), ]
 
     oo <- c()
+    rr <- c()
     for(jj in seq(n)) {
       reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
       bet.2[coh[jj]] * ee[jj] + 
       bet.3[coh[jj]] * size[jj]
       oo[jj] <- rexp(1, rate = exp(reg))
       rr[jj] <- deviance.res(duration[jj], 
-                            scale = 1 / exp(reg), 
-                            shape = 1, 
-                            inclusion = extinct[jj])
+                             scale = 1 / exp(reg), 
+                             shape = 1, 
+                             inclusion = extinct[jj])
     }
 
     er[[ii]] <- oo

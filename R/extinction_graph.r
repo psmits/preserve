@@ -117,7 +117,7 @@ quant <- quant + geom_vline(data = quant.dur, aes(xintercept = value),
                             colour = 'blue', size = 2)
 quant <- quant + labs(x = 'Duration in stages', y = 'Prob. Density')
 quant <- quant + facet_wrap(~ Var2, ncol = 2)
-ggsave(ppc.quant, filename = '../doc/survival/figure/quant_ppc.png',
+ggsave(quant, filename = '../doc/survival/figure/quant_ppc.png',
        width = 8, height = 5)
 
 

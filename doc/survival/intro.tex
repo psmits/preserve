@@ -1,12 +1,11 @@
 \documentclass[12pt,letterpaper]{article}
 
 \usepackage{amsmath, amsthm}
-\usepackage{graphicx,hyperref}
 \usepackage{microtype, parskip}
-\usepackage[comma,sort&compress]{natbib}
+\usepackage[comma,numbers,sort&compress]{natbib}
 \usepackage{lineno}
 \usepackage{docmute}
-\usepackage{subcaption, multirow, morefloats}
+\usepackage{caption, subcaption, multirow, morefloats, rotating}
 \usepackage{wrapfig}
 
 \frenchspacing
@@ -27,5 +26,14 @@ Of additional interest is the possibility of a potential nonlinear relationship 
 I adopt a hierarchical Bayesian survival modelling approach for multiple reasons, one being that it represents a conceptual and statistical unification of the paleontological dynamic and cohort survivorship approaches \citep{VanValen1973,VanValen1979,Raup1978,Raup1975,Foote1988,Baumiller1993,Simpson2006}. Hierarchical modelling, sometimes called ``mixed-effects modeling,'' is a statistical approach which explicitly takes into account the structure of the observed data in order to model both the with and between group structure \citep{Gelman2013d,Gelman2007}. In this case, origination cohorts are the groups and the mean survival model corresponds to the dynamic survivorship model.By using a Bayesian framework I am best able to quantify the uncertainty inherent in the estimates of the effects of taxon traits on survival while also incorporating important prior information.
 
 
+% brief summary
+%   model that takes all of these effects into account simltaneously
+%     comparison to previous approaches
+%     major improvements
+%       taking into account uncertainty in environmental affinity
+%       potential age-dependent duration distribution
+%       estimating both time varying and time invariant effects
+%       model correlation between covariate effects
+%   structure controls for multiple comparisons
 
 \end{document}
