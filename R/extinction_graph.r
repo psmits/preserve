@@ -103,22 +103,22 @@ ggsave(res, filename = '../doc/survival/figure/residual_plot.png',
        width = 8, height = 5)
 
 
-# posterior predictive point checks
-quant <- laply(wr, function(x) c(mean = mean(x), quantile(x, c(.25, .5, .75))))
-quant <- melt(quant)
-quant.dur <- c(mean = mean(duration), quantile(duration, c(.25, .5, .75)))
-quant.dur <- melt(quant.dur)
-quant.dur$Var2 <- rownames(quant.dur)
-
-# all four of the major point checks
-quant <- ggplot(quant, aes(x = value))
-quant <- quant + geom_histogram(aes(y = ..density..), binwidth = .2)
-quant <- quant + geom_vline(data = quant.dur, aes(xintercept = value), 
-                            colour = 'blue', size = 2)
-quant <- quant + labs(x = 'Duration in stages', y = 'Prob. Density')
-quant <- quant + facet_wrap(~ Var2, ncol = 2)
-ggsave(quant, filename = '../doc/survival/figure/quant_ppc.png',
-       width = 8, height = 5)
+## posterior predictive point checks
+#quant <- laply(wr, function(x) c(mean = mean(x), quantile(x, c(.25, .5, .75))))
+#quant <- melt(quant)
+#quant.dur <- c(mean = mean(duration), quantile(duration, c(.25, .5, .75)))
+#quant.dur <- melt(quant.dur)
+#quant.dur$Var2 <- rownames(quant.dur)
+#
+## all four of the major point checks
+#quant <- ggplot(quant, aes(x = value))
+#quant <- quant + geom_histogram(aes(y = ..density..), binwidth = .2)
+#quant <- quant + geom_vline(data = quant.dur, aes(xintercept = value), 
+#                            colour = 'blue', size = 2)
+#quant <- quant + labs(x = 'Duration in stages', y = 'Prob. Density')
+#quant <- quant + facet_wrap(~ Var2, ncol = 2)
+#ggsave(quant, filename = '../doc/survival/figure/quant_ppc.png',
+#       width = 8, height = 5)
 
 
 # make plot of correlation and covariance matrices
@@ -499,8 +499,8 @@ for(ii in seq(unique(coh))) {
   coefs <- data.frame(first = wei.fit$beta[sam, ii, 3],
                       second = wei.fit$beta[sam, ii, 4],
                       alpha = wei.fit$alpha[sam])
-  lab <- round(sum(coefs[, 2] > 0) / nrow(coefs), 2)
-  cols <- ifelse(mean(coefs[, 2]) < 0, 'red', 'black')
+  lab <- round(sum(coefs[, 2] > 0) / nrow(coefs), 2) # probability downward
+  cols <- ifelse(mean(coefs[, 2]) < 0, 'red', 'black') # is mean is upward?
   coef.list[[ii]] <- coefs
   ss <- sample(nrow(exp.fit$mu_prior), 100)
   coefs <- data.frame(first = wei.fit$beta[ss, ii, 3],
@@ -536,5 +536,17 @@ p.epi.best <- laply(coef.list, function(x)
 # which are, on average, up ward facing parabolas
 wh.meanworst <- which(laply(coef.list, function(x) mean(x[, 2])) < 0)
 wh.midworst <- which(laply(coef.list, function(x) median(x[, 2])) < 0)
-# percent of draws with up ward facing parabolas
-per.worst <- laply(coef.list, function(x) sum(x[, 2] > 0) / nrow(x))
+# percent of draws with downward facing parabolas
+per.best <- laply(coef.list, function(x) sum(x[, 2] > 0) / nrow(x))
+
+# get probability that inflection point isn't in the observed range
+#   evidence just looking at one "arm"
+#     up or down doesn't actually matter!
+#   evidence of approximate linearity?
+#   the thing is curved here because it is exponentiated (definition)
+#     get around this because i'm working with the log-d coefs
+#   maybe just between -0.5 and 0.5?
+#     need to look at preferences to see how much is end member
+p.linear <- laply(coef.list, function(x) {
+                  sum(x[, 1] / (x[, 2] * 2) > 1 | 
+                      x[, 1] / (x[, 2] * 2) < -1)}) / nrow(coef.list[[1]])
