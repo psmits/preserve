@@ -45,26 +45,26 @@ transformed parameters {
   for(i in 1:N) {
     env[i] <- theta_species[i] - theta_back[i];
   }
-
-  // uncertainty in environment
-  // logit transform then rescale
 }
 model {
-
   alpha ~ cauchy(0, 2);
   // varying slopes, varying intercepts
   // done by cohort
   Omega ~ lkj_corr(2);
   sigma ~ cauchy(0, 1);
   for(i in 1:5) {
-    mu_prior[i] ~ normal(0, 5);
+    if(i == 2) {
+      mu_prior[i] ~ normal(-1, 1);
+    } else {
+      mu_prior[i] ~ normal(0, 5);
+    }
   }
   for(i in 1:O) {
     beta[i] ~ multi_normal(mu_prior, Sigma);
   }
 
-# uncertainty in environmental preference
-# here is the full posterior
+  // uncertainty in environmental preference
+  // here is the full posterior for each
   for(i in 1:N_unc) {
     theta_species[i] ~ beta(epi_unc[i] + 1, off_unc[i] + 1);
     theta_back[i] ~ beta(epi_bck_unc[i] + 1, off_bck_unc[i] + 1);

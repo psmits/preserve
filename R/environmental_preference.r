@@ -36,7 +36,7 @@ beta.mode <- function(n, N, a, b) {
   mod
 }
 
-set.seed(37)
+set.seed(420)
 bck.epi <- 500
 bck.off <- 500
 bck.theta <- rbeta(bck.epi + bck.off, bck.epi, bck.off)  # background
@@ -80,12 +80,12 @@ for(ii in seq(length(samp))) {
 
 
 
+o <- sample(nsim, 1)
 # compare distributions theta.taxon versus theta.background
 # mark modal estimate of theta.taxon
 xx <- data.frame(x = seq(0, 1, by = 0.001))
 gg.list <- list()
 for(ii in seq(length(samp))) {
-  o <- sample(nsim, 1)
   post.a <- sim.post[[ii]][o, 1]
   post.b <- sim.post[[ii]][o, 2]
   mod <- sim.mode[[ii]][o]
@@ -101,8 +101,8 @@ for(ii in seq(length(samp))) {
   gg.list[[ii]] <- gg
 }
 png(filename = '../doc/survival/figure/env_post_inspect.png',
-    width = 500, height = 1000)
-multiplot(plotlist = gg.list, cols = floor(length(gg.list) / 4))
+    width = 1000, height = 750)
+multiplot(plotlist = gg.list, cols = floor(length(gg.list) / 3))
 dev.off()
 
 # distribution of modal estimates
@@ -121,15 +121,14 @@ diffs.list <- llply(diffs.list, function(x)
                     x + coord_cartesian(xlim = c(-0.6, 0.6), 
                                         ylim = c(-0.5, maxet + 2)))
 png(filename = '../doc/survival/figure/env_mode_dist.png',
-    width = 500, height = 1000)
-multiplot(plotlist = diffs.list, cols = floor(length(samp) / 4))
+    width = 1000, height = 750)
+multiplot(plotlist = diffs.list, cols = floor(length(samp) / 3))
 dev.off()
 
 # for estimates of theta.taxon - theta.background see behavior with sample size
 theta.list <- list()
 maxet <- 0
 for(ii in seq(length(samp))) {
-  o <- sample(nsim, 1)
   vline <- mode.diff[[ii]][o]
   est.df <- data.frame(x = out[[ii]][[o]])
   maxet <- max(maxet, max(density(est.df$x)$y))
@@ -144,6 +143,6 @@ theta.list <- llply(theta.list, function(x)
                     x + coord_cartesian(xlim = c(-0.6, 0.6), 
                                         ylim = c(-0.5, maxet + 2)))
 png(filename = '../doc/survival/figure/env_diff.png',
-    width = 500, height = 1000)
-multiplot(plotlist = theta.list, cols = floor(length(samp) / 4))
+    width = 1000, height = 750)
+multiplot(plotlist = theta.list, cols = floor(length(samp) / 3))
 dev.off()
