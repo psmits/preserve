@@ -104,22 +104,11 @@ ggsave(res, filename = '../doc/survival/figure/residual_plot.png',
 
 
 ## posterior predictive point checks
-#quant <- laply(wr, function(x) c(mean = mean(x), quantile(x, c(.25, .5, .75))))
-#quant <- melt(quant)
-#quant.dur <- c(mean = mean(duration), quantile(duration, c(.25, .5, .75)))
-#quant.dur <- melt(quant.dur)
-#quant.dur$Var2 <- rownames(quant.dur)
-#
-## all four of the major point checks
-#quant <- ggplot(quant, aes(x = value))
-#quant <- quant + geom_histogram(aes(y = ..density..), binwidth = .2)
-#quant <- quant + geom_vline(data = quant.dur, aes(xintercept = value), 
-#                            colour = 'blue', size = 2)
-#quant <- quant + labs(x = 'Duration in stages', y = 'Prob. Density')
-#quant <- quant + facet_wrap(~ Var2, ncol = 2)
-#ggsave(quant, filename = '../doc/survival/figure/quant_ppc.png',
-#       width = 8, height = 5)
-
+quant <- laply(wr, function(x) quantile(x, seq(0.1, 0.9, by = 0.05)))
+qudur <- quantile(duration, seq(0.1, 0.9, by = 0.05))
+qp <- colSums(t(apply(quant, 1, function(x) x > qudur))) / nrow(quant)
+bad <- which(qp > 0.975 | qp < 0.025)
+# quality of fit is weak, though a lot is captured
 
 # make plot of correlation and covariance matrices
 # row is sample

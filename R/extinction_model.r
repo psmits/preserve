@@ -22,6 +22,7 @@ num.orig <- length(unique(con.orig))
 con.class <- as.numeric(as.factor(sepkoski.data$class))
 num.class <- length(unique(sepkoski.data$class))
 
+
 sum((sepkoski.data$epi + sepkoski.data$off) < 10) / nrow(sepkoski.data)
 # beta distribution of genus envrionmental occurrence
 a <- sepkoski.data$epi
