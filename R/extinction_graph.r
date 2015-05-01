@@ -10,6 +10,7 @@ library(grid)
 source('../R/waic.r')
 source('../R/multiplot.r')
 source('../R/extinction_post_sim.r')
+set.seed(420)
 
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
@@ -512,6 +513,7 @@ for(ii in seq(unique(coh))) {
   coefs <- data.frame(first = wei.fit$beta[ss, ii, 3],
                       second = wei.fit$beta[ss, ii, 4],
                       alpha = wei.fit$alpha[ss])
+  mm <- apply(coefs, 2, median)
   coefplot <- alply(as.matrix(coefs), 1, function(coef) {
                     stat_function(fun = function(x) {
                                   exp(-(coef[1] * x + coef[2] * x^2) / 
@@ -519,7 +521,12 @@ for(ii in seq(unique(coh))) {
                                   colour = 'grey',
                                   alpha = 0.75)})
   quadcoh <- ggplot(x, aes(x = x)) + coefplot
-  quadcoh <- quadcoh + geom_hline(yintercept = 1)
+  quadcoh <- quadcoh + stat_function(fun = function(x, f, s, a) {
+                                     exp(-(f * x + s * x^2) / a)},
+                                     colour = 'black',
+                                     args = list(f = mm[1],
+                                                 s = mm[2],
+                                                 a = mm[3]))
   quadcoh <- quadcoh + geom_text(y = 1.75, x = 0, 
                                  label = paste(lab), size = 10, colour = cols)
   quadcoh <- quadcoh + coord_cartesian(ylim = c(-0.5, 2))
