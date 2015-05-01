@@ -9,9 +9,27 @@ library(stringr)
 library(grid)
 source('../R/waic.r')
 source('../R/multiplot.r')
-
-map <- FALSE
 source('../R/extinction_post_sim.r')
+
+data <- read_rdump('../data/data_dump/fauna_info.data.R')
+
+pat <- 'faun_weib_[0-9].csv'
+outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
+wfit <- read_stan_csv(outs)
+wei.fit <- extract(wfit, permuted = TRUE)
+weibull.out <- post.sim(data = data, fit = wfit, map = FALSE, expo = FALSE)
+wr <- weibull.out[[1]]
+wr.res <- weibull.out[[2]]
+
+pat <- 'faun_expo_[0-9].csv'
+outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
+efit <- read_stan_csv(outs)
+exp.fit <- extract(wfit, permuted = TRUE)
+exponential.out <- post.sim(data = data, fit = efit, map = FALSE, expo = TRUE)
+er <- exponential.out[[1]]
+er.res <- exponential.out[[2]]
+
+#
 waic(wfit)$waic < waic(efit)$waic
 
 theme_set(theme_bw())
@@ -29,7 +47,6 @@ coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 rage <- c(data$occupy_unc, data$occupy_cen)
 envs <- c(data$env_unc, data$env_cen)  # maximum a posteriori estimate
-lits <- c(data$lit_unc, data$lit_cen)  # maximum a posteriori estimate
 size <- c(data$size_unc, data$size_cen)
 duration <- c(data$dur_unc, data$dur_cen)
 
