@@ -5,45 +5,45 @@ The style file: abbrvnat.bst
 Database file #1: biblio.bib
 Warning--I didn't find a database entry for "raster"
 Warning--I didn't find a database entry for "stan-software:2014"
-You've used 30 entries,
+You've used 33 entries,
             2773 wiz_defined-function locations,
-            833 strings with 10081 characters,
-and the built_in function-call counts, 12946 in all, are:
-= -- 1269
-> -- 528
-< -- 27
-+ -- 186
-- -- 156
-* -- 1036
-:= -- 2030
-add.period$ -- 130
-call.type$ -- 30
-change.case$ -- 138
-chr.to.int$ -- 30
-cite$ -- 60
-duplicate$ -- 599
-empty$ -- 1130
-format.name$ -- 210
-if$ -- 2698
+            857 strings with 10564 characters,
+and the built_in function-call counts, 14105 in all, are:
+= -- 1378
+> -- 569
+< -- 30
++ -- 201
+- -- 168
+* -- 1120
+:= -- 2213
+add.period$ -- 142
+call.type$ -- 33
+change.case$ -- 150
+chr.to.int$ -- 33
+cite$ -- 66
+duplicate$ -- 659
+empty$ -- 1240
+format.name$ -- 227
+if$ -- 2942
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 34
-newline$ -- 198
-num.names$ -- 120
-pop$ -- 216
+missing$ -- 38
+newline$ -- 216
+num.names$ -- 132
+pop$ -- 239
 preamble$ -- 1
-purify$ -- 112
+purify$ -- 122
 quote$ -- 0
-skip$ -- 418
+skip$ -- 458
 stack$ -- 0
-substring$ -- 625
-swap$ -- 43
+substring$ -- 674
+swap$ -- 47
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 305
+type$ -- 333
 warning$ -- 0
-while$ -- 136
+while$ -- 148
 width$ -- 0
-write$ -- 479
+write$ -- 524
 (There were 2 warnings)

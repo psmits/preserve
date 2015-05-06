@@ -115,6 +115,7 @@ res <- res + geom_hline(aes(yintercept = 2), colour = 'grey', size = 1,
 res <- res + geom_hline(aes(yintercept = -2), colour = 'grey', size = 1, 
                         linetype = 'dashed')
 res <- res + geom_point(alpha = 0.5, size = 1, position = 'jitter')
+res <- res + coord_cartesian(xlim = c(-0.5, 8))
 res <- res + facet_wrap( ~ L1, nrow = 3, ncol = 4)
 res <- res + labs(x = 'Duration in stages', y = 'Deviance residual')
 ggsave(res, filename = '../doc/survival/figure/residual_plot.png',
