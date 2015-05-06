@@ -20,9 +20,9 @@
 %   deviance residuals
 %   posterior predictive point tests
 %   weibull > exponential (supported by WAIC)
-As stated above, posterior approximations for both the exponential and Weibull models achieved approximate stationarity after 10,000 steps as all parameter estimates have an \(\hat{R} < 1.1\) \uppercase{ref tables}. 
+As stated above, posterior approximations for both the exponential and Weibull models achieved approximate stationarity after 10,000 steps, as all parameter estimates have an \(\hat{R} < 1.1\) \uppercase{ref tables}. 
 
-Comparisons of the survival functions estimated from 1000 posterior predictive estimated data sets to the estimated survival function of the observed genera demonstrates that both the exponential and Weibull models approximately capture the observed pattern of extinction (Fig. \ref{fig:surv}). The major difference in fit between the two models is that the Weibull model has a slightly better fit for longer lived taxa than the exponential model.
+Comparisons of the survival functions estimated from 1000 posterior predictive data sets to the estimated survival function of the observed genera demonstrates that both the exponential and Weibull models approximately capture the observed pattern of extinction (Fig. \ref{fig:surv}). The major difference in fit between the two models is that the Weibull model has a slightly better fit for longer lived taxa than the exponential model.
 
 \begin{figure}[ht]
   \centering
@@ -38,7 +38,7 @@ Additionally, the Weibull model is expected to have slightly better out-of-sampl
 % Results/hypothesis tests
 %   \mu of hierarchical effects
 %   \tau of hierarchical effects (partial pooling)
-Estimates of the overall overall mean covariate effects \(\mu_{\mathbf{B}}\) can be considered time-invariant generalizations for brachiopod survival for the Paleozoic \uppercase{Smits in prep} (Fig. \ref{fig:mu}). Consistent with expectations, geographic range size has a negative effect on extinction risk where genera with large ranges having greater durations than genera with small ranges. I also find no time-invariant effect of body size on genus duration. 
+Estimates of the overall overall mean covariate effects \(\mu_{B}\) can be considered time-invariant generalizations for brachiopod survival during the Paleozoic \uppercase{Smits in prep} (Fig. \ref{fig:mu}). Consistent with prior expectations, geographic range size has a negative effect on extinction risk where genera with large ranges having greater durations than genera with small ranges. I also find no time-invariant effect of body size on genus duration. 
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/coef_means}
@@ -46,16 +46,16 @@ Estimates of the overall overall mean covariate effects \(\mu_{\mathbf{B}}\) can
   \label{fig:mu}
 \end{figure}
 
-Interpretation of the effect of environmental preference \(v\) on duration is slightly more involved. Because a quadratic term is the equivalent of an interaction term, both \(\mu_{v}\) and \(\mu_{v^{2}}\) have to be interpreted together because it is illogical to change values of \(v\) and only affect one of the coefficients. To determine the nature of the effect of \(v\) on duration I calculated the multiplicative effect of environmental preference on extinction risk.
+Interpretation of the effect of environmental preference \(v\) on duration is slightly more involved. Because a quadratic term is the equivalent of an interaction term, both \(\mu_{v}\) and \(\mu_{v^{2}}\) have to be interpreted together because it is illogical to change values of \(v\) without also changing values \(v^{2}\). To determine the nature of the effect of \(v\) on duration I calculated the multiplicative effect of environmental preference on extinction risk.
 
 Given mean estimated extinction risk \(\tilde{\sigma}\), we can define the extinction risk multiplier of an observation with environmental preference \(v_{i}\) as 
 \begin{equation}
-  \frac{\tilde{\sigma_{i}}}{\tilde{\sigma}} = \exp\left(\frac{-(\mu_{v} v_{i} + \mu_{v^{2}} v^{2})}{\alpha}\right).
+  \frac{\tilde{\sigma_{i}}}{\tilde{\sigma}} = f(v_{i}) = \exp\left(\frac{-(\mu_{v} v_{i} + \mu_{v^{2}} v^{2})}{\alpha}\right).
   \label{eq:env}
 \end{equation}
-This exponentiated quadratic function has a y-intercept of \(\log(0)\) or 1 by definition. Equation \ref{eq:env} can be either upward or downward facing. A downward facing function indicates that genera of intermediate environmental preference have greater durations than either extreme, and \textit{vice versa} for upward facing functions.
+This exponentiated quadratic function \(f(v_{i})\) has a y-intercept of \(\log(0)\) or 1 by definition as it does not have a specified non-zero intercept term. Equation \ref{eq:env} can be either upward or downward facing. A downward facing function indicates that genera of intermediate environmental preference have greater durations than either extreme, and \textit{vice versa} for upward facing functions.
 
-The estimated mean effect of environmental preference as a multiplier of mean extinction risk can then be simply visualized (Fig. \ref{fig:env_mean}). This figure depicts 1000 posterior predictive estimates of Eq. \ref{eq:env} across all possible values of \(v\). The number indicates the posterior probability that the function is downward facing, with generalists having lower extinction risk/greater duration than either type of specialist. Note that the inflection point/optimum of Fig. \ref{fig:env_mean} is at approximately 0, something that is observable given the estimate of \(\mu_{v}\) (Fig. \ref{fig:mu}).
+The expected effect of environmental preference as a multiplier of expected extinction risk can then be simply visualized (Fig. \ref{fig:env_mean}). This figure depicts 1000 posterior predictive estimates of Eq. \ref{eq:env} across all possible values of \(v\). The number indicates the posterior probability that the function is downward facing, with generalists having lower extinction risk/greater duration than either type of specialist. Note that the inflection point/optimum of Fig. \ref{fig:env_mean} is approximately \(x = 0\), something that is expected given the estimate of \(\mu_{v}\) (Fig. \ref{fig:mu}).
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/environ_quad}
@@ -63,9 +63,9 @@ The estimated mean effect of environmental preference as a multiplier of mean ex
   \label{fig:env_mean}
 \end{figure}
 
-The matrix \(\Sigma\) describing the covariance between the different coefficients describes how these coefficients might vary together across the origination cohorts. Similar to how this was modeled (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}), \(\Sigma\) can be decomposed into a vector of standard deviations \(\tau\) and a correlation matrix \(\Omega\).
+The matrix \(\Sigma\) describing the covariance between the different coefficients describes how these coefficients might vary together across the origination cohorts. Similar to how this was modeled (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}), for interpretation purposes \(\Sigma\) can be decomposed into a vector of standard deviations \(\tau\) and a correlation matrix \(\Omega\).
 
-The estimates of the standard deviation of between cohort coefficient estimates \(\tau_{B}\) vary greatly (Fig. \ref{fig:tau}). Coefficients with greater values of \(\tau\) have greater between cohort variation. The covariate effect with the greatest between origination cohort variation is \(\beta_{v^{2}}\) with \(\beta_{r}\) being the second largest. Both \(\beta_{v}\) and \(\beta_{m}\) have little between cohort variation, as both have less variation than mean extinction risk \(\beta_{0}\). However the amount between cohort variation in estimates of \(\beta_{v}\) means that it is possible that the function describing the effect of environment can be upward facing for some cohorts (Eq. \ref{eq:env}), meaning that environmental generalists being shorted lived than specialists.
+The estimates of the standard deviation of between cohort coefficient estimates \(\tau_{B}\) vary greatly (Fig. \ref{fig:tau}). Coefficients with greater values of \(\tau\) have greater between cohort variation. The individual covariate effects with the greatest between origination cohort variation are \(\beta_{v^{2}}\) and \(\beta_{r}\). Both \(\beta_{v}\) and \(\beta_{m}\) have little between cohort variation, as both have less variation than baseline extinction risk \(\beta_{0}\). However the amount between cohort variation in estimates of \(\beta_{v}\) mean that it is possible for the function describing the effect of environmental affinity can be upward facing for some cohorts (Eq. \ref{eq:env}), which corresponds to environmental generalists being shorted lived than specialists in that cohort.
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/coef_var}
@@ -78,7 +78,7 @@ The estimates of the standard deviation of between cohort coefficient estimates 
 %   correlations with baseline extinction risk of of major interest
 %   high/positive values of intercept --> high extinction risk
 %   low/negative values of intercept --> low extinction risk
-The correlation matrix \(\Omega\) shows a few important correlations between the coefficients (Fig. \ref{fig:omega}). The correlation terms describe the relationship between the coefficients and how their estimates may vary together across cohorts. Of particular note are the correlations between the intercept term \(\beta_{0}\), or expected extinction risk, and the biological covariates (Fig. \ref{fig:omega} first column/last row). Keep in mind that when \(\beta_{0}\) is low, extinction risk is low; and conversely, when \(\beta_{0}\) is high, then extinction risk is high.
+The correlation terms of \(\Omega\) (Fig. \ref{fig:omega}) describe the relationship between the coefficients and how their estimates may vary together across cohorts. The correlations between the intercept term \(\beta_{0}\), or expected extinction risk, and the biological covariates (Fig. \ref{fig:omega} first column/last row) are of particular interest to the \citet{Jablonski1986} hypothesis. Keep in mind that when \(\beta_{0}\) is low, extinction risk is low; and conversely, when \(\beta_{0}\) is high, then extinction risk is high.
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_heatmap}
@@ -86,7 +86,7 @@ The correlation matrix \(\Omega\) shows a few important correlations between the
   \label{fig:omega}
 \end{figure}
 
-The marginal posterior estimates for the correlations between estimates of the \(\beta_{0}\) and the effects of the biological covariates indicate that the relationships between expected extinction risk and either geographic range \(\beta_{r}\) is of note (Fig. \ref{fig:corr}). The negative correlation between \(\beta_{0}\) and \(\beta_{r}\) implies that as extinction risk increases, the effect/importance of geographic range on genus duration increases. %Similarly, the correlation between \(\beta_{0}\) and \(\beta_{v^{2}}\) implies that as extinction risk increases, the function describing the effect of environmental preference flattens (and potentially inverts).
+The correlations between estimates of the \(\beta_{0}\) and the effects of the biological covariates indicate that the correlation between between expected extinction risk and geographic range \(\beta_{r}\) is of particular note (Fig. \ref{fig:corr}). The negative correlation between \(\beta_{0}\) and \(\beta_{r}\) implies that as extinction risk increases, the effect/importance of geographic range on genus duration increases. This translates to mean that increases in baseline extinction rate are correlated with an increased importance of geographic range size. % this actually means that the effects of the other traits aren't going down, but instead aren't correlated with intensity and geographic range just gets more important!
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_marginal}
@@ -95,9 +95,9 @@ The marginal posterior estimates for the correlations between estimates of the \
 \end{figure}
 
 % effects varying between cohorts
-In addition to just analyzing the covariance matrix between the coefficient estimates, it is important to also observe the individual origination cohort level estimates. 
+While the overall group level estimates are of particular importance when defining time-invariant differences in extinction risk, it is also important and useful to analyze the individual level parameter estimates in order to better understand how parameters actually vary across cohorts.
 
-In comparison to the overall mean extinction risk \(\mu_{intercept}\), cohort level estimates \(\beta_{0}\) show some amount of variation through time as expected by estimates of \(\tau_{intercept}\) (Fig. \ref{fig:cohort_intercept}). A similar, if slightly greater, amount of variation is also observable in cohort estimates of the effect of geographic range \(\beta_{0}\) (Fig. \ref{fig:cohort_range}). Again, smaller values of \(\beta_{0}\) correspond to lower expected extinction risk. Similarly, smaller values of \(\beta_{0}\) correspond to greater decrease in extinction risk with increasing geographic range 
+In comparison to the overall mean extinction risk \(\mu_{intercept}\), cohort level estimates \(\beta_{0}\) show some amount of variation through time as expected by estimates of \(\tau_{intercept}\) (Fig. \ref{fig:cohort_intercept}). A similar, if slightly greater, amount of variation is also observable in cohort estimates of the effect of geographic range \(\beta_{r}\) (Fig. \ref{fig:cohort_range}). Again, smaller values of \(\beta_{r}\) correspond to lower expected extinction risk. Similarly, smaller values of \(\beta_{0}\) correspond to greater decrease in extinction risk with increasing geographic range 
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/intercept_cohort}
@@ -114,9 +114,9 @@ In comparison to the overall mean extinction risk \(\mu_{intercept}\), cohort le
 
 % environmental effect for cohort
 %   effect of environmental preference as duration multiplier
-How environmental effect varies between cohorts can be observed by using the cohort specific estimates of the coefficients \(\mathbf{B}_{j}\). Following the exact same procedure for generating figure \ref{fig:tau}, but substituting \(\beta_{v; j}\) and \(\beta_{v^{2}; j}\) for \(\mu_{v}\) and \(\mu_{v^{2}}\), the cohort specific effect of environmental preference as a multiplier of mean extinction risk can be calculated. This was done only for the Weibull model, though the observed pattern should be similar for the exponential model. 
+How the effect of environmental affinity varies between cohorts can be observed by using the cohort specific coefficients estimates \(B_{j}\). Following the exact same procedure used earlier (Fig. \ref{fig:tau}), but substituting \(\beta_{v; j}\) and \(\beta_{v^{2}; j}\) for \(\mu_{v}\) and \(\mu_{v^{2}}\), the cohort specific effect of environmental preference as a multiplier of mean extinction risk can be calculated. This was done only for the Weibull model, though the observed pattern should be similar for the exponential model. 
 
-As expected based on the estimates of \(\tau_{v}\) and \(\tau_{v^{2}}\), there is greater variation in the peakedness of the function than there is variation between upward and downward facing functions (Fig. \ref{fig:env_cohort}. Only 9 of the 31 cohorts have less than 50\% posterior probability that generalists are shorter lived than specialists, though 2 of those cases have approximately a 50\% probability of being either upward or downward facing. This is congruent with the 0.70+ posterior probability that \(\mu_{v^{2}}\) is positive/the relationship is downward facing, which corresponds to approximately 8 out of 31 cohorts.
+As expected based on the estimates of \(\tau_{v}\) and \(\tau_{v^{2}}\), there is greater variation in the peakedness of the function than there is variation between upward and downward facing functions (Fig. \ref{fig:env_cohort}). Only 9 of the 31 cohorts have less than 50\% posterior probability that generalists are shorter lived than specialists, though 2 of those cases have approximately a 50\% probability of being either upward or downward facing. This is congruent with the 0.70+ posterior probability that \(\mu_{v^{2}}\) is positive/the relationship is downward facing, which corresponds to approximately 8 out of 31 cohorts.
 
 Additionally, a quite striking pattern emerges when the inflection point of the function is either far away from the y-intercept (x = 0, y = 1) or when there is little evidence non-linearity (Fig. \ref{fig:env_cohort}). Cohort 21 and 20, for example, have almost linear relationships between environmental preference and duration multiplier. This type of relationship occurs when \(\beta_{v^{2}}\) approaches 0, flattening the non-linear curvature of the relationship.
 

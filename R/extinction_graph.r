@@ -25,7 +25,7 @@ wr.res <- weibull.out[[2]]
 pat <- 'faun_expo_[0-9].csv'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 efit <- read_stan_csv(outs)
-exp.fit <- extract(wfit, permuted = TRUE)
+exp.fit <- extract(efit, permuted = TRUE)
 exponential.out <- post.sim(data = data, fit = efit, map = FALSE, expo = TRUE)
 er <- exponential.out[[1]]
 er.res <- exponential.out[[2]]
