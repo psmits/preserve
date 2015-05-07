@@ -1,0 +1,48 @@
+\documentclass[12pt,letterpaper]{article}
+
+\usepackage{amsmath, amsthm}
+\usepackage{microtype, parskip}
+\usepackage[comma,numbers,sort&compress]{natbib}
+\usepackage{lineno}
+\usepackage{docmute}
+\usepackage{caption, subcaption, multirow, morefloats, rotating}
+\usepackage{wrapfig}
+
+\frenchspacing
+
+\captionsetup[subfigure]{position = top, labelfont = bf, textfont = normalfont, singlelinecheck = off, justification = raggedright}
+
+\begin{document}
+\section{Discussion}
+
+% hypotheses
+%   Jablonski1987 hypothesis
+The results presented here are in an interesting combination of contrast and congruence with the original \citet{Jablonski1987} hypothesis. While \citet{Jablonski1987} hypothesized that, as extinction risk increases, the effect of taxon traits, except for the effect geographic range size, should decrease in size. My results, however, demonstrate that the only effect that has strong systematic change with extinction risk is that of geographic range (Fig. \ref{fig:corr}). Instead of the effect of other taxon traits decreasing with increasing extinction risk, the effect of geographic range increases while the others have no systematic correlation with extinction risk. 
+
+These results are partially consistent with \citet{Jablonski1987} because during periods of higher baseline extinction risk the effect of geographic range is greater than the effects of other taxon traits, though the macroevolutionary mechanism proposed by \citet{Jablonski1987} is not supported by my results.
+
+%   Miller2009a results
+Two mass extinction events are captured within the time frame considered here: the end Ordovician, and the end Devonian. The nature of the analysis used here means that the effect of the mass extinction is only captured with any clarity by the survival patterns of the origination cohort that immediately proceeds the event. These two cohorts are Hirnantian and Frasnian for the end Ordovician and end Devonian, respectively.
+
+For the Hirnantian, there is a 57\% posterior probability that taxa which tend to favor epicontinental seas are expected to survive longer than those favoring open ocean environments. Similarly, for the Frasnian there is a 47\% posterior probability that taxa which tend to favor epicontinental seas are expected to survive longer than those favoring open ocean environments. These probabilities were calculated as the percent of posterior draws of \(f(v_{i})\) which have their optima greater than 0, or towards favoring epicontinental. 
+
+These results are either inconsistent or, at best, weak support for the observation of \citet{Miller2009a} that epicontinental seas are favored at mass extinction boundaries. However, this analysis may not be capturing the patterns analyzed in \citet{Miller2009a} as my focus is on extinction patterns between and within origination cohorts and not on changes in extinction rates across stages. Additionally, my measure of environmental preference is very different from that of \citet{Miller2009a}. Given these two caveats, it is hard to make direct comparisons between my results and those of \citet{Miller2009a}.
+
+%   generalists versus specialists
+There is an approximate 75\% posterior probability that taxa with intermediate environmental preferences have a lesser extinction risk than either end members, though the over all curvature of \(f(v_{i}\) is not very peaked meaning that this relationship does not lead to very strong differences in extinction risk (Fig. \ref{fig:env_mean}). This result supports the hypothesis that, in general, environmental generalists survive greater than environmental specialists \citep{Simpson1944,Liow2004a,Liow2007b,Nurnberg2013a,Nurnberg2015}.
+
+The variance in estimate of the overall \(f(v_{i}\) reflects the large between cohort variance in cohort specific estimates of \(f(v_{i})\) (Fig. \ref{fig:env_cohort}). Given that there is only a 75\% posterior probability that the expected overall estimate of \(f(v_{i})\), it is not surprising that there are some stages where the theorized relationship is in fact reversed. Additionally, as discussed earlier, there are some stages where \(f(v_{i})\) does not resemble the theorized nonlinear relation with the optimum in the middle but instead is highly skewed or effectively linear (Fig. \ref{fig:env_cohort}). 
+
+These results do not refute ``survival of the unspecialized'' as a time-invariant generalization, but instead demonstrate how while the expected group-level estimate of \(f(v_{i})\) might favor one hypothesis there is still enough variability between cohorts so that in some realizations this pattern may not hold or can even be reversed. These results are also consistent with aspects of \citep{Miller2009a} who found that the effect of environmental preference on extinction risk was quite variable and without obvious patterning during times of background extinction.
+
+% deficiencies
+%   lack of phylogeny; see Smits Submitted
+%   species:genus
+%   difficulty towards tails, but that's to be expected
+%   other measures of ecology? affixing strategy a la Alexander1977
+
+% future direction
+
+% concluding statements
+
+\end{document}

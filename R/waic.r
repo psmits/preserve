@@ -9,7 +9,7 @@ colVars <- function (a){
 # The calculation of Waic!  Returns lppd, p_waic_1, p_waic_2, and waic, which we define
 # as 2*(lppd - p_waic_2), as recommmended in BDA
 waic <- function (stanfit){
-  log_lik <- extract (stanfit, "log_lik")$log_lik
+  log_lik <- rstan::extract(stanfit, "log_lik")$log_lik
   lppd <- sum (log (colMeans(exp(log_lik))))
   p_waic_1 <- 2*sum (log(colMeans(exp(log_lik))) - colMeans(log_lik))
   p_waic_2 <- sum (colVars(log_lik))

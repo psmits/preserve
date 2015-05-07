@@ -7,25 +7,36 @@ library(rstan)
 library(survival)
 library(stringr)
 library(grid)
+source('../R/gts.r')
 source('../R/waic.r')
+source('../R/mung.r')
 source('../R/multiplot.r')
 source('../R/extinction_post_sim.r')
 set.seed(420)
 
+data.file <- list.files('../data', pattern = 'Occs')
+fossil <- read.csv(paste0('../data/', data.file))
+bibr <- fossil
+payne <- read.table('../data/payne_bodysize/Occurrence_PaleoDB.txt',
+                    header = TRUE, stringsAsFactors = FALSE)
+sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', gts)
+
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
-pat <- 'faun_weib_lith_[0-9].csv'
+pat <- 'faun_weib_[0-9].csv'
+#pat <- 'faun_weib_lith_[0-9].csv'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 wfit <- read_stan_csv(outs)
-wei.fit <- extract(wfit, permuted = TRUE)
+wei.fit <- rstan::extract(wfit, permuted = TRUE)
 weibull.out <- post.sim(data = data, fit = wfit, map = FALSE, expo = FALSE)
 wr <- weibull.out[[1]]
 wr.res <- weibull.out[[2]]
 
-pat <- 'faun_expo_lith_[0-9].csv'
+pat <- 'faun_expo_[0-9].csv'
+#pat <- 'faun_expo_lith_[0-9].csv'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 efit <- read_stan_csv(outs)
-exp.fit <- extract(efit, permuted = TRUE)
+exp.fit <- rstan::extract(efit, permuted = TRUE)
 exponential.out <- post.sim(data = data, fit = efit, map = FALSE, expo = TRUE)
 er <- exponential.out[[1]]
 er.res <- exponential.out[[2]]
@@ -500,6 +511,10 @@ ggsave(quad, filename = '../doc/survival/figure/environ_quad.png',
 
 # now do quadratics plot with facet for each cohort
 # cohort one
+renum <- sort(unique(mapvalues(coh, 
+                               from = unique(coh), 
+                               unique(match(as.character(sepkoski.data$orig), gts)))))
+rename <- gts[renum]
 sam <- sample(nrow(exp.fit$mu_prior), 1000)
 coef.list <- list()
 plotlist <- list()
@@ -531,7 +546,7 @@ for(ii in seq(unique(coh))) {
   quadcoh <- quadcoh + geom_text(y = 1.75, x = 0, 
                                  label = paste(lab), size = 10, colour = cols)
   quadcoh <- quadcoh + coord_cartesian(ylim = c(-0.5, 2))
-  quadcoh <- quadcoh + labs(x = paste(ii), 
+  quadcoh <- quadcoh + labs(x = paste(rename[ii]), 
                             y = expression(paste(tilde(sigma[i])/tilde(sigma))))
   plotlist[[ii]] <- quadcoh
 }
@@ -564,3 +579,10 @@ per.best <- laply(coef.list, function(x) sum(x[, 2] > 0) / nrow(x))
 p.linear <- laply(coef.list, function(x) {
                   sum(x[, 1] / (x[, 2] * 2) > 1 | 
                       x[, 1] / (x[, 2] * 2) < -1)}) / nrow(coef.list[[1]])
+
+save(p.epi.best, 
+     wh.meanworst, 
+     wh.midworst, 
+     per.best, 
+     p.linear, 
+     file = '../data/epi_over_off.rdata')
