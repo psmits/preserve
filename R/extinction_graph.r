@@ -14,7 +14,7 @@ set.seed(420)
 
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
-pat <- 'faun_weib_[0-9].csv'
+pat <- 'faun_weib_lith_[0-9].csv'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 wfit <- read_stan_csv(outs)
 wei.fit <- extract(wfit, permuted = TRUE)
@@ -22,7 +22,7 @@ weibull.out <- post.sim(data = data, fit = wfit, map = FALSE, expo = FALSE)
 wr <- weibull.out[[1]]
 wr.res <- weibull.out[[2]]
 
-pat <- 'faun_expo_[0-9].csv'
+pat <- 'faun_expo_lith_[0-9].csv'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 efit <- read_stan_csv(outs)
 exp.fit <- extract(efit, permuted = TRUE)

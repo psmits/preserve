@@ -70,7 +70,7 @@ model {
     if(i == 2) {
       mu_prior[i] ~ normal(-1, 1);
     } else if(i > 3) {
-      mu_prior[i] ~ normal(0, tau[i - 2] * lambda);
+      mu_prior[i] ~ normal(0, tau[i - 3] * lambda);
     } else {
       mu_prior[i] ~ normal(0, 5);
     }

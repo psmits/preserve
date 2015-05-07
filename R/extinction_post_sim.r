@@ -124,6 +124,7 @@ post.sim <- function(data, fit, map = FALSE, expo = TRUE) {
       exp.fit <- extract(efit, permuted = TRUE)
       betas <- exp.fit$beta
       envs <- exp.fit$env
+      lits <- exp.fit$lit
       er <- list()
       er.res <- list()
       for(ii in 1:nsim) {
@@ -133,13 +134,20 @@ post.sim <- function(data, fit, map = FALSE, expo = TRUE) {
         bet.2 <- betas[sample(nrow(betas), 1), , 3]
         bet.3 <- betas[sample(nrow(betas), 1), , 4]
         ee <- envs[sample(nrow(envs), 1), ]
+        ll <- lits[sample(nrow(lits), 1), ]
 
         oo <- c()
         rr <- c()
         for(jj in seq(n)) {
           reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
-          bet.2[coh[jj]] * ee[jj] + 
-          bet.3[coh[jj]] * size[jj]
+          bet.2[coh[jj]] * size[jj]
+          bet.3[coh[jj]] * ee[jj] + 
+          bet.4[coh[jj]] * (ee[jj])^2 + 
+          bet.5[coh[jj]] * ll[jj] + 
+          bet.6[coh[jj]] * (ll[jj])^2 + 
+          bet.7[coh[jj]] * (ll[jj] * ee[jj]) + 
+          bet.8[coh[jj]] * (ll[jj] * ee[jj])^2
+
           oo[jj] <- rexp(1, rate = exp(reg))
           rr[jj] <- deviance.res(duration[jj], 
                                  scale = 1 / exp(reg), 
@@ -158,6 +166,7 @@ post.sim <- function(data, fit, map = FALSE, expo = TRUE) {
       wei.fit <- extract(wfit, permuted = TRUE)
       betas <- wei.fit$beta
       envs <- wei.fit$env
+      lits <- wei.fit$lit
       wr <- list()
       wr.res <- list()
       for(ii in 1:nsim) {
@@ -167,14 +176,25 @@ post.sim <- function(data, fit, map = FALSE, expo = TRUE) {
         bet.1 <- betas[sample(nrow(betas), 1), , 2]
         bet.2 <- betas[sample(nrow(betas), 1), , 3]
         bet.3 <- betas[sample(nrow(betas), 1), , 4]
+        bet.4 <- betas[sample(nrow(betas), 1), , 5]
+        bet.5 <- betas[sample(nrow(betas), 1), , 6]
+        bet.6 <- betas[sample(nrow(betas), 1), , 7]
+        bet.7 <- betas[sample(nrow(betas), 1), , 8]
+        bet.8 <- betas[sample(nrow(betas), 1), , 9]
         ee <- envs[sample(nrow(envs), 1), ]
+        ll <- lits[sample(nrow(lits), 1), ]
 
         oo <- c()
         rr <- c()
         for(jj in seq(n)) {
           reg <- int[coh[jj]] + bet.1[coh[jj]] * rage[jj] + 
-          bet.2[coh[jj]] * ee[jj] + 
-          bet.3[coh[jj]] * size[jj]
+          bet.2[coh[jj]] * size[jj]
+          bet.3[coh[jj]] * ee[jj] + 
+          bet.4[coh[jj]] * (ee[jj])^2 + 
+          bet.5[coh[jj]] * ll[jj] + 
+          bet.6[coh[jj]] * (ll[jj])^2 + 
+          bet.7[coh[jj]] * (ll[jj] * ee[jj]) + 
+          bet.8[coh[jj]] * (ll[jj] * ee[jj])^2
           oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
           rr[jj] <- deviance.res(duration[jj], 
                                  scale = exp(reg), 
