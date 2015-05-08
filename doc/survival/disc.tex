@@ -16,17 +16,15 @@
 \section{Discussion}
 
 % hypotheses
-%   Jablonski1987 hypothesis
-The results presented here are in an interesting combination of congruence and contrast with those of \citet{Jablonski1987}.  These results are partially consistent with \citet{Jablonski1987} because during periods of higher baseline extinction risk the effect of geographic range is greater than the effects of other taxon traits, though the macroevolutionary mechanism proposed by \citet{Jablonski1987} is not supported by my results. While \citet{Jablonski1987} hypothesized that, as extinction risk increases, the effect of taxon traits, except for the effect geographic range size, decrease in size. 
-
-My results instead demonstrate that the only effect that has strong correlation with baseline extinction risk is that of geographic range (Fig. \ref{fig:corr}). Instead of the effects of other taxon traits decreasing with increasing baseline extinction risk, the effect of geographic range increases while the effects of other taxon traits have no strong correlation with baseline extinction risk. 
+%   Jablonski1986 hypothesis
+The results presented here are in an interesting combination of congruence and contrast with those of \citet{Jablonski1986}.  These results are partially consistent with \citet{Jablonski1986} because during periods of higher baseline extinction risk the effect of geographic range is greater than the effects of other taxon traits, though the macroevolutionary mechanism proposed by \citet{Jablonski1986} is not supported by my results. \citet{Jablonski1986} hypothesized that as extinction risk increases, the effects of all taxon traits except for geographic range size decrease in size. My results instead demonstrate that the only effect that has strong correlation with baseline extinction risk is that of geographic range (Fig. \ref{fig:corr}). Additionally, instead of the effects of other taxon traits decreasing with increasing baseline extinction risk, the effect of geographic range increases while the effects of other taxon traits have no strong correlation with baseline extinction risk. 
 
 %   Miller2009a results
 There are two mass extinction events are captured within the time frame considered here: the end Ordovician, and the end Devonian. The nature of the analysis used here means that the effect of the mass extinction is only captured with any clarity by the survival patterns of the origination cohort that immediately proceeds the event. These two cohorts are Hirnantian and Frasnian for the end Ordovician and end Devonian, respectively.
 
 For the Hirnantian, there is a 57\% posterior probability that taxa which tend to favor epicontinental seas are expected to survive longer than those favoring open ocean environments. Similarly, for the Frasnian there is a 47\% posterior probability that taxa which tend to favor epicontinental seas are expected to survive longer than those favoring open ocean environments. These probabilities were calculated as the percent of posterior draws of \(f(v_{i})\) which have their optima greater than 0, or towards favoring epicontinental. 
 
-These results demonstrate no support for the observation of \citet{Miller2009a} that epicontinental seas are favored at mass extinction boundaries. These results, also, do not support the opposite conclusion. Instead, they are equitable. However, this analysis may not be capturing the patterns analyzed in \citet{Miller2009a} as my focus is on long term taxonomic duration between and within origination cohorts and not patterns of instantaenous extinction rates between stages. Given both of these factors, it is hard to make strong conclusions about the results of \citet{Miller2009a}.  
+These results indicate no evidence for or against the observation of \citet{Miller2009a} that epicontinental seas are favored at mass extinction boundaries. Instead, these alternatives are equiprobable. However, this analysis may not be capturing the patterns analyzed in \citet{Miller2009a} as my focus is on long term taxonomic duration between and within origination cohorts and not patterns of instantaenous extinction rates between stages. Given both of these factors, it is hard to make strong conclusions about the results of \citet{Miller2009a}.  
 %   generalists versus specialists
 There is an approximate 75\% posterior probability that taxa with intermediate environmental preferences have a lesser extinction risk than either end members, though the over all curvature of \(f(v_{i}\) is not very peaked meaning that this relationship does not lead to very strong differences in extinction risk (Fig. \ref{fig:env_mean}). This result supports the hypothesis that, in general, environmental generalists survive greater than environmental specialists \citep{Simpson1944,Liow2004a,Liow2007b,Nurnberg2013a,Nurnberg2015}.
 
@@ -42,10 +40,19 @@ These results do not refute ``survival of the unspecialized'' as a time-invarian
 %     though, of course, this model has a long way to go (all models are false)
 
 % future direction
+This model can be improved through either increasing the number of analyzed taxon traits, expanding the hierarchical structure of the model to include other major taxonomic groups of interest, and the inclusion of explicit phylogenetic relationships between the taxa in the model as an additional hierarchical effect.
+
 %   other measures of ecology? affixing strategy a la Alexander1977
-%   integration of phylogenetic information/taxonomic component
-%     see Smits Submitted
+An example taxon trait that may be of particular interest is the affixing strategy or method of interaction with the substrate of the taxon. This trait has been found to be related to brachiopod survival \citep{Alexander1977} so it's inclusion may be of particular interest.
+
 %   comparison with other major groups in hierarchical model
+It is theoretically possible to expand this model to allow for comparisons within and between major taxonomic groups. This approach would better constrain the brachiopod estimates while also allowing for estimation of potential cross-taxonomic pattern similarities and differences. The major issue surrounding this expansion involves finding an similarly well sampled taxonomic group that is present during the Paleozoic. Example groups include Triolobita, Crinoidea, Ostracoda, and other ``Paleozoic'' groups \citep{SepkoskiJr.1981a}.
+
+%   integration of phylogenetic information/taxonomic component
+%     taxon traits are more than likely heritable
+%     what aspect of variation is explained just by 
+%     see Smits Submitted
+Taxon traits like environmental preference or geographic range \citep{Jablonski1987,Hunt2005b} are most likely heritable, at least phylogenetically \citep{Lynch1991,Housworth2004}. Without phylogenetic context, this analysis assumes that differences in extinction risk between taxa are independent of those taxa's shared evolutionary history \citep{Felsenstein1985b}. In contrast, the origination cohorts capture shared temporal context. The inclusion of phylogenetic context as an addition individual level hierarchical structure independent of origination cohort would allow for determining how much of the observed variability is due to shared evolutionary history versus actual differences associated with these taxonomic traits. It has been shown that phylogeny contributes non-trivially to differences in mammal species durations \uppercase{Smits Submitted}.
 
 % concluding statements
 %   different mechanism than proposed by Jablonski1986, but same overall observation
