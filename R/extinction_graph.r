@@ -42,8 +42,10 @@ er <- exponential.out[[1]]
 er.res <- exponential.out[[2]]
 
 #
-waic(wfit)$waic < waic(efit)$waic
+wei.waic <- waic(wfit)$waic
+exp.waic <- waic(efit)$waic
 
+#
 theme_set(theme_bw())
 cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
          '#0072B2', '#D55E00', '#CC79A7')
@@ -267,8 +269,7 @@ coef.mean <- coef.mean + scale_colour_manual(values = cbp, name = '')
 coef.mean <- coef.mean + theme(axis.text.y = element_text(size = 10),
                                axis.title.y = element_text(angle = 0),
                                axis.text.x = element_text(size = 15),
-                               legend.text = element_text(size = 10),
-                               legend.position = 'left')
+                               legend.text = element_text(size = 10))
 ggsave(coef.mean, filename = '../doc/survival/figure/coef_means.png',
        width = 8, height = 4)
 
@@ -303,8 +304,7 @@ coef.var <- coef.var + scale_colour_manual(values = cbp, name = '')
 coef.var <- coef.var + theme(axis.text.y = element_text(size = 10),
                              axis.title.y = element_text(angle = 0),
                              axis.text.x = element_text(size = 15),
-                             legend.text = element_text(size = 10),
-                             legend.position = 'left')
+                             legend.text = element_text(size = 10))
 ggsave(coef.var, filename = '../doc/survival/figure/coef_var.png',
        width = 8, height = 4)
 
@@ -580,7 +580,9 @@ p.linear <- laply(coef.list, function(x) {
                   sum(x[, 1] / (x[, 2] * 2) > 1 | 
                       x[, 1] / (x[, 2] * 2) < -1)}) / nrow(coef.list[[1]])
 
-save(p.epi.best, 
+save(wei.waic,
+     exp.waic,
+     p.epi.best, 
      wh.meanworst, 
      wh.midworst, 
      per.best, 
