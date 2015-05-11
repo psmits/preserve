@@ -503,7 +503,7 @@ quad <- quad + stat_function(fun = function(x) {
                                  cc[3])}, size = 1)
 quad <- quad + geom_text(y = 1.75, x = 0, 
                          label = paste(lab), size = 10)
-quad <- quad + coord_cartesian(ylim = c(-0.5, 2))
+quad <- quad + coord_cartesian(ylim = c(0, 2))
 quad <- quad + labs(x = expression(v[i]), 
                     y = expression(paste(tilde(sigma[i])/tilde(sigma))))
 ggsave(quad, filename = '../doc/survival/figure/environ_quad.png',
@@ -545,7 +545,7 @@ for(ii in seq(unique(coh))) {
                                                  a = mm[3]))
   quadcoh <- quadcoh + geom_text(y = 1.75, x = 0, 
                                  label = paste(lab), size = 10, colour = cols)
-  quadcoh <- quadcoh + coord_cartesian(ylim = c(-0.5, 2))
+  quadcoh <- quadcoh + coord_cartesian(ylim = c(0, 2))
   quadcoh <- quadcoh + labs(x = paste(rename[ii]), 
                             y = expression(paste(tilde(sigma[i])/tilde(sigma))))
   plotlist[[ii]] <- quadcoh

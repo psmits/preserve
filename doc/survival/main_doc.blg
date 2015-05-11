@@ -3,47 +3,45 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: main_doc.aux
 The style file: abbrvnat.bst
 Database file #1: biblio.bib
-Warning--I didn't find a database entry for "raster"
-Warning--I didn't find a database entry for "stan-software:2014"
-You've used 40 entries,
+Database file #2: packages.bib
+You've used 43 entries,
             2773 wiz_defined-function locations,
-            909 strings with 11813 characters,
-and the built_in function-call counts, 17050 in all, are:
-= -- 1661
-> -- 679
-< -- 35
-+ -- 241
-- -- 201
-* -- 1357
-:= -- 2663
-add.period$ -- 165
-call.type$ -- 40
-change.case$ -- 182
-chr.to.int$ -- 40
-cite$ -- 80
-duplicate$ -- 801
-empty$ -- 1516
-format.name$ -- 267
-if$ -- 3555
-int.to.chr$ -- 1
+            919 strings with 12128 characters,
+and the built_in function-call counts, 17922 in all, are:
+= -- 1741
+> -- 709
+< -- 38
++ -- 254
+- -- 210
+* -- 1410
+:= -- 2802
+add.period$ -- 175
+call.type$ -- 43
+change.case$ -- 192
+chr.to.int$ -- 42
+cite$ -- 86
+duplicate$ -- 850
+empty$ -- 1598
+format.name$ -- 279
+if$ -- 3733
+int.to.chr$ -- 2
 int.to.str$ -- 1
 missing$ -- 45
-newline$ -- 253
-num.names$ -- 160
-pop$ -- 292
+newline$ -- 269
+num.names$ -- 172
+pop$ -- 317
 preamble$ -- 1
-purify$ -- 147
+purify$ -- 156
 quote$ -- 0
-skip$ -- 553
+skip$ -- 590
 stack$ -- 0
-substring$ -- 848
-swap$ -- 54
+substring$ -- 854
+swap$ -- 61
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 410
+type$ -- 443
 warning$ -- 0
-while$ -- 183
+while$ -- 192
 width$ -- 0
-write$ -- 619
-(There were 2 warnings)
+write$ -- 657
