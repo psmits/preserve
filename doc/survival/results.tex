@@ -24,27 +24,15 @@ As stated above, posterior approximations for both the exponential and Weibull m
 
 Comparisons of the survival functions estimated from 1000 posterior predictive data sets to the estimated survival function of the observed genera demonstrates that both the exponential and Weibull models approximately capture the observed pattern of extinction (Fig. \ref{fig:surv}). The major difference in fit between the two models is that the Weibull model has a slightly better fit for longer lived taxa than the exponential model.
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/survival_curves}
-  \caption{Comparison of empirical estimates of \(S(t)\) versus estimates from 1000 posterior predictive data sets. \(S(t)\) corresponds to \(P(T > t)\) as it is the probability that a given genus observed at age \(t\) will continue to live. This is equivalent to the probability that \(t\) is less than the genus' ultimate duration \(T\). Note that the Weibull (left) model has noticeably better fir to the data than the exponential (right).}
-  \label{fig:surv}
-\end{figure}
 
 %Inspection of the deviance residuals yields a similar pattern of biased estimates for longer lived taxa \uppercase{ref figure}. 
 
-Additionally, the Weibull model is expected to have slightly better out-of-sample predictive accuracy when compared to the exponential model \uppercase{values}. This is congruent with graphical comparisons of the survival functions (Fig. \ref{fig:surv}). Because the difference between the WAIC scores is small, both results from the exponential and Weibull models will be analyzed.
+Additionally, the Weibull model is expected to have slightly better out-of-sample predictive accuracy when compared to the exponential model (3941 versus 3948, respectively). This is congruent with graphical comparisons of the survival functions (Fig. \ref{fig:surv}). Because the difference between the WAIC scores is small, both results from the exponential and Weibull models will be analyzed.
 
 % Results/hypothesis tests
 %   \mu of hierarchical effects
 %   \tau of hierarchical effects (partial pooling)
 Estimates of the overall overall mean covariate effects \(\mu\) can be considered time-invariant generalizations for brachiopod survival during the Paleozoic \uppercase{Smits in prep} (Fig. \ref{fig:mu}). Consistent with prior expectations, geographic range size has a negative effect on extinction risk where genera with large ranges having greater durations than genera with small ranges. I also find no time-invariant effect of body size on genus duration. 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/coef_means}
-  \caption{<+caption text+>}
-  \label{fig:mu}
-\end{figure}
 
 Interpretation of the effect of environmental preference \(v\) on duration is slightly more involved. Because a quadratic term is the equivalent of an interaction term, both \(\mu_{v}\) and \(\mu_{v^{2}}\) have to be interpreted together because it is illogical to change values of \(v\) without also changing values \(v^{2}\). To determine the nature of the effect of \(v\) on duration I calculated the multiplicative effect of environmental preference on extinction risk.
 
@@ -56,22 +44,10 @@ Given mean estimated extinction risk \(\tilde{\sigma}\), we can define the extin
 This exponentiated quadratic function \(f(v_{i})\) has a y-intercept of \(\exp(0)\) or 1 by definition as it does not have a specified non-zero intercept term. Equation \ref{eq:env} can be either upward or downward facing. A downward facing \(f(v_{i})\) indicates that genera of intermediate environmental preference have greater durations than either extreme, and \textit{vice versa} for upward facing functions.
 
 The expected effect of environmental preference as a multiplier of expected extinction risk can then be visualized (Fig. \ref{fig:env_mean}). This figure depicts 1000 posterior predictive estimates of Eq. \ref{eq:env} across all possible values of \(v\). The number indicates the posterior probability that the function is downward facing, with generalists having lower extinction risk/greater duration than either type of specialist. Note that the inflection point/optimum of Fig. \ref{fig:env_mean} is approximately \(x = 0\), something that is expected given the estimate of \(\mu_{v}\) (Fig. \ref{fig:mu}).
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/environ_quad}
-  \caption{<+caption text+>}
-  \label{fig:env_mean}
-\end{figure}
 
 The matrix \(\Sigma\) describing the covariance between the different coefficients describes how these coefficients might vary together across the origination cohorts. Similar to how this was modeled (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}), for interpretation purposes \(\Sigma\) can be decomposed into a vector of standard deviations \(\vec{\tau}\) and a correlation matrix \(\Omega\).
 
 The estimates of the standard deviation of between cohort coefficient estimates \(\tau\) vary greatly (Fig. \ref{fig:tau}). Coefficients with greater values of \(\tau\) have greater between cohort variation. The individual covariate effects with the greatest between origination cohort variation are \(\beta_{r}\), \(\beta_{v}\), and \(\beta_{v^{2}}\). \(\beta_{m}\) has negligible between cohort variation, as it has less have less between cohort variation than the between cohort variation in baseline extinction risk \(\beta_{0}\). However the amount between cohort variation in estimates of \(\beta_{v^{2}}\) mean that it is possible for the function describing the effect of environmental affinity can be upward facing for some cohorts (Eq. \ref{eq:env}), which corresponds to environmental generalists being shorted lived than specialists in that cohort.
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/coef_var}
-  \caption{<+caption text+>}
-  \label{fig:tau}
-\end{figure}
 
 
 % omega heatmap
@@ -79,38 +55,13 @@ The estimates of the standard deviation of between cohort coefficient estimates 
 %   high/positive values of intercept --> high extinction risk
 %   low/negative values of intercept --> low extinction risk
 The correlation terms of \(\Omega\) (Fig. \ref{fig:omega}) describe the relationship between the coefficients and how their estimates may vary together across cohorts. The correlations between the intercept term \(\beta_{0}\) and the effects of the taxon traits are of particular interest for evaluating the \citet{Jablonski1986} hypothesis (Fig. \ref{fig:omega} first column/last row). Keep in mind that when \(\beta_{0}\) is low, extinction risk is low; and conversely, when \(\beta_{0}\) is high, then extinction risk is high.
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_heatmap}
-  \caption{<+caption text+>}
-  \label{fig:omega}
-\end{figure}
 
 Marginal posterior probabilities of the correlation terms between the level of baseline extinction risk \(\beta_{0}\) and the effects of the taxon traits indicate that the correlation between between expected extinction risk and geographic range \(\beta_{r}\) is of particular note (Fig. \ref{fig:corr}). The negative correlation between \(\beta_{0}\) and \(\beta_{r}\) implies that as extinction risk increases, the effect/importance of geographic range on genus duration increases. This translates to mean that increases in baseline extinction rate are correlated with an increased importance of geographic range size. % this actually means that the effects of the other traits aren't going down, but instead aren't correlated with intensity and geographic range just gets more important!
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_marginal}
-  \caption{<+caption text+>}
-  \label{fig:corr}
-\end{figure}
 
 % effects varying between cohorts
 While the overall group level estimates are of particular importance when defining time-invariant differences in extinction risk, it is also important and useful to analyze the individual level parameter estimates in order to better understand how parameters actually vary across cohorts.
 
 In comparison to the overall mean extinction risk \(\mu_{intercept}\), cohort level estimates \(\beta_{0}\) show some amount of variation through time as expected by estimates of \(\tau_{intercept}\) (Fig. \ref{fig:cohort_intercept}). A similar, if slightly greater, amount of variation is also observable in cohort estimates of the effect of geographic range \(\beta_{r}\) (Fig. \ref{fig:cohort_range}). Again, smaller values of \(\beta_{0}\) correspond to lower expected extinction risk. Similarly, smaller values of \(\beta_{r}\) correspond to greater decrease in extinction risk with increasing geographic range 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/intercept_cohort}
-  \caption{<+caption text+>}
-  \label{fig:cohort_intercept}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/range_cohort}
-  \caption{<+caption text+>}
-  \label{fig:cohort_range}
-\end{figure}
 
 % environmental effect for cohort
 %   effect of environmental preference as duration multiplier
@@ -119,6 +70,63 @@ How the effect of environmental affinity varies between cohorts can be observed 
 As expected based on the estimates of \(\tau_{v}\) and \(\tau_{v^{2}}\), there is greater variation in the peakedness of \(f(v_{i}\) than there is variation between upward and downward facing functions (Fig. \ref{fig:env_cohort}). Only 9 of the 31 cohorts have less than 50\% posterior probability that generalists are shorter lived than specialists, though 2 of those cases have approximately a 50\% probability of being either upward or downward facing. This is congruent with the 0.70+ posterior probability that \(\mu_{v^{2}}\) is positive/\(f(v_{i})\) is downward facing, which corresponds to approximately 8 out of 31 cohorts.
 
 Additionally, a quite striking pattern emerges when the inflection point of the function is either far away from the y-intercept (x = 0, y = 1) or when there is little evidence of non-linearity (Fig. \ref{fig:env_cohort}). Cohort 21 and 20, for example, have almost linear relationships between environmental preference and the duration multiplier. This type of relationship occurs when \(\beta_{v^{2}}\) approaches 0, flattening the non-linear curvature of the relationship.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/survival_curves}
+  \caption{Comparison of empirical estimates of \(S(t)\) versus estimates from 1000 posterior predictive data sets. \(S(t)\) corresponds to \(P(T > t)\) as it is the probability that a given genus observed at age \(t\) will continue to live. This is equivalent to the probability that \(t\) is less than the genus' ultimate duration \(T\). Note that the Weibull (left) model has noticeably better fir to the data than the exponential (right).}
+  \label{fig:surv}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/coef_means}
+  \caption{Estimates of the overall effects of the covariates on extinction risk. Included is also the estimate of \(\mu_{0}\) which corresponds to the intercept term or, because of standardization, the overall mean expected extinction risk. Estimates are presented for both the exponential (gold) and Weibull (blue) models. The point corresponds to the median of the posterior distribution, while the error bars correspond to the 80\% credible intervals of the estimates.}
+  \label{fig:mu}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/environ_quad}
+  \caption{The overall expected relationship \(f(v_{i})\) between environmental affinity \(v_{i}\) and a multiplier of extinction risk (Eq. \ref{eq:env}). Each grey line corresponds to a single draw posterior predictive distribution, while the black corresponds to the median of the posterior predictive distribution. The overall shape of \(f(v_{i})\) is concave down with an optimum of close 0, which corresponds to affinity approximately equal to the expectation based on background environmental occurrence rates.}
+  \label{fig:env_mean}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/coef_var}
+  \caption{Estimates of the scale parameters describing the expected differences in the effect of the covariates, and of the intercept/baseline extinction risk, between cohorts. Higher values of \(\tau\) correspond to greater expected differences between cohorts. Estimates are presented for both the exponential (gold) and Weibull (blue) models. The point corresponds to the median of the posterior distribution, while the error bars correspond to the 80\% credible intervals of the estimates.}
+  \label{fig:tau}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_heatmap}
+  \caption{Heatmap for the median estimates of the terms of the correlation matrix \(\Omega\) between cohort-level covariate effects. Both the exponential (left) and Weibull (right) models are presented. The off-diagonal terms are the correlation between the estimates of the cohort-level estimates of the effects of covariates, along with intercept/baseline extinction risk.}
+  \label{fig:omega}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_marginal}
+  \caption{Marginal posterior distributions of the correlations between intercept terms/baseline extinction risk and the effects of each of the covariates. These are presented for both the exponential (left) and Weibull (right) models.}
+  \label{fig:corr}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/intercept_cohort}
+  \caption{Comparison of cohort-specific estimates of \(\beta_{0}\) presented along with the estimate for the overall baseline extinction risk. Points correspond to the median of the cohort-specific estimate, along with 80\% credible intervals. The horizontal line is the median estimate of the overall baseline extinction risk along with 80\% credible intervals. Results are presented for the exponential (top) and Weibull (bottom) models.}
+  \label{fig:cohort_intercept}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/range_cohort}
+  \caption{Comparison of cohort-specific estimates of the effect of geographic range on extinction risk \(\beta_{r}\) presented along with the estimate for the overall effect of geographic range. Points correspond to the median of the cohort-specific estimate, along with 80\% credible intervals. The horizontal line is the median estimate of the overall baseline extinction risk along with 80\% credible intervals. Results are presented for the exponential (top) and Weibull (bottom) models.}
+  \label{fig:cohort_range}
+\end{figure}
+
 
 \begin{sidewaysfigure}[ht]
   \centering
