@@ -15,7 +15,7 @@
 
 \subsection{Fossil occurrence information}
 
-The dataset analyzed here is derived from the a combination of the occurrence information from \citet{Foote2013} and the body size data from \citet{Payne2014}. The \citet{Foote2013} dataset is based on the Paleobiology Database (http://www.paleodb.org); see \citet{Foote2013} for a full description of the inclusion criterion. Additionally, epicontinental versus open ocean assignemnts for occurrence information are based on \citet{Miller2009a}.
+The dataset analyzed here is derived from the a combination of the occurrence information from \citet{Foote2013} and the body size data from \citet{Payne2014}. The \citet{Foote2013} dataset is based on the Paleobiology Database (http://www.paleodb.org); see \citet{Foote2013} for a full description of the inclusion criterion. Additionally, epicontinental versus open ocean assignemnts for occurrence information are based on \citet{Miller2009a}. \uppercase{note: I don't know how this may need to be updated.}
 
 Sampled occurrences were restricted to those with latitude and longitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Genera who's last appearance was in a stage preceding a mass extinction were right censored, and genera with a duration of only one stage and were left censored (see below for explanation of censoring). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v\)), and body size (\(m\)). 
 
@@ -133,8 +133,8 @@ Given all the above, the exponential model is then defined as
   \begin{aligned}
     y_{i} &\sim \mathrm{Exponential}(\lambda) \\
     \lambda_{i} &= \exp(\mathbf{X}_{i} B_{j[i]}) \\
-    B &\sim \mathrm{MVN}(\vec{\mu}, \Sigma_{B}) \\
-    \Sigma_{B} &= \text{Diag}(\vec{\tau}) \Omega_{B} \text{Diag}(\vec{\tau}) \\
+    B &\sim \mathrm{MVN}(\vec{\mu}, \Sigma) \\
+    \Sigma &= \text{Diag}(\vec{\tau}) \Omega \text{Diag}(\vec{\tau}) \\
     \mu_{\kappa} &\sim 
     \begin{cases} 
       \mathcal{N}(0, 5) & \text{if } k \neq r, or \\
@@ -150,8 +150,8 @@ The Weibull model is then also defined as
   \begin{aligned}
     y_{i} &\sim \mathrm{Weibull}(\alpha, \sigma) \\
     \sigma_{i} &= \exp\left(\frac{-(\mathbf{X}_{i} B_{j[i]})}{\alpha}\right) \\
-    B &\sim \mathrm{MVN}(\vec{\mu}, \Sigma_{B}) \\
-    \Sigma_{B} &= \text{Diag}(\vec{\tau}) \Omega_{B} \text{Diag}(\vec{\tau}) \\
+    B &\sim \mathrm{MVN}(\vec{\mu}, \Sigma) \\
+    \Sigma &= \text{Diag}(\vec{\tau}) \Omega \text{Diag}(\vec{\tau}) \\
     \alpha &\sim \mathrm{C^{+}}(2) \\
     \mu_{k} &\sim 
     \begin{cases} 
@@ -227,7 +227,7 @@ In order to compare the fitted model to the observed data, various graphical com
 
 The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. However, because the Weibull model reduces to the exponential model when \(\alpha = 1\) my interest is not in choosing between these models. Instead, comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}.
 
-WAIC can be considered a fully Bayesian alternative to the Akaike information criterion, where WAIC acts as an approximation of leave-one-out cross-validation which acts as a measure of out-of-sample predictive accuracy. WAIC is calculated starting with the log pointwise posterior predictive density calculated as
+WAIC can be considered a fully Bayesian alternative to the Akaike information criterion, where WAIC acts as an approximation of leave-one-out cross-validation which acts as a measure of out-of-sample predictive accuracy \citep{Gelman2013d}. WAIC is calculated starting with the log pointwise posterior predictive density calculated as
 \begin{equation}
   \mathrm{lppd} = \sum_{i = 1}^{n} \log \left(\frac{1}{S} \sum_{s = 1}^{S} p(y_{i}|\Theta^{S})\right),
   \label{eq:lppd}
@@ -244,7 +244,7 @@ Given both equations \ref{eq:lppd} and \ref{eq:pwaic}, WAIC is then calculated
   \mathrm{WAIC} = \mathrm{lppd} - p_{\mathrm{WAIC}}.
   \label{eq:waic}
 \end{equation}
-When comparing two or more models, lower WAIC values indicate better out-of-sample predictive accuracy. Importantly, WAIC is just one way of comparing models. When combined with posterior predictive checks it is possible to get a more complete understanding of model fit.
+When comparing two or more models, lower WAIC values indicate better out-of-sample predictive accuracy. Importantly, WAIC is just one way of comparing models. When combined with posterior predictive checks it is possible to get a more complete understanding of a model's fit to the data.
 
 \begin{figure}[ht]
   \centering

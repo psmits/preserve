@@ -251,11 +251,11 @@ mids$var <- rep(c('i', 'r', 'e', 'e2', 'm'), 2)
 mids$var <- factor(mids$var, levels = unique(mids$var))
 mids$mod <- rep(c('Exponential', 'Weibull'), each = 5)
 
-relab.x <- scale_x_discrete(labels = c('i' = expression(mu[intercept]), 
-                                       'r' = expression(mu[range]),
-                                       'e' = expression(mu[environment]), 
-                                       'e2' = expression(mu[environment^2]), 
-                                       'm' = expression(mu[size])))
+relab.x <- scale_x_discrete(labels = c('i' = expression(mu[0]), 
+                                       'r' = expression(mu[r]),
+                                       'e' = expression(mu[v]), 
+                                       'e2' = expression(mu[v^2]), 
+                                       'm' = expression(mu[m])))
 
 coef.mean <- ggplot(mids, aes(x = var, y = mid))
 coef.mean <- coef.mean + geom_hline(aes(yintercept = 0), 
@@ -264,10 +264,9 @@ coef.mean <- coef.mean + geom_pointrange(aes(ymin = bot, ymax = top,
                                              colour = mod), size = 0.75,
                                          position = position_jitter(width = 0.1, 
                                                                     height = 0))
-coef.mean <- coef.mean + relab.x + labs(x = '', y = expression(hat(mu)))
+coef.mean <- coef.mean + relab.x + labs(x = '', y = paste('Parameter estimate'))
 coef.mean <- coef.mean + scale_colour_manual(values = cbp, name = '')
 coef.mean <- coef.mean + theme(axis.text.y = element_text(size = 10),
-                               axis.title.y = element_text(angle = 0),
                                axis.text.x = element_text(size = 15),
                                legend.text = element_text(size = 10))
 ggsave(coef.mean, filename = '../doc/survival/figure/coef_means.png',
@@ -286,11 +285,11 @@ vars$var <- rep(c('i', 'r', 'e', 'e2', 'm'), 2)
 vars$var <- factor(vars$var, levels = unique(vars$var))
 vars$mod <- rep(c('Exponential', 'Weibull'), each = 5)
 
-relab.x <- scale_x_discrete(labels = c('i' = expression(tau[intercept]), 
-                                       'r' = expression(tau[range]),
-                                       'e' = expression(tau[environment]), 
-                                       'e2' = expression(tau[environment^2]), 
-                                       'm' = expression(tau[size])))
+relab.x <- scale_x_discrete(labels = c('i' = expression(tau[0]), 
+                                       'r' = expression(tau[r]),
+                                       'e' = expression(tau[v]), 
+                                       'e2' = expression(tau[v^2]), 
+                                       'm' = expression(tau[m])))
 
 coef.var <- ggplot(vars, aes(x = var, y = mid))
 coef.var <- coef.var + geom_hline(aes(yintercept = 0), 
@@ -299,10 +298,9 @@ coef.var <- coef.var + geom_pointrange(aes(ymin = bot, ymax = top,
                                            colour = mod), size = 0.75,
                                        position = position_jitter(width = 0.1, 
                                                                   height = 0))
-coef.var <- coef.var + relab.x + labs(x = '', y = expression(hat(tau)))
+coef.var <- coef.var + relab.x + labs(x = '', y = paste('Parameter estimate'))
 coef.var <- coef.var + scale_colour_manual(values = cbp, name = '')
 coef.var <- coef.var + theme(axis.text.y = element_text(size = 10),
-                             axis.title.y = element_text(angle = 0),
                              axis.text.x = element_text(size = 15),
                              legend.text = element_text(size = 10))
 ggsave(coef.var, filename = '../doc/survival/figure/coef_var.png',
@@ -351,7 +349,7 @@ tb.cv <- ggplot(baseline.covar, aes(x = value))
 tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
 tb.cv <- tb.cv + facet_grid(var ~ lab, labeller = label_parsed)
-tb.cv <- tv.cv + labs(x = 'Parameter estimate', y = 'Prob. Density')
+tb.cv <- tb.cv + labs(x = 'Parameter estimate', y = 'Prob. Density')
 ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.png',
        width = 10, height = 5)
 
@@ -415,7 +413,7 @@ base.line <- base.line + geom_segment(data = grand,
 base.line <- base.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 #base.line <- base.line + geom_line()
 base.line <- base.line + facet_grid(label ~ ., labeller = label_parsed)
-base.line <- base.line + labs(x = 'Stage', y = expression(beta[intercept]))
+base.line <- base.line + labs(x = 'Stage', y = expression(beta[0]))
 ggsave(base.line, filename = '../doc/survival/figure/intercept_cohort.png',
        width = 10, height = 5)
 
@@ -479,7 +477,7 @@ rage.line <- rage.line + geom_segment(data = grand,
 rage.line <- rage.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 #rage.line <- rage.line + geom_line()
 rage.line <- rage.line + facet_grid(label ~ ., labeller = label_parsed)
-rage.line <- rage.line + labs(x = 'Stage', y = expression(beta[range]))
+rage.line <- rage.line + labs(x = 'Stage', y = expression(beta[r]))
 ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.png',
        width = 10, height = 5)
 
