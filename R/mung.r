@@ -21,7 +21,7 @@ sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya',
                             'Malacostraca', 'Echinoidea', 'Gymnolaemata', 
                             'Demospongea', 'Chondrichthyes'))
 
-
+# sort.data -- prep data for survival analysis
 # start function here, runs all the way to the end of the file
 # argument: bibr data frame for all the general occurrence shit
 # argument: payne body size data
@@ -31,18 +31,18 @@ sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya',
 #
 # this function cleans the data completely as document in my mung routine
 # at the end, spit out the sepkoski.data file
-
 sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
 
   # i need to have good bin information, either stage 10my or fr2my
   bins <- c('collections.stage')
+  bibr$collections.stage <- as.character(bibr$collections.stage)
+  bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
+  
   bibr <- bibr[!is.na(bibr[, bins]), ]
   bibr <- bibr[!is.na(bibr$EO_5_1_2014), ]
   bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
   bibr <- bibr[!is.na(bibr$collections.paleolatdec), ]
   bibr <- bibr[bibr$collections.stage %in% gts, ] 
-  bibr$collections.stage <- as.character(bibr$collections.stage)
-  bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
 
   paleozoic <- gts[which(gts == 'Changhsingian'):length(gts)]
   bibr <- bibr[bibr$collections.stage %in% paleozoic, ]
@@ -215,4 +215,44 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
   sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
   sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]
   sepkoski.data
+}
+
+
+# space.time -- prep data for state-space model
+space.time <- function(bibr, taxon = 'Rhynchonellata', gts = gts) {
+  # i need to have good bin information, either stage 10my or fr2my
+  #bibr <- fossil
+  bins <- c('collections.stage')
+  bibr$collections.stage <- as.character(bibr$collections.stage)
+  bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
+  bibr <- bibr[bibr$occurrences.class_name == taxon, ]
+ 
+  to.rm <- apply(is.na(bibr[, c('occurrences.genus_name', 
+                                'collections.stage', 
+                                'collections.paleolngdec', 
+                                'collections.paleolatdec')]), 
+                 1, any)
+  bibr <- bibr[!to.rm, ]
+  bibr <- bibr[bibr$collections.stage %in% gts, ] 
+  paleozoic <- gts[which(gts == 'Changhsingian'):length(gts)]
+                   #which(gts == 'Asselian')]
+  bibr <- bibr[bibr$collections.stage %in% paleozoic, ]
+
+  # to do this by province 
+  #   identify bioprovinces
+  #   assign taxa to provinces
+  #   each row corresponds to a taxons occurrence in a province
+  #   have province indicator
+  #   have taxon indicator
+
+  working <- bibr[, c('occurrences.genus_name', 'collections.stage')]
+  occ <- dcast(working, occurrences.genus_name ~ collections.stage)
+  occ <- apply(occ[, -1], 2, function(x) {
+               cc <- x > 0
+               x[cc] <- 1
+               x})
+  ord <- match(colnames(occ), paleozoic)
+  ord <- mapvalues(ord, from = unique(ord), to = rank(unique(ord)))
+  occ <- occ[, ord]
+  occ
 }
