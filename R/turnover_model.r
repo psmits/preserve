@@ -6,9 +6,10 @@ source('../R/mung.r')
 
 data.file <- list.files('../data', pattern = 'Occs')
 fossil <- read.csv(paste0('../data/', data.file))
+shape <- readShapeSpatial('../data/ne_10m_coastline.shp')  # from natural earth
 bibr <- fossil
 
-sight <- space.time(bibr, gts = gts)
+sight <- space.time(bibr, gts = gts, shape = shape)
 
 num <- nrow(sight)
 tim <- ncol(sight)

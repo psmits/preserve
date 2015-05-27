@@ -3,6 +3,7 @@ library(arm)
 library(plyr)
 library(stringr)
 library(raster)
+library(igraph)
 library(sp)
 library(dismo)
 library(XML)
@@ -219,8 +220,9 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
 
 
 # space.time -- prep data for state-space model
-space.time <- function(bibr, taxon = 'Rhynchonellata', gts = gts) {
+space.time <- function(bibr, taxon = 'Rhynchonellata', gts = gts, shape) {
   # i need to have good bin information, either stage 10my or fr2my
+  #taxon <- 'Rhynchonellata'
   #bibr <- fossil
   bins <- c('collections.stage')
   bibr$collections.stage <- as.character(bibr$collections.stage)
@@ -239,11 +241,48 @@ space.time <- function(bibr, taxon = 'Rhynchonellata', gts = gts) {
   bibr <- bibr[bibr$collections.stage %in% paleozoic, ]
 
   # to do this by province 
-  #   identify bioprovinces
-  #   assign taxa to provinces
-  #   each row corresponds to a taxons occurrence in a province
-  #   have province indicator
-  #   have taxon indicator
+  # geographic position
+  eq <- CRS("+proj=cea +lat_0=0 +lon_0=0 +lat_ts=30 +a=6371228.0 +units=m")
+  proj4string(shape) <- eq
+  spatialref <- SpatialPoints(coords = bibr[, c('collections.paleolngdec', 
+                                                'collections.paleolatdec')], 
+                              proj4string = eq)  # wgs1984.proj
+  r <- raster(shape, nrows = 50, ncols = 50)
+  sp.ras <- rasterize(spatialref, r)
+  bibr$membership <- cellFromXY(sp.ras, xy = bibr[, c('collections.lngdec', 
+                                                      'collections.latdec')])
+  # identify bioprovinces
+  cooc <- bibr[, c('occurrences.genus_name', 'membership')]
+  g <- graph.data.frame(cooc, directed = FALSE)
+  V(g)$type <- V(g)$name %in% unique(cooc[, 2])
+  mapcom <- infomap.community(g, nb.trials = 1000)
+  
+  cg <- contract.vertices(g, membership(mapcom))
+  E(cg)$weight <- 1
+  cg <- simplify(cg, remove.loops = FALSE)
+  cgcom <- infomap.community(cg, nb.trials = 1000)
+  
+  # what community do the originals belong to?
+  # what community do the second level belong to?
+  members <- taxon.member <- loc.member <- list()
+  taxa <- which(str_detect(V(g)$name, '[A-Za-z]'))
+  loc <- which(str_detect(V(g)$name, '[0-9]'))
+  for(ii in seq(length(communities(cgcom)))) {
+    members[[ii]] <- unlist(communities(mapcom)[communities(cgcom)[[ii]]])
+    taxon.member[[ii]] <- members[[ii]][members[[ii]] %in% taxa]
+    loc.member[[ii]] <- members[[ii]][members[[ii]] %in% loc]
+  }
+  # assign taxa to provinces
+  second.member <- rep(seq(length(members)), times = laply(members, length))
+  cg2 <- contract.vertices(cg, membership(cgcom))
+  E(cg2)$weight <- 1
+  cg3 <- simplify(cg2, remove.loops = TRUE)
+  E(cg3)$weight <- degree(cg2)
+  # TODO
+
+  # each row corresponds to a taxons occurrence in a province
+  # have province indicator
+  # have taxon indicator
 
   working <- bibr[, c('occurrences.genus_name', 'collections.stage')]
   occ <- dcast(working, occurrences.genus_name ~ collections.stage)
