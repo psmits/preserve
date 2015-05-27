@@ -1,12 +1,12 @@
 #!/bin/bash
 # all taxa models
 # switch to just the fauna models
-FILES=../data/data_dump/sight*
+FILES=../data/data_dump/sim_info*
 for f in $FILES;
 do
   for i in `seq 1 4`;
   do
-    ./turnover_model sample num_samples=1000 num_warmup=1000 \
+    ./turnover_simple sample num_samples=2000 num_warmup=2000 \
       random seed=420 \
       id=$i \
       data file=$f \
