@@ -155,8 +155,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
 
   # get species duration along with if died in stage before/of mass extinction
   wh.stage <- llply(off, names)
-  mass.ext <- c('Masstrichtian', 'Rhaetian', 'Changhsingian', 
-                'Frasnian', 'Hirnantian', 'Calabrian')
+  mass.ext <- 'Changhsingian'
   in.mass <- llply(wh.stage, function(x) x %in% mass.ext)
   censored <- laply(in.mass, function(x) {
                     o <- c()

@@ -8,6 +8,7 @@ parameters {
   vector[T - 1] phi_norm;
   vector[T] gamma_norm;
   real<lower=0> scales[3];
+  real mu[3];
 }
 transformed parameters {
   vector<lower=0,upper=1>[T] p;
@@ -34,15 +35,22 @@ model {
       gamma[t] * k;
   }
   
+  mu[1] ~ normal(0, 1);
+  mu[2] ~ normal(0, 1);
+  mu[3] ~ normal(0, 1);
   scales[1] ~ cauchy(0, 1);
   scales[2] ~ cauchy(0, 1);
   scales[3] ~ cauchy(0, 1);
+  # replace with:
+  #   multi_normal(mu, Sigma);
+  #   Sigma <- diag(scales) * Omega * diag(scales);
+  #   Omega ~ LKJ_corr(2);
   for(t in 1:T) {
-    p_norm[t] ~ normal(0, scales[1]);
+    p_norm[t] ~ normal(mu[1], scales[1]);
     if(t < T) {
-      phi_norm[t] ~ normal(0, scales[2]);
+      phi_norm[t] ~ normal(mu[2], scales[2]);
     }
-    gamma_norm[t] ~ normal(0, scales[3]);
+    gamma_norm[t] ~ normal(mu[3], scales[3]);
   }
   
   for(n in 1:N) {
