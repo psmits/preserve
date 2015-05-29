@@ -7,52 +7,62 @@ source('../R/mung.r')
 data.file <- list.files('../data', pattern = 'Occs')
 fossil <- read.csv(paste0('../data/', data.file))
 bibr <- fossil
+
+lump.file <- list.files('../data', pattern = 'lump')
+lump <- read.csv(paste0('../data/', lump.file))
+
 payne <- read.table('../data/payne_bodysize/Occurrence_PaleoDB.txt',
                     header = TRUE, stringsAsFactors = FALSE)
-sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', gts)
+sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
+                           bins = 'collections.stage', gts = gts,
+                           cuts = 'Changhsingian')
+short.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
+                        bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
+                        gts = rev(as.character(lump[, 2])),
+                        cuts = 'Chang')
 
 # sepkoski.data
-num.samp <- nrow(sepkoski.data)
+num.samp <- nrow(short.data)
 
-con.orig <- match(as.character(sepkoski.data$orig), gts)
+con.orig <- match(as.character(short.data$orig), gts)
 con.orig <- mapvalues(con.orig, from = unique(con.orig), 
                       to = rank(unique(con.orig)))
 num.orig <- length(unique(con.orig))
 
-con.class <- as.numeric(as.factor(sepkoski.data$class))
-num.class <- length(unique(sepkoski.data$class))
+con.class <- as.numeric(as.factor(short.data$class))
+num.class <- length(unique(short.data$class))
 
 
-sum((sepkoski.data$epi + sepkoski.data$off) < 10) / nrow(sepkoski.data)
+sum((short.data$epi + short.data$off) < 10) / nrow(short.data)
 # beta distribution of genus envrionmental occurrence
-a <- sepkoski.data$epi
-a2 <- sepkoski.data$epi.bck
-b <- sepkoski.data$off
-b2 <- sepkoski.data$off.bck
+a <- short.data$epi
+a2 <- short.data$epi.bck
+b <- short.data$off
+b2 <- short.data$off.bck
 tax.ml <- ((a + 1) - 1) / ((a + 1) + (b + 1) - 2)
 bck.ml <- ((a2 + 1) - 1) / ((a2 + 1) + (b2 + 1) - 2)
 env.ml <- tax.ml - bck.ml
 
 ## beta distribution of genus lithological occurrence
-a <- sepkoski.data$car
-b <- sepkoski.data$cla
-a2 <- sepkoski.data$car.bck
-b2 <- sepkoski.data$cla.bck
+a <- short.data$car
+b <- short.data$cla
+a2 <- short.data$car.bck
+b2 <- short.data$cla.bck
 tax.ml <- ((a + 1) - 1) / ((a + 1) + (b + 1) - 2)
 bck.ml <- ((a2 + 1) - 1) / ((a2 + 1) + (b2 + 1) - 2)
 lit.ml <- tax.ml - bck.ml
 
 # do it so i can propegate error
-idv.epi <- sepkoski.data$epi
-idv.off <- sepkoski.data$off
-tot.epi <- sepkoski.data$epi.bck
-tot.off <- sepkoski.data$off.bck
-idv.car <- sepkoski.data$car
-idv.cla <- sepkoski.data$cla
-tot.car <- sepkoski.data$car.bck
-tot.cla <- sepkoski.data$cla.bck
+idv.epi <- short.data$epi
+idv.off <- short.data$off
+tot.epi <- short.data$epi.bck
+tot.off <- short.data$off.bck
+idv.car <- short.data$car
+idv.cla <- short.data$cla
+tot.car <- short.data$car.bck
+tot.cla <- short.data$cla.bck
 
-data <- list(duration = sepkoski.data$duration, group = con.class,
+data <- list(duration = short.data$duration, group = con.class,
              cohort = con.orig, 
              env = env.ml,
              lit = lit.ml,
@@ -60,10 +70,10 @@ data <- list(duration = sepkoski.data$duration, group = con.class,
              epi.bck = tot.epi, off.bck = tot.off,
              car = idv.car, cla = idv.cla, 
              car.bck = tot.car, cla.bck = tot.cla,
-             occupy = rescale(logit(sepkoski.data$occupy)),
-             size = rescale(log(sepkoski.data$size)))
+             occupy = rescale(logit(short.data$occupy)),
+             size = rescale(log(short.data$size)))
 
-dead <- sepkoski.data$censored != 1
+dead <- short.data$censored != 1
 unc <- llply(data, function(x) x[dead])
 cen <- llply(data, function(x) x[!dead])
 

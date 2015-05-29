@@ -27,26 +27,29 @@ sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya',
 # argument: bibr data frame for all the general occurrence shit
 # argument: payne body size data
 # argument: taxonomic group
-# argument: gts global temporal scale by stages
+# argument: binning scheme being used
+# argument: gts global temporal scale for the bins
+# argument: cuts where the mass ext is
 # (argument: temporal unit; currently it is set up for pre-P/T boundary)
 #
 # this function cleans the data completely as document in my mung routine
 # at the end, spit out the sepkoski.data file
-sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
+sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', 
+                      bins = 'collections.stage', gts = gts,
+                      cuts = 'Changhsingian') {
 
   # i need to have good bin information, either stage 10my or fr2my
-  bins <- c('collections.stage')
-  bibr$collections.stage <- as.character(bibr$collections.stage)
+  bibr[, bins] <- as.character(bibr[, bins])
   bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
   
   bibr <- bibr[!is.na(bibr[, bins]), ]
   bibr <- bibr[!is.na(bibr$EO_5_1_2014), ]
   bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
   bibr <- bibr[!is.na(bibr$collections.paleolatdec), ]
-  bibr <- bibr[bibr$collections.stage %in% gts, ] 
+  bibr <- bibr[bibr[, bins] %in% gts, ] 
 
-  paleozoic <- gts[which(gts == 'Changhsingian'):length(gts)]
-  bibr <- bibr[bibr$collections.stage %in% paleozoic, ]
+  paleozoic <- gts[which(gts == cuts):length(gts)]
+  bibr <- bibr[bibr[, bins] %in% paleozoic, ]
 
   bibr <- bibr[bibr$occurrences.class_name == taxon, ]
   bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
@@ -61,15 +64,15 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
   bibr <- bibr[!(bibr$collections.lithology1 %in% c('', 'mixed')), ]
 
   # this section is all about finding duration
-  collec.stage <- table(bibr$collections.stage)
+  collec.stage <- table(bibr[, bins])
   find.dur <- function(x) {
-    mm <- which(gts %in% unique(x$collections.stage))
+    mm <- which(gts %in% unique(x[, bins]))
     max(mm) - min(mm) + 1
   }
   # generic duration
   taxon.age <- ddply(bibr, .(occurrences.genus_name), find.dur)
   taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
-                       table(x$collections.stage)})
+                       table(x[, bins])})
   taxon.nstage <- unlist(llply(taxon.occur, length))
 
   nzero <- taxon.age[, 2] - taxon.nstage
@@ -85,6 +88,9 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
   sp.ras <- rasterize(spatialref, r)
   bibr$membership <- cellFromXY(sp.ras, xy = bibr[, c('collections.lngdec', 
                                                       'collections.latdec')])
+
+  # fixes here
+  names(bibr)[names(bibr) == bins] <- 'collections.stage'
   ncell <- ddply(bibr, .(occurrences.genus_name, collections.stage), 
                  summarize, tt = length(unique(membership)))
   big.ncell <- ddply(bibr, .(collections.stage), summarize,
@@ -155,7 +161,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', gts = gts) {
 
   # get species duration along with if died in stage before/of mass extinction
   wh.stage <- llply(off, names)
-  mass.ext <- 'Changhsingian'
+  mass.ext <- cuts
   in.mass <- llply(wh.stage, function(x) x %in% mass.ext)
   censored <- laply(in.mass, function(x) {
                     o <- c()
@@ -235,7 +241,7 @@ space.time <- function(bibr, taxon = 'Rhynchonellata', gts = gts, shape) {
                  1, any)
   bibr <- bibr[!to.rm, ]
   bibr <- bibr[bibr$collections.stage %in% gts, ] 
-  paleozoic <- gts[which(gts == 'Changhsingian'):length(gts)]
+  paleozoic <- gts[which(gts == cuts):length(gts)]
                    #which(gts == 'Asselian')]
   bibr <- bibr[bibr$collections.stage %in% paleozoic, ]
 
