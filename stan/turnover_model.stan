@@ -1,61 +1,103 @@
+functions {
+  int first_capture(int[] y_i) {
+    for (k in 1:size(y_i))
+      if (y_i[k])
+        return k;
+    return 0;
+  }
+  int last_capture(int[] y_i) {
+    for (k_rev in 0:(size(y_i) - 1)) {
+      int k;
+      k <- size(y_i) - k_rev;
+      if (y_i[k])
+        return k;
+    }
+    return 0;
+  }
+  int foo(int fc, int s, int lc) {
+    return fc * max(1, s - lc);
+  }
+  real state_space_log(int[] y, vector phi, vector p, vector gamma) {
+    int ft;
+    int lt;
+    int S;
+    vector[foo(first_capture(y), size(y), last_capture(y))] lp;
+    int i;
+
+    ft <- first_capture(y);
+    lt <- last_capture(y);
+    S <- size(y);
+    i <- 1;
+
+    for(t_first_alive in 1:ft) {
+      for (t_last_alive in lt:S) {
+        real sl;
+        int z[S];
+
+        for(l in 1:S) {
+          z[l] <- 0;
+        }
+        for(a in t_first_alive:t_last_alive) {
+          z[a] <- 1;
+        }
+
+        sl <- bernoulli_log(z[1], gamma[1]);
+        for(j in 2:S) {
+          sl <- sl + bernoulli_log(z[j], (z[j - 1] * phi[j - 1]) + 
+              (gamma[j] * (1 - z[j - 1])));
+        }
+        for(k in 1:S) {
+          sl <- sl + bernoulli_log(y[k], z[k] * p[k]);
+        }
+
+        lp[i] <- sl;
+        i <- i + 1;
+      }
+    }
+    return log_sum_exp(lp);
+  }
+}
 data {
   int N;
   int T;
   int sight[N, T];
 }
 parameters {
-  vector[T] p_norm;
-  vector[T - 1] phi_norm;
-  vector[T] gamma_norm;
-  real<lower=0> scales[3];
-  real mu[3];
+  vector[T - 1] phi_logit;
+  vector[T] p_logit;
+  vector[T] gamma_logit;
+  real phi_mu;
+  real p_mu;
+  real gamma_mu;
+  real<lower=0> phi_scale;
+  real<lower=0> p_scale;
+  real<lower=0> gamma_scale;
 }
 transformed parameters {
-  vector<lower=0,upper=1>[T] p;
   vector<lower=0,upper=1>[T - 1] phi;
+  vector<lower=0,upper=1>[T] p;
   vector<lower=0,upper=1>[T] gamma;
 
   for(t in 1:T) {
-    p[t] <- inv_logit(p_norm[t]);
     if(t < T) {
-      phi[t] <- inv_logit(phi_norm[t]);
+      phi[t] <- inv_logit(phi_logit[t]);
     }
-    gamma[t] <- inv_logit(gamma_norm[t]);
+    p[t] <- inv_logit(p_logit[t]);
+    gamma[t] <- inv_logit(gamma_logit[t]);
   }
 }
 model {
-  real run_prob[T];
-  real k;
-  k <- 1;
-  
-  run_prob[1] <- gamma[1];
-  for(t in 2:T) {
-    k <- k * (1 - run_prob[t - 1]);
-    run_prob[t] <- run_prob[t - 1] * phi[t - 1] + 
-      gamma[t] * k;
-  }
-  
-  mu[1] ~ normal(0, 1);
-  mu[2] ~ normal(0, 1);
-  mu[3] ~ normal(0, 1);
-  scales[1] ~ cauchy(0, 1);
-  scales[2] ~ cauchy(0, 1);
-  scales[3] ~ cauchy(0, 1);
-  # replace with:
-  #   multi_normal(mu, Sigma);
-  #   Sigma <- diag(scales) * Omega * diag(scales);
-  #   Omega ~ LKJ_corr(2);
-  for(t in 1:T) {
-    p_norm[t] ~ normal(mu[1], scales[1]);
-    if(t < T) {
-      phi_norm[t] ~ normal(mu[2], scales[2]);
-    }
-    gamma_norm[t] ~ normal(mu[3], scales[3]);
-  }
-  
+  phi_logit ~ normal(phi_mu, phi_scale);
+  phi_mu ~ normal(0, 1);
+  phi_scale ~ cauchy(0, 1);
+  p_logit ~ normal(p_mu, p_scale);
+  p_mu ~ normal(0, 1);
+  p_scale ~ cauchy(0, 1);
+  gamma_logit ~ normal(gamma_mu, gamma_scale);
+  gamma_mu ~ normal(0, 1);
+  gamma_scale ~ cauchy(0, 1);
+
   for(n in 1:N) {
-    for(t in 1:T) {
-      sight[n, t] ~ bernoulli(p[t] * run_prob[t]);
-    }
+    sight[n] ~ state_space(phi, p, gamma);
   }
 }
