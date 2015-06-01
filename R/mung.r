@@ -90,15 +90,15 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
                                                       'collections.latdec')])
 
   # fixes here
-  names(bibr)[names(bibr) == bins] <- 'collections.stage'
-  ncell <- ddply(bibr, .(occurrences.genus_name, collections.stage), 
+  names(bibr)[names(bibr) == bins] <- 'colstage'
+  ncell <- ddply(bibr, .(occurrences.genus_name, colstage), 
                  summarize, tt = length(unique(membership)))
-  big.ncell <- ddply(bibr, .(collections.stage), summarize,
+  big.ncell <- ddply(bibr, .(colstage), summarize,
                      total = length(unique(membership)))
 
   ncell.bygenus <- split(ncell, ncell$occurrences.genus_name)
   occupy <- llply(ncell.bygenus, function(x) {
-                  xx <- match(x[, 2], big.ncell$collections.stage)
+                  xx <- match(x[, 2], big.ncell$colstage)
                   xx <- x$tt / big.ncell[xx, 2]
                   mean(xx)})
 
@@ -109,7 +109,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
                  epi = sum(EO_5_1_2014 == 'E'),
                  off = sum(EO_5_1_2014 == 'O'))
   # now for each stage, get the epi and off
-  big.onoff <- ddply(bibr, .(collections.stage), summarize,
+  big.onoff <- ddply(bibr, .(colstage), summarize,
                      epi = sum(EO_5_1_2014 == 'E'),
                      off = sum(EO_5_1_2014 == 'O'))
   for(ii in seq(length(taxon.occur))) {
@@ -127,7 +127,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
                  carbonate = sum(collections.lithology1 == 'carbonate'),
                  clastic = sum(collections.lithology1 == 'clastic'))
   # now for each stage, get the epi and off
-  big.litho <- ddply(bibr, .(collections.stage), summarize,
+  big.litho <- ddply(bibr, .(colstage), summarize,
                      carbonate = sum(collections.lithology1 == 'carbonate'),
                      clastic = sum(collections.lithology1 == 'clastic'))
   for(ii in seq(length(taxon.occur))) {
@@ -240,6 +240,7 @@ space.time <- function(bibr, taxon = 'Rhynchonellata', gts = gts, shape) {
                                 'collections.paleolatdec')]), 
                  1, any)
   bibr <- bibr[!to.rm, ]
+  cuts <- 'Changhsingian'
   bibr <- bibr[bibr$collections.stage %in% gts, ] 
   paleozoic <- gts[which(gts == cuts):length(gts)]
                    #which(gts == 'Asselian')]

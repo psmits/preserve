@@ -7,7 +7,6 @@ library(rstan)
 library(survival)
 library(stringr)
 library(grid)
-source('../R/gts.r')
 source('../R/waic.r')
 source('../R/mung.r')
 source('../R/multiplot.r')
@@ -19,7 +18,15 @@ fossil <- read.csv(paste0('../data/', data.file))
 bibr <- fossil
 payne <- read.table('../data/payne_bodysize/Occurrence_PaleoDB.txt',
                     header = TRUE, stringsAsFactors = FALSE)
-sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', gts)
+
+lump.file <- list.files('../data', pattern = 'lump')
+lump <- read.csv(paste0('../data/', lump.file))
+gts <- rev(as.character(lump[, 2]))
+
+short.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
+                        bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
+                        gts = gts,
+                        cuts = 'Chang')
 
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
@@ -512,7 +519,8 @@ ggsave(quad, filename = '../doc/survival/figure/environ_quad.png',
 # cohort one
 renum <- sort(unique(mapvalues(coh, 
                                from = unique(coh), 
-                               unique(match(as.character(sepkoski.data$orig), gts)))))
+                               unique(match(as.character(sepkoski.data$orig),
+                                            gts)))))
 rename <- gts[renum]
 sam <- sample(nrow(exp.fit$mu_prior), 1000)
 coef.list <- list()
@@ -553,7 +561,7 @@ png(filename = '../doc/survival/figure/cohort_quads.png',
     width = 3000, height = 1500)
 multiplot(plotlist = plotlist, 
           layout = matrix(c(rev(seq(unique(coh))), NA), 
-                          ncol = 8, byrow = TRUE))
+                          ncol = 7, byrow = TRUE))
 dev.off()
 
 # do the derivative of the coefficients; get the inflection points

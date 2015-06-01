@@ -9,6 +9,7 @@ generate.capture <- function(tt = 30, surv = 0.3, gg = 0.3, samp = 0.3) {
   present <- c()
   run.prob <- c()
   alive <- c()
+  present <- c()
   k <- 1
   for(ii in seq(tt)) {
     if(ii == 1) {
@@ -17,15 +18,21 @@ generate.capture <- function(tt = 30, surv = 0.3, gg = 0.3, samp = 0.3) {
       k <- k * (1 - run.prob[ii - 1])
       run.prob[ii] <- run.prob[ii - 1] * surv + gg * k
     }
-    alive[ii] <- runif(1) <= run.prob[ii] * samp
+    alive[ii] <- runif(1) <= run.prob[ii]
+    if(alive) {
+      present[ii] <- ifelse(runif(1) <= samp, 1, 0)
+    } else {
+      present[ii] <- 0
+    }
   }
-  out <- list(alive = as.numeric(alive), 
+  out <- list(present = present,
+              alive = as.numeric(alive), 
               run.prob = run.prob)
   out
 }
 
 sims <- replicate(nsim, expr = {generate.capture()}, simplify = FALSE)
-record <- Reduce(rbind, llply(sims, function(x) x$alive))
+record <- Reduce(rbind, llply(sims, function(x) x$present))
 
 num <- nrow(record)
 tim <- ncol(record)

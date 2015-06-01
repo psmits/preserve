@@ -24,7 +24,7 @@ short.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
 # sepkoski.data
 num.samp <- nrow(short.data)
 
-con.orig <- match(as.character(short.data$orig), gts)
+con.orig <- match(as.character(short.data$orig), rev(as.character(lump[, 2])))
 con.orig <- mapvalues(con.orig, from = unique(con.orig), 
                       to = rank(unique(con.orig)))
 num.orig <- length(unique(con.orig))
@@ -33,7 +33,7 @@ con.class <- as.numeric(as.factor(short.data$class))
 num.class <- length(unique(short.data$class))
 
 
-sum((short.data$epi + short.data$off) < 10) / nrow(short.data)
+#sum((short.data$epi + short.data$off) < 10) / nrow(short.data)
 # beta distribution of genus envrionmental occurrence
 a <- short.data$epi
 a2 <- short.data$epi.bck
@@ -122,7 +122,7 @@ data$C <- num.class
 with(data, {stan_rdump(list = c('dur_unc', 'group_unc', 'cohort_unc', 
                                 'N_unc', 'dur_cen', 'group_cen', 
                                 'cohort_cen', 'N_cen', 'samp_unc', 
-                                'samp_cen', 'N', 'O', 'R', 'C', 'F',
+                                'samp_cen', 'N', 'O', 'C', 'F',
                                 'occupy_unc', 'occupy_cen',
                                 'env_unc', 'env_cen',
                                 'lit_unc', 'lit_cen',
