@@ -19,7 +19,7 @@ devonian <- c('Famennian', 'Frasnian', 'Givetian', 'Eifilian', 'Emsian',
 silurian <- c('Ludfordian', 'Gorstian', 'Homerian', 'Sheinwoodian', 
               'Telychian', 'Aeronian', 'Rhuddanian')
 ordovician <- c('Hirnantian', 'Katian', 'Sandbian', 'Darriwilian', 
-                'Dapingian', 'Floian', 'Termadocian')
+                'Dapingian', 'Floian', 'Tremadocian')
 
 gts <- c(cenozoic, mesozoic, permian, carboniferous, 
          devonian, silurian, ordovician)

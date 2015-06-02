@@ -36,8 +36,12 @@ sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya',
 # at the end, spit out the sepkoski.data file
 sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', 
                       bins = 'collections.stage', gts = gts,
-                      cuts = 'Changhsingian') {
+                      cuts = 'Changhsingian',
+                      bot = 'Tremadocian') {
 
+  # bibr <- fossil
+  # taxon <- 'Rhynchonellata'; bins <- 'StageNewOrdSplitNoriRhae20Nov2013'
+  # gts <- rev(as.character(lump[, 2])); cuts <- 'Chang'; bot <- 'Trem'
   # i need to have good bin information, either stage 10my or fr2my
   bibr[, bins] <- as.character(bibr[, bins])
   bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
@@ -46,23 +50,41 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   bibr <- bibr[!is.na(bibr$EO_5_1_2014), ]
   bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
   bibr <- bibr[!is.na(bibr$collections.paleolatdec), ]
-  bibr <- bibr[bibr[, bins] %in% gts, ] 
-
-  paleozoic <- gts[which(gts == cuts):length(gts)]
-  bibr <- bibr[bibr[, bins] %in% paleozoic, ]
 
   bibr <- bibr[bibr$occurrences.class_name == taxon, ]
   bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
 
-  # lithology
-  # high chance of removing occurrences
-  bibr$collections.lithology1 <- as.character(bibr$collections.lithology1)
-  bibr <- bibr[!is.na(bibr$collections.lithology1), ]
-  lith <- bibr$collections.lithology1
-  lith <- gsub(pattern = '[\\"?]', replacement = '', lith, perl = TRUE)
-  bibr$collections.lithology1 <- clean.lith(lith)
-  bibr <- bibr[!(bibr$collections.lithology1 %in% c('', 'mixed')), ]
+  ## lithology
+  ## high chance of removing occurrences
+  #bibr$collections.lithology1 <- as.character(bibr$collections.lithology1)
+  #bibr <- bibr[!is.na(bibr$collections.lithology1), ]
+  #lith <- bibr$collections.lithology1
+  #lith <- gsub(pattern = '[\\"?]', replacement = '', lith, perl = TRUE)
+  #bibr$collections.lithology1 <- clean.lith(lith)
+  #bibr <- bibr[!(bibr$collections.lithology1 %in% c('', 'mixed')), ]
 
+  #bibr <- bibr[bibr[, bins] %in% gts, ] 
+
+  straight.occ <- dlply(bibr, .(occurrences.genus_name), 
+                        function(x) unique(x[, bins]))
+  # find out which range into the paleozoic
+  too.old <- names(which(laply(straight.occ, function(x) 
+                               any(which(gts %in% x) > which(gts == bot)))))
+  # never in the paleozoic
+  too.young <- names(which(laply(straight.occ, function(x) 
+                                 all(which(gts %in% x) < which(gts == cuts)))))
+  # remove those
+  bibr <- bibr[!(bibr$occurrences.genus_name %in% c(too.old, too.young)), ]
+  
+  # find out which range out of the paleozoic
+  straight.occ <- dlply(bibr, .(occurrences.genus_name), 
+                        function(x) unique(x[, bins]))
+  survivors <- names(which(laply(straight.occ, function(x) 
+                                 any(which(gts %in% x) < which(gts == cuts)))))
+ 
+  paleozoic <- gts[which(gts == cuts):which(gts == bot)]
+  bibr <- bibr[bibr[, bins] %in% paleozoic, ]
+  
   # this section is all about finding duration
   collec.stage <- table(bibr[, bins])
   find.dur <- function(x) {
@@ -71,6 +93,13 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   }
   # generic duration
   taxon.age <- ddply(bibr, .(occurrences.genus_name), find.dur)
+  spot.fix <- split(bibr[, bins], bibr$occurrences.genus_name)
+  spot.fix <- spot.fix[names(spot.fix) %in% survivors]
+  spot.fix <- llply(spot.fix, function(x) 
+                    max(which(gts %in% unique(x))) - which(gts %in% cuts) + 1)
+  spot.fix <- melt(spot.fix)
+  taxon.age[taxon.age[, 1] %in% spot.fix[, 2], 2] <- spot.fix[, 1]
+
   taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
                        table(x[, bins])})
   taxon.nstage <- unlist(llply(taxon.occur, length))
@@ -122,23 +151,23 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
     onoff[ii, 5] <- off.back
   }
 
-  # do the above based on lithology
-  litho <- ddply(bibr, .(occurrences.genus_name), summarize,
-                 carbonate = sum(collections.lithology1 == 'carbonate'),
-                 clastic = sum(collections.lithology1 == 'clastic'))
-  # now for each stage, get the epi and off
-  big.litho <- ddply(bibr, .(colstage), summarize,
-                     carbonate = sum(collections.lithology1 == 'carbonate'),
-                     clastic = sum(collections.lithology1 == 'clastic'))
-  for(ii in seq(length(taxon.occur))) {
-    app <- which(gts %in% names(taxon.occur[[ii]]))
-    wh <- gts[seq(min(app), max(app))]
-    background <- big.litho[big.litho[, 1] %in% wh, ]
-    car.back <- sum(background$car) - litho[ii, 2]
-    cla.back <- sum(background$cla) - litho[ii, 3]
-    litho[ii, 4] <- car.back
-    litho[ii, 5] <- cla.back
-  }
+  ## do the above based on lithology
+  #litho <- ddply(bibr, .(occurrences.genus_name), summarize,
+  #               carbonate = sum(collections.lithology1 == 'carbonate'),
+  #               clastic = sum(collections.lithology1 == 'clastic'))
+  ## now for each stage, get the epi and off
+  #big.litho <- ddply(bibr, .(colstage), summarize,
+  #                   carbonate = sum(collections.lithology1 == 'carbonate'),
+  #                   clastic = sum(collections.lithology1 == 'clastic'))
+  #for(ii in seq(length(taxon.occur))) {
+  #  app <- which(gts %in% names(taxon.occur[[ii]]))
+  #  wh <- gts[seq(min(app), max(app))]
+  #  background <- big.litho[big.litho[, 1] %in% wh, ]
+  #  car.back <- sum(background$car) - litho[ii, 2]
+  #  cla.back <- sum(background$cla) - litho[ii, 3]
+  #  litho[ii, 4] <- car.back
+  #  litho[ii, 5] <- cla.back
+  #}
 
 
   # the number of collections to offset each observation by 
@@ -171,15 +200,16 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
                       o <- 0
                     }
                     o})
+  censored[which(names(off) %in% survivors)] <- 1
+
   orig <- laply(wh.stage, function(x) rev(gts[gts %in% x])[1])
   age.order <- llply(orig, function(x) which(gts %in% x))
   big.dead <- which(gts %in% mass.ext)
   regime <- laply(age.order, function(x) 
                   max(which(x > big.dead)))
-  age.data <- cbind(taxon.age, censored, orig, regime, onoff[, -1], litho[, -1])
+  age.data <- cbind(taxon.age, censored, orig, regime, onoff[, -1])
   names(age.data) <- c('genus', 'duration', 'censored', 'orig', 'regime', 
-                       'epi', 'off', 'epi.bck', 'off.bck',
-                       'car', 'cla', 'car.bck', 'cla.bck')
+                       'epi', 'off', 'epi.bck', 'off.bck')
   # need to retain the class stuff too
 
   # split based on class

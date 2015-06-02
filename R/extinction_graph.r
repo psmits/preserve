@@ -23,7 +23,7 @@ lump.file <- list.files('../data', pattern = 'lump')
 lump <- read.csv(paste0('../data/', lump.file))
 gts <- rev(as.character(lump[, 2]))
 
-short.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
+sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
                         bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
                         gts = gts,
                         cuts = 'Chang')

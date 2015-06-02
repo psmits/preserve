@@ -19,7 +19,8 @@ sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
 short.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
                         bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
                         gts = rev(as.character(lump[, 2])),
-                        cuts = 'Chang')
+                        cuts = 'Chang',
+                        bot = 'Trem')
 
 # sepkoski.data
 num.samp <- nrow(short.data)
@@ -44,32 +45,32 @@ bck.ml <- ((a2 + 1) - 1) / ((a2 + 1) + (b2 + 1) - 2)
 env.ml <- tax.ml - bck.ml
 
 ## beta distribution of genus lithological occurrence
-a <- short.data$car
-b <- short.data$cla
-a2 <- short.data$car.bck
-b2 <- short.data$cla.bck
-tax.ml <- ((a + 1) - 1) / ((a + 1) + (b + 1) - 2)
-bck.ml <- ((a2 + 1) - 1) / ((a2 + 1) + (b2 + 1) - 2)
-lit.ml <- tax.ml - bck.ml
+#a <- short.data$car
+#b <- short.data$cla
+#a2 <- short.data$car.bck
+#b2 <- short.data$cla.bck
+#tax.ml <- ((a + 1) - 1) / ((a + 1) + (b + 1) - 2)
+#bck.ml <- ((a2 + 1) - 1) / ((a2 + 1) + (b2 + 1) - 2)
+#lit.ml <- tax.ml - bck.ml
 
 # do it so i can propegate error
 idv.epi <- short.data$epi
 idv.off <- short.data$off
 tot.epi <- short.data$epi.bck
 tot.off <- short.data$off.bck
-idv.car <- short.data$car
-idv.cla <- short.data$cla
-tot.car <- short.data$car.bck
-tot.cla <- short.data$cla.bck
+#idv.car <- short.data$car
+#idv.cla <- short.data$cla
+#tot.car <- short.data$car.bck
+#tot.cla <- short.data$cla.bck
 
 data <- list(duration = short.data$duration, group = con.class,
              cohort = con.orig, 
              env = env.ml,
-             lit = lit.ml,
+             #lit = lit.ml,
              epi = idv.epi, off = idv.off, 
              epi.bck = tot.epi, off.bck = tot.off,
-             car = idv.car, cla = idv.cla, 
-             car.bck = tot.car, cla.bck = tot.cla,
+             #car = idv.car, cla = idv.cla, 
+             #car.bck = tot.car, cla.bck = tot.cla,
              occupy = rescale(logit(short.data$occupy)),
              size = rescale(log(short.data$size)))
 
@@ -86,11 +87,11 @@ data <- list(dur_unc = unc$duration,
              off_unc = unc$off,
              epi_bck_unc = unc$epi.bck,
              off_bck_unc = unc$off.bck,
-             lit_unc = unc$lit,
-             car_unc = unc$car,
-             cla_unc = unc$cla,
-             car_bck_unc = unc$car.bck,
-             cla_bck_unc = unc$cla.bck,
+             #lit_unc = unc$lit,
+             #car_unc = unc$car,
+             #cla_unc = unc$cla,
+             #car_bck_unc = unc$car.bck,
+             #cla_bck_unc = unc$cla.bck,
              size_unc = unc$size,
              N_unc = length(unc$duration),
              dur_cen = cen$duration,
@@ -102,11 +103,11 @@ data <- list(dur_unc = unc$duration,
              off_cen = cen$off,
              epi_bck_cen = cen$epi.bck,
              off_bck_cen = cen$off.bck,
-             lit_cen = cen$lit,
-             car_cen = cen$car,
-             cla_cen = cen$cla,
-             car_bck_cen = cen$car.bck,
-             cla_bck_cen = cen$cla.bck,
+             #lit_cen = cen$lit,
+             #car_cen = cen$car,
+             #cla_cen = cen$cla,
+             #car_bck_cen = cen$car.bck,
+             #cla_bck_cen = cen$cla.bck,
              size_cen = cen$size,
              N_cen = length(cen$duration))
 
@@ -125,14 +126,14 @@ with(data, {stan_rdump(list = c('dur_unc', 'group_unc', 'cohort_unc',
                                 'samp_cen', 'N', 'O', 'C', 'F',
                                 'occupy_unc', 'occupy_cen',
                                 'env_unc', 'env_cen',
-                                'lit_unc', 'lit_cen',
+                                #'lit_unc', 'lit_cen',
                                 'epi_unc', 'epi_cen', 
                                 'off_unc', 'off_cen',
                                 'epi_bck_unc', 'epi_bck_cen', 
                                 'off_bck_unc', 'off_bck_cen', 
-                                'car_unc', 'car_cen', 
-                                'cla_unc', 'cla_cen',
-                                'car_bck_unc', 'car_bck_cen', 
-                                'cla_bck_unc', 'cla_bck_cen', 
+                                #'car_unc', 'car_cen', 
+                                #'cla_unc', 'cla_cen',
+                                #'car_bck_unc', 'car_bck_cen', 
+                                #'cla_bck_unc', 'cla_bck_cen', 
                                 'size_unc', 'size_cen'),
                        file = '../data/data_dump/fauna_info.data.R')})
