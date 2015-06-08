@@ -15,19 +15,13 @@
 \begin{document}
 \section{Results}
 
-% Model fit
-%   survival curve
-%   deviance residuals
-%   posterior predictive point tests
-%   weibull > exponential (supported by WAIC)
 As stated above, posterior approximations for both the exponential and Weibull models achieved approximate stationarity after 10,000 steps, as all parameter estimates have an \(\hat{R} < 1.1\).%\uppercase{ref tables}.
 
 Comparisons of the survival functions estimated from 1000 posterior predictive data sets to the estimated survival function of the observed genera demonstrates that both the exponential and Weibull models approximately capture the observed pattern of extinction (Fig. \ref{fig:surv}). The major difference in fit between the two models is that the Weibull model has a slightly better fit for longer lived taxa than the exponential model.
 
-
 %Inspection of the deviance residuals yields a similar pattern of biased estimates for longer lived taxa \uppercase{ref figure}. 
 
-Additionally, the Weibull model is expected to have slightly better out-of-sample predictive accuracy when compared to the exponential model (3941 versus 3948, respectively). This is congruent with graphical comparisons of the survival functions (Fig. \ref{fig:surv}). Because the difference between the WAIC scores is small, both results from the exponential and Weibull models will be presented.
+Additionally, the Weibull model is expected to have slightly better out-of-sample predictive accuracy when compared to the exponential model (4577 versus 4605, respectively). This is congruent with graphical comparisons of the survival functions (Fig. \ref{fig:surv}). While the difference in WAIC between these two models is large, both results from the exponential and Weibull models will be presented.
 
 % Results/hypothesis tests
 %   \mu of hierarchical effects
@@ -54,9 +48,13 @@ The estimates of the standard deviation of between-cohort coefficient estimates 
 %   correlations with baseline extinction risk of of major interest
 %   high/positive values of intercept --> high extinction risk
 %   low/negative values of intercept --> low extinction risk
-The correlation terms of \(\Omega\) (Fig. \ref{fig:omega}) describe the relationship between the coefficients and how their estimates may vary together across cohorts. The correlations between the intercept term \(\beta_{0}\) and the effects of the taxon traits are of particular interest for evaluating the \citet{Jablonski1986} hypothesis (Fig. \ref{fig:omega} first column/last row). Keep in mind that when \(\beta_{0}\) is low, extinction risk is low; and conversely, when \(\beta_{0}\) is high, then extinction risk is high.
+The correlation terms of \(\Omega\) (Fig. \ref{fig:omega}) describe the relationship between the coefficients and how their estimates may vary together across cohorts. The correlations between the intercept term \(\beta_{0}\) and the effects of the taxon traits are of particular interest for evaluating the \citet{Jablonski1986} scenario (Fig. \ref{fig:omega} first column/last row). Keep in mind that when \(\beta_{0}\) is low, extinction risk is low; and conversely, when \(\beta_{0}\) is high, then extinction risk is high.
 
-Marginal posterior probabilities of the correlations between the level of baseline extinction risk \(\beta_{0}\) and the effects of the taxon traits indicate that the correlation between expected extinction risk and geographic range \(\beta_{r}\) is of particular note (Fig. \ref{fig:corr}). The negative correlation between \(\beta_{0}\) and \(\beta_{r}\) implies that as extinction risk increases, the effect/importance of geographic range on genus duration increases. This means that increases in baseline extinction rate are correlated with an increased importance of geographic range size. % this actually means that the effects of the other traits aren't going down, but instead aren't correlated with intensity and geographic range just gets more important!
+Marginal posterior probabilities of the correlations between the level of baseline extinction risk \(\beta_{0}\) and the effects of the taxon traits indicate that the correlation between expected extinction risk and both geographic range \(\beta_{r}\) and \(\beta_{v^{2}}\) are of particular note (Fig. \ref{fig:corr}). 
+
+There is a XX\% probability that \(\beta_{0}\) and \(\beta_{r}\) are negatively correlated, meaning that as extinction risk increases, the effect/importance of geographic range on genus duration increases. This means that increases in baseline extinction rate are correlated with an increased importance of geographic range size. 
+
+There is a XX\% probability that \(\beta_{0}\) and \(\beta_{v^{2}}\) are negatively correlated, meaning that as extinction risk increases, the peakedness of \(f(v_{i})\) increases and the relationship tends towards concave down.
 
 % effects varying between cohorts
 While the overall group level estimates are of particular importance when defining time-invariant differences in extinction risk, it is also important and useful to analyze the individual level parameter estimates in order to better understand how parameters actually vary across cohorts.
@@ -67,7 +65,7 @@ In comparison to the overall mean extinction risk \(\mu_{0}\), cohort level esti
 %   effect of environmental preference as duration multiplier
 How the effect of environmental affinity varies between cohorts can be observed by using the cohort specific coefficients estimates. Following the same procedure used earlier (Fig. \ref{fig:tau}), but substituting cohort specific estimates of \(\beta_{v}\) and \(\beta_{v^{2}}\) for \(\mu_{v}\) and \(\mu_{v^{2}}\), the cohort specific effect of environmental preference as a multiplier of mean extinction risk can be calculated. This was done only for the Weibull model, though the observed pattern should be similar for the exponential model. 
 
-As expected based on the estimates of \(\tau_{v}\) and \(\tau_{v^{2}}\), there is greater variation in the peakedness of \(f(v_{i})\) than there is variation between convave up and down functions (Fig. \ref{fig:env_cohort}). Only 9 of the 31 cohorts have less than 50\% posterior probability that generalists are shorter lived than specialists, though 2 of those cases have approximately a 50\% probability of being either covave up or down. This is congruent with the 0.70+ posterior probability that \(\mu_{v^{2}}\) is positive/\(f(v_{i})\) is concave down, which corresponds to approximately 8 out of 31 cohorts.
+As expected based on the estimates of \(\tau_{v}\) and \(\tau_{v^{2}}\), there is greater variation in the peakedness of \(f(v_{i})\) than there is variation between convave up and down functions (Fig. \ref{fig:env_cohort}). 9 of the 33 cohorts have less than 50\% posterior probability that generalists are shorter lived than specialists, though 2 of those cases have approximately a 50\% probability of being either concave up or down. This is congruent with the 0.70+ posterior probability that \(\mu_{v^{2}}\) is positive/\(f(v_{i})\) is concave down, which corresponds to approximately 8 out of 31 cohorts.
 
 Additionally, a quite striking pattern emerges when the inflection point of the function is either far away from the y-intercept (x = 0, y = 1) or when there is little evidence of non-linearity (Fig. \ref{fig:env_cohort}). Cohort 21 and 20, for example, have almost linear relationships between environmental preference and the duration multiplier. This type of relationship occurs when \(\beta_{v^{2}}\) approaches 0, flattening the non-linear curvature of the relationship.
 

@@ -41,55 +41,11 @@ Prior to analysis, geographic range and body size were transformed and standardi
 
 \subsection{Survival model}
 
-Genus durations were assumed to follow either an exponential or Weibull distribution. Each of these distributions makes assumptions about how duration may effect extinction risk \citep{Klein2003}. The exponential distribution assumes that extinction risk is independent of duration. In contrast, the Weibull distribution allows for age dependent extinction via the shape parameter \(\alpha\), though only as a monotonic function of duration. Importantly, the Weibull distribution is equivalent to the exponential distribution when \(\alpha = 1\). %In general, the notation used here follows \citet{Gelman2007}, \citet{Gelman2013d}, and \citet{stan-manual:2014}.
+Genus durations were assumed to follow either an exponential or Weibull distribution. Each of these distributions makes assumptions about how duration may effect extinction risk \citep{Klein2003}. The exponential distribution assumes that extinction risk is independent of duration. In contrast, the Weibull distribution allows for age dependent extinction via the shape parameter \(\alpha\), though only as a monotonic function of duration. Importantly, the Weibull distribution is equivalent to the exponential distribution when \(\alpha = 1\). 
 
-The simplest model of genus duration includes no covariate or structural information. Define \(y_{i}\) as the duration in stages of genus \(i\), where \(i = 1, \dots, n\) and \(n\) is the number of observed genera. These two models are them simply defined as
-\begin{equation}
-  \begin{aligned}
-    y_{i} &\sim \mathrm{Exponential}(\lambda) \\
-    y_{i} &\sim \mathrm{Weibull}(\alpha, \sigma).
-  \end{aligned}
-  \label{eq:simple}
-\end{equation}
-\(\lambda, \alpha, \text{and} \sigma\) are all defined for all positive reals. Note that \(\lambda\) is a ``rate'' or inverse-scale while \(\sigma\) is a scale parameter, meaning that \(\frac{1}{\lambda} = \sigma\).
+\(y_{i}\) is the duration of genus \(i\) in geologic stages, \(X\) is a matrix of covariates including a constant term, \(B_{j}\) is the vector of regression coefficients for origination cohort \(j\), \(\Sigma\) is the covariance matrix of the regression coefficients, \(\tau\) is a vector of scales the standard deviations of the between-cohort variation in regression coefficient estimates, and \(\Omega\) is a correlation matrix of the regression coefficients.
 
-These simple models can then be expanded to include covariate information as predictors by reparameterizing \(\lambda\) or \(\sigma\) as a regression \citep{Klein2003}. Each of the covariates of interest is given its own regression coefficient (e.g. \(\beta_{r}\)) along with an intercept term \(\beta_{0}\). There are some additional complications to the parameterization of \(\sigma\) associated with the inclusion of \(\alpha\) as well as for interpretability \citep{Klein2003}. Both of these are then written as
-\begin{equation}
-  \begin{aligned}
-    \lambda_{i} &= \exp(\beta_{0} + \beta_{r} r_{i} + \beta_{v} v_{i} + \beta_{v^{2}} v_{i}^{2} + \beta_{m} m_{i}) \\
-    \sigma_{i} &= \exp\left(\frac{-(\beta_{0} + \beta_{r} r_{i} + \beta_{v} v_{i} + \beta_{v^{2}} v_{i}^{2} + \beta_{m} m_{i})}{\alpha}\right).
-  \end{aligned}
-  \label{eq:regression}
-\end{equation}
-The quadratic term for environmental affinity \(v\) is to allow for the possible nonlinear relationship between environmental affinity and extinction risk.
-
-The models which incorporate both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 5\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a columns of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts. We then rewrite \(\lambda\) and \(\sigma\) of equation \ref{eq:regression} in matrix notation as
-\begin{equation}
-  \begin{aligned}
-    \lambda_{i} &= \exp(\mathbf{X}_{i} B_{j[i]}) \\
-    \sigma_{i} &= \exp\left(\frac{-(\mathbf{X}_{i} B_{j[i]})}{\alpha}\right). 
-  \end{aligned}
-  \label{eq:multivariate}
-\end{equation}
-
-Because \(B\) is a matrix, I use a multivariate normal prior with unknown vector of means \(\mu\) and covariance matrix \(\Sigma\). This is written as 
-\begin{equation}
-  B \sim \mathrm{MVN}(\vec{\mu}, \Sigma)
-  \label{eq:beta_prior}
-\end{equation}
-where \(\vec{\mu}\) is length \(k\) vector representing the overall mean of the distributions of \(\beta\) coefficients. \(\Sigma\) is a \(k \times k\) covariance matrix of the \(\beta\) coefficients.
-
-What remains is assigning priors the elements of \(\vec{\mu}\) and the covariance matrix \(\Sigma\). All elements of \(\vec{\mu}\) except for \(\mu_{r}\) were given weakly informative normal priors while \(\mu_{r}\) was given an informative normal prior (\(\mu_{r} \sim \mathcal{N}(-1, 1)\). The prior for \(\Sigma\) is a bit more complicated due to its multivariate nature. 
-Following the \citet{stan-manual:2014}, I modeled the scale terms separate from the correlation structure of the coefficients. This is possible because of the relationship between a covariance and a correlation matrix, defined as 
-\begin{equation}
-  \Sigma_{B} = \text{Diag}(\vec{\tau}) \Omega \text{Diag}(\vec{\tau})
-  \label{eq:covcor}
-\end{equation}
-where \(\vec{\tau}\) is a length \(k\) vector of variances and Diag(\(\tau\)) is a diagonal matrix.
-
-I used a LKJ prior distribution for correlation matrix \(\Omega\) as recommended by \citet{stan-manual:2014}. The LKJ distribution is a single parameter multivariate distribution where values of the parameter \(\eta\) greater than 1 concentrate density at the unit correlation matrix, which corresponds to no correlation between the \(\beta\) coefficients. The scale parameters, \(\vec{\tau}\), are given weakly informative half-Cauchy (C\(^{+}\)) priors following \citet{Gelman2006a}.
-
-Given all the above, the exponential model is then defined as
+The exponential model is then defined
 \begin{equation}
   \begin{aligned}
     y_{i} &\sim \mathrm{Exponential}(\lambda) \\
@@ -99,14 +55,15 @@ Given all the above, the exponential model is then defined as
     \mu_{\kappa} &\sim 
     \begin{cases} 
       \mathcal{N}(0, 5) & \text{if } k \neq r, or \\
-      \mathcal{N}(-1, 1) & \text{if } k = r \\  % what i should really be talking about is range
+      \mathcal{N}(-1, 1) & \text{if } k = r \\
     \end{cases} \\
     \tau_{\kappa} &\sim \mathrm{C^{+}}(1) \text{ for } \kappa \in 1:k \\
     \Omega &\sim \text{LKJ}(2).
   \end{aligned}
   \label{eq:exp_total}
 \end{equation}
-The Weibull model is then also defined as
+
+Similarly, the Weibull model is defined
 \begin{equation}
   \begin{aligned}
     y_{i} &\sim \mathrm{Weibull}(\alpha, \sigma) \\
@@ -117,14 +74,16 @@ The Weibull model is then also defined as
     \mu_{k} &\sim 
     \begin{cases} 
       \mathcal{N}(0, 5) & \text{if } k \neq r, or \\
-      \mathcal{N}(-1, 1) & \text{if } k = r \\  % what i should really be talking about is range
+      \mathcal{N}(-1, 1) & \text{if } k = r \\ 
     \end{cases} \\
     \tau_{k} &\sim \mathrm{C^{+}}(1) \\
     \Omega &\sim \text{LKJ}(2).
   \end{aligned}
   \label{eq:wei_total}
 \end{equation}
-Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) does not include how the uncertainty in environmental affinity is included nor how censored observations are included. For an explanation of including censored observations see Appendix \ref{sec:cen}.
+The principle difference between this model and the previous (Eq. \ref{eq:exp_total}) is the inclusion of the shape parameter \(\alpha\). Note that \(\sigma\) is approximately \(1 / \lambda\).
+
+For an explanation of how this model was developed and parameter explanations, please see Appendix \ref{sec:survival}. Note that these models (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) do not include how the uncertainty in environmental affinity is included nor how censored observations are included. For an explanation of both of these aspects, see Appendices \ref{sec:uncer} and \ref{sec:cen}.
 
 \subsection{Parameter estimation}
 The  joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10000 draws, split half warm-up and half sampling and thinned to every 10th sample for a total of 5000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
