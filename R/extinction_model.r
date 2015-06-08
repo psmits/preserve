@@ -13,9 +13,7 @@ lump <- read.csv(paste0('../data/', lump.file))
 
 payne <- read.table('../data/payne_bodysize/Occurrence_PaleoDB.txt',
                     header = TRUE, stringsAsFactors = FALSE)
-sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
-                           bins = 'collections.stage', gts = gts,
-                           cuts = 'Changhsingian')
+#sepkoski.data <- sort.data(bibr, payne)
 short.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
                         bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
                         gts = rev(as.character(lump[, 2])),

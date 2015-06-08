@@ -14,14 +14,14 @@ functions {
     }
     return 0;
   }
-  int foo(int fc, int s, int lc) {
-    return fc * max(1, s - lc);
-  }
+//  int foo(int fc, int s, int lc) {
+//    return fc * max(1, s - lc);
+//  }
   real state_space_log(int[] y, vector phi, vector p, vector gamma) {
     int ft;
     int lt;
     int S;
-    vector[foo(first_capture(y), size(y), last_capture(y))] lp;
+    vector[first_capture(y) * (size(y) - last_capture(y) + 1)] lp;
     int i;
 
     ft <- first_capture(y);

@@ -102,9 +102,6 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
 
   taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
                        table(x[, bins])})
-  taxon.nstage <- unlist(llply(taxon.occur, length))
-
-  nzero <- taxon.age[, 2] - taxon.nstage
 
   # this is about geographic range size
   eq <- CRS("+proj=cea +lat_0=0 +lon_0=0 +lat_ts=30 +a=6371228.0 +units=m")

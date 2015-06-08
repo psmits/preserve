@@ -11,7 +11,7 @@ bibr <- fossil
 
 sight <- space.time(bibr, gts = gts, shape = shape)
 
-sight <- sight[sample(nrow(sight), 100), ]
+#sight <- sight[sample(nrow(sight), 100), ]
 num <- nrow(sight)
 tim <- ncol(sight)
 

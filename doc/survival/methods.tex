@@ -11,73 +11,33 @@
 \frenchspacing
 
 \begin{document}
-\section{Methods}
+\section{Materials and Methods}
+
+\subsection{Approach}
+
+Hierarchical modelling, sometimes called ``mixed-effects modeling,'' is a statistical approach which explicitly takes into account the structure of the observed data in order to model both the within and between group variance \citep{Gelman2013d,Gelman2007}. In this case, origination cohorts are the groups and the mean survival model corresponds to the dynamic survivorship model. This leads to simultaneous dynamic and cohort style analysis. The units of study (e.g. genera) each belong to a single grouping (e.g. origination cohort) that are also considered draws from a shared probability distribution (e.g. all cohorts, observed and unobserved). The group level parameters are then estimated simultaneously as the other parameters of interest (e.g. covariate effects) \citep{Gelman2013d}. The subsequent estimates are partially pooled together, where parameters from groups with large samples or effects remain large while those of groups with small samples or effects are pulled towards the overall group mean. 
+
+This partial pooling is one of the greatest advantages of hierarchical modeling. By letting the groups ``support'' each other, parameter estimates then better reflect our actual uncertainty. Additionally, this partial pooling helps control for multiple comparisons and possibly spurious results as effects with little support are drawn towards the overall group mean \citep{Gelman2013d,Gelman2007}. 
+
+All covariate effects (regression coefficients), as well as the intercept term (baseline extinction risk), were allowed to vary by group (origination cohort). The covariance/correlation between covariate effects was also modeled. This hierarchical structure allows inference for how covariates effects may change with respect to each other while simultaneously estimating the effects themselves, correctly propagating our uncertainty. 
+
+Additionally, instead of relying on point estimates of environmental affinity, I treat environmental affinity as a continuous measure of the difference between the taxon's environmental occurrence pattern and the background occurrence pattern.
+
 
 \subsection{Fossil occurrence information}
 
 The dataset analyzed here is derived from the a combination of the occurrence information from \citet{Foote2013} and the body size data from \citet{Payne2014}. The \citet{Foote2013} dataset is based on the Paleobiology Database (http://www.paleodb.org); see \citet{Foote2013} for a full description of the inclusion criterion. Additionally, epicontinental versus open ocean assignemnts for occurrence information are based on \citet{Miller2009a}. \uppercase{note: I don't know how this may need to be updated.}
 
-Sampled occurrences were restricted to those with latitude and longitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Genera who's last appearance was in a stage preceding a mass extinction were right censored, and genera with a duration of only one stage and were left censored (see below for explanation of censoring). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v\)), and body size (\(m\)). 
+Sampled occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Genera with a last occurrence in the Changhsingian stage were right censored while enera with a duration of only one stage and were left censored (see below for explanation of censoring). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v\)), and body size (\(m\)). 
 
-Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). Following this, for each stage, the total number of grid cells occupied was calculated. The number of grid cells that each genus present occurs was also calculated and made relative by dividing by the total number of possible cells. Finally, mean relative genus occupancy was calculated as the mean of per stage relative occupancy. The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}.
+Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}.
+
+For each stage, the total number of occupied grid cells, or cells in which a fossil occurrs, was calculated. Then, for each genus, the number of grid cells occupied by that genus was calculated. Dividing the genus occupancy by the total occupancy gives the relative occupancy of that genus. Mean relative genus occupancy was then calculated as the mean of the per stage relative occupancies of that genus. 
 
 Body size data was sourced directly from \citet{Payne2014}. Because those measurements are presented without error, a measurement error model similar to the one for environmental affinity could not be implemented (below).
 
-Prior to analysis, geographic range and body size were transformed and standardized in order to improve interpretability of the results. Geographic range size, which can only have between 0 and 1, was logit transformed. Body size, which is defined for all positive real values was natural log transformed. These covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
+Prior to analysis, geographic range and body size were transformed and standardized in order to improve interpretability of the results. Geographic range size, which can only vary between 0 and 1, was logit transformed. Body size, which is defined for all positive real values, was natural log transformed. These covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
 
-\subsubsection{Uncertainty in environmental preference}
-The calculation and inclusion of environmental affinity in the survival model is a statistical procedure that takes into account our uncertainty based on where fossils tend to occur. Because we cannot directly observe if a fossil taxon had occurrences restricted to only a single environmental, instead we can only estimate its affinity with uncertainty. One advantage of using a Bayesian analytical approach is that both parameters and data are considered random samples from some underlying distribution, which means that is is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. My approach is conceptually similar to \citet{Simpson2009} but instead of obtaining a single point estimate, an entire posterior distribution is estimated.
-
-The first step is to determine the probability \(\theta\) at which genus \(i\) occurs in an epicontinental settings based on its own pattern of occurrences. Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. open ocean). Because the value of interest is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a binomial distribution. We can then define our sampling statement as
-\begin{equation}
-  e_{i} \sim \mathrm{Binomial}(e_{i} + o_{i}, \theta_{i}).
-  \label{eq:epi_lik}
-\end{equation}
-I used a flat prior of \(\theta_{i}\) defined as \(\theta_{i} \sim \mathrm{Beta}(1, 1)\). Because the beta distribution is the conjugate prior for the binomial distribution, the posterior is easy to compute in closed form. The posterior probability of \(\theta\) is then 
-\begin{equation}
-  \theta_{i} \sim \mathrm{Beta}(e_{i} + 1, o_{i} + 1)
-  \label{eq:epi_post}
-\end{equation}
-
-It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an additional probability \(\Theta\). Define \(E_{i}\) as the total number of other fossil occurrences (e.g. excepting for genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(O_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define the sampling statement as
-\begin{equation}
-  E_{i} \sim \mathrm{Binomial}(E_{i} + O_{i}, \Theta_{i}).
-  \label{eq:bck_lik}
-\end{equation}
-Again, I used a flat prior of \(\Theta_{i}\) defined as \(\Theta_{i} \sim \mathrm{Beta}(1, 1)\). The posterior of \(\Theta\) is then simply defined as
-\begin{equation}
-  \Theta_{i} \sim \mathrm{Beta}(E_{i} + 1, O_{i} + 1)
-  \label{eq:bck_post}
-\end{equation}
-
-I then define the environmental affinity of genus \(i\) as \(v_{i} = \theta_{i} - \Theta_{i}\). \(v_{i}\) is a value that can range between -1 and 1, where negative values indicate that genus \(i\) tends to occur more frequently in open ocean environments than background while positive values indicate that genus \(i\) tends to occur in epicontiental environments.
-
-While this approach is noticeably more complicated than previous ones \citep{Foote2006,Miller2001,Simpson2009,Kiessling2007a} there are some important benefits to both using a continuous measure of affinity as well directly modeling our uncertainty. In order to show case some of these benefits, I performed a simulation analysis of how modal/maximum \textit{a posteriori} (MAP) estimates versus full posterior estimates.
-
-In this simulation, I first defined the ``background'' epicontinental occurrence \(\theta_{b}\) as 0.50 with a small amount of noise. This was represented as a beta distribution 
-\begin{equation}
-  \Theta_{b} = \mathrm{Beta}(\alpha = 2500, \beta = 2500). 
-  \label{eq:bck_sim}
-\end{equation}
-This choice of parameters for the distribution reflects the average number of background occurrences for either epicontinental or open ocean environments per genus.
-
-Using this background occurrence ratio, randomly generated the occurrence patterns 1000 simulated taxa. This was done at multiple sample sizes (1, 2, 3, 4, 5, 10, 25, 50, 100) in order to demonstrate the effects of increasing sample size on the confidence of environmental affinity. For each simulated taxon I calculated the full posterior distribution while assuming a flat Beta prior (\(\mathrm{Beta}(1, 1)\)). Using the full posterior I calculated the MAP probability of occurring in epicontinental environments. The environmental affinity was calculated for each of the simulated taxa using both the full posterior and the MAP estimate. In this toy example, environmental affinity can range between -0.5 and 0.5.
-
-As should be expected, as sample size increases the distribution of MAP estimates converge on the true value (Fig. \ref{fig:env_mode}). For taxa with less than 10 occurrences, the MAP estimate is biased towards extreme values. Note that the mode of the beta distribution is not defined for situations where there were 0 draws of one of the environmental conditions. Instead, the vertical line is based entirely on the observed occurrences which are technically the modal estimates because they are the most frequently occurring/highest density.
-
-In contrast, we can compare the true occurrence probability distribution versus the posterior estimate for a given sample (Fig. \ref{fig:env_post}). When sample sizes are low, posterior estimates are flat and represent a compromise between the likelihood and the flat prior (Eq. \ref{eq:epi_post}). Because of this, estimates from small sizes are less likely to be overly biased towards the extremes. This is further emphasized by inspection of the estimates of environmental affinity for the simulated taxa (Fig. \ref{fig:env_diff}). Posterior estimates from simulated taxa with small sample size have a much broader distribution that both allows for the extreme observation but still captures the ``true'' value (0). 
-
-
-By defining environmental preference as the difference in full posterior estimates of occurrence probability, it is possible to include taxa with low sample sizes that are normal discarded \citep{Foote2006,Miller2001,Simpson2009,Kiessling2007a}. Additionally, 55+\% of observed Paleozoic brachiopod genera have less than 10 occurrences which is the range of sample sizes where MAP (or ML) estimates would be potentially most biased. This is preferable to finding the difference between the MAP estimates (blue line; Fig. \ref{fig:env_diff}).
-
-% behavior of MAP estimates
-%   as sample size increases, converge on true (10+)
-% behavior of posterior
-%   compromise between likelihood of data occurrences and (flat) prior
-%   really important for small sample sizes
-%   at 10+ makes no difference anymore
-%   this is also kind obvious from the estimates of \(v\)
-% how many taxa have less than 10 occurrences? \approx 55\%
 
 \subsection{Survival model}
 
@@ -91,7 +51,7 @@ The simplest model of genus duration includes no covariate or structural informa
   \end{aligned}
   \label{eq:simple}
 \end{equation}
-Note that \(\lambda\) is a ``rate'' or inverse-scale while \(\sigma\) is a scale parameter, meaning that \(\frac{1}{\lambda} = \sigma\).
+\(\lambda, \alpha, \text{and} \sigma\) are all defined for all positive reals. Note that \(\lambda\) is a ``rate'' or inverse-scale while \(\sigma\) is a scale parameter, meaning that \(\frac{1}{\lambda} = \sigma\).
 
 These simple models can then be expanded to include covariate information as predictors by reparameterizing \(\lambda\) or \(\sigma\) as a regression \citep{Klein2003}. Each of the covariates of interest is given its own regression coefficient (e.g. \(\beta_{r}\)) along with an intercept term \(\beta_{0}\). There are some additional complications to the parameterization of \(\sigma\) associated with the inclusion of \(\alpha\) as well as for interpretability \citep{Klein2003}. Both of these are then written as
 \begin{equation}
@@ -101,7 +61,7 @@ These simple models can then be expanded to include covariate information as pre
   \end{aligned}
   \label{eq:regression}
 \end{equation}
-The regression equations are exponentiated because both \(\lambda\) and \(\sigma\) are only defined for positive reals. The quadratic term for environmental affinity \(v\) is to allow for the possible nonlinear relationship between environmental affinity and extinction risk.
+The quadratic term for environmental affinity \(v\) is to allow for the possible nonlinear relationship between environmental affinity and extinction risk.
 
 The models which incorporate both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 5\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a columns of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts. We then rewrite \(\lambda\) and \(\sigma\) of equation \ref{eq:regression} in matrix notation as
 \begin{equation}
@@ -114,12 +74,13 @@ The models which incorporate both equations \ref{eq:simple} and \ref{eq:regressi
 
 Because \(B\) is a matrix, I use a multivariate normal prior with unknown vector of means \(\mu\) and covariance matrix \(\Sigma\). This is written as 
 \begin{equation}
-  B \sim \mathrm{MVN}(\mu, \Sigma)
+  B \sim \mathrm{MVN}(\vec{\mu}, \Sigma)
   \label{eq:beta_prior}
 \end{equation}
-where \(\mu\) is length \(k\) vector representing the overall mean of the distributions of \(\beta\) coefficients. \(\Sigma\) is a \(k \times k\) covariance matrix of the \(\beta\) coefficients.
+where \(\vec{\mu}\) is length \(k\) vector representing the overall mean of the distributions of \(\beta\) coefficients. \(\Sigma\) is a \(k \times k\) covariance matrix of the \(\beta\) coefficients.
 
-What remains is assigning priors the elements of \(\vec{\mu}\) and the covariance matrix \(\Sigma\). All elements of \(\vec{\mu}\) except for \(\mu_{r}\) were given weakly informative normal priors while \(\mu_{r}\) was given an informative normal prior (\(\mu_{r} \sim \mathcal{N}(-1, 1)\). The prior for \(\Sigma\) is a bit more complicated due to its multivariate nature. While the conditional conjugate prior distribution of the covariance matrix of a multivariate normal distribution is the inverse-Wishart \citep{Gelman2013d}, because I am using a variant for Hamiltonian Monte Carlo (HMC) called No U-Turn Sampling (NUTS) for posterior approximation as opposed to the more commonly used Gibbs sampling there is no benefit from using a conjugate prior \citet{stan-manual:2014}. Additionally, the inverse-Wishart distribution strongly constrains the off-diagonal elements of the covariance matrix which is not desired. Instead, it is better to model the scale terms separate from the correlation structure of the coefficients. This is possible because of the relationship between a covariance and a correlation matrix, defined as 
+What remains is assigning priors the elements of \(\vec{\mu}\) and the covariance matrix \(\Sigma\). All elements of \(\vec{\mu}\) except for \(\mu_{r}\) were given weakly informative normal priors while \(\mu_{r}\) was given an informative normal prior (\(\mu_{r} \sim \mathcal{N}(-1, 1)\). The prior for \(\Sigma\) is a bit more complicated due to its multivariate nature. 
+Following the \citet{stan-manual:2014}, I modeled the scale terms separate from the correlation structure of the coefficients. This is possible because of the relationship between a covariance and a correlation matrix, defined as 
 \begin{equation}
   \Sigma_{B} = \text{Diag}(\vec{\tau}) \Omega \text{Diag}(\vec{\tau})
   \label{eq:covcor}
@@ -163,46 +124,15 @@ The Weibull model is then also defined as
   \end{aligned}
   \label{eq:wei_total}
 \end{equation}
-Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) does not include how the uncertainty in environmental affinity is included nor how censored observations are included. An explination of including censored observations follows.
-
-
-\subsection{Censored observations}
-A key aspect of survival analysis is the inclusion of censored, or incompletely observed, data points \citep{Ibrahim2001,Klein2003}. The two classes of censored observations encountered in this study were right and left censored observations. Right censored genera are those that did not go extinct during the window of observation, or genera that are still extant. Left censored observations are those taxa that it is only known when it was extinct by. To put another way, this is a taxon that went extinct but the observed duration is an over estimate of the actual duration. 
-
-In the context of this study, I considered all genera that had a duration of only one geologic stage to be left censored as we do not have a finer degree of resolution. Conceptually, this is similar to if I was studying, say, survival patterns in rats and an individual had died between the start of the experiment and next time the rats were observed. We know the rat lived no more than that amount of time.
-
-The key function for modeling censored observations is the survival function, or \(S(t)\). \(S(t)\) corresponds to the probability that a genus having existed for \(t\) stages will not have gone extinct while \(h(t)\) corresponds to the instantaneous extinction rate at taxon age \(t\) \cite{Klein2003}. For an exponential model, \(S(t)\) is defined as
-\begin{equation}
-  S(t) = \exp(-\lambda t),
-  \label{eq:exp_surv}
-\end{equation}
-and for the Weibull distribution \(S(t)\) is defined as
-\begin{equation}
-  S(t) = \exp\left(-\left(\frac{t}{\sigma}\right)^{\alpha}\right).
-  \label{eq:wei_surv}
-\end{equation}
-\(S(t)\) is equivalent to the complementary cumulative distribution function, \(1 - F(t)\) \citep{Klein2003}. 
-
-For right censored observations, instead of calculating the likelihood as normal (Eq. \ref{eq:multivariate}) the likelihood of an observation is evaluated using \(S(t)\). Conceptually, this approach calculates the likelihood of observing a taxon that existed for at least that long. For left censored data, instead the likelihood is calculated using \(1 - S(t)\) which corresponds to the likelihood of observing a taxon that existed no longer than \(t\).
-
-The full likelihood statements incorporating fully observed, right censored, and left censored observations are then
-\begin{equation}
-  \begin{aligned}
-    \mathcal{L} &\propto \prod_{i \in C} \mathrm{Exponential}(y_{i} | \lambda) \prod_{j \in R} S(y_{j} | \lambda) \prod_{k \in L} \left(1 - S(y_{k} | \lambda)\right) \\
-    \mathcal{L} &\propto \prod_{i \in C} \mathrm{Weibull}(y_{i} | \alpha, \sigma) \prod_{j \in R} S(y_{j} | \alpha, \sigma) \prod_{k \in L} \left(1 - S(y_{k} | \alpha, \sigma)\right)
-  \end{aligned}
-  \label{eq:censored_likelihood}
-\end{equation}
-where \(C\) is the set of all fully observed taxa, \(R\) the set of all right censored taxa, and \(L\) the set of all left-censored taxa.
-
+Note that the above formulations of each model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) does not include how the uncertainty in environmental affinity is included nor how censored observations are included. For an explanation of including censored observations see Appendix \ref{sec:cen}.
 
 \subsection{Parameter estimation}
-The  joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The estimate of the posterior distribution were approximated from four parallel chains run for 10000 draws split half warm-up and half sampling thinned to every 10th sample for a total of 5000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
+The  joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10000 draws, split half warm-up and half sampling and thinned to every 10th sample for a total of 5000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
 
 \subsection{Model evaluation}
 
-Models were evaluated using both posterior predictive checks and an estimate of out-of-sample predictive accuracy. The motivation behind posterior predictive checks as tools for determining model adequacy is that replicated data sets using the fitted model should be similar to the original data \citep{Gelman2013d}. Systematic differences between the simulations and observed indicate weaknesses of the currently fit model. An example of a technique that is very similar would be inspecting the residuals and Q-Q plots from a linear regression.
+Models were evaluated using both posterior predictive checks and an estimate of out-of-sample predictive accuracy. The motivation behind posterior predictive checks as tools for determining model adequacy is that replicated data sets using the fitted model should be similar to the original data \citep{Gelman2013d}. Systematic differences between the simulations and observations indicate weaknesses of the model fit. An example of a technique that is very similar would be inspecting the residuals from a linear regression.
 
 The strategy behind posterior predictive checks is to draw simulated values from the joint posterior predictive distribution, \(p(y^{rep} | y)\), and then compare those draws to the empirically observed values \citep{Gelman2013d}. To accomplish this, for each replicate, a single value is drawn from the marginal posterior distributions of each regression coefficient from the final model as well as \(\alpha\) for the Weibull model (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}). Then, given the covariate information \(\mathbf{X}\), a new set of \(n\) genus durations are generated giving a single replicated data set \(y^{rep}\). This is repeated 1000 times in order to provide a distribution of possible values that could have been observed given the model. 
 
@@ -225,46 +155,6 @@ In order to compare the fitted model to the observed data, various graphical com
 %\end{equation}
 %Deviance residuals have a mean of 0 and a standard deviation of 1 by definition \citep{Klein2003}.
 
-The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. However, because the Weibull model reduces to the exponential model when \(\alpha = 1\) my interest is not in choosing between these models. Instead, comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}.
-
-WAIC can be considered a fully Bayesian alternative to the Akaike information criterion, where WAIC acts as an approximation of leave-one-out cross-validation which acts as a measure of out-of-sample predictive accuracy \citep{Gelman2013d}. WAIC is calculated starting with the log pointwise posterior predictive density calculated as
-\begin{equation}
-  \mathrm{lppd} = \sum_{i = 1}^{n} \log \left(\frac{1}{S} \sum_{s = 1}^{S} p(y_{i}|\Theta^{S})\right),
-  \label{eq:lppd}
-\end{equation}
-where \(n\) is sample size, \(S\) is the number posterior simulation draws, and \(\Theta\) represents all of the estimated parameters of the model. This is similar to calculating the likelihood of each observation given the entire posterior. A correction for the effective number of parameters is then added to lppd to adjust for overfitting. The effective number of parameters is calculated, following the recommendations of \citet{Gelman2013d}, as
-\begin{equation}
-  p_{\mathrm{WAIC}} = \sum_{i = 1}^{n} V_{s = 1}^{S} (\log p(y_{i}|\Theta^{S})).
-  \label{eq:pwaic}
-\end{equation}
-where \(V\) is the sample posterior variance of the log predictive density for each data point.
-
-Given both equations \ref{eq:lppd} and \ref{eq:pwaic}, WAIC is then calculated
-\begin{equation}
-  \mathrm{WAIC} = \mathrm{lppd} - p_{\mathrm{WAIC}}.
-  \label{eq:waic}
-\end{equation}
-When comparing two or more models, lower WAIC values indicate better out-of-sample predictive accuracy. Importantly, WAIC is just one way of comparing models. When combined with posterior predictive checks it is possible to get a more complete understanding of a model's fit to the data.
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = \textheight,width=\textwidth,keepaspectratio=true]{figure/env_mode_dist}
-  \caption{Histograms of the distributions of from the beta distribution defined in Eq. \ref{eq:bck_sim}. As to be expected, as sample size increases the draws better resemble the underlying true distribution. Sample size is indicated as the label of the x-axis, increasing in column major order.}
-  \label{fig:env_mode}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = \textheight,width=\textwidth,keepaspectratio=true]{figure/env_post_inspect}
-  \caption{Comparisons of the underlying distribution (blue) to posterior estimates based on increasing sample size (gold). Each posterior estimate is represented for only a single realization of draws, each with sample size indicated as the x-axis label (increasing in column major order). Black vertical lines correspond to the MAP estimate of the simulated taxon's affinity. This stands in contrast to the posterior distribution of expected affinity in gold.}
-  \label{fig:env_post}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = \textheight,width=\textwidth,keepaspectratio=true]{figure/env_diff}
-  \caption{Histograms of the difference in the underlying occurrence distribution and the posterior distribution estimates from the previous graph (Fig. \ref{fig:env_post}). The ``true'' value is included in all distributions of environmental affinities. Each affinity estimate is represented for only a single realization of draws, each with sample size indicated as the x-axis label (increasing in column major order). Blue vertical lines correspond to the difference in MAP estimates between the underlying distribution and the simulated taxon's draws. This stands in contrast to the distribution of the differences between the simulated taxon and background.}
-  \label{fig:env_diff}
-\end{figure}
+The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. However, because the Weibull model reduces to the exponential model when \(\alpha = 1\) my interest is not in choosing between these models. Instead, comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. For an explanation of how WAIC is calculated, see Appendix \ref{sec:waic}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
 
 \end{document}

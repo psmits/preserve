@@ -26,7 +26,8 @@ gts <- rev(as.character(lump[, 2]))
 sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
                         bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
                         gts = gts,
-                        cuts = 'Chang')
+                        cuts = 'Chang',
+                        bot = 'Trem')
 
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
@@ -523,6 +524,7 @@ renum <- sort(unique(mapvalues(coh,
                                             gts)))))
 rename <- gts[renum]
 sam <- sample(nrow(exp.fit$mu_prior), 1000)
+x <- data.frame(x = seq(-1, 1, 0.001))
 coef.list <- list()
 plotlist <- list()
 for(ii in seq(unique(coh))) {
@@ -560,7 +562,7 @@ for(ii in seq(unique(coh))) {
 png(filename = '../doc/survival/figure/cohort_quads.png', 
     width = 3000, height = 1500)
 multiplot(plotlist = plotlist, 
-          layout = matrix(c(rev(seq(unique(coh))), NA), 
+          layout = matrix(c(rev(seq(unique(coh))), NA, NA), 
                           ncol = 7, byrow = TRUE))
 dev.off()
 
