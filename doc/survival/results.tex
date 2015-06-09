@@ -21,7 +21,7 @@ Comparisons of the survival functions estimated from 1000 posterior predictive d
 
 %Inspection of the deviance residuals yields a similar pattern of biased estimates for longer lived taxa \uppercase{ref figure}. 
 
-Additionally, the Weibull model is expected to have slightly better out-of-sample predictive accuracy when compared to the exponential model (4577 versus 4605, respectively). This is congruent with graphical comparisons of the survival functions (Fig. \ref{fig:surv}). While the difference in WAIC between these two models is large, both results from the exponential and Weibull models will be presented.
+Additionally, the Weibull model is expected to have slightly better out-of-sample predictive accuracy when compared to the exponential model (4577 versus 4605, respectively). This is congruent with graphical comparisons of the survival functions (Fig. \ref{fig:surv}). Because the difference in WAIC between these two models is large, while results from both the exponential and Weibull models will be presented, those from the Weibull model will be discussed.
 
 % Results/hypothesis tests
 %   \mu of hierarchical effects
@@ -35,7 +35,7 @@ Given mean estimated extinction risk \(\tilde{\sigma}\), we can define the extin
   \frac{\tilde{\sigma_{i}}}{\tilde{\sigma}} = f(v_{i}) = \exp\left(\frac{-(\mu_{v} v_{i} + \mu_{v^{2}} v^{2})}{\alpha}\right).
   \label{eq:env}
 \end{equation}
-This function \(f(v_{i})\) has a y-intercept of \(\exp(0)\) or 1 because it does not have a specified non-zero intercept term. Equation \ref{eq:env} can be either concave up or down. A concave down \(f(v_{i})\) indicates that genera of intermediate environmental preference have greater durations than either extreme, and \textit{vice versa} for concave up function.
+This function \(f(v_{i})\) has a y-intercept of \(\exp(0)\) or 1 because it does not have a non-zero intercept term. Equation \ref{eq:env} can be either concave up or down. A concave down \(f(v_{i})\) indicates that genera of intermediate environmental preference have greater durations than either extreme, and \textit{vice versa} for concave up function.
 
 The expected effect of environmental preference as a multiplier of expected extinction risk can then be visualized (Fig. \ref{fig:env_mean}). This figure depicts 1000 posterior predictive estimates of Eq. \ref{eq:env} across all possible values of \(v\). The number indicates the posterior probability that the function is downward facing, with generalists having lower extinction risk/greater duration than either type of specialist. Note that the inflection point/optimum of Fig. \ref{fig:env_mean} is approximately \(x = 0\), something that is expected given the estimate of \(\mu_{v}\) (Fig. \ref{fig:mu}).
 
@@ -52,9 +52,7 @@ The correlation terms of \(\Omega\) (Fig. \ref{fig:omega}) describe the relation
 
 Marginal posterior probabilities of the correlations between the level of baseline extinction risk \(\beta_{0}\) and the effects of the taxon traits indicate that the correlation between expected extinction risk and both geographic range \(\beta_{r}\) and \(\beta_{v^{2}}\) are of particular note (Fig. \ref{fig:corr}). 
 
-There is a XX\% probability that \(\beta_{0}\) and \(\beta_{r}\) are negatively correlated, meaning that as extinction risk increases, the effect/importance of geographic range on genus duration increases. This means that increases in baseline extinction rate are correlated with an increased importance of geographic range size. 
-
-There is a XX\% probability that \(\beta_{0}\) and \(\beta_{v^{2}}\) are negatively correlated, meaning that as extinction risk increases, the peakedness of \(f(v_{i})\) increases and the relationship tends towards concave down.
+There is a XX\% probability that \(\beta_{0}\) and \(\beta_{r}\) are negatively correlated (Fig. \ref{fig:corr}), meaning that as extinction risk increases, the effect/importance of geographic range on genus duration increases. This means that increases in baseline extinction rate are correlated with an increased importance of geographic range size. There is a XX\% probability that \(\beta_{0}\) and \(\beta_{v^{2}}\) are negatively correlated (Fig. \ref{fig:corr}), meaning that as extinction risk increases, the peakedness of \(f(v_{i})\) increases and the relationship tends towards concave down. Additionally, there is a XX\% probability that values of \(\beta_{r}\) and \(\beta_{v^{2}}\) are positively correlated. 
 
 % effects varying between cohorts
 While the overall group level estimates are of particular importance when defining time-invariant differences in extinction risk, it is also important and useful to analyze the individual level parameter estimates in order to better understand how parameters actually vary across cohorts.
@@ -65,9 +63,9 @@ In comparison to the overall mean extinction risk \(\mu_{0}\), cohort level esti
 %   effect of environmental preference as duration multiplier
 How the effect of environmental affinity varies between cohorts can be observed by using the cohort specific coefficients estimates. Following the same procedure used earlier (Fig. \ref{fig:tau}), but substituting cohort specific estimates of \(\beta_{v}\) and \(\beta_{v^{2}}\) for \(\mu_{v}\) and \(\mu_{v^{2}}\), the cohort specific effect of environmental preference as a multiplier of mean extinction risk can be calculated. This was done only for the Weibull model, though the observed pattern should be similar for the exponential model. 
 
-As expected based on the estimates of \(\tau_{v}\) and \(\tau_{v^{2}}\), there is greater variation in the peakedness of \(f(v_{i})\) than there is variation between convave up and down functions (Fig. \ref{fig:env_cohort}). 9 of the 33 cohorts have less than 50\% posterior probability that generalists are shorter lived than specialists, though 2 of those cases have approximately a 50\% probability of being either concave up or down. This is congruent with the 0.70+ posterior probability that \(\mu_{v^{2}}\) is positive/\(f(v_{i})\) is concave down, which corresponds to approximately 8 out of 31 cohorts.
+As expected based on the estimates of \(\tau_{v}\) and \(\tau_{v^{2}}\), there is greater variation in the peakedness of \(f(v_{i})\) than there is variation between convave up and down functions (Fig. \ref{fig:env_cohort}). 9 of the 33 cohorts have less than 50\% posterior probability that generalists are shorter lived than specialists, though 2 of those cases have approximately a 50\% probability of being either concave up or down. This is congruent with the 0.86 posterior probability that \(\mu_{v^{2}}\) is positive/\(f(v_{i})\) is concave down.
 
-Additionally, a quite striking pattern emerges when the inflection point of the function is either far away from the y-intercept (x = 0, y = 1) or when there is little evidence of non-linearity (Fig. \ref{fig:env_cohort}). Cohort 21 and 20, for example, have almost linear relationships between environmental preference and the duration multiplier. This type of relationship occurs when \(\beta_{v^{2}}\) approaches 0, flattening the non-linear curvature of the relationship.
+Additionally, a quite striking pattern emerges when the inflection point of the function is either far away from the y-intercept (x = 0, y = 1) or when there is little evidence of non-linearity (Fig. \ref{fig:env_cohort}). For most of the all stages between the Emsian through the Tournaisian, inclusive, intermediate preferences are of intermediate extinction risk when compared with epicontinental specialists (lowest risk) or open-ocean specialists (highest risk). This time period represents most of the Devonian.
 
 \begin{figure}[ht]
   \centering
@@ -129,7 +127,7 @@ Additionally, a quite striking pattern emerges when the inflection point of the 
 \begin{sidewaysfigure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/cohort_quads}
-  \caption{Comparison of the cohort-specific estimates of \(f(v_{i})\) (Eq. \ref{eq:env}) for the 31 analyzed origination cohorts. The stage of origination is labeled on the x-axis of each panel. The oldest stage is in the upper left, while the youngest is in the lower left. The number in each panel corresponds to the posterior probability that \(f(v_{i})\) is concave down. Those that are highlighed in red do not have less than 51\% posterior predictive probability that \(f(v_{i})\) is concave down.}
+  \caption{Comparison of the cohort-specific estimates of \(f(v_{i})\) (Eq. \ref{eq:env}) for the 33 analyzed origination cohorts. The stage of origination is labeled on the x-axis of each panel. The oldest stage is in the upper left, while the youngest is in the lower left. The number in each panel corresponds to the posterior probability that \(f(v_{i})\) is concave down. Those that are highlighed in red have less than 51\% posterior predictive probability that \(f(v_{i})\) is concave down.}
   \label{fig:env_cohort}
 \end{sidewaysfigure}
 

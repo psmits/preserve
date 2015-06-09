@@ -588,8 +588,8 @@ per.best <- laply(coef.list, function(x) sum(x[, 2] > 0) / nrow(x))
 p.linear <- laply(coef.list, function(x) {
                   sum(x[, 1] / (x[, 2] * 2) > 1 | 
                       x[, 1] / (x[, 2] * 2) < -1)}) / nrow(coef.list[[1]])
-
-save(wei.waic,
+save(wei.fit,
+     wei.waic,
      exp.waic,
      p.epi.best, 
      wh.meanworst, 

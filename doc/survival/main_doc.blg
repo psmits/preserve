@@ -1,47 +1,50 @@
 This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: main_doc.aux
-The style file: abbrvnat.bst
+The style file: chicago.bst
 Database file #1: biblio.bib
 Database file #2: packages.bib
+Warning--empty organization in raster
+Warning--empty organization in stan-manual:2014
 You've used 43 entries,
-            2773 wiz_defined-function locations,
-            919 strings with 12128 characters,
-and the built_in function-call counts, 17922 in all, are:
-= -- 1741
-> -- 709
-< -- 38
-+ -- 254
-- -- 210
-* -- 1410
-:= -- 2802
-add.period$ -- 175
+            2861 wiz_defined-function locations,
+            897 strings with 10875 characters,
+and the built_in function-call counts, 26953 in all, are:
+= -- 2317
+> -- 1694
+< -- 0
++ -- 472
+- -- 622
+* -- 2311
+:= -- 4995
+add.period$ -- 127
 call.type$ -- 43
-change.case$ -- 192
+change.case$ -- 276
 chr.to.int$ -- 42
-cite$ -- 86
-duplicate$ -- 850
-empty$ -- 1598
-format.name$ -- 279
-if$ -- 3733
+cite$ -- 45
+duplicate$ -- 751
+empty$ -- 1768
+format.name$ -- 694
+if$ -- 4885
 int.to.chr$ -- 2
-int.to.str$ -- 1
+int.to.str$ -- 0
 missing$ -- 45
-newline$ -- 269
-num.names$ -- 172
-pop$ -- 317
+newline$ -- 216
+num.names$ -- 428
+pop$ -- 178
 preamble$ -- 1
-purify$ -- 156
+purify$ -- 541
 quote$ -- 0
-skip$ -- 590
+skip$ -- 804
 stack$ -- 0
-substring$ -- 854
-swap$ -- 61
+substring$ -- 1625
+swap$ -- 238
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 443
-warning$ -- 0
-while$ -- 192
+type$ -- 796
+warning$ -- 2
+while$ -- 471
 width$ -- 0
-write$ -- 657
+write$ -- 564
+(There were 2 warnings)

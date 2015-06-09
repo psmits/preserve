@@ -185,7 +185,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   }
   occurs <- lapply(taxon.occur, length)
 
-  # get species duration along with if died in stage before/of mass extinction
+  # get species duration along with if died in stage at/after mass extinction
   wh.stage <- llply(off, names)
   mass.ext <- cuts
   in.mass <- llply(wh.stage, function(x) x %in% mass.ext)
