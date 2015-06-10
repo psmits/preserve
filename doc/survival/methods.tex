@@ -15,20 +15,20 @@
 
 \subsection{Analytical approach}
 
-Hierarchical modelling, sometimes called ``mixed-effects modeling,'' is a statistical approach which explicitly takes into account the structure of the observed data in order to model both the within and between group variance \citep{Gelman2013d,Gelman2007}. In this case, origination cohorts are the groups and the higher-level relationship across cohorts corresponds to the dynamic survivorship model. This leads to simultaneous dynamic and cohort survivorship analysis. The units of study (e.g. genera) each belong to a single grouping (e.g. origination cohort). These groups are considered draws from a shared probability distribution (e.g. all cohorts, observed and unobserved). The group-level parameters are then estimated simultaneously as the other parameters of interest (e.g. covariate effects) \citep{Gelman2013d}. The subsequent estimates are partially pooled together, where parameters from groups with large samples or effects remain large while those of groups with small samples or effects are pulled towards the overall group mean. 
+Hierarchical modelling, sometimes called ``mixed-effects modeling,'' is a statistical approach which explicitly takes into account the structure of the observed data in order to model both the within and between group variance \citep{Gelman2013d,Gelman2007}. The units of study (e.g. genera) each belong to a single grouping (e.g. origination cohort). These groups are considered draws from a shared probability distribution (e.g. all cohorts, observed and unobserved). The group-level parameters are then estimated simultaneously as the other parameters of interest (e.g. covariate effects) \citep{Gelman2013d}. The subsequent estimates are partially pooled together, where parameters from groups with large samples or effects remain large while those of groups with small samples or effects are pulled towards the overall group mean. 
 
-This partial pooling is one of the greatest advantages of hierarchical modeling. By letting the groups ``support'' each other, parameter estimates then better reflect our actual uncertainty. Additionally, this partial pooling helps control for multiple comparisons and possibly spurious results as effects with little support are drawn towards the overall group mean \citep{Gelman2013d,Gelman2007}. 
+This partial pooling is one of the greatest advantages of hierarchical modeling. By letting the groups ``support'' each other, parameter estimates then better reflect our statistical uncertainty. Additionally, this partial pooling helps control for multiple comparisons and possibly spurious results as effects with little support are drawn towards the overall group mean \citep{Gelman2013d,Gelman2007}. 
 
-All covariate effects (regression coefficients), as well as the intercept term (baseline extinction risk), were allowed to vary by group (origination cohort). The covariance/correlation between covariate effects was also modeled. This hierarchical structure allows inference for how covariates effects may change with respect to each other while simultaneously estimating the effects themselves, correctly propagating our uncertainty. 
+All covariate effects (regression coefficients), as well as the intercept term (baseline extinction risk), were allowed to vary by group (origination cohort). The covariance/correlation between covariate effects was also modeled. This hierarchical structure allows inference for how covariates effects may change with respect to each other while simultaneously estimating the effects themselves, propagating our uncertainty through all estimates. 
 
-Additionally, instead of relying on point estimates of environmental affinity, I treat environmental affinity as a continuous measure of the difference between the taxon's environmental occurrence pattern and the background occurrence pattern.
+Additionally, instead of relying on point estimates of environmental affinity, I treat environmental affinity as a continuous measure of the difference between the taxon's environmental occurrence pattern and the background occurrence pattern (Appendix \ref{sec:uncer}).
 
 
 \subsection{Fossil occurrence information}
 
 The dataset analyzed here is derived from the a combination of the occurrence information from \citet{Foote2013} and the body size data from \citet{Payne2014}. The \citet{Foote2013} dataset is based on the Paleobiology Database (http://www.paleodb.org); see \citet{Foote2013} for a full description of the inclusion criterion. Additionally, epicontinental versus open ocean assignemnts for occurrence information are based on \citet{Miller2009a}. \uppercase{note: I don't know how this may need to be updated.}
 
-Sampled occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Genera with a last occurrence in or after Changhsingian stage were right censored while at the Changhsingian. Genera with a duration of only one stage were left censored (see Appendix \ref{sec:cen}). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), and body size (\(m\)). 
+Sampled occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Genera with a last occurrence in or after Changhsingian stage were right censored at the Changhsingian. Genera with a duration of only one stage were left censored (Appendix \ref{sec:cen}). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), and body size (\(m\)). 
 
 Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}.
 
@@ -36,15 +36,15 @@ For each stage, the total number of occupied grid cells, or cells in which a fos
 
 Body size data was sourced directly from \citet{Payne2014}. Because those measurements are presented without error, a measurement error model similar to the one for environmental affinity could not be implemented (Appendix \ref{sec:uncer}).
 
-Prior to analysis, geographic range and body size were transformed and standardized in order to improve interpretability of the results. Geographic range size, which can only vary between 0 and 1, was logit transformed. Body size, which is defined for all positive real values, was natural log transformed. These covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
+Prior to analysis, geographic range and body size were transformed and standardized in order to improve interpretability of the results. Geographic range, which can only vary between 0 and 1, was logit transformed. Body size, which is defined for all positive real values, was natural log transformed. These covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
 
 
 \subsection{Survival model}
 Genus durations were modeled as time-till-event data \citep{Klein2003}, with covariate information used in estimates of extinction risk as a hierarchical regression model. Genus durations were assumed to follow either an exponential or Weibull distribution. Each of these distributions makes assumptions about how duration may effect extinction risk \citep{Klein2003}. The exponential distribution assumes that extinction risk is independent of duration. In contrast, the Weibull distribution allows for age dependent extinction via the shape parameter \(\alpha\), though only as a monotonic function of duration. Importantly, the Weibull distribution is equivalent to the exponential distribution when \(\alpha = 1\). 
 
-\(y_{i}\) is the duration of genus \(i\) in geologic stages, \(X\) is the matrix of covariates including a constant term, \(B_{j}\) is the vector of regression coefficients for origination cohort \(j\), \(\Sigma\) is the covariance matrix of the regression coefficients, \(\tau\) is the vector of scales the standard deviations of the between-cohort variation in regression coefficient estimates, and \(\Omega\) is the correlation matrix of the regression coefficients.
+The following variables are defined: \(y_{i}\) is the duration of genus \(i\) in geologic stages, \(X\) is the matrix of covariates including a constant term, \(B_{j}\) is the vector of regression coefficients for origination cohort \(j\), \(\Sigma\) is the covariance matrix of the regression coefficients, \(\tau\) is the vector of scales the standard deviations of the between-cohort variation in regression coefficient estimates, and \(\Omega\) is the correlation matrix of the regression coefficients.
 
-The exponential model is then defined
+The exponential model is defined
 \begin{equation}
   \begin{aligned}
     y_{i} &\sim \mathrm{Exponential}(\lambda) \\
@@ -85,7 +85,7 @@ The principle difference between this model and the previous (Eq. \ref{eq:exp_to
 For an explanation of how this model was developed and parameter explanations, please see Appendix \ref{sec:survival}. Note that these models (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) do not include how the uncertainty in environmental affinity is included nor how censored observations are included. For an explanation of both of these aspects, see Appendices \ref{sec:uncer} and \ref{sec:cen}.
 
 \subsection{Parameter estimation}
-The  joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10000 draws, split half warm-up and half sampling and thinned to every 10th sample for a total of 5000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
+The  joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 draws each, split half warm-up and half sampling and thinned to every 10th sample for a total of 5000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
 
 \subsection{Model evaluation}
@@ -96,23 +96,6 @@ The strategy behind posterior predictive checks is to draw simulated values from
 
 In order to compare the fitted model to the observed data, various graphical comparisons or test quantities need to be defined. The principal comparison used here is a comparison between non-parameteric approximation of the survival function \(S(t)\) as estimated from both the observed data and each of the replicated data sets. The purpose of this comparison is to determine if the model approximates the same survival/extinction pattern as the original data. 
 
-%I also did a graphical examination of the deviance residuals. While normal residuals are defined as \(y_{i}^{rep} - y_{i}\), deviance residuals are a specific class of residuals derived with non-normal errors in mind. The definition of deviance residuals for a Weibull regression, of which the above models can be considered, is as follows. First define the cumulative hazard function \(\Lambda(t)\) for the Weibull distribution \citep{Klein2003}. Given \(S(t)\) (Eq. \ref{eq:wei_surv}), the cumulative hazard function is 
-%\begin{equation}
-%  \Lambda(t) = -log\left(S\left(t\right)\right).
-%\end{equation}
-%
-%Next, define martingale residuals \(m\) as
-%\begin{equation}
-%  m_{i} = I_{i} - \Lambda(t_i).
-%\end{equation}
-%\(I\), called the inclusion vector, is vector of length \(n\) where \(I_{i} = 1\) means the observation is completely observed and \(I_{i} = 0\) means the observation is censored. Martingale residuals have a mean of 0, range between 1 and \(-\infty\), and can be viewed as the difference between the observed number of deaths between 0 and \(t_{i}\) and the expected number of deaths based on the model. However, martingale residuals are asymmetrically distributed, and can not be interpreted in the same manner as standard residuals. 
-%
-%The solution to this is to use deviance residuals, \(D\), which are defined as a function of martingale residuals and takes the form
-%\begin{equation}
-%  D_{i} = \text{sign}(m_{i}) \sqrt{-2[m_{i} + I_{i}log(I_{i} - m_{i})]}.
-%\end{equation}
-%Deviance residuals have a mean of 0 and a standard deviation of 1 by definition \citep{Klein2003}.
-
-The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. However, because the Weibull model reduces to the exponential model when \(\alpha = 1\) my interest is not in choosing between these models. Instead, comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. For an explanation of how WAIC is calculated, see Appendix \ref{sec:waic}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
+The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. Out-of-sample predictive accuracy is a measure of the expected fit of the model to new data. However, because the Weibull model reduces to the exponential model when \(\alpha = 1\) my interest is not in choosing between these models. Instead, comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. For an explanation of how WAIC is calculated, see Appendix \ref{sec:waic}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
 
 \end{document}

@@ -357,7 +357,7 @@ tb.cv <- ggplot(baseline.covar, aes(x = value))
 tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
 tb.cv <- tb.cv + facet_grid(var ~ lab, labeller = label_parsed)
-tb.cv <- tb.cv + labs(x = 'Parameter estimate', y = 'Prob. Density')
+tb.cv <- tb.cv + labs(x = 'Correlation', y = 'Prob. Density')
 ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.png',
        width = 10, height = 5)
 
