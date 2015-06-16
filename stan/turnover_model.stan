@@ -14,14 +14,11 @@ functions {
     }
     return 0;
   }
-  int foo(int fc, int s, int lc) {
-    return fc * max(1, s - lc);
-  }
   real state_space_log(int[] y, vector phi, vector p, vector gamma) {
     int ft;
     int lt;
     int S;
-    vector[foo(first_capture(y), size(y), last_capture(y))] lp;
+    vector[first_capture(y) * (size(y) - last_capture(y) + 1)] lp;
     int i;
 
     ft <- first_capture(y);
@@ -58,46 +55,29 @@ functions {
   }
 }
 data {
-  int N;
-  int T;
-  int sight[N, T];
+  int R;  // rows, occurrences records
+  int C;  // columns, temporal bins
+  int T;  // number of unique taxa
+  int P;  // number of provinces
+  int sight[R, C];  // total sight record matrix
+  int taxon[R];  // which taxon for record
+  int prov[P];  // size of each province
 }
 parameters {
-  vector[T - 1] phi_logit;
-  vector[T] p_logit;
-  vector[T] gamma_logit;
-  real phi_mu;
-  real p_mu;
-  real gamma_mu;
-  real<lower=0> phi_scale;
-  real<lower=0> p_scale;
-  real<lower=0> gamma_scale;
-}
-transformed parameters {
-  vector<lower=0,upper=1>[T - 1] phi;
-  vector<lower=0,upper=1>[T] p;
-  vector<lower=0,upper=1>[T] gamma;
-
-  for(t in 1:T) {
-    if(t < T) {
-      phi[t] <- inv_logit(phi_logit[t]);
-    }
-    p[t] <- inv_logit(p_logit[t]);
-    gamma[t] <- inv_logit(gamma_logit[t]);
-  }
+  vector<lower=0,upper=1>[C - 1] phi[P];
+  vector<lower=0,upper=1>[C] p[P];
+  vector<lower=0,upper=1>[C] gamma[P];
 }
 model {
-  phi_logit ~ normal(phi_mu, phi_scale);
-  phi_mu ~ normal(0, 1);
-  phi_scale ~ cauchy(0, 1);
-  p_logit ~ normal(p_mu, p_scale);
-  p_mu ~ normal(0, 1);
-  p_scale ~ cauchy(0, 1);
-  gamma_logit ~ normal(gamma_mu, gamma_scale);
-  gamma_mu ~ normal(0, 1);
-  gamma_scale ~ cauchy(0, 1);
-
-  for(n in 1:N) {
-    sight[n] ~ state_space(phi, p, gamma);
+  for(k in 1:P) {
+    if(k == 1) {
+      for(y in 1:(prov[k])) {
+        sight[y] ~ state_space(phi[k], p[k], gamma[k]);
+      }
+    } else {
+      for(y in (prov[k - 1] + 1):prov[k]) {
+        sight[y] ~ state_space(phi[k], p[k], gamma[k]);
+      }
+    }
   }
 }

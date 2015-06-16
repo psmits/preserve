@@ -30,7 +30,6 @@ sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya',
 # argument: binning scheme being used
 # argument: gts global temporal scale for the bins
 # argument: cuts where the mass ext is
-# (argument: temporal unit; currently it is set up for pre-P/T boundary)
 #
 # this function cleans the data completely as document in my mung routine
 # at the end, spit out the sepkoski.data file
@@ -45,7 +44,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   # i need to have good bin information, either stage 10my or fr2my
   bibr[, bins] <- as.character(bibr[, bins])
   bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
-  
+
   bibr <- bibr[!is.na(bibr[, bins]), ]
   bibr <- bibr[!is.na(bibr$EO_5_1_2014), ]
   bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
@@ -75,16 +74,16 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
                                  all(which(gts %in% x) < which(gts == cuts)))))
   # remove those
   bibr <- bibr[!(bibr$occurrences.genus_name %in% c(too.old, too.young)), ]
-  
+
   # find out which range out of the paleozoic
   straight.occ <- dlply(bibr, .(occurrences.genus_name), 
                         function(x) unique(x[, bins]))
   survivors <- names(which(laply(straight.occ, function(x) 
                                  any(which(gts %in% x) < which(gts == cuts)))))
- 
+
   paleozoic <- gts[which(gts == cuts):which(gts == bot)]
   bibr <- bibr[bibr[, bins] %in% paleozoic, ]
-  
+
   # this section is all about finding duration
   collec.stage <- table(bibr[, bins])
   find.dur <- function(x) {
@@ -252,76 +251,84 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
 
 
 # space.time -- prep data for state-space model
-space.time <- function(bibr, taxon = 'Rhynchonellata', gts = gts, shape) {
+# argument: bibr fossil occurrence information
+# argument: taxon taxonomic group
+# argument: binning scheme
+# argument: gts geologic time scale
+# argument: cuts where the end is
+# arugment: bot where the top is
+# argument: shape shape file of globe
+space.time <- function(bibr, 
+                       taxon = 'Rhynchonellata', 
+                       bins = 'collections.stage',
+                       gts = gts, 
+                       cuts = 'Changhsingian',
+                       bot = 'Tremadocian',
+                       shape) {
   # i need to have good bin information, either stage 10my or fr2my
-  #taxon <- 'Rhynchonellata'
-  #bibr <- fossil
-  bins <- c('collections.stage')
-  bibr$collections.stage <- as.character(bibr$collections.stage)
+  bibr[, bins] <- as.character(bibr[, bins])
   bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
+
+  bibr <- bibr[!is.na(bibr[, bins]), ]
+  bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
+  bibr <- bibr[!is.na(bibr$collections.paleolatdec), ]
   bibr <- bibr[bibr$occurrences.class_name == taxon, ]
- 
-  to.rm <- apply(is.na(bibr[, c('occurrences.genus_name', 
-                                'collections.stage', 
-                                'collections.paleolngdec', 
-                                'collections.paleolatdec')]), 
-                 1, any)
-  bibr <- bibr[!to.rm, ]
-  cuts <- 'Changhsingian'
-  bibr <- bibr[bibr$collections.stage %in% gts, ] 
-  paleozoic <- gts[which(gts == cuts):length(gts)]
-                   #which(gts == 'Asselian')]
-  bibr <- bibr[bibr$collections.stage %in% paleozoic, ]
 
-  ## to do this by province 
-  ## geographic position
-  #eq <- CRS("+proj=cea +lat_0=0 +lon_0=0 +lat_ts=30 +a=6371228.0 +units=m")
-  #proj4string(shape) <- eq
-  #spatialref <- SpatialPoints(coords = bibr[, c('collections.paleolngdec', 
-  #                                              'collections.paleolatdec')], 
-  #                            proj4string = eq)  # wgs1984.proj
-  #r <- raster(shape, nrows = 50, ncols = 50)
-  #sp.ras <- rasterize(spatialref, r)
-  #bibr$membership <- cellFromXY(sp.ras, xy = bibr[, c('collections.lngdec', 
-  #                                                    'collections.latdec')])
-  ## identify bioprovinces
-  #cooc <- bibr[, c('occurrences.genus_name', 'membership')]
-  #g <- graph.data.frame(cooc, directed = FALSE)
-  #V(g)$type <- V(g)$name %in% unique(cooc[, 2])
-  #mapcom <- infomap.community(g, nb.trials = 1000)
-  #
-  #cg <- contract.vertices(g, membership(mapcom))
-  #E(cg)$weight <- 1
-  #cg <- simplify(cg, remove.loops = FALSE)
-  #cgcom <- infomap.community(cg, nb.trials = 1000)
-  #
-  ## what community do the originals belong to?
-  ## what community do the second level belong to?
-  #members <- taxon.member <- loc.member <- list()
-  #taxa <- which(str_detect(V(g)$name, '[A-Za-z]'))
-  #loc <- which(str_detect(V(g)$name, '[0-9]'))
-  #for(ii in seq(length(communities(cgcom)))) {
-  #  members[[ii]] <- unlist(communities(mapcom)[communities(cgcom)[[ii]]])
-  #  taxon.member[[ii]] <- members[[ii]][members[[ii]] %in% taxa]
-  #  loc.member[[ii]] <- members[[ii]][members[[ii]] %in% loc]
-  #}
-  ## assign taxa to provinces
-  #second.member <- rep(seq(length(members)), times = laply(members, length))
-  #second.loc <- rep(seq(length(loc.member)), times = laply(loc.member, length))
-  #values(sp.ras)
+  paleozoic <- gts[which(gts == cuts):which(gts == bot)]
+  bibr <- bibr[bibr[, bins] %in% paleozoic, ]
 
-  ## each row corresponds to a taxons occurrence in a province
-  ## have province indicator
-  ## have taxon indicator
+  # spatial analysis
+  eq <- CRS("+proj=cea +lat_0=0 +lon_0=0 +lat_ts=30 +a=6371228.0 +units=m")
+  globe.map <- readShapeSpatial('../data/ne_10m_coastline.shp')  # from natural earth
+  proj4string(globe.map) <- eq
 
-  working <- bibr[, c('occurrences.genus_name', 'collections.stage')]
-  occ <- dcast(working, occurrences.genus_name ~ collections.stage)
-  occ <- apply(occ[, -1], 2, function(x) {
-               cc <- x > 0
-               x[cc] <- 1
-               x})
-  ord <- paleozoic %in% colnames(occ) 
-  
-  occ <- occ[, rev(paleozoic[ord])]
+  spatialref <- SpatialPoints(coords = bibr[, c('collections.paleolngdec',
+                                                'collections.paleolatdec')],
+                              proj4string = eq)  # wgs1984.proj
+  r <- raster(globe.map, nrows = 70, ncols = 34)
+  sp.ras <- trim(rasterize(spatialref, r))
+  membership <- cellFromXY(sp.ras, xy = bibr[, c('collections.paleolngdec', 
+                                                 'collections.paleolatdec')])
+
+  # temp vs trop
+  n.tropic <- 23.5
+  s.tropic <- -23.5
+
+  north.temp <- bibr$collections.paleolatdec > n.tropic
+  north.trop <- bibr$collections.paleolatdec < n.tropic &
+  bibr$collections.paleolatdec > 0
+
+  south.trop <- bibr$collections.paleolatdec > s.tropic &
+  bibr$collections.paleolatdec < 0
+  south.temp <- bibr$collections.paleolatdec < s.tropic
+
+  locs <- list(north.temp, north.trop, south.trop, south.temp)
+
+  by.loc <- llply(locs, function(x) bibr[x, ])
+  occ <- llply(by.loc, function(x) {
+               working <- x[, c('occurrences.genus_name', bins)]
+               names(working) <- c('gen', 'stg')
+               occ <- dcast(working, gen ~ stg)
+               nn <- occ[, 1]
+               occ <- apply(occ[, -1], 2, function(x) {
+                            cc <- x > 0
+                            x[cc] <- 1
+                            x})
+               ord <- gts %in% colnames(occ) 
+               occ <- occ[, rev(gts[ord])]
+               rownames(occ) <- nn
+               occ})
+  occ <- llply(occ, function(x) {
+               if(ncol(x) < length(paleozoic)) {
+                 dummy <- matrix(0, nrow = nrow(x), ncol = length(paleozoic))
+                 ma <- which(paleozoic %in% colnames(x))
+                 for(ii in seq(length(ma))) {
+                   dummy[, ma[ii]] <- x[, ii]
+                 }
+                 rownames(dummy) <- rownames(x)
+                 dummy
+               } else {
+                 x
+               }})  # p/a by geologic unit for zone
   occ
 }

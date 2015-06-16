@@ -14,9 +14,6 @@ functions {
     }
     return 0;
   }
-//  int foo(int fc, int s, int lc) {
-//    return fc * max(1, s - lc);
-//  }
   real state_space_log(int[] y, vector phi, vector p, vector gamma) {
     int ft;
     int lt;

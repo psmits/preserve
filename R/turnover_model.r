@@ -6,16 +6,43 @@ source('../R/mung.r')
 
 data.file <- list.files('../data', pattern = 'Occs')
 fossil <- read.csv(paste0('../data/', data.file))
-shape <- readShapeSpatial('../data/ne_10m_coastline.shp')  # from natural earth
 bibr <- fossil
 
-sight <- space.time(bibr, gts = gts, shape = shape)
+lump.file <- list.files('../data', pattern = 'lump')
+lump <- read.csv(paste0('../data/', lump.file))
 
-#sight <- sight[sample(nrow(sight), 100), ]
-num <- nrow(sight)
-tim <- ncol(sight)
+shape <- readShapeSpatial('../data/ne_10m_coastline.shp')  # from natural earth
 
-data <- list(N = num, T = tim, sight = sight)
+sight <- space.time(bibr, 
+                    bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
+                    gts = rev(as.character(lump[, 2])),
+                    cuts = 'Chang',
+                    bot = 'Trem',
+                    shape = shape)
 
-with(data, {stan_rdump(list = c('N', 'T', 'sight'),
+sizes <- laply(sight, dim)
+time.bin <- sizes[1, 2]
+per.prov <- sizes[, 1]
+
+taxon <- as.numeric(as.factor(Reduce(c, llply(sight, rownames))))
+ntaxa <- length(unique(taxon))
+
+prov.size <- sizes[, 1]
+
+
+# R rows
+# C columns
+# T taxa
+# P provinces
+#
+# matrix[R, C] sight;
+# vector[R] taxon;
+# vector[P] prov;
+data <- list(R = sum(sizes[, 1]), C = time.bin, 
+             T = ntaxa, P = length(prov.size),
+             sight = Reduce(rbind, sight),
+             taxon = taxon,
+             prov = prov.size)
+
+with(data, {stan_rdump(list = c('R', 'C', 'T', 'P', 'sight', 'taxon', 'prov'),
                        file = '../data/data_dump/sight_info.data.R')})

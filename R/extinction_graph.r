@@ -29,6 +29,12 @@ sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
                         cuts = 'Chang',
                         bot = 'Trem')
 
+#oops <- fossil[fossil$occurrences.genus_name %in% sepkoski.data$genus, ]
+#ord.rate <- table(as.character(oops$occurrences.order_name))
+#ords <- names(ord.rate)
+#fam.rate <- table(as.character(oops$occurrences.family_name))
+#fams <- names(fam.rate)
+
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
 pat <- 'faun_weib_[0-9].csv'
@@ -120,8 +126,8 @@ surv.plot <- surv.plot + geom_line(size = 1)
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
-ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves.png',
-       width = 8, height = 5)
+ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves.pdf',
+       width = 8, height = 5, dpi = 600)
 
 
 # deviance residuals
@@ -139,8 +145,8 @@ res <- res + geom_point(alpha = 0.5, size = 1, position = 'jitter')
 res <- res + coord_cartesian(xlim = c(-0.5, 8))
 res <- res + facet_wrap( ~ L1, nrow = 3, ncol = 4)
 res <- res + labs(x = 'Duration in stages', y = 'Deviance residual')
-ggsave(res, filename = '../doc/survival/figure/residual_plot.png',
-       width = 8, height = 5)
+ggsave(res, filename = '../doc/survival/figure/residual_plot.pdf',
+       width = 8, height = 5, dpi = 600)
 
 
 ## posterior predictive point checks
@@ -211,8 +217,8 @@ omega.plot <- omega.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
 omega.plot <- omega.plot + relab.x + relab.y
 omega.plot <- omega.plot + labs(x = '', y = '')
 omega.plot <- omega.plot + theme(axis.text = element_text(size = 15))
-ggsave(omega.plot, filename = '../doc/survival/figure/correlation_heatmap.png',
-       width = 10, height = 5)
+ggsave(omega.plot, filename = '../doc/survival/figure/correlation_heatmap.pdf',
+       width = 10, height = 5, dpi = 600)
 
 # just for the weibull
 omega.wei <- melt(list(Weibull = wei.covcor[[1]]))
@@ -226,8 +232,8 @@ weicor.plot <- weicor.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
 weicor.plot <- weicor.plot + relab.x + relab.y
 weicor.plot <- weicor.plot + labs(x = '', y = '')
 weicor.plot <- weicor.plot + theme(axis.text = element_text(size = 15))
-ggsave(weicor.plot, filename = '../doc/survival/figure/wei_cor_heatmap.png',
-       width = 7, height = 5)
+ggsave(weicor.plot, filename = '../doc/survival/figure/wei_cor_heatmap.pdf',
+       width = 7, height = 5, dpi = 600)
 
 # covariance matrix
 sigma.med <- melt(list(Exponential = exp.covcor[[5]], 
@@ -243,8 +249,8 @@ sigma.plot <- sigma.plot + scale_fill_gradient2(name = 'Median\nCovariance',
 sigma.plot <- sigma.plot + relab.x + relab.y
 sigma.plot <- sigma.plot + labs(x = '', y = '')
 sigma.plot <- sigma.plot + theme(axis.text = element_text(size = 15))
-ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_heatmap.png',
-       width = 10, height = 5)
+ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_heatmap.pdf',
+       width = 10, height = 5, dpi = 600)
 
 
 # mean of all coefficients
@@ -277,8 +283,8 @@ coef.mean <- coef.mean + scale_colour_manual(values = cbp, name = '')
 coef.mean <- coef.mean + theme(axis.text.y = element_text(size = 10),
                                axis.text.x = element_text(size = 15),
                                legend.text = element_text(size = 10))
-ggsave(coef.mean, filename = '../doc/survival/figure/coef_means.png',
-       width = 8, height = 4)
+ggsave(coef.mean, filename = '../doc/survival/figure/coef_means.pdf',
+       width = 8, height = 4, dpi = 600)
 
 
 # variance vector for covariates
@@ -311,8 +317,8 @@ coef.var <- coef.var + scale_colour_manual(values = cbp, name = '')
 coef.var <- coef.var + theme(axis.text.y = element_text(size = 10),
                              axis.text.x = element_text(size = 15),
                              legend.text = element_text(size = 10))
-ggsave(coef.var, filename = '../doc/survival/figure/coef_var.png',
-       width = 8, height = 4)
+ggsave(coef.var, filename = '../doc/survival/figure/coef_var.pdf',
+       width = 8, height = 4, dpi = 600)
 
 
 # histogram of posterior of correlation between inter and env
@@ -358,8 +364,8 @@ tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
 tb.cv <- tb.cv + facet_grid(var ~ lab, labeller = label_parsed)
 tb.cv <- tb.cv + labs(x = 'Correlation', y = 'Prob. Density')
-ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.png',
-       width = 10, height = 5)
+ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.pdf',
+       width = 10, height = 5, dpi = 600)
 
 
 # change in baseline through time
@@ -422,8 +428,8 @@ base.line <- base.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 #base.line <- base.line + geom_line()
 base.line <- base.line + facet_grid(label ~ ., labeller = label_parsed)
 base.line <- base.line + labs(x = 'Stage', y = expression(beta[0]))
-ggsave(base.line, filename = '../doc/survival/figure/intercept_cohort.png',
-       width = 10, height = 5)
+ggsave(base.line, filename = '../doc/survival/figure/intercept_cohort.pdf',
+       width = 10, height = 5, dpi = 600)
 
 
 # change in range size effect through time
@@ -486,8 +492,8 @@ rage.line <- rage.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 #rage.line <- rage.line + geom_line()
 rage.line <- rage.line + facet_grid(label ~ ., labeller = label_parsed)
 rage.line <- rage.line + labs(x = 'Stage', y = expression(beta[r]))
-ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.png',
-       width = 10, height = 5)
+ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.pdf',
+       width = 10, height = 5, dpi = 600)
 
 
 # quadratics plot
@@ -513,8 +519,8 @@ quad <- quad + geom_text(y = 1.75, x = 0,
 quad <- quad + coord_cartesian(ylim = c(0, 2))
 quad <- quad + labs(x = expression(v[i]), 
                     y = expression(paste(tilde(sigma[i])/tilde(sigma))))
-ggsave(quad, filename = '../doc/survival/figure/environ_quad.png',
-       width = 7, height = 5)
+ggsave(quad, filename = '../doc/survival/figure/environ_quad.pdf',
+       width = 7, height = 5, dpi = 600)
 
 # now do quadratics plot with facet for each cohort
 # cohort one
@@ -559,7 +565,7 @@ for(ii in seq(unique(coh))) {
                             y = expression(paste(tilde(sigma[i])/tilde(sigma))))
   plotlist[[ii]] <- quadcoh
 }
-png(filename = '../doc/survival/figure/cohort_quads.png', 
+pdf(filename = '../doc/survival/figure/cohort_quads.pdf', 
     width = 3000, height = 1500)
 multiplot(plotlist = plotlist, 
           layout = matrix(c(rev(seq(unique(coh))), NA, NA), 
