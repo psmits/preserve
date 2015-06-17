@@ -64,11 +64,47 @@ data {
   int prov[P];  // size of each province
 }
 parameters {
+  vector[C - 1] phi_norm[P];
+  vector[C] p_norm[P];
+  vector[C] gamma_norm[P];
+  vector[3] loc[P];
+  vector<lower=0>[3] scale[P];
+  vector[3] mu;
+  vector<lower=0>[3] sigma;
+}
+transformed parameters {
   vector<lower=0,upper=1>[C - 1] phi[P];
   vector<lower=0,upper=1>[C] p[P];
   vector<lower=0,upper=1>[C] gamma[P];
+  for(k in 1:P) {
+    for(c in 1:C) {
+      if(c < C) {
+        phi[k][c] <- inv_logit(phi_norm[k][c]);
+      }
+      p[k][c] <- inv_logit(p_norm[k][c]);
+      gamma[k][c] <- inv_logit(gamma_norm[k][c]);
+    }
+  }
 }
 model {
+  // priors
+  for(k in 1:P) {
+    for(c in 1:C) {
+      if(c < C) {
+        phi_norm[k][c] ~ normal(loc[k][1], scale[k][1]);
+      }
+      p_norm[k][c] ~ normal(loc[k][2], scale[k][2]);
+      gamma_norm[k][c] ~ normal(loc[k][3], scale[k][3]);
+    }
+    loc[k][1] ~ normal(mu[1], sigma[1]);
+    loc[k][2] ~ normal(mu[2], sigma[2]);
+    loc[k][3] ~ normal(mu[3], sigma[2]);
+    scale[k] ~ cauchy(0, 1);
+  }
+  mu ~ normal(0, 1);
+  sigma ~ cauchy(0, 1);
+  
+  // sampling statement
   for(k in 1:P) {
     if(k == 1) {
       for(y in 1:(prov[k])) {
