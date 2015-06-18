@@ -13,4 +13,29 @@
 \begin{document}
 \section{Materials and Methods}
 
+\subsection{Occurrence information}
+
+\subsection{Diversity model}
+
+This model is based on the Jolly-Seber model for capture-mark-recapture data CITATION. There are three major parameters to this model: survival probability \(\phi\), recruitment probability \(\gamma\), and sampling probability \(p\). Implicit in this model is also removal probabilty \(1 - \phi\).
+
+\(\phi_{t - 1}\) is the probability of surving to time \(t\) from \(t - 1\) given presence at time \(t - 1\). Survival probability is a function of both extinction and extirpation.
+
+\(\gamma_{t}\) is the probability of first appearing at time \(t\) given absence at time \(t - 1\). Recruitment is a function of both origination and colonization.
+
+\(p_{t}\) is the probability of observing \(y_{i}\) at time \(t\) if it is present.
+
+
+\begin{equation}
+  \begin{aligned}
+    y_{i,t} &\sim \mathrm{Bernoulli}(p_{t} z_{i, t}) \\
+    z_{i, t} &\sim
+    \begin{cases}
+      \mathrm{Bernoulli}(\gamma_{1}) & \text{if } t = 1, \text{and} \\
+      \mathrm{Bernoulli}(z_{i, t} \phi_{t - 1} + (1 - z_{i, t}) \gamma_{t}) & \text{if } t > 1. \\
+    \end{cases}
+  \end{aligned}
+\end{equation}
+
+
 \end{document}
