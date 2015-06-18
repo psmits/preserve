@@ -88,6 +88,7 @@ transformed parameters {
 }
 model {
   // priors
+  // missing spatial relationships between provinces
   for(k in 1:P) {
     for(c in 1:C) {
       if(c < C) {
