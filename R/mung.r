@@ -30,6 +30,7 @@ sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya',
 # argument: binning scheme being used
 # argument: gts global temporal scale for the bins
 # argument: cuts where the mass ext is
+# arugment: bot where the top is
 #
 # this function cleans the data completely as document in my mung routine
 # at the end, spit out the sepkoski.data file
@@ -331,4 +332,93 @@ space.time <- function(bibr,
                  x
                }})  # p/a by geologic unit for zone
   occ
+}
+
+
+# get the environmental occurrence for taxa at the stage level to track change
+# argument: bibr data frame for all the general occurrence shit
+# argument: taxonomic group
+# argument: binning scheme being used
+# argument: gts global temporal scale for the bins
+# argument: cuts where the mass ext is
+# arugment: bot where the top is
+#
+environ.occ <- function(bibr, 
+                        taxon = 'Rhynchonellata', 
+                        bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
+                        gts = gts, 
+                        cuts = 'Chang', 
+                        bot = 'Trem') {
+
+  bibr[, bins] <- as.character(bibr[, bins])
+  bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
+
+  bibr <- bibr[!is.na(bibr[, bins]), ]
+  bibr <- bibr[!is.na(bibr$EO_5_1_2014), ]
+  bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
+  bibr <- bibr[!is.na(bibr$collections.paleolatdec), ]
+
+  bibr <- bibr[bibr$occurrences.class_name == taxon, ]
+
+  straight.occ <- dlply(bibr, .(occurrences.genus_name), 
+                        function(x) unique(x[, bins]))
+  # find out which range into the paleozoic
+  too.old <- names(which(laply(straight.occ, function(x) 
+                               any(which(gts %in% x) > which(gts == bot)))))
+  # never in the paleozoic
+  too.young <- names(which(laply(straight.occ, function(x) 
+                                 all(which(gts %in% x) < which(gts == cuts)))))
+  # remove those
+  bibr <- bibr[!(bibr$occurrences.genus_name %in% c(too.old, too.young)), ]
+
+  # find out which range out of the paleozoic
+  straight.occ <- dlply(bibr, .(occurrences.genus_name), 
+                        function(x) unique(x[, bins]))
+  survivors <- names(which(laply(straight.occ, function(x) 
+                                 any(which(gts %in% x) < which(gts == cuts)))))
+
+  paleozoic <- gts[which(gts == cuts):which(gts == bot)]
+  bibr <- bibr[bibr[, bins] %in% paleozoic, ]
+
+  # now start getting to relevant occurrence information
+  # split by stage
+  # stage by genus
+  stages <- split(bibr, bibr[, bins])
+  genus <- llply(stages, function(x) split(x, x$occurrences.genus_name))
+  occur <- llply(genus, function(x) llply(x, nrow))
+  epicont <- llply(genus, function(x) 
+                   llply(x, function(y) sum(y$EO_5_1_2014 == 'E')))
+
+  occpat <- Map(function(a, b) cbind(total = unlist(a), epi = unlist(b)), 
+                a = occur, b = epicont)
+  occpat <- occpat[rev(order(match(names(occpat), gts)))]
+
+  ambient <- laply(occpat, function(x) sum(x[, 1]))
+  land <- laply(occpat, function(x) sum(x[, 2]))
+
+  # for each observed genera
+  gen <- sort(unique(bibr$occurrences.genus_name))
+  oo <- list()
+  for(ii in seq(length(gen))) {
+    tester <- laply(occpat, function(x) any(rownames(x) == gen[ii]))
+    if(sum(tester) > 1) {
+      ww <- occpat[tester]
+      obs <- llply(ww, function(x) x[rownames(x) == gen[ii]])
+      obs.epi <- laply(obs, function(x) x[2])
+      obs.off <- laply(obs, function(x) x[1] - x[2])
+
+      back.epi <- land[tester] - obs.epi
+      back.off <- ambient[tester] - land[tester] - obs.off
+
+      oo[[ii]] <- data.frame(stg = names(obs), 
+                             obs.epi, obs.off, 
+                             back.epi, back.off)
+    } else {
+      oo[[ii]] <- NA
+    }
+  }
+  names(oo) <- gen
+  occ.filt <- Filter(function(x) length(x) > 1, oo)
+
+  occ.filt
 }

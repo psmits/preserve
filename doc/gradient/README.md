@@ -1,6 +1,25 @@
 Gradients
 =========
 
+Questions/theoretical framework
+-------------------------------
+
+Latitudinal diversity gradients, "normal" or "reversed."
+
+Higher extinction and origination at tropics.
+
+Hypotheses based on diversification
+
+-  Museum vs Cradle
+  -  Preserve versus create diversity.
+-  Out of the Tropics / In to the Tropics
+  - Diversify in one and then move into other.
+
+These hypotheses have distinct predictions about the relative birth/death
+probabilities, and migration/extirpation, between the environmental
+types.
+
+
 Data
 ----
 
