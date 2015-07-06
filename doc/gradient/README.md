@@ -19,6 +19,10 @@ These hypotheses have distinct predictions about the relative birth/death
 probabilities, and migration/extirpation, between the environmental
 types.
 
+Greater recruitment and/or loss in tropical or temperate zones?
+
+Correlation between recruitment and loss?
+
 
 Data
 ----
@@ -41,3 +45,9 @@ Need to include taxon effect as taxa can be in more than one province which
 violates exchangability.
 
 Need to include binary predictor of "seen else where?"
+
+Model is focused on first entry and last exit, not re-colonization dynamics.
+That would require a more traditional HMM, not one with an absorbing state
+(death/extinction).
+
+Do I want to distinguish between northern and southern hemispheres?

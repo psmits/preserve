@@ -22,12 +22,11 @@ sight <- space.time(bibr,
 
 sizes <- laply(sight, dim)
 time.bin <- sizes[1, 2]
-per.prov <- sizes[, 1]
+prov.size <- sizes[, 1]
 
 taxon <- as.numeric(as.factor(Reduce(c, llply(sight, rownames))))
 ntaxa <- length(unique(taxon))
 
-prov.size <- sizes[, 1]
 
 
 # R rows
