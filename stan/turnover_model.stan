@@ -69,13 +69,20 @@ parameters {
   vector[C] gamma_norm[P];
   vector[3] loc[P];
   vector<lower=0>[3] scale[P];
-  vector[3] mu;
+  vector[P] mu[3];
   vector<lower=0>[3] sigma;
+  vector[3] mu_prior;
+  corr_matrix[3] Omega;
+  vector[3] tau;
 }
 transformed parameters {
   vector<lower=0,upper=1>[C - 1] phi[P];
   vector<lower=0,upper=1>[C] p[P];
   vector<lower=0,upper=1>[C] gamma[P];
+
+  cov_matrix[5] Sigma;
+
+  // logit stuff
   for(k in 1:P) {
     for(c in 1:C) {
       if(c < C) {
@@ -85,6 +92,9 @@ transformed parameters {
       gamma[k][c] <- inv_logit(gamma_norm[k][c]);
     }
   }
+  
+  // multivariate normal
+  Sigma <- quad_form_diag(Omega, tau);
 }
 model {
   // priors
@@ -97,14 +107,21 @@ model {
       p_norm[k][c] ~ normal(loc[k][2], scale[k][2]);
       gamma_norm[k][c] ~ normal(loc[k][3], scale[k][3]);
     }
-    loc[k][1] ~ normal(mu[1], sigma[1]);
-    loc[k][2] ~ normal(mu[2], sigma[2]);
-    loc[k][3] ~ normal(mu[3], sigma[2]);
+    loc[k][1] ~ normal(mu[1][k], sigma[1]);
+    loc[k][2] ~ normal(mu[2][k], sigma[2]);
+    loc[k][3] ~ normal(mu[3][k], sigma[2]);
     scale[k] ~ cauchy(0, 1);
   }
-  mu ~ normal(0, 1);
   sigma ~ cauchy(0, 1);
-  
+ 
+  // correlation between parameters
+  for(i in 1:3) {
+    mu[i] ~ multi_normal(mu_prior, Sigma);
+  }
+  mu_prior ~ normal(0, 1);
+  tau ~ cauchy(0, 1);
+ 
+
   // sampling statement
   for(k in 1:P) {
     if(k == 1) {
