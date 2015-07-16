@@ -73,7 +73,10 @@ parameters {
   vector<lower=0>[3] sigma;
   vector[3] mu_prior;
   corr_matrix[3] Omega;
-  vector[3] tau;
+  vector<lower=0>[3] tau;
+
+  vector[T] indiv;
+  real<lower=0> sigma_indiv;
 }
 transformed parameters {
   vector<lower=0,upper=1>[C - 1] phi[P];
@@ -99,28 +102,34 @@ transformed parameters {
 model {
   // priors
   // missing spatial relationships between provinces
-  for(k in 1:P) {
-    for(c in 1:C) {
-      if(c < C) {
-        phi_norm[k][c] ~ normal(loc[k][1], scale[k][1]);
+  for(r in 1:R) {
+    for(k in 1:P) {
+      for(c in 1:C) {
+        if(c < C) {
+          phi_norm[k][c] ~ normal(loc[k][1], scale[k][1]);
+        }
+        p_norm[k][c] ~ normal(loc[k][2], scale[k][2]);
+        gamma_norm[k][c] ~ normal(loc[k][3], scale[k][3]);
       }
-      p_norm[k][c] ~ normal(loc[k][2], scale[k][2]);
-      gamma_norm[k][c] ~ normal(loc[k][3], scale[k][3]);
+      loc[k][1] ~ normal(mu[1][k] + indiv[r], sigma[1]);
+      loc[k][2] ~ normal(mu[2][k] + indiv[r], sigma[2]);
+      loc[k][3] ~ normal(mu[3][k] + indiv[r], sigma[2]);
+      scale[k] ~ cauchy(0, 1);
     }
-    loc[k][1] ~ normal(mu[1][k], sigma[1]);
-    loc[k][2] ~ normal(mu[2][k], sigma[2]);
-    loc[k][3] ~ normal(mu[3][k], sigma[2]);
-    scale[k] ~ cauchy(0, 1);
   }
   sigma ~ cauchy(0, 1);
- 
+  
+  # individual effects are all drawn from the same normal
+  indiv ~ normal(0, sigma_indiv);
+  sigma_indiv ~ cauchy(0, 1);
+
   // correlation between parameters
   for(i in 1:3) {
     mu[i] ~ multi_normal(mu_prior, Sigma);
   }
   mu_prior ~ normal(0, 1);
   tau ~ cauchy(0, 1);
- 
+
 
   // sampling statement
   for(k in 1:P) {
