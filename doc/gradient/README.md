@@ -48,6 +48,9 @@ Need to include binary predictor of "seen else where?"
 
 Model is focused on first entry and last exit, not re-colonization dynamics.
 That would require a more traditional HMM, not one with an absorbing state
-(death/extinction).
+(death/extinction). Maybe just do both models and compare? That would get
+turnover with out distinguishing types of gains/losses. Another possibility
+would then be including the binary predictor "seen else where" for certain time
+points, this way there the effect of global observation can be estimated.
 
 Do I want to distinguish between northern and southern hemispheres?

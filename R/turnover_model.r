@@ -27,8 +27,6 @@ prov.size <- sizes[, 1]
 taxon <- as.numeric(as.factor(Reduce(c, llply(sight, rownames))))
 ntaxa <- length(unique(taxon))
 
-
-
 # R rows
 # C columns
 # T taxa
