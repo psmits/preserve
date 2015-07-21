@@ -35,6 +35,9 @@ parameters {
   vector<lower=0>[5] sigma;
   real<lower=0,upper=1> theta_species[N];
   real<lower=0,upper=1> theta_back[N];
+
+  real<lower=0> tau[4];
+  real<lower=0> lambda;
 }
 transformed parameters {
   cov_matrix[5] Sigma;
@@ -52,13 +55,15 @@ model {
   // done by cohort
   Omega ~ lkj_corr(2);
   sigma ~ cauchy(0, 1);
-  for(i in 1:5) {
-    if(i == 2) {
-      mu_prior[i] ~ normal(-1, 1);
-    } else {
-      mu_prior[i] ~ normal(0, 5);
-    }
-  }
+  mu_prior[2] ~ normal(-1, 1);
+  
+  mu_prior[1] ~ normal(0, tau[1] * lambda);
+  mu_prior[3] ~ normal(0, tau[2] * lambda);
+  mu_prior[4] ~ normal(0, tau[3] * lambda);
+  mu_prior[5] ~ normal(0, tau[4] * lambda);
+  tau ~ cauchy(0, 1);
+  lambda ~ cauchy(0, 1);
+  
   for(i in 1:O) {
     beta[i] ~ multi_normal(mu_prior, Sigma);
   }
