@@ -7,6 +7,7 @@ library(rstan)
 library(survival)
 library(stringr)
 library(grid)
+library(gridExtra)
 source('../R/waic.r')
 source('../R/mung.r')
 source('../R/multiplot.r')
@@ -565,11 +566,9 @@ for(ii in seq(unique(coh))) {
                             y = expression(paste(tilde(sigma[i])/tilde(sigma))))
   plotlist[[ii]] <- quadcoh
 }
-pdf(filename = '../doc/survival/figure/cohort_quads.pdf', 
+png(file = '../doc/survival/figure/cohort_quads.png', 
     width = 3000, height = 1500)
-multiplot(plotlist = plotlist, 
-          layout = matrix(c(rev(seq(unique(coh))), NA, NA), 
-                          ncol = 7, byrow = TRUE))
+do.call('grid.arrange', c(rev(plotlist), ncol = 7))
 dev.off()
 
 # do the derivative of the coefficients; get the inflection points

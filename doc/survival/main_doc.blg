@@ -2,20 +2,20 @@ This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: main_doc.aux
 The style file: evolution.bst
-Database file #1: biblio.bib
+Database file #1: newbib.bib
 Database file #2: packages.bib
 You've used 48 entries,
             2892 wiz_defined-function locations,
-            934 strings with 12297 characters,
-and the built_in function-call counts, 25076 in all, are:
-= -- 2242
+            914 strings with 11043 characters,
+and the built_in function-call counts, 24856 in all, are:
+= -- 2202
 > -- 847
 < -- 43
 + -- 286
 - -- 237
-* -- 1554
-:= -- 4112
-add.period$ -- 167
+* -- 1514
+:= -- 4072
+add.period$ -- 147
 call.type$ -- 48
 change.case$ -- 313
 chr.to.int$ -- 47
@@ -23,13 +23,13 @@ cite$ -- 48
 duplicate$ -- 1832
 empty$ -- 2015
 format.name$ -- 351
-if$ -- 5068
+if$ -- 5028
 int.to.chr$ -- 2
 int.to.str$ -- 1
 missing$ -- 363
-newline$ -- 267
+newline$ -- 247
 num.names$ -- 192
-pop$ -- 650
+pop$ -- 670
 preamble$ -- 1
 purify$ -- 271
 quote$ -- 0
@@ -44,4 +44,4 @@ type$ -- 414
 warning$ -- 0
 while$ -- 218
 width$ -- 0
-write$ -- 665
+write$ -- 625
