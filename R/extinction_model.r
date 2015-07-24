@@ -1,6 +1,7 @@
 library(rstan)
 library(arm)
 library(parallel)
+library(stringr)
 source('../R/gts.r')
 source('../R/mung.r')
 
@@ -18,6 +19,14 @@ short.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
                         gts = rev(as.character(lump[, 2])),
                         cuts = 'Chang',
                         bot = 'Trem')
+
+ss <- bibr[bibr$occurrences.genus_name %in% short.data$genus, ]
+ss <- unique(ss[, c('occurrences.genus_name', 'occurrences.species_name')])
+ss <- ss[order(ss[, 1]), ]
+ss <- ss[!(str_detect(ss[, 2], 'sp') | str_detect(ss[, 2], '[A-Z]')), ]
+ss.gen <- ddply(ss, .(occurrences.genus_name), summarize, 
+                o <- length(occurrences.species_name))
+
 
 # sepkoski.data
 num.samp <- nrow(short.data)
