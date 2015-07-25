@@ -1,0 +1,48 @@
+model {
+  # prior
+  for(j in 1:nprov) { 
+    psi[j] ~ dunif(0, 1)
+    
+    p[nyear] <- ilogit(p_norm)
+    p_norm[nyear, j] ~ dnorm(0, 1)
+    for(i in 1:(nyear - 1)) {
+      gamma[i, j] <- ilogit(gamma_norm[i, j])
+      phi[i, j] <- ilogit(phi_norm[i, j])
+      p[i, j] <- ilogit(p_norm[i, j])
+      gamma_norm[i, j] ~ dnorm(mu_gamma[j],  sigma_gamma)
+      phi_norm[i, j] ~ dnorm(mu_phi[j], sigma_phi)
+      p_norm[i, j] ~ dnorm(mu_p[j], sigma_p)
+    }
+    mu_gamma[j] ~ dnorm(0, 1)
+    mu_phi[j] ~ dnorm(0, 1)
+    mu_p[j] ~ dnorm(0, 1)
+    # currently each province is seperate
+    # would need another layer on top of mu_XXX[j]
+    # but i don't even know if this works yet. and it probably takes forever
+    # use simulated data first
+  }
+  mu_gamma ~ dt(0, 1, 1) T(0, )
+  mu_phi ~ dt(0, 1, 1) T(0, )
+  mu_p ~ dt(0, 1, 1) T(0, )
+
+  # process model specification
+  for(j in 1:nprov) {
+    for(i in 1:nindiv) {
+      z[i, 1, j] ~ dbern(psi[j])
+      for(t in 2:nyear) {
+        muZ[i, t, j] <- z[i, t - 1, j] * phi[t - 1, j] + (1 - z[i, t - 1, j]) * gamma[t - 1, j]
+        z[i, t, j] ~ dbern(muZ[i, t, j])
+      }
+    }
+  }
+
+  # observation model
+  for(j in 1:nprob) {
+    for(i in 1:nindiv) {
+      for(t in 1:nyear) {
+        Py[i, t, j] <- z[i, t, j] * p[t, j]
+        y[i, t, j] ~ dbern(Py[i, t, j])
+      }
+    }
+  }
+}
