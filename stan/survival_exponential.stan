@@ -35,7 +35,7 @@ parameters {
   real<lower=0,upper=1> theta_species[N];
   real<lower=0,upper=1> theta_back[N];
 
-  real<lower=0> tau[4];
+  real<lower=0> tau[3];
   real<lower=0> lambda;
 }
 transformed parameters {
@@ -53,12 +53,11 @@ model {
   // done by cohort
   Omega ~ lkj_corr(2);
   sigma ~ cauchy(0, 1);
+  mu_prior[1] ~ normal(0, 5);
   mu_prior[2] ~ normal(-1, 1);
-
-  mu_prior[1] ~ normal(0, tau[1] * lambda);
-  mu_prior[3] ~ normal(0, tau[2] * lambda);
-  mu_prior[4] ~ normal(0, tau[3] * lambda);
-  mu_prior[5] ~ normal(0, tau[4] * lambda);
+  mu_prior[3] ~ normal(0, tau[1] * lambda);
+  mu_prior[4] ~ normal(0, tau[2] * lambda);
+  mu_prior[5] ~ normal(0, tau[3] * lambda);
   tau ~ cauchy(0, 1);
   lambda ~ cauchy(0, 1);
   
