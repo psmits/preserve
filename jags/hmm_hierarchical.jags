@@ -1,38 +1,43 @@
 model {
   # prior
   # hierarchical "time series" of all parameters by provice
-  psi ~ dunif(0, 1)  # initial state
+  for(j in 1:nprov) {
+    psi[j] ~ dunif(0, 1)  # initial state
 
-  gamma_mu ~ dnorm(0, 1)
-  phi_mu ~ dnorm(0, 1)
-  p_mu ~ dnorm(0, 1)
+    gamma_mu[j] ~ dnorm(0, 1)
+    phi_mu[j] ~ dnorm(0, 1)
+    p_mu[j] ~ dnorm(0, 1)
 
-  gamma_sigma ~ dt(0, 1, 1) T(0, )
-  phi_sigma ~ dt(0, 1, 1) T(0, )
-  p_sigma ~ dt(0, 1, 1) T(0, )
+    gamma_sigma[j] ~ dt(0, 1, 1) T(0, )
+    phi_sigma[j] ~ dt(0, 1, 1) T(0, )
+    p_sigma[j] ~ dt(0, 1, 1) T(0, )
 
-  gamma_tau <- pow(gamma_sigma, -2)
-  phi_tau <- pow(phi_sigma, -2)
-  p_tau <- pow(p_sigma, -2)
+    gamma_tau[j] <- pow(gamma_sigma[j], -2)
+    phi_tau[j] <- pow(phi_sigma[j], -2)
+    p_tau[j] <- pow(p_sigma[j], -2)
 
-  p_norm[nyear] ~ dnorm(p_mu, p_tau)
-  p[nyear] <- ilogit(p_norm[nyear])
-  for(i in 1:(nyear - 1)) {
-    gamma_norm[i] ~ dnorm(gamma_mu, gamma_tau)
-    phi_norm[i] ~ dnorm(phi_mu, phi_tau)
-    p_norm[i] ~ dnorm(p_mu, p_tau)
-    gamma[i] <- ilogit(gamma_norm[i])
-    phi[i] <- ilogit(phi_norm[i])
-    p[i] <- ilogit(p_norm[i])
+    p_norm[nyear, j] ~ dnorm(p_mu[j], p_tau[j])
+    p[nyear, j] <- ilogit(p_norm[nyear, j])
+    for(i in 1:(nyear - 1)) {
+      gamma_norm[i, j] ~ dnorm(gamma_mu[j], gamma_tau[j])
+      phi_norm[i, j] ~ dnorm(phi_mu[j], phi_tau[j])
+      p_norm[i, j] ~ dnorm(p_mu[j], p_tau[j])
+      gamma[i, j] <- ilogit(gamma_norm[i, j])
+      phi[i, j] <- ilogit(phi_norm[i, j])
+      p[i, j] <- ilogit(p_norm[i, j])
+    }
   }
 
   # process model (2 states, p/a)
   # by province
-  for(i in 1:nindiv) {
-    z[i, 1] ~ dbern(psi)
-    for(t in 2:nyear) {
-      muZ[i, t] <- z[i, t - 1] * phi[t - 1] + (1 - z[i, t - 1]) * gamma[t - 1]
-      z[i, t] ~ dbern(muZ[i, t])
+  for(j in 1:nprov) {
+    for(i in 1:nindiv) {
+      z[i, 1, j] ~ dbern(psi[j])
+      for(t in 2:nyear) {
+        muZ[i, t, j] <- z[i, t - 1, j] * phi[t - 1, j] + 
+          (1 - z[i, t - 1, j]) * gamma[t - 1, j]
+        z[i, t, j] ~ dbern(muZ[i, t, j])
+      }
     }
   }
 
@@ -42,17 +47,24 @@ model {
   #   matrix where rows are 1:prov[1], (prov[j - 1] + 1):prov[j], etc. 
   #   columns are time
   # TO DO
-  for(i in 1:nindiv) {
-    for(t in 1:nyear) {
-      Py[i, t] <- z[i, t] * p[t]
-      y[i, t] ~ dbern(Py[i, t])
+  for(j in 1:nprov) {
+    for(i in 1:nindiv) {
+      for(t in 1:nyear) {
+        Py[i, t, j] <- z[i, t, j] * p[t, j]
+        y[i, t, j] ~ dbern(Py[i, t, j])
+      }
     }
   }
-  
-  psivec[1] <- psi
-  for(t in 2:nyear){
-    psivec[t] <- psivec[t - 1] * phi[t - 1] + (1 - psivec[t - 1]) * gamma[t - 1]
-    turnover[t - 1] <- ((1 - psivec[t - 1]) * gamma[t - 1]) /
-      ((1 - psivec[t - 1]) * gamma[t - 1] + phi[t - 1] * psivec[t - 1])
+
+  for(j in 1:nprov) {
+    psivec[1, j] <- psi[j]
+    for(t in 2:nyear) {
+      psivec[t, j] <- psivec[t - 1, j] * phi[t - 1, j] + 
+        (1 - psivec[t - 1, j]) * gamma[t - 1, j]
+
+      turnover[t - 1, j] <- ((1 - psivec[t - 1, j]) * gamma[t - 1, j]) /
+        ((1 - psivec[t - 1, j]) * gamma[t - 1, j] + 
+        phi[t - 1, j] * psivec[t - 1, j])
+    }
   }
 }

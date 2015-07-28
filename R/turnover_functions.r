@@ -10,45 +10,39 @@ library(rstan)
 #   sight: sighting record (just need initial, i think)
 posterior.turnover <- function(post, data) {
   out <- list()
-  for(kk in seq(data$P)) {
+  for(jj in seq(data$J)) {
     taxa <- list()
-    if(kk == 1) {
-      strt = 1
-    } else {
-      strt = data$prov[kk - 1] + 1
-    }
-    for(jj in seq(from = strt, to = data$prov[kk])) {
-      # simulate for each province, for the number of taxa observed?
-      rand <- sample(length(post$lp__), 1)
-      ## diversification process
-      time.step <- data$C
-      life.time <- c()
-      life.time[1] <- data$sight[jj, 1]
+    # simulate for each province, for the number of taxa observed?
+    rand <- sample(nrow(post[[1]]), 1)
+    ## diversification process
+
+    time.step <- data$C
+    life.time <- c()
+    for(nn in seq(data$R)) {
+      life.time[1] <- data$sight[nn, 1, jj]
       for(ii in 2:time.step) {
         if(life.time[ii - 1] == 1) {
           life.time[[ii]] <- rbinom(1, size = 1, 
-                                    prob = post$phi[rand, kk, ii - 1])
-        } else if (any(life.time == 1) & life.time[ii - 1] == 0) {
-          life.time[ii] <- 0
+                                    prob = post$phi[rand, ii - 1, jj])
         } else {
           life.time[ii] <- rbinom(1, size = 1, 
-                                  prob = post$gamma[rand, kk, ii])
+                                  prob = post$gamma[rand, ii - 1, jj])
         }
       }
-
-      sample.time <- life.time
-      # observation process
-      for(ii in seq(from = 2, to = time.step)) {
-        sample.time[ii] <- life.time[ii] * rbinom(1, size = 1, 
-                                                  prob = post$p[rand, kk, ii])
-      }
-
-      taxa[[jj]] <- list(true = life.time, observed = sample.time)
     }
-    true <- Reduce(rbind, llply(taxa, function(x) x[[1]]))
-    observed <- Reduce(rbind, llply(taxa, function(x) x[[2]]))
-    out[[kk]] <- list(true = true, observed = observed)
+
+    sample.time <- life.time
+    # observation process
+    for(ii in seq(from = 2, to = time.step)) {
+      sample.time[ii] <- life.time[ii] * rbinom(1, size = 1, 
+                                                prob = post$p[rand, ii, jj])
+    }
+
+    taxa[[jj]] <- list(true = life.time, observed = sample.time)
   }
+  true <- Reduce(rbind, llply(taxa, function(x) x[[1]]))
+  observed <- Reduce(rbind, llply(taxa, function(x) x[[2]]))
+  out[[kk]] <- list(true = true, observed = observed)
   out
 }
 

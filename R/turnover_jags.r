@@ -7,6 +7,8 @@ library(rstan)
 source('../R/gts.r')
 source('../R/mung.r')
 
+set.seed(420)
+
 data.file <- list.files('../data', pattern = 'Occs')
 fossil <- read.csv(paste0('../data/', data.file))
 bibr <- fossil
@@ -22,6 +24,7 @@ sight <- space.time(bibr,
                     cuts = 'Chang',
                     bot = 'Trem',
                     shape = shape)
+sight <- sight[1:2]
 
 sizes <- laply(sight, dim)
 time.bin <- sizes[1, 2]
@@ -30,24 +33,28 @@ prov.size <- sizes[, 1]
 taxon <- as.numeric(as.factor(Reduce(c, llply(sight, rownames))))
 ntaxa <- length(unique(taxon))
 
-# R rows
-# C columns
-# T taxa
-# P provinces
-#
-# matrix[R, C] sight;
-# vector[R] taxon;
-# vector[P] prov;
+total.names <- sort(unique(Reduce(c, llply(sight, rownames))))
 
-data <- list(R = sizes[1, 1], C = time.bin, sight = as.matrix(sight[[1]]))
+total.occur <- array(0, c(ntaxa, time.bin, length(sight)))
+for(ii in seq(length(sight))) {
+  total.occur[match(rownames(sight[[ii]]), total.names), , ii] <- sight[[ii]]
+}
+
+data <- list(R = ntaxa, C = time.bin, J = length(sight), 
+             sight = total.occur)
+save(data, file = '../data/data_dump/occurrence_data.rdata')
+
+p.init <- matrix(0, nrow = data$C, ncol = data$J)
+
 jags <- with(data, {jags.model('../jags/hmm_hierarchical.jags', 
-                               data = list('nyear' = C, 
+                               data = list('nprov' = J,
+                                           'nyear' = C, 
                                            'nindiv' = R,
                                            'y' = sight),
                                n.chains = 4,
                                n.adapt = 100,
                                inits = list(z = sight,
-                                            p_norm = rep(0, C)))})
+                                            p_norm = p.init))})
 # warm-up/burn-in
 update(jags, 5000)
 # production
