@@ -39,20 +39,22 @@ ntaxa <- length(unique(taxon))
 # vector[R] taxon;
 # vector[P] prov;
 
-data <- list(R = sizes[2, 1], C = time.bin, sight = as.matrix(sight[[2]]))
+data <- list(R = sizes[1, 1], C = time.bin, sight = as.matrix(sight[[1]]))
 jags <- with(data, {jags.model('../jags/hmm_hierarchical.jags', 
                                data = list('nyear' = C, 
                                            'nindiv' = R,
                                            'y' = sight),
                                n.chains = 4,
-                               n.adapt = 1000,
+                               n.adapt = 100,
                                inits = list(z = sight,
-                                            p = rep(0.5, C)))})
-# discard/burn-in
+                                            p_norm = rep(0, C)))})
+# warm-up/burn-in
 update(jags, 5000)
-# posterior samples
+# production
 post.samp <- coda.samples(jags, c('psi', 
                                   'gamma', 'phi', 'p',
+                                  'gamma_mu', 'phi_mu', 'p_mu',
+                                  'gamma_sigma', 'phi_sigma', 'p_sigma',
                                   'z', 'turnover'),  
                           n.iter = 5000, thin = 5)
-test <- coda::gelman.diag(post.samp)
+save(post.samp, file = '../data/mcmc_out/turnover_jags.rdata')

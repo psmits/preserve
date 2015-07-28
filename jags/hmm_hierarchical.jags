@@ -2,11 +2,28 @@ model {
   # prior
   # hierarchical "time series" of all parameters by provice
   psi ~ dunif(0, 1)  # initial state
-  p[nyear] ~ dunif(0, 1)
+
+  gamma_mu ~ dnorm(0, 1)
+  phi_mu ~ dnorm(0, 1)
+  p_mu ~ dnorm(0, 1)
+
+  gamma_sigma ~ dt(0, 1, 1) T(0, )
+  phi_sigma ~ dt(0, 1, 1) T(0, )
+  p_sigma ~ dt(0, 1, 1) T(0, )
+
+  gamma_tau <- pow(gamma_sigma, -2)
+  phi_tau <- pow(phi_sigma, -2)
+  p_tau <- pow(p_sigma, -2)
+
+  p_norm[nyear] ~ dnorm(p_mu, p_tau)
+  p[nyear] <- ilogit(p_norm[nyear])
   for(i in 1:(nyear - 1)) {
-    gamma[i] ~ dunif(0, 1)
-    phi[i] ~ dunif(0, 1)
-    p[i] ~ dunif(0, 1)
+    gamma_norm[i] ~ dnorm(gamma_mu, gamma_tau)
+    phi_norm[i] ~ dnorm(phi_mu, phi_tau)
+    p_norm[i] ~ dnorm(p_mu, p_tau)
+    gamma[i] <- ilogit(gamma_norm[i])
+    phi[i] <- ilogit(phi_norm[i])
+    p[i] <- ilogit(p_norm[i])
   }
 
   # process model (2 states, p/a)
