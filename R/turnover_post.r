@@ -105,15 +105,7 @@ turn.est <- ggplot(est.turn, aes(x = year, y = div, group = sim))
 turn.est <- turn.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
 
 
-# per captia turnover
-est.shortdiv <- est.div[est.div$year != 33, ]
-capita.turn <- est.turn
-capita.turn$div <- est.turn$div / est.shortdiv$div
-capita.turn.est <- ggplot(capita.turn, aes(x = year, y = div, group = sim))
-capita.turn.est <- capita.turn.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
-
-
-# survival/origination probabilities
+# remain/gain probabilities
 macro.prob <- function(data, post, ww = 'gamma') {
   samp <- sample(4000, 1)
   regions <- list()
@@ -159,14 +151,70 @@ surv.est <- ggplot(est.surv, aes(x = year, y = div, group = sim))
 surv.est <- surv.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
 
 
-# now in per captia form 
-est.shortdiv <- est.div[est.div$year != 33, ]
-capita.orig <- est.orig
-capita.orig$div <- est.orig$div / est.shortdiv$div
-capita.orig.est <- ggplot(capita.orig, aes(x = year, y = div, group = sim))
-capita.orig.est <- capita.orig.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
 
-capita.surv <- est.surv
-capita.ext$div <- (1 - est.surv$div) / est.shortdiv$div
-capita.ext.est <- ggplot(capita.ext, aes(x = year, y = div, group = sim))
-capita.ext.est <- capita.ext.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+# per captia rates
+# got to count the number of gains!
+# b = sum (1 - z[i, t - 1]) z[i, t]
+birth.count <- function(data, post) {
+  samp <- sample(4000, 1)
+  birth <- list()
+  for(jj in seq(data$J)) {
+    hold <- c()
+    for(ii in seq(from = 1, to = data$C - 1)) {
+      hold[ii] <- sum((1 - post$z[[1]][samp, , ii]) * post$z[[1]][samp, , ii + 1])
+    }
+    birth[[jj]] <- hold
+  }
+  birth
+}
+est.birth <- replicate(1000, birth.count(data = data, post = post), simplify = FALSE)
+est.birth <- llply(seq(data$J), function(y) 
+                   Reduce(rbind, llply(est.birth, function(x) x[[y]])))
+
+est.birth <- Map(function(x) {
+               rownames(x) <- seq(nrow(x))
+               x}, est.birth)
+est.birth <- melt(est.birth)
+names(est.birth) <- c('sim', 'year', 'div', 'prov')
+est.birth$prov <- factor(est.birth$prov)
+
+# got to count the number of losses! 
+# d = sum (z[i, t - 1]) (1 - z[i, t])
+death.count <- function(data, post) {
+  samp <- sample(4000, 1)
+  death <- list()
+  for(jj in seq(data$J)) {
+    hold <- c()
+    for(ii in seq(from = 1, to = data$C - 1)) {
+      hold[ii] <- sum(post$z[[1]][samp, , ii] * (1 - post$z[[1]][samp, , ii + 1]))
+    }
+    death[[jj]] <- hold
+  }
+  death  
+}
+est.death <- replicate(1000, death.count(data = data, post = post), simplify = FALSE)
+est.death <- llply(seq(data$J), function(y) 
+                   Reduce(rbind, llply(est.death, function(x) x[[y]])))
+
+est.death <- Map(function(x) {
+               rownames(x) <- seq(nrow(x))
+               x}, est.death)
+est.death <- melt(est.death)
+names(est.death) <- c('sim', 'year', 'div', 'prov')
+est.death$prov <- factor(est.death$prov)
+
+# per captia gain is gained at t / total at t
+# per captia loss is lost at t / total at t
+after.first <- est.div[est.div$year != 1, ]
+
+percapita.birth <- percapita.death <- after.first
+percapita.birth$div <- est.birth$div / after.first$div
+percapita.death$div <- est.death$div / after.first$div
+
+percapita <- rbind(cbind(percapita.birth, type = 'gain'), 
+                   cbind(percapita.death, type = 'loss'))
+percapita$div[is.nan(percapita$div)] <- 0
+percapita$div[is.nan(percapita$div)] <- 0
+
+capita.est <- ggplot(percapita, aes(x = year, y = div, group = sim))
+capita.est <- capita.est + geom_line(alpha = 0.1) + facet_grid(prov ~ type)
