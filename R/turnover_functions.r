@@ -38,8 +38,9 @@ process.coda <- function(post) {
         for(cc in seq(from = 1, to = data$C)) {
           timeholder[, , cc] <- regionholder[, timeseq[cc, 1]:timeseq[cc, 2]]
         }
+        holder[[jj]] <- timeholder
       }
-      new.post[[ii]] <- timeholder
+      new.post[[ii]] <- holder
     }
   }
   names(new.post) <- unlist(vars)

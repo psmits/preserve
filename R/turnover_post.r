@@ -9,8 +9,10 @@ source('../R/turnover_functions.r')
 load('../data/data_dump/occurrence_data.rdata')  # data
 load('../data/mcmc_out/turnover_custom.rdata')  # post
 
-
-post.check <- replicate(100, posterior.turnover(post = post, data = data), 
+# posterior predicitive check
+#   if simulate data from same starting point, do we get the same pattern 
+#   of **observed** diversity (visually)?
+post.check <- replicate(1000, posterior.turnover(post = post, data = data), 
                         simplify = FALSE)
 
 true.seen <- obs.seen <- div.true <- div.obs <- list()
@@ -40,7 +42,111 @@ obs <- data.frame(Reduce(rbind, obs))
 names(obs) <- c('year', 'div', 'prov')
 
 prov.div <- ggplot(div.melt, aes(x = year, y = div, group = sim))
-prov.div <- prov.div + geom_line() + facet_grid(prov ~ .)
+prov.div <- prov.div + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
 prov.div <- prov.div + geom_line(data = obs, 
                                  mapping = aes(x = year, y = div, group = NULL),
                                  colour = 'blue')
+
+
+# "true" diversity...
+true.diversity <- function(data, post) {
+  samp <- sample(4000, 1)
+  regions <- list()
+  for(jj in seq(data$J)) {
+    hold <- c()
+    for(cc in seq(data$C)) {
+      hold[cc] <- sum(post$z[[jj]][samp, , cc])
+    }
+    regions[[jj]] <- hold
+  }
+  regions
+}
+est.div <- replicate(1000, true.diversity(data = data, post = post), 
+                     simplify = FALSE)
+est.div <- llply(seq(data$J), function(y) 
+                 Reduce(rbind, llply(est.div, function(x) x[[y]])))
+
+est.div <- Map(function(x) {
+               rownames(x) <- seq(nrow(x))
+               x}, est.div)
+est.div <- melt(est.div)
+names(est.div) <- c('sim', 'year', 'div', 'prov')
+est.div$prov <- factor(est.div$prov)
+
+prov.est <- ggplot(est.div, aes(x = year, y = div, group = sim))
+prov.est <- prov.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+
+
+# turnover probability
+turnover.prob <- function(data, post) {
+  samp <- sample(4000, 1)
+  regions <- list()
+  for(jj in seq(data$J)) {
+    hold <- c()
+    for(cc in seq(data$C - 1)) {
+      hold[cc] <- post$turnover[samp, cc, jj]
+    }
+    regions[[jj]] <- hold
+  }
+  regions
+}
+est.turn <- replicate(1000, turnover.prob(data = data, post = post), 
+                     simplify = FALSE)
+est.turn <- llply(seq(data$J), function(y) 
+                 Reduce(rbind, llply(est.turn, function(x) x[[y]])))
+
+est.turn <- Map(function(x) {
+               rownames(x) <- seq(nrow(x))
+               x}, est.turn)
+est.turn <- melt(est.turn)
+names(est.turn) <- c('sim', 'year', 'div', 'prov')
+est.turn$prov <- factor(est.turn$prov)
+
+turn.est <- ggplot(est.turn, aes(x = year, y = div, group = sim))
+turn.est <- turn.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+
+
+# survival/origination probabilities
+macro.prob <- function(data, post, ww = 'gamma') {
+  samp <- sample(4000, 1)
+  regions <- list()
+  for(jj in seq(data$J)) {
+    hold <- c()
+    for(cc in seq(data$C - 1)) {
+      hold[cc] <- post[[ww]][samp, cc, jj]
+    }
+    regions[[jj]] <- hold
+  }
+  regions
+}
+est.orig <- replicate(1000, macro.prob(data = data, post = post, ww = 'gamma'), 
+                      simplify = FALSE)
+est.orig <- llply(seq(data$J), function(y) 
+                 Reduce(rbind, llply(est.orig, function(x) x[[y]])))
+
+est.orig <- Map(function(x) {
+               rownames(x) <- seq(nrow(x))
+               x}, est.orig)
+est.orig <- melt(est.orig)
+names(est.orig) <- c('sim', 'year', 'div', 'prov')
+est.orig$prov <- factor(est.orig$prov)
+
+orig.est <- ggplot(est.orig, aes(x = year, y = div, group = sim))
+orig.est <- orig.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+
+# and the other...
+est.surv <- replicate(1000, macro.prob(data = data, post = post, ww = 'gamma'), 
+                      simplify = FALSE)
+
+est.surv <- llply(seq(data$J), function(y) 
+                 Reduce(rbind, llply(est.surv, function(x) x[[y]])))
+
+est.surv <- Map(function(x) {
+               rownames(x) <- seq(nrow(x))
+               x}, est.surv)
+est.surv <- melt(est.surv)
+names(est.surv) <- c('sim', 'year', 'div', 'prov')
+est.surv$prov <- factor(est.surv$prov)
+
+surv.est <- ggplot(est.surv, aes(x = year, y = div, group = sim))
+surv.est <- surv.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
