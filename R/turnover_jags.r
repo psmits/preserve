@@ -8,6 +8,7 @@ source('../R/gts.r')
 source('../R/mung.r')
 
 set.seed(420)
+n <- 2
 
 data.file <- list.files('../data', pattern = 'Occs')
 fossil <- read.csv(paste0('../data/', data.file))
@@ -24,7 +25,7 @@ sight <- space.time(bibr,
                     cuts = 'Chang',
                     bot = 'Trem',
                     shape = shape)
-sight <- sight[1:2]
+sight <- sight[1:n]
 
 sizes <- laply(sight, dim)
 time.bin <- sizes[1, 2]
@@ -55,13 +56,13 @@ jags <- with(data, {jags.model('../jags/hmm_hierarchical.jags',
                                n.adapt = 100,
                                inits = list(z = sight,
                                             p_norm = p.init))})
-# warm-up/burn-in
+## warm-up/burn-in
 update(jags, 5000)
-# production
-post.samp <- coda.samples(jags, c('psi', 
-                                  'gamma', 'phi', 'p',
-                                  'gamma_mu', 'phi_mu', 'p_mu',
-                                  'gamma_sigma', 'phi_sigma', 'p_sigma',
-                                  'z', 'turnover'),  
-                          n.iter = 5000, thin = 5)
-save(post.samp, file = '../data/mcmc_out/turnover_jags.rdata')
+## production
+#post.samp <- coda.samples(jags, c('psi', 
+#                                  'gamma', 'phi', 'p',
+#                                  'gamma_mu', 'phi_mu', 'p_mu',
+#                                  'gamma_sigma', 'phi_sigma', 'p_sigma',
+#                                  'z', 'turnover'),  
+#                          n.iter = 5000, thin = 5)
+#save(post.samp, file = '../data/mcmc_out/turnover_jags.rdata')

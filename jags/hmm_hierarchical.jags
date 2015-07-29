@@ -1,12 +1,24 @@
 model {
   # prior
   # hierarchical "time series" of all parameters by provice
+  gamma_group ~ dnorm(0, 1)
+  phi_group ~ dnorm(0, 1)
+  p_group ~ dnorm(0, 1)
+
+  gamma_sigma_group ~ dt(0, 1, 1) T(0, )
+  phi_sigma_group ~ dt(0, 1, 1) T(0, )
+  p_sigma_group ~ dt(0, 1, 1) T(0, )
+  
+  gamma_tau_group <- pow(gamma_sigma_group, -2)
+  phi_tau_group <- pow(gamma_sigma_group, -2)
+  p_tau_group <- pow(gamma_sigma_group, -2)
+
   for(j in 1:nprov) {
     psi[j] ~ dunif(0, 1)  # initial state
 
-    gamma_mu[j] ~ dnorm(0, 1)
-    phi_mu[j] ~ dnorm(0, 1)
-    p_mu[j] ~ dnorm(0, 1)
+    gamma_mu[j] ~ dnorm(gamma_group, gamma_tau_group)
+    phi_mu[j] ~ dnorm(phi_group, phi_tau_group)
+    p_mu[j] ~ dnorm(p_group, p_tau_group)
 
     gamma_sigma[j] ~ dt(0, 1, 1) T(0, )
     phi_sigma[j] ~ dt(0, 1, 1) T(0, )

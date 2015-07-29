@@ -76,7 +76,6 @@ est.div$prov <- factor(est.div$prov)
 prov.est <- ggplot(est.div, aes(x = year, y = div, group = sim))
 prov.est <- prov.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
 
-
 # turnover probability
 turnover.prob <- function(data, post) {
   samp <- sample(4000, 1)
@@ -104,6 +103,14 @@ est.turn$prov <- factor(est.turn$prov)
 
 turn.est <- ggplot(est.turn, aes(x = year, y = div, group = sim))
 turn.est <- turn.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+
+
+# per captia turnover
+est.shortdiv <- est.div[est.div$year != 33, ]
+capita.turn <- est.turn
+capita.turn$div <- est.turn$div / est.shortdiv$div
+capita.turn.est <- ggplot(capita.turn, aes(x = year, y = div, group = sim))
+capita.turn.est <- capita.turn.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
 
 
 # survival/origination probabilities
@@ -150,3 +157,16 @@ est.surv$prov <- factor(est.surv$prov)
 
 surv.est <- ggplot(est.surv, aes(x = year, y = div, group = sim))
 surv.est <- surv.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+
+
+# now in per captia form 
+est.shortdiv <- est.div[est.div$year != 33, ]
+capita.orig <- est.orig
+capita.orig$div <- est.orig$div / est.shortdiv$div
+capita.orig.est <- ggplot(capita.orig, aes(x = year, y = div, group = sim))
+capita.orig.est <- capita.orig.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+
+capita.surv <- est.surv
+capita.ext$div <- (1 - est.surv$div) / est.shortdiv$div
+capita.ext.est <- ggplot(capita.ext, aes(x = year, y = div, group = sim))
+capita.ext.est <- capita.ext.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
