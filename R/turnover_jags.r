@@ -45,7 +45,7 @@ data <- list(R = ntaxa, C = time.bin, J = length(sight),
              sight = total.occur)
 save(data, file = '../data/data_dump/occurrence_data.rdata')
 
-p.init <- matrix(0, nrow = data$C, ncol = data$J)
+p.init <- array(0, dim = c(data$C, data$J))
 
 jags <- with(data, {jags.model('../jags/hmm_hierarchical.jags', 
                                data = list('nprov' = J,
@@ -56,13 +56,21 @@ jags <- with(data, {jags.model('../jags/hmm_hierarchical.jags',
                                n.adapt = 100,
                                inits = list(z = sight,
                                             p_norm = p.init))})
-## warm-up/burn-in
-update(jags, 5000)
-## production
-#post.samp <- coda.samples(jags, c('psi', 
-#                                  'gamma', 'phi', 'p',
-#                                  'gamma_mu', 'phi_mu', 'p_mu',
-#                                  'gamma_sigma', 'phi_sigma', 'p_sigma',
-#                                  'z', 'turnover'),  
-#                          n.iter = 5000, thin = 5)
-#save(post.samp, file = '../data/mcmc_out/turnover_jags.rdata')
+# warm-up/burn-in
+update(jags, 10000)
+# production
+post.samp <- coda.samples(jags, c('psi', 
+                                  'gamma', 'phi', 'p',
+                                  'gamma_mu', 'phi_mu', 'p_mu',
+                                  'gamma_sigma', 'phi_sigma', 'p_sigma',
+                                  'gamma_group', 'phi_group', 'p_group',
+                                  'gamma_sigma_group', 
+                                  'phi_sigma_group', 
+                                  'p_sigma_group',
+                                  'indiv_gamma', 'indiv_phi', 'indiv_p',
+                                  'indiv_gamma_sigma', 
+                                  'indiv_phi_sigma', 
+                                  'indiv_p_sigma',
+                                  'z', 'turnover'),  
+                          n.iter = 10000, thin = 10)
+save(post.samp, file = '../data/mcmc_out/turnover_jags.rdata')

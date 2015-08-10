@@ -205,7 +205,7 @@ est.death$prov <- factor(est.death$prov)
 
 # per captia gain is gained at t / total at t
 # per captia loss is lost at t / total at t
-after.first <- est.div[est.div$year != 1, ]
+after.first <- est.div[est.div$year != 33, ]
 
 percapita.birth <- percapita.death <- after.first
 percapita.birth$div <- est.birth$div / after.first$div

@@ -27,13 +27,16 @@ model {
     gamma_tau[j] <- pow(gamma_sigma[j], -2)
     phi_tau[j] <- pow(phi_sigma[j], -2)
     p_tau[j] <- pow(p_sigma[j], -2)
-
+    
     p_norm[nyear, j] ~ dnorm(p_mu[j], p_tau[j])
-    p[nyear, j] <- ilogit(p_norm[nyear, j])
     for(i in 1:(nyear - 1)) {
       gamma_norm[i, j] ~ dnorm(gamma_mu[j], gamma_tau[j])
       phi_norm[i, j] ~ dnorm(phi_mu[j], phi_tau[j])
       p_norm[i, j] ~ dnorm(p_mu[j], p_tau[j])
+    }
+    
+    p[nyear, j] <- ilogit(p_norm[nyear, j])
+    for(i in 1:(nyear - 1)) {
       gamma[i, j] <- ilogit(gamma_norm[i, j])
       phi[i, j] <- ilogit(phi_norm[i, j])
       p[i, j] <- ilogit(p_norm[i, j])
