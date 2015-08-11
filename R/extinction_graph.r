@@ -102,21 +102,21 @@ wei.surv <- Reduce(rbind, Map(function(x, y) {
                               y = seq(length(wei.surv))))
 wei.surv$label <- 'Weibull'
 
-# exponential model
-exp.surv <- llply(er, function(x) survfit(Surv(x) ~ 1))
-exp.surv <- llply(exp.surv, function(x) {
-                  y <- data.frame(time = x$time, surv = x$surv)
-                  y <- rbind(c(0, 1), y)
-                  y})
-exp.surv <- Reduce(rbind, Map(function(x, y) {
-                              x$group <- y
-                              x}, 
-                              x = exp.surv, 
-                              y = seq(length(exp.surv))))
-exp.surv$label <- 'Exponential'
+## exponential model
+#exp.surv <- llply(er, function(x) survfit(Surv(x) ~ 1))
+#exp.surv <- llply(exp.surv, function(x) {
+#                  y <- data.frame(time = x$time, surv = x$surv)
+#                  y <- rbind(c(0, 1), y)
+#                  y})
+#exp.surv <- Reduce(rbind, Map(function(x, y) {
+#                              x$group <- y
+#                              x}, 
+#                              x = exp.surv, 
+#                              y = seq(length(exp.surv))))
+#exp.surv$label <- 'Exponential'
 
 # combine both simulation sets
-sim.surv <- rbind(wei.surv, exp.surv)
+sim.surv <- wei.surv
 
 # fit model
 surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
@@ -125,10 +125,10 @@ surv.plot <- surv.plot + geom_line(data = sim.surv,
                                    colour = 'grey', alpha = 0.2)
 surv.plot <- surv.plot + geom_line(size = 1)
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
-surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
+#surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
 ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves.pdf',
-       width = 8, height = 5, dpi = 600)
+       width = 4, height = 5, dpi = 600)
 
 
 # deviance residuals
@@ -204,22 +204,22 @@ relab.y <- scale_y_discrete(labels = c('i' = expression(beta[intercept]),
                                        'e' = expression(beta[environment]), 
                                        'e2' = expression(beta[environment^2]), 
                                        'm' = expression(beta[size])))
-# correlation matrix
-omega.med <- melt(list(Exponential = exp.covcor[[1]], 
-                       Weibull = wei.covcor[[1]]))
-omega.plot <- ggplot(omega.med, aes(x = Var1, y = Var2, fill = value))
-omega.plot <- omega.plot + geom_tile()
-omega.plot <- omega.plot + geom_text(aes(label = round(value, 2)))
-omega.plot <- omega.plot + facet_grid(. ~ L1, labeller = label_parsed)
-omega.plot <- omega.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
-                                                low = 'blue', 
-                                                mid = 'white', 
-                                                high = 'red')
-omega.plot <- omega.plot + relab.x + relab.y
-omega.plot <- omega.plot + labs(x = '', y = '')
-omega.plot <- omega.plot + theme(axis.text = element_text(size = 15))
-ggsave(omega.plot, filename = '../doc/survival/figure/correlation_heatmap.pdf',
-       width = 10, height = 5, dpi = 600)
+## correlation matrix
+#omega.med <- melt(list(Exponential = exp.covcor[[1]], 
+#                       Weibull = wei.covcor[[1]]))
+#omega.plot <- ggplot(omega.med, aes(x = Var1, y = Var2, fill = value))
+#omega.plot <- omega.plot + geom_tile()
+#omega.plot <- omega.plot + geom_text(aes(label = round(value, 2)))
+#omega.plot <- omega.plot + facet_grid(. ~ L1, labeller = label_parsed)
+#omega.plot <- omega.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
+#                                                low = 'blue', 
+#                                                mid = 'white', 
+#                                                high = 'red')
+#omega.plot <- omega.plot + relab.x + relab.y
+#omega.plot <- omega.plot + labs(x = '', y = '')
+#omega.plot <- omega.plot + theme(axis.text = element_text(size = 15))
+#ggsave(omega.plot, filename = '../doc/survival/figure/correlation_heatmap.pdf',
+#       width = 10, height = 5, dpi = 600)
 
 # just for the weibull
 omega.wei <- melt(list(Weibull = wei.covcor[[1]]))
@@ -236,125 +236,125 @@ weicor.plot <- weicor.plot + theme(axis.text = element_text(size = 15))
 ggsave(weicor.plot, filename = '../doc/survival/figure/wei_cor_heatmap.pdf',
        width = 7, height = 5, dpi = 600)
 
-# covariance matrix
-sigma.med <- melt(list(Exponential = exp.covcor[[5]], 
-                       Weibull = wei.covcor[[5]]))
-sigma.plot <- ggplot(sigma.med, aes(x = Var1, y = Var2, fill = value))
-sigma.plot <- sigma.plot + geom_tile()
-sigma.plot <- sigma.plot + geom_text(aes(label = round(value, 2)))
-sigma.plot <- sigma.plot + facet_grid(. ~ L1, labeller = label_parsed)
-sigma.plot <- sigma.plot + scale_fill_gradient2(name = 'Median\nCovariance', 
-                                                low = 'blue', 
-                                                mid = 'white', 
-                                                high = 'red')
-sigma.plot <- sigma.plot + relab.x + relab.y
-sigma.plot <- sigma.plot + labs(x = '', y = '')
-sigma.plot <- sigma.plot + theme(axis.text = element_text(size = 15))
-ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_heatmap.pdf',
-       width = 10, height = 5, dpi = 600)
+## covariance matrix
+#sigma.med <- melt(list(Exponential = exp.covcor[[5]], 
+#                       Weibull = wei.covcor[[5]]))
+#sigma.plot <- ggplot(sigma.med, aes(x = Var1, y = Var2, fill = value))
+#sigma.plot <- sigma.plot + geom_tile()
+#sigma.plot <- sigma.plot + geom_text(aes(label = round(value, 2)))
+#sigma.plot <- sigma.plot + facet_grid(. ~ L1, labeller = label_parsed)
+#sigma.plot <- sigma.plot + scale_fill_gradient2(name = 'Median\nCovariance', 
+#                                                low = 'blue', 
+#                                                mid = 'white', 
+#                                                high = 'red')
+#sigma.plot <- sigma.plot + relab.x + relab.y
+#sigma.plot <- sigma.plot + labs(x = '', y = '')
+#sigma.plot <- sigma.plot + theme(axis.text = element_text(size = 15))
+#ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_heatmap.pdf',
+#       width = 10, height = 5, dpi = 600)
 
 
-# mean of all coefficients
-mid <- c(apply(exp.fit$mu_prior, 2, median),
-         apply(wei.fit$mu_prior, 2, median))
-top <- c(apply(exp.fit$mu_prior, 2, function(x) quantile(x, probs = 0.9)), 
-         apply(wei.fit$mu_prior, 2, function(x) quantile(x, probs = 0.9)))
-bot <- c(apply(exp.fit$mu_prior, 2, function(x) quantile(x, probs = 0.1)), 
-         apply(wei.fit$mu_prior, 2, function(x) quantile(x, probs = 0.1)))
-mids <- data.frame(mid, top, bot)
-mids$var <- rep(c('i', 'r', 'e', 'e2', 'm'), 2)
-mids$var <- factor(mids$var, levels = unique(mids$var))
-mids$mod <- rep(c('Exponential', 'Weibull'), each = 5)
-
-relab.x <- scale_x_discrete(labels = c('i' = expression(mu[0]), 
-                                       'r' = expression(mu[r]),
-                                       'e' = expression(mu[v]), 
-                                       'e2' = expression(mu[v^2]), 
-                                       'm' = expression(mu[m])))
-
-coef.mean <- ggplot(mids, aes(x = var, y = mid))
-coef.mean <- coef.mean + geom_hline(aes(yintercept = 0), 
-                                    colour = 'grey', size = 2)
-coef.mean <- coef.mean + geom_pointrange(aes(ymin = bot, ymax = top, 
-                                             colour = mod), size = 0.75,
-                                         position = position_jitter(width = 0.1, 
-                                                                    height = 0))
-coef.mean <- coef.mean + relab.x + labs(x = '', y = paste('Parameter estimate'))
-coef.mean <- coef.mean + scale_colour_manual(values = cbp, name = '')
-coef.mean <- coef.mean + theme(axis.text.y = element_text(size = 10),
-                               axis.text.x = element_text(size = 15),
-                               legend.text = element_text(size = 10))
-ggsave(coef.mean, filename = '../doc/survival/figure/coef_means.pdf',
-       width = 8, height = 4, dpi = 600)
-
-
-# variance vector for covariates
-mid <- c(apply(exp.fit$sigma, 2, median),
-         apply(wei.fit$sigma, 2, median))
-top <- c(apply(exp.fit$sigma, 2, function(x) quantile(x, probs = 0.9)), 
-         apply(wei.fit$sigma, 2, function(x) quantile(x, probs = 0.9)))
-bot <- c(apply(exp.fit$sigma, 2, function(x) quantile(x, probs = 0.1)), 
-         apply(wei.fit$sigma, 2, function(x) quantile(x, probs = 0.1)))
-vars <- data.frame(mid, top, bot)
-vars$var <- rep(c('i', 'r', 'e', 'e2', 'm'), 2)
-vars$var <- factor(vars$var, levels = unique(vars$var))
-vars$mod <- rep(c('Exponential', 'Weibull'), each = 5)
-
-relab.x <- scale_x_discrete(labels = c('i' = expression(tau[0]), 
-                                       'r' = expression(tau[r]),
-                                       'e' = expression(tau[v]), 
-                                       'e2' = expression(tau[v^2]), 
-                                       'm' = expression(tau[m])))
-
-coef.var <- ggplot(vars, aes(x = var, y = mid))
-coef.var <- coef.var + geom_hline(aes(yintercept = 0), 
-                                  colour = 'grey', size = 2)
-coef.var <- coef.var + geom_pointrange(aes(ymin = bot, ymax = top, 
-                                           colour = mod), size = 0.75,
-                                       position = position_jitter(width = 0.1, 
-                                                                  height = 0))
-coef.var <- coef.var + relab.x + labs(x = '', y = paste('Parameter estimate'))
-coef.var <- coef.var + scale_colour_manual(values = cbp, name = '')
-coef.var <- coef.var + theme(axis.text.y = element_text(size = 10),
-                             axis.text.x = element_text(size = 15),
-                             legend.text = element_text(size = 10))
-ggsave(coef.var, filename = '../doc/survival/figure/coef_var.pdf',
-       width = 8, height = 4, dpi = 600)
+## mean of all coefficients
+#mid <- c(apply(exp.fit$mu_prior, 2, median),
+#         apply(wei.fit$mu_prior, 2, median))
+#top <- c(apply(exp.fit$mu_prior, 2, function(x) quantile(x, probs = 0.9)), 
+#         apply(wei.fit$mu_prior, 2, function(x) quantile(x, probs = 0.9)))
+#bot <- c(apply(exp.fit$mu_prior, 2, function(x) quantile(x, probs = 0.1)), 
+#         apply(wei.fit$mu_prior, 2, function(x) quantile(x, probs = 0.1)))
+#mids <- data.frame(mid, top, bot)
+#mids$var <- rep(c('i', 'r', 'e', 'e2', 'm'), 2)
+#mids$var <- factor(mids$var, levels = unique(mids$var))
+#mids$mod <- rep(c('Exponential', 'Weibull'), each = 5)
+#
+#relab.x <- scale_x_discrete(labels = c('i' = expression(mu[0]), 
+#                                       'r' = expression(mu[r]),
+#                                       'e' = expression(mu[v]), 
+#                                       'e2' = expression(mu[v^2]), 
+#                                       'm' = expression(mu[m])))
+#
+#coef.mean <- ggplot(mids, aes(x = var, y = mid))
+#coef.mean <- coef.mean + geom_hline(aes(yintercept = 0), 
+#                                    colour = 'grey', size = 2)
+#coef.mean <- coef.mean + geom_pointrange(aes(ymin = bot, ymax = top, 
+#                                             colour = mod), size = 0.75,
+#                                         position = position_jitter(width = 0.1, 
+#                                                                    height = 0))
+#coef.mean <- coef.mean + relab.x + labs(x = '', y = paste('Parameter estimate'))
+#coef.mean <- coef.mean + scale_colour_manual(values = cbp, name = '')
+#coef.mean <- coef.mean + theme(axis.text.y = element_text(size = 10),
+#                               axis.text.x = element_text(size = 15),
+#                               legend.text = element_text(size = 10))
+#ggsave(coef.mean, filename = '../doc/survival/figure/coef_means.pdf',
+#       width = 8, height = 4, dpi = 600)
+#
+#
+## variance vector for covariates
+#mid <- c(apply(exp.fit$sigma, 2, median),
+#         apply(wei.fit$sigma, 2, median))
+#top <- c(apply(exp.fit$sigma, 2, function(x) quantile(x, probs = 0.9)), 
+#         apply(wei.fit$sigma, 2, function(x) quantile(x, probs = 0.9)))
+#bot <- c(apply(exp.fit$sigma, 2, function(x) quantile(x, probs = 0.1)), 
+#         apply(wei.fit$sigma, 2, function(x) quantile(x, probs = 0.1)))
+#vars <- data.frame(mid, top, bot)
+#vars$var <- rep(c('i', 'r', 'e', 'e2', 'm'), 2)
+#vars$var <- factor(vars$var, levels = unique(vars$var))
+#vars$mod <- rep(c('Exponential', 'Weibull'), each = 5)
+#
+#relab.x <- scale_x_discrete(labels = c('i' = expression(tau[0]), 
+#                                       'r' = expression(tau[r]),
+#                                       'e' = expression(tau[v]), 
+#                                       'e2' = expression(tau[v^2]), 
+#                                       'm' = expression(tau[m])))
+#
+#coef.var <- ggplot(vars, aes(x = var, y = mid))
+#coef.var <- coef.var + geom_hline(aes(yintercept = 0), 
+#                                  colour = 'grey', size = 2)
+#coef.var <- coef.var + geom_pointrange(aes(ymin = bot, ymax = top, 
+#                                           colour = mod), size = 0.75,
+#                                       position = position_jitter(width = 0.1, 
+#                                                                  height = 0))
+#coef.var <- coef.var + relab.x + labs(x = '', y = paste('Parameter estimate'))
+#coef.var <- coef.var + scale_colour_manual(values = cbp, name = '')
+#coef.var <- coef.var + theme(axis.text.y = element_text(size = 10),
+#                             axis.text.x = element_text(size = 15),
+#                             legend.text = element_text(size = 10))
+#ggsave(coef.var, filename = '../doc/survival/figure/coef_var.pdf',
+#       width = 8, height = 4, dpi = 600)
 
 
 # histogram of posterior of correlation between inter and env
-baseline.covar <- data.frame(value = c(exp.fit$Omega[, 1, 2], 
+baseline.covar <- data.frame(value = c(#exp.fit$Omega[, 1, 2], 
                                        wei.fit$Omega[, 1, 2],
-                                       exp.fit$Omega[, 1, 3], 
+                                       #exp.fit$Omega[, 1, 3], 
                                        wei.fit$Omega[, 1, 3],
-                                       exp.fit$Omega[, 1, 4], 
+                                       #exp.fit$Omega[, 1, 4], 
                                        wei.fit$Omega[, 1, 4],
-                                       exp.fit$Omega[, 1, 5], 
+                                       #exp.fit$Omega[, 1, 5], 
                                        wei.fit$Omega[, 1, 5]),
-                             lab = c(rep('Exponential', 
-                                         length(exp.fit$Omega[, 1, 3])),
+                             lab = c(#rep('Exponential', 
+                                     #    length(exp.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(exp.fit$Omega[, 1, 3])),
-                                     rep('Exponential', 
-                                         length(wei.fit$Omega[, 1, 3])),
+                                     #rep('Exponential', 
+                                     #    length(wei.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3])),
-                                     rep('Exponential', 
-                                         length(wei.fit$Omega[, 1, 3])),
+                                     #rep('Exponential', 
+                                     #    length(wei.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3])),
-                                     rep('Exponential', 
-                                         length(wei.fit$Omega[, 1, 3])),
+                                     #rep('Exponential', 
+                                     #    length(wei.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3]))))
 baseline.covar$var <- c(rep('Cor(beta[0], beta[r])',
-                            2 * length(exp.fit$Omega[, 1, 3])),
+                            length(wei.fit$Omega[, 1, 3])),
                         rep('Cor(beta[0], beta[v])',
-                            2 * length(exp.fit$Omega[, 1, 3])),
+                            length(wei.fit$Omega[, 1, 3])),
                         rep('Cor(beta[0], beta[v^2])',
-                            2 * length(exp.fit$Omega[, 1, 3])),
+                            length(wei.fit$Omega[, 1, 3])),
                         rep('Cor(beta[0], beta[m])',
-                            2 * length(exp.fit$Omega[, 1, 3])))
+                            length(wei.fit$Omega[, 1, 3])))
 baseline.covar$var <- factor(baseline.covar$var, 
                              levels = c('Cor(beta[0], beta[r])',
                                         'Cor(beta[0], beta[v])',
@@ -363,10 +363,10 @@ baseline.covar$var <- factor(baseline.covar$var,
 tb.cv <- ggplot(baseline.covar, aes(x = value))
 tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
-tb.cv <- tb.cv + facet_grid(var ~ lab, labeller = label_parsed)
+tb.cv <- tb.cv + facet_grid(var ~ ., labeller = label_parsed)
 tb.cv <- tb.cv + labs(x = 'Correlation', y = 'Prob. Density')
 ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.pdf',
-       width = 10, height = 5, dpi = 600)
+       width = 7, height = 5, dpi = 600)
 
 
 # change in baseline through time
@@ -388,31 +388,31 @@ wei.grand$stage <- 1
 wei.grand <- rbind(wei.grand, wei.grand)
 wei.grand$stage <- c(1, length(wei.med))
 
-# exponential
-exp.grandmean <- exp.fit$mu_prior[, 1]
-ee <- list()
-for(ii in seq(length(unique(coh)))) {
-  ee[[ii]] <- exp.fit$beta[, ii, 1]
-}
-exp.med <- laply(ee, median)
-exp.10 <- laply(ee, function(x) quantile(x, probs = 0.1))
-exp.90 <- laply(ee, function(x) quantile(x, probs = 0.9))
-exp.bases <- data.frame(stage = seq(length(exp.med)), 
-                        med = exp.med, q1 = exp.10, q9 = exp.90)
-exp.grand <- data.frame(grand.med = median(exp.grandmean), 
-                        grand.q1 = quantile(exp.grandmean, probs = 0.1),
-                        grand.q9 = quantile(exp.grandmean, probs = 0.9))
-exp.grand$stage <- 1
-exp.grand <- rbind(exp.grand, exp.grand)
-exp.grand$stage <- c(1, length(exp.med))
+## exponential
+#exp.grandmean <- exp.fit$mu_prior[, 1]
+#ee <- list()
+#for(ii in seq(length(unique(coh)))) {
+#  ee[[ii]] <- exp.fit$beta[, ii, 1]
+#}
+#exp.med <- laply(ee, median)
+#exp.10 <- laply(ee, function(x) quantile(x, probs = 0.1))
+#exp.90 <- laply(ee, function(x) quantile(x, probs = 0.9))
+#exp.bases <- data.frame(stage = seq(length(exp.med)), 
+#                        med = exp.med, q1 = exp.10, q9 = exp.90)
+#exp.grand <- data.frame(grand.med = median(exp.grandmean), 
+#                        grand.q1 = quantile(exp.grandmean, probs = 0.1),
+#                        grand.q9 = quantile(exp.grandmean, probs = 0.9))
+#exp.grand$stage <- 1
+#exp.grand <- rbind(exp.grand, exp.grand)
+#exp.grand$stage <- c(1, length(exp.med))
 
 # put 'em together
 wei.bases$label <- 'Weibull'
-exp.bases$label <- 'Exponential'
-bases <- rbind(wei.bases, exp.bases)
+#exp.bases$label <- 'Exponential'
+bases <- wei.bases
 wei.grand$label <- 'Weibull'
-exp.grand$label <- 'Exponential'
-grand <- rbind(wei.grand, exp.grand)
+#exp.grand$label <- 'Exponential'
+grand <- wei.grand
 
 base.line <- ggplot(bases, aes(x = stage, y = med))
 base.line <- base.line + geom_ribbon(data = grand,
@@ -427,10 +427,10 @@ base.line <- base.line + geom_segment(data = grand,
                                                     yend = grand.med))
 base.line <- base.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 #base.line <- base.line + geom_line()
-base.line <- base.line + facet_grid(label ~ ., labeller = label_parsed)
+#base.line <- base.line + facet_grid(label ~ ., labeller = label_parsed)
 base.line <- base.line + labs(x = 'Stage', y = expression(beta[0]))
 ggsave(base.line, filename = '../doc/survival/figure/intercept_cohort.pdf',
-       width = 10, height = 5, dpi = 600)
+       width = 10, height = 3, dpi = 600)
 
 
 # change in range size effect through time
@@ -452,31 +452,31 @@ wei.grand$stage <- 1
 wei.grand <- rbind(wei.grand, wei.grand)
 wei.grand$stage <- c(1, length(wei.med))
 
-# exponential
-exp.grandmean <- exp.fit$mu_prior[, 2]
-ee <- list()
-for(ii in seq(length(unique(coh)))) {
-  ee[[ii]] <- exp.fit$beta[, ii, 2]
-}
-exp.med <- laply(ee, median)
-exp.10 <- laply(ee, function(x) quantile(x, probs = 0.1))
-exp.90 <- laply(ee, function(x) quantile(x, probs = 0.9))
-exp.bases <- data.frame(stage = seq(length(exp.med)), 
-                        med = exp.med, q1 = exp.10, q9 = exp.90)
-exp.grand <- data.frame(grand.med = median(exp.grandmean), 
-                        grand.q1 = quantile(exp.grandmean, probs = 0.1),
-                        grand.q9 = quantile(exp.grandmean, probs = 0.9))
-exp.grand$stage <- 1
-exp.grand <- rbind(exp.grand, exp.grand)
-exp.grand$stage <- c(1, length(exp.med))
+## exponential
+#exp.grandmean <- exp.fit$mu_prior[, 2]
+#ee <- list()
+#for(ii in seq(length(unique(coh)))) {
+#  ee[[ii]] <- exp.fit$beta[, ii, 2]
+#}
+#exp.med <- laply(ee, median)
+#exp.10 <- laply(ee, function(x) quantile(x, probs = 0.1))
+#exp.90 <- laply(ee, function(x) quantile(x, probs = 0.9))
+#exp.bases <- data.frame(stage = seq(length(exp.med)), 
+#                        med = exp.med, q1 = exp.10, q9 = exp.90)
+#exp.grand <- data.frame(grand.med = median(exp.grandmean), 
+#                        grand.q1 = quantile(exp.grandmean, probs = 0.1),
+#                        grand.q9 = quantile(exp.grandmean, probs = 0.9))
+#exp.grand$stage <- 1
+#exp.grand <- rbind(exp.grand, exp.grand)
+#exp.grand$stage <- c(1, length(exp.med))
 
 # put 'em together
 wei.bases$label <- 'Weibull'
-exp.bases$label <- 'Exponential'
-bases <- rbind(wei.bases, exp.bases)
+#exp.bases$label <- 'Exponential'
+bases <- wei.bases
 wei.grand$label <- 'Weibull'
-exp.grand$label <- 'Exponential'
-grand <- rbind(wei.grand, exp.grand)
+#exp.grand$label <- 'Exponential'
+grand <- wei.grand
 
 rage.line <- ggplot(bases, aes(x = stage, y = med))
 rage.line <- rage.line + geom_ribbon(data = grand,
@@ -491,7 +491,7 @@ rage.line <- rage.line + geom_segment(data = grand,
                                                     yend = grand.med))
 rage.line <- rage.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 #rage.line <- rage.line + geom_line()
-rage.line <- rage.line + facet_grid(label ~ ., labeller = label_parsed)
+#rage.line <- rage.line + facet_grid(label ~ ., labeller = label_parsed)
 rage.line <- rage.line + labs(x = 'Stage', y = expression(beta[r]))
 ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.pdf',
        width = 10, height = 5, dpi = 600)
