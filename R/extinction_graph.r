@@ -8,6 +8,7 @@ library(survival)
 library(stringr)
 library(grid)
 library(gridExtra)
+library(xtable)
 source('../R/waic.r')
 source('../R/mung.r')
 source('../R/multiplot.r')
@@ -254,72 +255,18 @@ ggsave(weicor.plot, filename = '../doc/survival/figure/wei_cor_heatmap.pdf',
 #       width = 10, height = 5, dpi = 600)
 
 
-## mean of all coefficients
-#mid <- c(apply(exp.fit$mu_prior, 2, median),
-#         apply(wei.fit$mu_prior, 2, median))
-#top <- c(apply(exp.fit$mu_prior, 2, function(x) quantile(x, probs = 0.9)), 
-#         apply(wei.fit$mu_prior, 2, function(x) quantile(x, probs = 0.9)))
-#bot <- c(apply(exp.fit$mu_prior, 2, function(x) quantile(x, probs = 0.1)), 
-#         apply(wei.fit$mu_prior, 2, function(x) quantile(x, probs = 0.1)))
-#mids <- data.frame(mid, top, bot)
-#mids$var <- rep(c('i', 'r', 'e', 'e2', 'm'), 2)
-#mids$var <- factor(mids$var, levels = unique(mids$var))
-#mids$mod <- rep(c('Exponential', 'Weibull'), each = 5)
-#
-#relab.x <- scale_x_discrete(labels = c('i' = expression(mu[0]), 
-#                                       'r' = expression(mu[r]),
-#                                       'e' = expression(mu[v]), 
-#                                       'e2' = expression(mu[v^2]), 
-#                                       'm' = expression(mu[m])))
-#
-#coef.mean <- ggplot(mids, aes(x = var, y = mid))
-#coef.mean <- coef.mean + geom_hline(aes(yintercept = 0), 
-#                                    colour = 'grey', size = 2)
-#coef.mean <- coef.mean + geom_pointrange(aes(ymin = bot, ymax = top, 
-#                                             colour = mod), size = 0.75,
-#                                         position = position_jitter(width = 0.1, 
-#                                                                    height = 0))
-#coef.mean <- coef.mean + relab.x + labs(x = '', y = paste('Parameter estimate'))
-#coef.mean <- coef.mean + scale_colour_manual(values = cbp, name = '')
-#coef.mean <- coef.mean + theme(axis.text.y = element_text(size = 10),
-#                               axis.text.x = element_text(size = 15),
-#                               legend.text = element_text(size = 10))
-#ggsave(coef.mean, filename = '../doc/survival/figure/coef_means.pdf',
-#       width = 8, height = 4, dpi = 600)
-#
-#
-## variance vector for covariates
-#mid <- c(apply(exp.fit$sigma, 2, median),
-#         apply(wei.fit$sigma, 2, median))
-#top <- c(apply(exp.fit$sigma, 2, function(x) quantile(x, probs = 0.9)), 
-#         apply(wei.fit$sigma, 2, function(x) quantile(x, probs = 0.9)))
-#bot <- c(apply(exp.fit$sigma, 2, function(x) quantile(x, probs = 0.1)), 
-#         apply(wei.fit$sigma, 2, function(x) quantile(x, probs = 0.1)))
-#vars <- data.frame(mid, top, bot)
-#vars$var <- rep(c('i', 'r', 'e', 'e2', 'm'), 2)
-#vars$var <- factor(vars$var, levels = unique(vars$var))
-#vars$mod <- rep(c('Exponential', 'Weibull'), each = 5)
-#
-#relab.x <- scale_x_discrete(labels = c('i' = expression(tau[0]), 
-#                                       'r' = expression(tau[r]),
-#                                       'e' = expression(tau[v]), 
-#                                       'e2' = expression(tau[v^2]), 
-#                                       'm' = expression(tau[m])))
-#
-#coef.var <- ggplot(vars, aes(x = var, y = mid))
-#coef.var <- coef.var + geom_hline(aes(yintercept = 0), 
-#                                  colour = 'grey', size = 2)
-#coef.var <- coef.var + geom_pointrange(aes(ymin = bot, ymax = top, 
-#                                           colour = mod), size = 0.75,
-#                                       position = position_jitter(width = 0.1, 
-#                                                                  height = 0))
-#coef.var <- coef.var + relab.x + labs(x = '', y = paste('Parameter estimate'))
-#coef.var <- coef.var + scale_colour_manual(values = cbp, name = '')
-#coef.var <- coef.var + theme(axis.text.y = element_text(size = 10),
-#                             axis.text.x = element_text(size = 15),
-#                             legend.text = element_text(size = 10))
-#ggsave(coef.var, filename = '../doc/survival/figure/coef_var.pdf',
-#       width = 8, height = 4, dpi = 600)
+# mean of all coefficients
+# sd of all coefficients
+param.est <- rbind(data.frame(p = c('mu_i', 'mu_r', 
+                                    'mu_e', 'mu_e2', 'mu_m'),
+                              m = apply(wei.fit$mu_prior, 2, mean), 
+                              s = apply(wei.fit$mu_prior, 2, sd)),
+                   data.frame(p = c('tau_i', 'tau_r', 
+                                    'tau_e', 'tau_e2', 'tau_m'),
+                              m = apply(wei.fit$sigma, 2, mean), 
+                              s = apply(wei.fit$sigma, 2, sd)))
+param.table <- xtable(param.est, label = 'tab:param')
+print.xtable(param.table, file = '../doc/survival/table_param.tex')
 
 
 # histogram of posterior of correlation between inter and env
@@ -494,7 +441,7 @@ rage.line <- rage.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 #rage.line <- rage.line + facet_grid(label ~ ., labeller = label_parsed)
 rage.line <- rage.line + labs(x = 'Stage', y = expression(beta[r]))
 ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.pdf',
-       width = 10, height = 5, dpi = 600)
+       width = 10, height = 3, dpi = 600)
 
 
 # quadratics plot
