@@ -43,7 +43,7 @@ The expected effect of environmental preference as a multiplier of expected exti
 
 The matrix \(\Sigma\) describing the covariance between the different coefficients describes how these coefficients might vary together across the origination cohorts. Similar to how this was modeled (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}), for interpretation purposes \(\Sigma\) can be decomposed into a vector of standard deviations \(\vec{\tau}\) and a correlation matrix \(\Omega\).
 
-The estimates of the standard deviation of between-cohort coefficient estimates \(\tau\) inidicate that some effects can vary greatly between-cohorts (Fig. \ref{tab:param}). Coefficients with greater values of \(\tau\) have greater between-cohort variation. The covariate effects with the greatest between origination cohort variation are \(\beta_{r}\), \(\beta_{v}\), and \(\beta_{v^{2}}\). Estimates of \(\beta_{m}\) have negligible between cohort variation, as there is less between cohort variation than the between cohort variation in baseline extinction risk \(\beta_{0}\). However the amount of between cohort variation in estimates of \(\beta_{v^{2}}\) means that it is possible for the function describing the effect of environmental affinity to be upward facing for some cohorts (Eq. \ref{eq:env}), which corresponds to environmental generalists being shorted lived than specialists in that cohort.
+The estimates of the standard deviation of between-cohort coefficient estimates \(\tau\) inidicate that some effects can vary greatly between-cohorts (Fig. \ref{tab:param}). Coefficients with greater values of \(\tau\) have greater between-cohort variation. The covariate effects with the greatest between origination cohort variation are \(\beta_{r}\), \(\beta_{v}\), and \(\beta_{v^{2}}\). Estimates of \(\beta_{m}\) have negligible between cohort variation, as there is less between cohort variation than the between cohort variation in baseline extinction risk \(\beta_{0}\). However the amount of between cohort variation in estimates of \(\beta_{v^{2}}\) means that it is possible for the function describing the effect of environmental affinity to be upward facing for some cohorts (Eq. \ref{eq:env}), which corresponds to environmental generalists being shorter lived than specialists in that cohort.
 
 
 % omega heatmap
@@ -87,17 +87,20 @@ Additionally, for some cohorts there is a quite striking pattern where the effec
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_heatmap}
-  \caption{Heatmap for the median estimates of the terms of the correlation matrix \(\Omega\) between cohort-level covariate effects. Both the exponential (left) and Weibull (right) models are presented. The off-diagonal terms are the correlation between the estimates of the cohort-level estimates of the effects of covariates, along with intercept/baseline extinction risk.}
-  \label{fig:omega}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \caption{}
+    \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap}
+    \label{fig:omega}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\textwidth}
+    \caption{}
+    \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_marginal}
+    \label{fig:corr}
+  \end{subfigure}
+  \caption{\textbf{A}: Heatmap for the median estimates of the terms of the correlation matrix \(\Omega\) between cohort-level covariate effects. Both the exponential (left) and Weibull (right) models are presented. The off-diagonal terms are the correlation between the estimates of the cohort-level estimates of the effects of covariates, along with intercept/baseline extinction risk. \textbf{B}: Marginal posterior distributions of the correlations between intercept terms/baseline extinction risk and the effects of each of the covariates. These are presented for both the exponential (left) and Weibull (right) models.}
+  \label{fig:cor_posterior}
 \end{figure}
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_marginal}
-  \caption{Marginal posterior distributions of the correlations between intercept terms/baseline extinction risk and the effects of each of the covariates. These are presented for both the exponential (left) and Weibull (right) models.}
-  \label{fig:corr}
-\end{figure}
 
 \begin{figure}[ht]
   \centering

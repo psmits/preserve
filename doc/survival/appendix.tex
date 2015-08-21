@@ -16,12 +16,12 @@
 \section{Uncertainty in environmental preference} \label{sec:uncer}
 The calculation and inclusion of environmental affinity in the survival model is a statistical procedure that takes into account our uncertainty based on where fossils tend to occur. Because we cannot directly observe if a fossil taxon had occurrences restricted to only a single environment, instead we can only estimate its affinity with uncertainty. One advantage of using a Bayesian analytical approach is that both parameters and data are considered random samples from some underlying distribution, which means that is is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. My approach is conceptually similar to \citet{Simpson2009} but instead of obtaining a single point estimate, an entire posterior distribution is estimated.
 
-The first step is to determine the probability \(\theta\) at which genus \(i\) occurs in an epicontinental settings based on its own pattern of occurrences. Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. open ocean). Because the value of interest is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a binomial distribution. We can then define our sampling statement as
+The first step is to determine the probability \(\theta\) at which genus \(i\) occurs in an epicontinental settings based on its own pattern of occurrences. Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. open ocean). Because the value of interest is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a Bernoulli distribution. We can then define our sampling statement as
 \begin{equation}
-  e_{i} \sim \mathrm{Binomial}(e_{i} + o_{i}, \theta_{i}).
+  e_{i} \sim \mathrm{Bernoulli}(e_{i} + o_{i}, \theta_{i}).
   \label{eq:epi_lik}
 \end{equation}
-I used a flat prior for \(\theta_{i}\) defined as \(\theta_{i} \sim \mathrm{Beta}(1, 1)\). Because the beta distribution is the conjugate prior for the binomial distribution, the posterior is easy to compute in closed form. The posterior probability of \(\theta\) is then 
+I used a flat prior for \(\theta_{i}\) defined as \(\theta_{i} \sim \mathrm{Beta}(1, 1)\). Because the beta distribution is the conjugate prior for the Bernoulli distribution, the posterior is easy to compute in closed form. The posterior probability of \(\theta\) is then 
 \begin{equation}
   \theta_{i} \sim \mathrm{Beta}(e_{i} + 1, o_{i} + 1)
   \label{eq:epi_post}
@@ -29,7 +29,7 @@ I used a flat prior for \(\theta_{i}\) defined as \(\theta_{i} \sim \mathrm{Beta
 
 It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an additional probability \(\Theta\). Define \(E_{i}\) as the total number of other fossil occurrences (exceptfor genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(O_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define the sampling statement as
 \begin{equation}
-  E_{i} \sim \mathrm{Binomial}(E_{i} + O_{i}, \Theta_{i}).
+  E_{i} \sim \mathrm{Bernoulli}(E_{i} + O_{i}, \Theta_{i}).
   \label{eq:bck_lik}
 \end{equation}
 Again, I used a flat prior of \(\Theta_{i}\) defined as \(\Theta_{i} \sim \mathrm{Beta}(1, 1)\). The posterior of \(\Theta\) is then simply defined as

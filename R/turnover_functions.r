@@ -1,7 +1,7 @@
 library(plyr)
 library(rstan)
 # processing coda into stan-like posterior draws
-process.coda <- function(post) {
+process.coda <- function(post, data) {
   post <- Reduce(rbind, post)
   vars <- unique(llply(str_split(colnames(post), pattern = '\\['), 
                        function(x) x[1]))
@@ -13,11 +13,24 @@ process.coda <- function(post) {
                               paste0(vars[[ii]], '\\['))]
     dim.check <- str_count(colnames(temp), pattern = '\\,')
     col.num <- ncol(temp) / data$J
+   
+    if(sum(temp) == 0) {
+      temp <- post[, vars[[ii]]]
+      col.num <- 1
+    }
+    
     if(col.num == 1) {   # don't vary by time, but by region
       new.post[[ii]] <- temp
     } else if (all(dim.check <= 1)){  # vary by time, but only one variable
       holder <- array(dim = c(nrow(temp), col.num, data$J))
-      colseq <- list(seq(col.num), seq(from = col.num + 1, to = col.num * data$J))
+      
+      colseq <- list()
+      colseq[[1]] <- seq(col.num)
+      for(jj in seq(from = 2, to = data$J)) {
+        val <- colseq[[jj - 1]][length(colseq[[jj - 1]])]
+        colseq[[jj]] <- seq(from = val + 1, to = val + col.num)
+      }
+     
       for(jj in seq(data$J)) {
         holder[, , jj] <- temp[, colseq[[jj]]]
       }
@@ -25,7 +38,14 @@ process.coda <- function(post) {
     } else if (all(dim.check > 1)) {  # generated 3-way array z (list by region)
       holder <- list()
       regionholder <- array(dim = c(nrow(temp), col.num, data$J))
-      colseq <- list(seq(col.num), seq(from = col.num + 1, to = col.num * data$J))
+      
+      colseq <- list()
+      colseq[[1]] <- seq(col.num)
+      for(jj in seq(from = 2, to = data$J)) {
+        val <- colseq[[jj - 1]][length(colseq[[jj - 1]])]
+        colseq[[jj]] <- seq(from = val + 1, to = val + col.num)
+      }
+     
       for(jj in seq(data$J)) {
         regionholder <- temp[, colseq[[jj]]]
 

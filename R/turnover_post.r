@@ -12,7 +12,7 @@ load('../data/mcmc_out/turnover_custom.rdata')  # post
 # posterior predicitive check
 #   if simulate data from same starting point, do we get the same pattern 
 #   of **observed** diversity (visually)?
-post.check <- replicate(1000, posterior.turnover(post = post, data = data), 
+post.check <- replicate(10, posterior.turnover(post = post, data = data), 
                         simplify = FALSE)
 
 true.seen <- obs.seen <- div.true <- div.obs <- list()

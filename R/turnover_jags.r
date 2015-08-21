@@ -1,30 +1,33 @@
 library(arm)
+library(plyr)
 library(parallel)
 library(rjags)
 library(coda)
 library(rstan)
 #load.module('glm')
-source('../R/gts.r')
-source('../R/mung.r')
-
-set.seed(420)
-n <- 2
-
-data.file <- list.files('../data', pattern = 'Occs')
-fossil <- read.csv(paste0('../data/', data.file))
-bibr <- fossil
-
-lump.file <- list.files('../data', pattern = 'lump')
-lump <- read.csv(paste0('../data/', lump.file))
-
-shape <- readShapeSpatial('../data/ne_10m_coastline.shp')  # from natural earth
-
-sight <- space.time(bibr, 
-                    bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
-                    gts = rev(as.character(lump[, 2])),
-                    cuts = 'Chang',
-                    bot = 'Trem',
-                    shape = shape)
+#source('../R/gts.r')
+#source('../R/mung.r')
+#
+#set.seed(420)
+#
+#data.file <- list.files('../data', pattern = 'Occs')
+#fossil <- read.csv(paste0('../data/', data.file))
+#bibr <- fossil
+#
+#lump.file <- list.files('../data', pattern = 'lump')
+#lump <- read.csv(paste0('../data/', lump.file))
+#
+#shape <- readShapeSpatial('../data/ne_10m_coastline.shp')  # from natural earth
+#
+#sight <- space.time(bibr, 
+#                    bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
+#                    gts = rev(as.character(lump[, 2])),
+#                    cuts = 'Chang',
+#                    bot = 'Trem',
+#                    shape = shape)
+#save.image('../data/gradient_setup.rdata')
+load('../data/gradient_setup.rdata')
+n <- 4
 sight <- sight[1:n]
 
 sizes <- laply(sight, dim)
@@ -57,7 +60,7 @@ jags <- with(data, {jags.model('../jags/hmm_hierarchical.jags',
                                inits = list(z = sight,
                                             p_norm = p.init))})
 # warm-up/burn-in
-update(jags, 10000)
+update(jags, 100)
 # production
 post.samp <- coda.samples(jags, c('psi', 
                                   'gamma', 'phi', 'p',
@@ -67,10 +70,6 @@ post.samp <- coda.samples(jags, c('psi',
                                   'gamma_sigma_group', 
                                   'phi_sigma_group', 
                                   'p_sigma_group',
-                                  'indiv_gamma', 'indiv_phi', 'indiv_p',
-                                  'indiv_gamma_sigma', 
-                                  'indiv_phi_sigma', 
-                                  'indiv_p_sigma',
                                   'z', 'turnover'),  
-                          n.iter = 10000, thin = 10)
+                          n.iter = 100)#, thin = 10)
 save(post.samp, file = '../data/mcmc_out/turnover_jags.rdata')
