@@ -12,7 +12,7 @@ load('../data/mcmc_out/turnover_custom.rdata')  # post
 # posterior predicitive check
 #   if simulate data from same starting point, do we get the same pattern 
 #   of **observed** diversity (visually)?
-post.check <- replicate(10, posterior.turnover(post = post, data = data), 
+post.check <- replicate(100, posterior.turnover(post = post, data = data), 
                         simplify = FALSE)
 
 true.seen <- obs.seen <- div.true <- div.obs <- list()
@@ -25,7 +25,7 @@ for(ii in seq(length(post.check))) {
   div.true[[ii]] <- llply(post.check[[ii]], function(x) colSums(x$true))
   div.obs[[ii]] <- llply(post.check[[ii]], function(x) colSums(x$obs))
 }
-div.dist <- llply(1:2, function(y) 
+div.dist <- llply(1:4, function(y) 
                   Reduce(rbind, llply(div.obs, function(x) x[[y]])))
 div.dist <- Map(function(x) {
                 rownames(x) <- seq(nrow(x))
@@ -42,10 +42,14 @@ obs <- data.frame(Reduce(rbind, obs))
 names(obs) <- c('year', 'div', 'prov')
 
 prov.div <- ggplot(div.melt, aes(x = year, y = div, group = sim))
-prov.div <- prov.div + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+prov.div <- prov.div + geom_line(alpha = 0.1)
 prov.div <- prov.div + geom_line(data = obs, 
                                  mapping = aes(x = year, y = div, group = NULL),
                                  colour = 'blue')
+prov.div <- prov.div + facet_grid(prov ~ .)
+prov.div <- prov.div + labs(x = 'time', y = 'observed diversity')
+ggsave(plot = prov.div, filename = '../doc/gradient/figure/obs_div.pdf',
+       width = 10, height = 5)
 
 
 # "true" diversity...
@@ -75,6 +79,9 @@ est.div$prov <- factor(est.div$prov)
 
 prov.est <- ggplot(est.div, aes(x = year, y = div, group = sim))
 prov.est <- prov.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+prov.est <- prov.est + labs(x = 'time', y = 'estimated diversity')
+ggsave(plot = prov.est, filename = '../doc/gradient/figure/est_div.pdf',
+       width = 10, height = 5)
 
 # turnover probability
 turnover.prob <- function(data, post) {
@@ -103,7 +110,9 @@ est.turn$prov <- factor(est.turn$prov)
 
 turn.est <- ggplot(est.turn, aes(x = year, y = div, group = sim))
 turn.est <- turn.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
-
+turn.est <- turn.est + labs(x = 'time', y = 'Pr(z(i,t - 1) = 0 | z(i, t) = 1)')
+ggsave(plot = turn.est, filename = '../doc/gradient/figure/turnover.pdf',
+       width = 10, height = 5)
 
 # remain/gain probabilities
 macro.prob <- function(data, post, ww = 'gamma') {
@@ -132,6 +141,9 @@ est.orig$prov <- factor(est.orig$prov)
 
 orig.est <- ggplot(est.orig, aes(x = year, y = div, group = sim))
 orig.est <- orig.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+orig.est <- orig.est + labs(x = 'time', y = 'Pr(z(i, t) = 1 | z(i, t - 1) = 0)')
+ggsave(plot = orig.est, filename = '../doc/gradient/figure/entrance.pdf',
+       width = 10, height = 5)
 
 # and the other...
 est.surv <- replicate(1000, macro.prob(data = data, post = post, ww = 'gamma'), 
@@ -149,6 +161,9 @@ est.surv$prov <- factor(est.surv$prov)
 
 surv.est <- ggplot(est.surv, aes(x = year, y = div, group = sim))
 surv.est <- surv.est + geom_line(alpha = 0.1) + facet_grid(prov ~ .)
+surv.est <- surv.est + labs(x = 'time', y = 'Pr(z(i, t) = 1 | z(i, t - 1) = 1)')
+ggsave(plot = surv.est, filename = '../doc/gradient/figure/survival.pdf',
+       width = 10, height = 5)
 
 
 
@@ -202,19 +217,3 @@ est.death <- Map(function(x) {
 est.death <- melt(est.death)
 names(est.death) <- c('sim', 'year', 'div', 'prov')
 est.death$prov <- factor(est.death$prov)
-
-# per captia gain is gained at t / total at t
-# per captia loss is lost at t / total at t
-after.first <- est.div[est.div$year != 33, ]
-
-percapita.birth <- percapita.death <- after.first
-percapita.birth$div <- est.birth$div / after.first$div
-percapita.death$div <- est.death$div / after.first$div
-
-percapita <- rbind(cbind(percapita.birth, type = 'gain'), 
-                   cbind(percapita.death, type = 'loss'))
-percapita$div[is.nan(percapita$div)] <- 0
-percapita$div[is.nan(percapita$div)] <- 0
-
-capita.est <- ggplot(percapita, aes(x = year, y = div, group = sim))
-capita.est <- capita.est + geom_line(alpha = 0.1) + facet_grid(prov ~ type)
