@@ -23,27 +23,27 @@
 
 \begin{titlepage}
   \begin{large}
-    \textbf{Title:} How do biological traits affect brachiopod taxonomic survival? A hierarchical Bayesian approach.
+    \textbf{Title:} Temporal variation and correlation of effects of biological traits on brachiopod taxonomic survival
   \end{large}
 
-  \textbf{Running title:} How do biological traits affect taxonomic survival?
+  \textbf{Running title:} Variation in effect of traits on taxonomic survival
 
-  \textbf{Author:} Peter D Smits, psmits@uchicago.edu, Committee on Evolutionary Biology, University of Chicago
+  \textbf{Author:} Peter D Smits, psmits@uchicago.edu, Committee on Evolutionary Biology, University of Chicago, IL, USA.
 
-  \textbf{Keywords:} extinction, macroevolution, macroecology, Paleozoic, selection
+  \textbf{Keywords:} macroevolution, extinction, macroecology, Bayesian
 
   \textbf{Word count:} ?
   
-  \textbf{Table count:} 0.
+  \textbf{Table count:} 1.
  
-  \textbf{Figure count:} 5 main text, 3 supplement.
+  \textbf{Figure count:} 5.
 
   \textbf{Data archival location:} If accepted, all data and code necessary to duplicate this analysis will be made available on DRYAD.
 
 \end{titlepage}
 
 \begin{abstract}
-  While the effect of geographic range on extinction risk is well documented, the effects of other traits are less well known. Using a hierarchical Bayesian modeling approach, I also model the possible interaction between the effects of the biological traits and a taxon's time of origination. I analyze patterns of Paleozoic brachiopod genus durations and their relationship to geographic range, affinity for epicontinental seas versus open ocean environments, and body size. Additionally, I allow for environmental affinity to have a nonlinear effect on duration. My analysis framework eschews the traditional distinction between background and mass extinction, instead the entire time period is analyzed where these ``states'' are part of a continuum. I find evidence that as extinction risk increases, the expected strength of the selection gradient on biological traits (except body size) increases. This manifests as greater expected differences in extinction risk for each unit change in geographic range and environmental preference during periods of high extinction risk, as opposed to a much flatter expected selection gradient during periods of low extinction risk. I find weak evidence for a universally nonlinear relationship between environmental preference and extinction risk such that ``generalists'' have a lower expected extinction risk than either ``specialists''. While for the many parts of the Paleozoic this hypothesis is supported, there are many times where this hypothesized relationship is absent or even reversed. Importantly, I find that as extinction risk increases, the steepness of this relationship is expected to increases as well.
+  While the effect of geographic range on extinction risk is well documented, how other traits may increase or decrease extinction risk is less well known. Using a hierarchical Bayesian modeling approach, I also model the possible interaction between the effects of the biological traits and a taxon's time of origination. I analyze patterns of Paleozoic brachiopod genus durations and their relationship to geographic range, affinity for epicontinental seas versus open ocean environments, and body size. Additionally, I allow for environmental affinity to have a nonlinear effect on duration. My analysis framework eschews the traditional distinction between background and mass extinction, instead the entire time period is analyzed where these ``states'' are part of a continuum. I find evidence that as extinction risk increases, the expected strength of the selection gradient on biological traits (except body size) increases. This manifests as greater expected differences in extinction risk for each unit change in geographic range and environmental preference during periods of high extinction risk, as opposed to a much flatter expected selection gradient during periods of low extinction risk. I find weak evidence for a universally nonlinear relationship between environmental preference and extinction risk such that ``generalists'' have a lower expected extinction risk than either ``specialists''. While for the many parts of the Paleozoic this hypothesis is supported, there are many times where this hypothesized relationship is absent or even reversed. Importantly, I find that as extinction risk increases, the steepness of this relationship is expected to increases as well.
 \end{abstract}
 
 
@@ -83,13 +83,13 @@ Fossil occurrences were analyzed at the genus level which is common for paleobio
 
 Sampled occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to fossils themselves but instead fossils are known from a geological interval which represents some temporal range. Stages are effectively irreducible temporal intervals in which taxa may occur.
 
-Genera with a last occurrence in or after Changhsingian stage were right censored at the Changhsingian. Genera with a duration of only one stage were left censored (Appendix \ref{sec:cen}). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), and body size (\(m\)). 
+Genera with a last occurrence in or after Changhsingian stage were right censored at the Changhsingian. Genera with a duration of only one stage were left censored (Appendix A). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), and body size (\(m\)). 
 
 Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}.
 
 For each stage, the total number of occupied grid cells, or cells in which a fossil occurs, was calculated. Then, for each genus, the number of grid cells occupied by that genus was calculated. Dividing the genus occupancy by the total occupancy gives the relative occupancy of that genus. Mean relative genus occupancy was then calculated as the mean of the per stage relative occupancies of that genus. 
 
-Body size data was sourced directly from \citet{Payne2014}. Because those measurements are presented without error, a measurement error model similar to the one for environmental affinity could not be implemented (Appendix \ref{sec:uncer}).
+Body size data was sourced directly from \citet{Payne2014}. Because those measurements are presented without error, a measurement error model similar to the one for environmental affinity could not be implemented (Appendix A).
 
 Prior to analysis, geographic range and body size were transformed and standardized in order to improve interpretability of the results. Geographic range, which can only vary between 0 and 1, was logit transformed. Body size, which is defined for all positive real values, was natural log transformed. These covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
 
@@ -101,7 +101,7 @@ This partial pooling is one of the greatest advantages of hierarchical modeling.
 
 All covariate effects (regression coefficients), as well as the intercept term (baseline extinction risk), were allowed to vary by group (origination cohort). The covariance/correlation between covariate effects was also modeled. This hierarchical structure allows inference for how covariates effects may change with respect to each other while simultaneously estimating the effects themselves, propagating our uncertainty through all estimates. 
 
-Additionally, instead of relying on point estimates of environmental affinity, I treat environmental affinity as a continuous measure of the difference between the taxon's environmental occurrence pattern and the background occurrence pattern (Appendix \ref{sec:uncer}).
+Additionally, instead of relying on point estimates of environmental affinity, I treat environmental affinity as a continuous measure of the difference between the taxon's environmental occurrence pattern and the background occurrence pattern (Appendix A).
 
 \subsection{Survival model}
 
@@ -151,7 +151,7 @@ Similarly, the Weibull model is defined
 \end{equation}
 The principal difference between this model and the previous (Eq. \ref{eq:exp_total}) is the inclusion of the shape parameter \(\alpha\). Note that \(\sigma\) is approximately equivalent to \(1 / \lambda\).
 
-For an explanation of how this model was developed, parameter explanations, and choice of priors, please see Appendix \ref{sec:survival}. Note that these models (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) do not include how the uncertainty in environmental affinity is included nor how censored observations are included. For an explanation of both of these aspects, see Appendices \ref{sec:uncer} and \ref{sec:cen}.
+For an explanation of how this model was developed, parameter explanations, and choice of priors, please see Appendix B. Note that these models (Eq. \ref{eq:exp_total}, \ref{eq:wei_total}) do not include how the uncertainty in environmental affinity is included nor how censored observations are included. For an explanation of both of these aspects, see Appendices A and C.
 
 \subsection{Parameter estimation}
 
@@ -165,7 +165,7 @@ The strategy behind posterior predictive checks is to draw simulated values from
 
 In order to compare the fitted model to the observed data, various graphical comparisons or test quantities need to be defined. The principal comparison used here is a comparison between non-parameteric approximation of the survival function \(S(t)\) as estimated from both the observed data and each of the replicated data sets. The purpose of this comparison is to determine if the model approximates the same survival/extinction pattern as the original data. 
 
-The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. Out-of-sample predictive accuracy is a measure of the expected fit of the model to new data. However, because the Weibull model reduces to the exponential model when \(\alpha = 1\) my interest is not in choosing between these models. Instead, comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. For an explanation of how WAIC is calculated, see Appendix \ref{sec:waic}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
+The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. Out-of-sample predictive accuracy is a measure of the expected fit of the model to new data. However, because the Weibull model reduces to the exponential model when \(\alpha = 1\) my interest is not in choosing between these models. Instead, comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. For an explanation of how WAIC is calculated, see Appendix D. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
 
 
 \section{Results}
@@ -274,7 +274,7 @@ In summary, patterns of Paleozoic brachiopod survival were analyzed using a full
 
 
 \section*{Acknowledgements}
-I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, and R. Ree for helpful discussion and advice. Additionally, thank you A. Miller for the epicontinental versus open-ocean assignments. This entire study would would not have been possible without the Herculean effort of the many contributors to the Paleobiology Database. In particular, I would like to thank J. Alroy, M. Aberhan, D. Bottjer, M. Clapham, F. F\"{u}rsich, N. Heim, A. Hendy, S. Holland, L. Ivany, W. Kiessling, B. Kr\"{o}ger, A. McGowan, T. Olszewski, P. Novack-Gottshall, M. Patzkowsky, M. Uhen, L. Villier, and P. Wager. This work was supported by a NASA Exobiology grant (NNX10AQ446) to A. Miller and M. Foote. This is Paleobiology Database publication XXX.
+I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, and R. Ree for helpful discussion and advice. Additionally, thank you A. Miller for the epicontinental versus open-ocean assignments. This entire study would would not have been possible without the Herculean effort of the many contributors to the Paleobiology Database. In particular, I would like to thank J. Alroy, M. Aberhan, D. Bottjer, M. Clapham, F. F\"{u}rsich, N. Heim, A. Hendy, S. Holland, L. Ivany, W. Kiessling, B. Kr\"{o}ger, A. McGowan, T. Olszewski, P. Novack-Gottshall, M. Patzkowsky, M. Uhen, L. Villier, and P. Wager. This work was supported by a NASA Exobiology grant (NNX10AQ446) to A. Miller and M. Foote. I declare no conflicts of interest. This is Paleobiology Database publication XXX.
 
 \clearpage
 
@@ -361,11 +361,6 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, and R. Ree for helpf
   \caption{Group-level estimates of the intercept terms the effects of biological traits on brachiopod generic survival from equations \ref{eq:exp_total} and \ref{eq:wei_total}, presented as means and standard deviations. \(\mu\) values are the location parameters of the effects, while \(\tau\) values are the scale terms describing the variation between cohorts. The subscripts correspond to the following: \(i\) intercept, \(r\) geographic range, \(e\) environmental affinity, \(e^{2}\) environmental affinity squared, \(m\) body size.}
   \label{tab:param}
 \end{table}
-
-\clearpage
-
-\appendix
-\input{appendix}
 
 
 \end{document}
