@@ -13,29 +13,65 @@
 \begin{document}
 \section{Materials and Methods}
 
-\subsection{Occurrence information}
+\subsection{Model specification}
 
-\subsection{Diversity model}
+\(y_{i, j, t}\) is the observed binary occurrence of taxon \(i\) in province \(j\) at time \(t\), where \(i = 1, 2, \dots, N\), \(j = 1, 2, \dots, J\), and \(t = 1, 2, \dots, T\). \(y = 1\) is occupied while \(y = 0\) is unoccupied.
 
-This model is based on the Jolly-Seber model for capture-mark-recapture data CITATION. There are three major parameters to this model: survival probability \(\phi\), recruitment probability \(\gamma\), and sampling probability \(p\). Implicit in this model is also removal probabilty \(1 - \phi\).
+\(z_{i, j, t}\) is the estimated binary occurrence of taxon \(i\) in province \(j\) at time \(t\), given the estimate of sampling. \(z = 1\) is occupied while \(z = 0\) is unoccupied.
 
-\(\phi_{t - 1}\) is the probability of surving to time \(t\) from \(t - 1\) given presence at time \(t - 1\). Survival probability is a function of both extinction and extirpation.
+\(p_{j, t}\) is the probability of preservation (\(Pr(y = 1 | z = 1)\)) in province \(j\) at time \(t\).
 
-\(\gamma_{t}\) is the probability of first appearing at time \(t\) given absence at time \(t - 1\). Recruitment is a function of both origination and colonization.
+\(\phi_{j, t}\) is the probability of surviving, in province \(j\), from time \(t\) to time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 1)\)).
 
-\(p_{t}\) is the probability of observing \(y_{i}\) at time \(t\) if it is present.
+\(\gamma_{j, t}\) is the probability of newly entering province \(j\) at time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 0)\)).
+
+\(\psi\) is probability of sit occupancy/probability of occurrence (\(Pr(z_{i, t = 1} = 1)\). The first time point is defined in terms of \(\psi\) because there is (assumed) no previous time points.
+
+\begin{equation}
+  \begin{aligned}
+    y_{i, t, j} &\sim \mathrm{Bern}(p_{t, j} z_{i, t, j}) \\
+    z_{i, 1, j} &\sim \mathrm{Bern}(\psi_{j}) \\
+    z_{i, t, j} &\sim \mathrm{Bern}(\phi_{j, t - 1} z_{i, t - 1, j} + \gamma_{j, t - 1} (1 - z_{i, t - 1, j}))
+  \end{aligned}
+\end{equation}
+
+The parameters \(\phi\), \(\gamma\), and \(p\) are then all defined hierarchically within each province, hierarchical by time bin with the mean of that hierarchical by province.
+
+\(\Phi_{j}\), \(\Gamma_{j}\), and \(P_{j}\) are the overall probabilities for province \(j\). \(M_{\phi}\), \(M_{\gamma}\), and \(M_{p}\) are the overall estimates of survival, origination, and preservation probabilities.
+
+\(\alpha\) and \(\beta\) are both \(J \times J\) matrices, where \(\beta_{j}\) would be a column vector. \(X\) is a \(J \times T\) matrix where \(X_{t}\) is a column vector where each element is defined \(X_{j, t} = \Sigma_{i = 1}^{N} z_{i, j, t}\) (i.e. the sum of the diversity in province \(j\) at time \(t\)).
 
 
 \begin{equation}
   \begin{aligned}
-    y_{i,t} &\sim \mathrm{Bernoulli}(p_{t} z_{i, t}) \\
-    z_{i, t} &\sim
-    \begin{cases}
-      \mathrm{Bernoulli}(\gamma_{1}) & \text{if } t = 1, \text{and} \\
-      \mathrm{Bernoulli}(z_{i, t} \phi_{t - 1} + (1 - z_{i, t}) \gamma_{t}) & \text{if } t > 1. \\
-    \end{cases}
+    \mathrm{logit}^{-1}(\phi_{j, t}) &\sim \mathrm{N}(\Phi_{j} + \beta_{j}^{t}X_{t - 1}, \sigma_{\phi, j}) \\
+    \Phi_{j} &\sim \mathrm{N}(M_{\phi}, \sigma_{\Phi}) \\
+    \sigma_{\phi, j} &\sim \mathrm{C}^{+}(1) \\
+    M_{\phi} &\sim \mathrm{N}(0, 1) \\
+    \sigma_{\Phi} &\sim \mathrm{C}^{+}(1) \\
   \end{aligned}
 \end{equation}
 
+\begin{equation}
+  \begin{aligned}
+    \mathrm{logit}^{-1}(\gamma_{j, t}) &\sim \mathrm{N}(\Gamma_{j} + \alpha_{j}^{t}X_{t - 1}, \sigma_{\gamma, j}) \\
+    \Gamma_{j} &\sim \mathrm{N}(M_{\gamma}, \sigma_{\Gamma}) \\
+    \sigma_{\gamma, j} &\sim \mathrm{C}^{+}(1) \\
+    M_{\gamma} &\sim \mathrm{N}(0, 1) \\
+    \sigma_{\Gamma} &\sim \mathrm{C}^{+}(1) \\
+  \end{aligned}
+\end{equation}
+
+\begin{equation}
+  \begin{aligned}
+    \mathrm{logit}^{-1}(p_{j, t}) &\sim \mathrm{N}(P_{j}, \sigma_{p, j}) \\
+    P_{j} &\sim \mathrm{N}(M_{p}, \sigma_{P}) \\
+    \sigma_{p, j} &\sim \mathrm{C}^{+}(1) \\
+    M_{p} &\sim \mathrm{N}(0, 1) \\
+    \sigma_{P} &\sim \mathrm{C}^{+}(1) \\
+  \end{aligned}
+\end{equation}
+
+And finally, I use independent priors for \(\psi_{j}\) by province \(j\): \(\psi_{j} \sim \mathrm{U}(0, 1)\).
 
 \end{document}

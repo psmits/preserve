@@ -38,19 +38,11 @@ predictor.
 Approach
 --------
 
-Hierarchical Jolly-Seber capture-mark-recapture model. Both within and between
-geographic provinces.
+Hierarchical hidden markov model with density dependent (regional) survival and
+origination/migration.
 
-Need to include taxon effect as taxa can be in more than one province which
-violates exchangability.
+Density-dependent effect is considered constant over time while intercept is
+hierarchical across time.
 
-Need to include binary predictor of "seen else where?"
-
-Model is focused on first entry and last exit, not re-colonization dynamics.
-That would require a more traditional HMM, not one with an absorbing state
-(death/extinction). Maybe just do both models and compare? That would get
-turnover with out distinguishing types of gains/losses. Another possibility
-would then be including the binary predictor "seen else where" for certain time
-points, this way there the effect of global observation can be estimated.
-
-Do I want to distinguish between northern and southern hemispheres?
+All regions affect the DD of all other regions (i.e. 4 regression coefs, one for
+each).

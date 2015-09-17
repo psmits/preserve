@@ -70,6 +70,7 @@ post.samp <- coda.samples(jags, c('psi',
                                   'gamma_sigma_group', 
                                   'phi_sigma_group', 
                                   'p_sigma_group',
+                                  'beta', 'alpha',
                                   'z', 'turnover'),  
                           n.iter = 10000, thin = 10)
 save(post.samp, file = '../data/mcmc_out/turnover_jags.rdata')
