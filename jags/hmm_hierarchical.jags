@@ -1,40 +1,50 @@
+#var z[nindiv, nyear, nprov]
 model {
   # prior
   # hierarchical "time series" of all parameters by provice
+
+  # these are the overall global means, averaged over groups and time
   gamma_group ~ dnorm(0, 1)
   phi_group ~ dnorm(0, 1)
   p_group ~ dnorm(0, 1)
 
+  # super annoying parameterization bullshit
   gamma_sigma_group ~ dt(0, 1, 1) T(0, )
   phi_sigma_group ~ dt(0, 1, 1) T(0, )
   p_sigma_group ~ dt(0, 1, 1) T(0, )
-  
   gamma_tau_group <- pow(gamma_sigma_group, -2)
   phi_tau_group <- pow(gamma_sigma_group, -2)
   p_tau_group <- pow(gamma_sigma_group, -2)
 
   for(j in 1:nprov) {
+    #beta[j] ~ dnorm(0, 1)
+    #for(t in 1:(nyear - 1)) {
+    #  density[t, j] <- sum(z[, t, j])
+    #}
+    
     psi[j] ~ dunif(0, 1)  # initial state
 
+    # province level mean
     gamma_mu[j] ~ dnorm(gamma_group, gamma_tau_group)
     phi_mu[j] ~ dnorm(phi_group, phi_tau_group)
     p_mu[j] ~ dnorm(p_group, p_tau_group)
 
+    # super annoying parameterization bullshit
     gamma_sigma[j] ~ dt(0, 1, 1) T(0, )
     phi_sigma[j] ~ dt(0, 1, 1) T(0, )
     p_sigma[j] ~ dt(0, 1, 1) T(0, )
-
     gamma_tau[j] <- pow(gamma_sigma[j], -2)
     phi_tau[j] <- pow(phi_sigma[j], -2)
     p_tau[j] <- pow(p_sigma[j], -2)
     
+    # draw from province to get time point
     p_norm[nyear, j] ~ dnorm(p_mu[j], p_tau[j])
     for(i in 1:(nyear - 1)) {
       gamma_norm[i, j] ~ dnorm(gamma_mu[j], gamma_tau[j])
       phi_norm[i, j] ~ dnorm(phi_mu[j], phi_tau[j])
       p_norm[i, j] ~ dnorm(p_mu[j], p_tau[j])
     }
-    
+    # transforms
     p[nyear, j] <- ilogit(p_norm[nyear, j])
     for(i in 1:(nyear - 1)) {
       gamma[i, j] <- ilogit(gamma_norm[i, j])
@@ -71,6 +81,7 @@ model {
     }
   }
 
+  # generate turnover
   for(j in 1:nprov) {
     psivec[1, j] <- psi[j]
     for(t in 2:nyear) {

@@ -82,7 +82,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   survivors <- names(which(laply(straight.occ, function(x) 
                                  any(which(gts %in% x) < which(gts == cuts)))))
 
-  paleozoic <- gts[which(gts == cuts):which(gts == bot)]
+  paleozoic <- rev(gts[which(gts == cuts):which(gts == bot)])
   bibr <- bibr[bibr[, bins] %in% paleozoic, ]
 
   # this section is all about finding duration

@@ -167,8 +167,7 @@ ggsave(plot = surv.est, filename = '../doc/gradient/figure/survival.pdf',
 
 
 
-# per captia rates
-# got to count the number of gains!
+# count the number of gains!
 # b = sum (1 - z[i, t - 1]) z[i, t]
 birth.count <- function(data, post) {
   samp <- sample(4000, 1)
@@ -193,7 +192,7 @@ est.birth <- melt(est.birth)
 names(est.birth) <- c('sim', 'year', 'div', 'prov')
 est.birth$prov <- factor(est.birth$prov)
 
-# got to count the number of losses! 
+# count the number of losses! 
 # d = sum (z[i, t - 1]) (1 - z[i, t])
 death.count <- function(data, post) {
   samp <- sample(4000, 1)
