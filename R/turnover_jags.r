@@ -60,7 +60,7 @@ jags <- with(data, {jags.model('../jags/hmm_hierarchical.jags',
                                inits = list(z = sight,
                                             p_norm = p.init))})
 # warm-up/burn-in
-update(jags, 100)
+update(jags, 10000)
 # production
 post.samp <- coda.samples(jags, c('psi', 
                                   'gamma', 'phi', 'p',
@@ -71,5 +71,5 @@ post.samp <- coda.samples(jags, c('psi',
                                   'phi_sigma_group', 
                                   'p_sigma_group',
                                   'z', 'turnover'),  
-                          n.iter = 100)#, thin = 10)
+                          n.iter = 10000, thin = 10)
 save(post.samp, file = '../data/mcmc_out/turnover_jags.rdata')

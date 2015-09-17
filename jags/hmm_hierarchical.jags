@@ -17,11 +17,12 @@ model {
   p_tau_group <- pow(gamma_sigma_group, -2)
 
   for(j in 1:nprov) {
-    #beta[j] ~ dnorm(0, 1)
-    #for(t in 1:(nyear - 1)) {
-    #  density[t, j] <- sum(z[, t, j])
-    #}
-    
+    for(k in 1:nprov) {
+      beta[j, k] ~ dnorm(0, 1)
+      alpha[j, k] ~ dnorm(0, 1)
+    }
+  }
+  for(j in 1:nprov) {
     psi[j] ~ dunif(0, 1)  # initial state
 
     # province level mean
@@ -40,8 +41,12 @@ model {
     # draw from province to get time point
     p_norm[nyear, j] ~ dnorm(p_mu[j], p_tau[j])
     for(i in 1:(nyear - 1)) {
-      gamma_norm[i, j] ~ dnorm(gamma_mu[j], gamma_tau[j])
-      phi_norm[i, j] ~ dnorm(phi_mu[j], phi_tau[j])
+      gamma_norm[i, j] ~ dnorm(gamma_mu[j] + 
+        beta[j, 1] * sum(z[, i, 1]) + beta[j, 2] * sum(z[, i, 2]) +
+        beta[j, 3] * sum(z[, i, 3]) + beta[j, 4] * sum(z[, i, 4]), gamma_tau[j])
+      phi_norm[i, j] ~ dnorm(phi_mu[j] + 
+        alpha[j, 1] * sum(z[, i, 1]) + alpha[j, 2] * sum(z[, i, 2]) +
+        alpha[j, 3] * sum(z[, i, 3]) + alpha[j, 4] * sum(z[, i, 4]), phi_tau[j])
       p_norm[i, j] ~ dnorm(p_mu[j], p_tau[j])
     }
     # transforms
