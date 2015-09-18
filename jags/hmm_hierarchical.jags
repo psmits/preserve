@@ -1,4 +1,3 @@
-#var z[nindiv, nyear, nprov]
 model {
   # prior
   # hierarchical "time series" of all parameters by provice
@@ -37,7 +36,7 @@ model {
     gamma_tau[j] <- pow(gamma_sigma[j], -2)
     phi_tau[j] <- pow(phi_sigma[j], -2)
     p_tau[j] <- pow(p_sigma[j], -2)
-    
+ 
     # draw from province to get time point
     p_norm[nyear, j] ~ dnorm(p_mu[j], p_tau[j])
     for(i in 1:(nyear - 1)) {

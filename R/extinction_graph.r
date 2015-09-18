@@ -228,9 +228,9 @@ weicor.plot <- ggplot(omega.wei, aes(x = Var1, y = Var2, fill = value))
 weicor.plot <- weicor.plot + geom_tile()
 weicor.plot <- weicor.plot + geom_text(aes(label = round(value, 2)))
 weicor.plot <- weicor.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
-                                                  low = 'blue', 
+                                                  low = muted('blue'), 
                                                   mid = 'white', 
-                                                  high = 'red')
+                                                  high = muted('red'))
 weicor.plot <- weicor.plot + relab.x + relab.y
 weicor.plot <- weicor.plot + labs(x = '', y = '')
 weicor.plot <- weicor.plot + theme(axis.text = element_text(size = 15))
@@ -507,7 +507,7 @@ for(ii in seq(unique(coh))) {
                                                  s = mm[2],
                                                  a = mm[3]))
   quadcoh <- quadcoh + geom_text(y = 1.75, x = 0, 
-                                 label = paste(lab), size = 10, colour = cols)
+                                 label = paste(lab), size = 10)#, colour = cols)
   quadcoh <- quadcoh + coord_cartesian(ylim = c(0, 2))
   quadcoh <- quadcoh + labs(x = paste(rename[ii]), 
                             y = expression(paste(tilde(sigma[i])/tilde(sigma))))

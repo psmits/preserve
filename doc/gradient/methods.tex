@@ -13,58 +13,60 @@
 \begin{document}
 \section{Materials and Methods}
 
+\subsection{Taxon occurrence information}
+
+\subsection{Geographic provinces}
+
 \subsection{Model specification}
+Taxon presence was modeled has a hierarchical hidden Markov model.
 
-\(y_{i, j, t}\) is the observed binary occurrence of taxon \(i\) in province \(j\) at time \(t\), where \(i = 1, 2, \dots, N\), \(j = 1, 2, \dots, J\), and \(t = 1, 2, \dots, T\). \(y = 1\) is occupied while \(y = 0\) is unoccupied.
+\(y_{i, j, t}\) is the observed binary occurrence of taxon \(i\) in province \(j\) at time \(t\), where \(i = 1, 2, \dots, N\), \(j = 1, 2, \dots, J\), and \(t = 1, 2, \dots, T\). \(y = 1\) is occupied while \(y = 0\) is unoccupied. \(z_{i, j, t}\) is the estimated binary occurrence of taxon \(i\) in province \(j\) at time \(t\), given the estimate of sampling. Just as with \(y\), \(z = 1\) is occupied while \(z = 0\) is unoccupied. 
 
-\(z_{i, j, t}\) is the estimated binary occurrence of taxon \(i\) in province \(j\) at time \(t\), given the estimate of sampling. \(z = 1\) is occupied while \(z = 0\) is unoccupied.
-
-\(p_{j, t}\) is the probability of preservation (\(Pr(y = 1 | z = 1)\)) in province \(j\) at time \(t\).
-
-\(\phi_{j, t}\) is the probability of surviving, in province \(j\), from time \(t\) to time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 1)\)).
-
-\(\gamma_{j, t}\) is the probability of newly entering province \(j\) at time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 0)\)).
+\(\phi_{j, t}\) is the probability of surviving, in province \(j\), from time \(t\) to time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 1)\)). \(\gamma_{j, t}\) is the probability of newly entering province \(j\) at time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 0)\)). \(p_{j, t}\) is the probability of preservation (\(Pr(y = 1 | z = 1)\)) in province \(j\) at time \(t\). 
 
 \(\psi\) is probability of sit occupancy/probability of occurrence (\(Pr(z_{i, t = 1} = 1)\). The first time point is defined in terms of \(\psi\) because there is (assumed) no previous time points.
 
 \begin{equation}
   \begin{aligned}
     y_{i, t, j} &\sim \mathrm{Bern}(p_{t, j} z_{i, t, j}) \\
-    z_{i, 1, j} &\sim \mathrm{Bern}(\psi_{j}) \\
+    z_{i, t = 1, j} &\sim \mathrm{Bern}(\psi_{j}) \\
     z_{i, t, j} &\sim \mathrm{Bern}(\phi_{j, t - 1} z_{i, t - 1, j} + \gamma_{j, t - 1} (1 - z_{i, t - 1, j}))
   \end{aligned}
 \end{equation}
 
-The parameters \(\phi\), \(\gamma\), and \(p\) are then all defined hierarchically within each province, hierarchical by time bin with the mean of that hierarchical by province.
+The parameters \(\phi\), \(\gamma\), and \(p\) are then all defined hierarchically within each province, hierarchical by time bin with the mean of that hierarchical by province. \(\Phi_{j}\), \(\Gamma_{j}\), and \(P_{j}\) are the overall probabilities for province \(j\). \(M_{\phi}\), \(M_{\gamma}\), and \(M_{p}\) are the overall estimates of survival, origination, and preservation probabilities. 
 
-\(\Phi_{j}\), \(\Gamma_{j}\), and \(P_{j}\) are the overall probabilities for province \(j\). \(M_{\phi}\), \(M_{\gamma}\), and \(M_{p}\) are the overall estimates of survival, origination, and preservation probabilities.
+Diversity dependent origination and survival was included as a regression coefficients in the parameterizations of \(\phi_{j, t}\), and \(\gamma_{j, t}\). In particular, the diversity of any province can affect the origination and survival probabilities of an province. % all provinces can effect all other, just like in the silvestro model!
 
-\(\alpha\) and \(\beta\) are both \(J \times J\) matrices, where \(\beta_{j}\) would be a column vector. \(X\) is a \(J \times T\) matrix where \(X_{t}\) is a column vector where each element is defined \(X_{j, t} = \Sigma_{i = 1}^{N} z_{i, j, t}\) (i.e. the sum of the diversity in province \(j\) at time \(t\)).
+\(\alpha\) and \(\beta\) are both \(J \times J\) matrices of regression coefficients, where \(\beta_{j}\) would be a column vector. \(X\) is a \(J \times T\) matrix where \(X_{t}\) is a column vector where each element is defined \(X_{j, t} = \Sigma_{i = 1}^{N} z_{i, j, t}\) (i.e. the sum of the diversity in province \(j\) at time \(t\)). All regression coefficients (i.e. all elements of the matrices) are given weakly-informative independent normally distributed priors.
 
+And finally, I use independent priors for \(\psi_{j}\) by province \(j\): \(\psi_{j} \sim \mathrm{U}(0, 1)\).
 
 \begin{equation}
   \begin{aligned}
-    \mathrm{logit}^{-1}(\phi_{j, t}) &\sim \mathrm{N}(\Phi_{j} + \beta_{j}^{t}X_{t - 1}, \sigma_{\phi, j}) \\
+    \mathrm{logit}(\phi_{j, t}) &\sim \mathrm{N}(\Phi_{j} + \beta_{j}^{T}X_{t - 1}, \sigma_{\phi, j}) \\
     \Phi_{j} &\sim \mathrm{N}(M_{\phi}, \sigma_{\Phi}) \\
     \sigma_{\phi, j} &\sim \mathrm{C}^{+}(1) \\
     M_{\phi} &\sim \mathrm{N}(0, 1) \\
     \sigma_{\Phi} &\sim \mathrm{C}^{+}(1) \\
+    \beta &\sim \mathrm{N}(0, 1) \\
   \end{aligned}
 \end{equation}
 
 \begin{equation}
   \begin{aligned}
-    \mathrm{logit}^{-1}(\gamma_{j, t}) &\sim \mathrm{N}(\Gamma_{j} + \alpha_{j}^{t}X_{t - 1}, \sigma_{\gamma, j}) \\
+    \mathrm{logit}(\gamma_{j, t}) &\sim \mathrm{N}(\Gamma_{j} + \alpha_{j}^{t}X_{t - 1}, \sigma_{\gamma, j}) \\
     \Gamma_{j} &\sim \mathrm{N}(M_{\gamma}, \sigma_{\Gamma}) \\
     \sigma_{\gamma, j} &\sim \mathrm{C}^{+}(1) \\
     M_{\gamma} &\sim \mathrm{N}(0, 1) \\
     \sigma_{\Gamma} &\sim \mathrm{C}^{+}(1) \\
+    \alpha &\sim \mathrm{N}(0, 1) \\
   \end{aligned}
 \end{equation}
 
 \begin{equation}
   \begin{aligned}
-    \mathrm{logit}^{-1}(p_{j, t}) &\sim \mathrm{N}(P_{j}, \sigma_{p, j}) \\
+    \mathrm{logit}(p_{j, t}) &\sim \mathrm{N}(P_{j}, \sigma_{p, j}) \\
     P_{j} &\sim \mathrm{N}(M_{p}, \sigma_{P}) \\
     \sigma_{p, j} &\sim \mathrm{C}^{+}(1) \\
     M_{p} &\sim \mathrm{N}(0, 1) \\
@@ -72,6 +74,5 @@ The parameters \(\phi\), \(\gamma\), and \(p\) are then all defined hierarchical
   \end{aligned}
 \end{equation}
 
-And finally, I use independent priors for \(\psi_{j}\) by province \(j\): \(\psi_{j} \sim \mathrm{U}(0, 1)\).
 
 \end{document}
