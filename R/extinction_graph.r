@@ -459,9 +459,17 @@ lab <- round(sum(coefs[, 2] > 0) / nrow(coefs), 2)
 x <- data.frame(x = seq(-1, 1, 0.001))
 quad <- ggplot(x, aes(x = x)) + coefplot
 quad <- quad + stat_function(fun = function(x) {
-                             cc <- colMeans(coefs)
+                             cc <- apply(coefs, 2, median)
                              exp(-(cc[1] * x + cc[2] * x^2) /
                                  cc[3])}, size = 1)
+quad <- quad + stat_function(fun = function(x) {
+                             cc <- apply(coefs, 2, function(x) median(x) + sd(x))
+                             exp(-(cc[1] * x + cc[2] * x^2) /
+                                 cc[3])}, size = 0.7, linetype = 'dashed')
+quad <- quad + stat_function(fun = function(x) {
+                             cc <- apply(coefs, 2, function(x) median(x) - sd(x))
+                             exp(-(cc[1] * x + cc[2] * x^2) /
+                                 cc[3])}, size = 0.7, linetype = 'dashed')
 quad <- quad + geom_text(y = 1.75, x = 0, 
                          label = paste(lab), size = 10)
 quad <- quad + coord_cartesian(ylim = c(0, 2))
@@ -477,6 +485,11 @@ renum <- sort(unique(mapvalues(coh,
                                unique(match(as.character(sepkoski.data$orig),
                                             gts)))))
 rename <- gts[renum]
+rename <- as.character(lump[match(rename, as.character(lump[, 2])), 4])
+for(ii in seq(length(rename))) {
+  rename[ii] <- paste0((length(rename) +1 ) - ii, '. ', rename[ii])
+}
+
 sam <- sample(nrow(exp.fit$mu_prior), 1000)
 x <- data.frame(x = seq(-1, 1, 0.001))
 coef.list <- list()
@@ -488,11 +501,13 @@ for(ii in seq(unique(coh))) {
   lab <- round(sum(coefs[, 2] > 0) / nrow(coefs), 2) # probability downward
   cols <- ifelse(mean(coefs[, 2]) < 0, 'red', 'black') # is mean is upward?
   coef.list[[ii]] <- coefs
+
   ss <- sample(nrow(exp.fit$mu_prior), 100)
   coefs <- data.frame(first = wei.fit$beta[ss, ii, 3],
                       second = wei.fit$beta[ss, ii, 4],
                       alpha = wei.fit$alpha[ss])
   mm <- apply(coefs, 2, median)
+  dd <- apply(coefs, 2, sd)
   coefplot <- alply(as.matrix(coefs), 1, function(coef) {
                     stat_function(fun = function(x) {
                                   exp(-(coef[1] * x + coef[2] * x^2) / 
@@ -503,9 +518,26 @@ for(ii in seq(unique(coh))) {
   quadcoh <- quadcoh + stat_function(fun = function(x, f, s, a) {
                                      exp(-(f * x + s * x^2) / a)},
                                      colour = 'black',
+                                     size = 1,
                                      args = list(f = mm[1],
                                                  s = mm[2],
                                                  a = mm[3]))
+  quadcoh <- quadcoh + stat_function(fun = function(x, f, s, a) {
+                                     exp(-(f * x + s * x^2) / a)},
+                                     colour = 'black', 
+                                     linetype = 'dashed',
+                                     size = 0.7, 
+                                     args = list(f = mm[1] - dd[1],
+                                                 s = mm[2] - dd[2],
+                                                 a = mm[3] - dd[3]))
+  quadcoh <- quadcoh + stat_function(fun = function(x, f, s, a) {
+                                     exp(-(f * x + s * x^2) / a)},
+                                     colour = 'black', 
+                                     linetype = 'dashed',
+                                     size = 0.7, 
+                                     args = list(f = mm[1] + dd[1],
+                                                 s = mm[2] + dd[2],
+                                                 a = mm[3] + dd[3]))
   quadcoh <- quadcoh + geom_text(y = 1.75, x = 0, 
                                  label = paste(lab), size = 10)#, colour = cols)
   quadcoh <- quadcoh + coord_cartesian(ylim = c(0, 2))
