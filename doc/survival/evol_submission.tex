@@ -23,16 +23,16 @@
 
 \begin{titlepage}
   \begin{large}
-    \textbf{Title:} \uppercase{need new title} Temporal variation and correlation of effects of biological traits on brachiopod taxonomic survival
+    \textbf{Title:} The interplay between extinction intensity and selectivity: correlation in trait effects on taxonomic survival
   \end{large}
 
   \textbf{Running title:} Variation in trait effects on taxonomic survival
 
   \textbf{Author:} Peter D Smits, psmits@uchicago.edu, Committee on Evolutionary Biology, University of Chicago, IL, USA.
 
-  \textbf{Keywords:} macroevolution, extinction, macroecology, Bayesian
+  \textbf{Keywords:} macroevolution, extinction, macroecology, Bayesian, brachiopods
 
-  \textbf{Word count:} ?
+  \textbf{Word count:} approximately 5600.
   
   \textbf{Table count:} 1.
  
@@ -43,7 +43,7 @@
 \end{titlepage}
 
 \begin{abstract}
-  While the effect of geographic range on extinction risk is well documented, how other traits may increase or decrease extinction risk is less well known. I analyze patterns of Paleozoic brachiopod genus durations and their relationship to geographic range, affinity for epicontinental seas versus open ocean environments, and body size. Additionally, I allow for environmental affinity to have a nonlinear effect on duration. Using a hierarchical Bayesian modeling approach, I also model the interaction between the effects of the biological traits and a taxon's time of origination. My analysis framework eschews the traditional distinction between background and mass extinction, instead the entire time period is analyzed where these ``states'' are part of a continuum. Contrary to previous work, I find evidence that as baseline extinction risk increases, the effects of biological traits (except body size) on extinction risk increase. This manifests as greater expected differences in extinction risk for each unit change in geographic range and environmental preference during periods of high extinction risk, as opposed to a much flatter expected selection gradient during periods of low extinction risk. While for the many parts of the Paleozoic this hypothesis is supported, there are many times where this hypothesized relationship is absent or even reversed. I find weak evidence for a nonlinear relationship between environmental preference and extinction risk such that ``generalists'' have a lower expected extinction risk than either ``specialists''. Importantly, I find that as baseline extinction risk increases, the steepness of this relationship is expected to increases as well.
+  While the effect of geographic range on extinction risk is well documented, how other traits may increase or decrease extinction risk is less well known. I analyze patterns of Paleozoic brachiopod genus durations and their relationship to geographic range, affinity for epicontinental seas versus open ocean environments, and body size. Additionally, I allow for environmental affinity to have a nonlinear effect on duration. Using a hierarchical Bayesian modeling approach, I also model the interaction between the effects of the biological traits and a taxon's time of origination. My analysis framework eschews the traditional distinction between background and mass extinction, instead the entire time period is analyzed where these ``states'' are part of a continuum. Contrary to previous work, I find evidence that as baseline extinction risk increases, the effects of biological traits (except body size) on extinction risk tend to increase. For parts of the Paleozoic I find support for a ``survival of the generalists'' scenario, there are times where this relationship is absent or even reversed. Importantly, I find that as baseline extinction risk increases, the steepness of this relationship is expected to increases as well.
 \end{abstract}
 
 
@@ -132,17 +132,19 @@ The exponential model is defined
 Similarly, the Weibull model is defined
 \begin{equation}
   \begin{aligned}
-    y_{i} &\sim \mathrm{Weibull}(\alpha, \sigma) \\
-    \sigma_{i} &= \exp\left(\frac{-(\mathbf{X}_{i} B_{j[i]})}{\alpha}\right) \\
+    y_{i} &\sim \mathrm{Weibull}(\alpha_{j[i]}, \sigma) \\
+    \sigma_{i} &= \exp\left(\frac{-(\mathbf{X}_{i} B_{j[i]})}{\alpha_{j[i]}}\right) \\
     B &\sim \mathrm{MVN}(\vec{\mu}, \Sigma) \\
     \Sigma &= \text{Diag}(\vec{\tau}) \Omega \text{Diag}(\vec{\tau}) \\
-    \alpha &\sim \mathrm{C^{+}}(2) \\
+    \log(\alpha) &\sim \mathcal{N}(a, \pi) \\
     \mu_{k} &\sim 
     \begin{cases} 
       \mathcal{N}(0, \psi_{k} \nu) & \text{if } k \neq r, or \\
       \mathcal{N}(-1, 1) & \text{if } k = r \\ 
     \end{cases} \\
     \tau_{k} &\sim \mathrm{C^{+}}(1) \\
+    a &\sim \mathrm{N}(0, 1) \\
+    \pi &\sim \mathrm{C^{+}}(1) \\
     \psi_{k} &\sim \mathrm{C^{+}}(1) \text{ if } k \neq r \\
     \nu &\sim \mathrm{C^{+}}(1) \\
     \Omega &\sim \text{LKJ}(2).
@@ -293,7 +295,7 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, and R. Ree for helpf
 \begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/environ_quad}
-  \caption{The overall expected relationship \(f(v_{i})\) between environmental affinity \(v_{i}\) and a multiplier of extinction risk (Eq. \ref{eq:env}). Each grey line corresponds to a single draw from the posterior predictive distribution, while the black corresponds to the median of the posterior predictive distribution. The overall shape of \(f(v_{i})\) is concave down with an optimum of close 0, which corresponds to affinity approximately equal to the expectation based on background environmental occurrence rates.}
+  \caption{The overall expected relationship \(f(v_{i})\) between environmental affinity \(v_{i}\) and a multiplier of extinction risk (Eq. \ref{eq:env}). Each grey line corresponds to a single draw from the posterior predictive distribution, the solid black line corresponds to the median of the posterior predictive distribution, and the dashed black lines correspond to the median relationship plus or minus one standard deviation. The overall shape of \(f(v_{i})\) is concave down with an optimum of close 0, which corresponds to affinity approximately equal to the expectation based on background environmental occurrence rates.}
   \label{fig:env_mean}
 \end{figure}
 
@@ -336,7 +338,7 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, and R. Ree for helpf
 \begin{sidewaysfigure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/cohort_quads}
-  \caption{Comparison of the cohort-specific estimates of \(f(v_{i})\) (Eq. \ref{eq:env}) for the 33 analyzed origination cohorts. The stage of origination is labeled on the x-axis of each panel. The oldest stage is in the upper left, while the youngest is in the lower left. The number in each panel corresponds to the posterior probability that \(f(v_{i})\) is concave down. Those that are highlighed in red have less than 51\% posterior predictive probability that \(f(v_{i})\) is concave down. Note that all estimates must pass through y = 1 when x = 0 (Eq. \ref{eq:env}).}
+  \caption{Comparison of the cohort-specific estimates of \(f(v_{i})\) (Eq. \ref{eq:env}) for the 33 analyzed origination cohorts. The stage of origination is labeled on the x-axis of each panel. The oldest stage is in the upper left, while the youngest is in the lower left. The number in each panel corresponds to the posterior probability that \(f(v_{i})\) is concave down. Those that are highlighed in red have less than 51\% posterior predictive probability that \(f(v_{i})\) is concave down. Each grey line corresponds to a single draw from the posterior predictive distribution, the solid black line corresponds to the median of the posterior predictive distribution, and the dashed black lines correspond to the median relationship plus or minus one standard deviation. Note that all estimates must pass through y = 1 when x = 0 (Eq. \ref{eq:env}).}
   \label{fig:env_cohort}
 \end{sidewaysfigure}
 

@@ -28,7 +28,10 @@ data {
   real size_cen[N_cen];
 }
 parameters {
-  real<lower=0> alpha;
+  real alpha_trans[O];
+  real alpha_mu;
+  real<lower=0> alpha_sigma;
+
   vector[5] mu_prior;
   vector[5] beta[O];  // betas
   corr_matrix[5] Omega;
@@ -40,8 +43,13 @@ parameters {
   real<lower=0> lambda;
 }
 transformed parameters {
+  real<lower=0> alpha[O];
   cov_matrix[5] Sigma;
   real env[N];
+
+  for(i in 1:O) {
+    alpha[i] <- exp(alpha_trans[i]);
+  }
 
   Sigma <- quad_form_diag(Omega, sigma);
 
@@ -50,7 +58,11 @@ transformed parameters {
   }
 }
 model {
-  alpha ~ cauchy(0, 2);
+  for(i in 1:O) {
+    alpha_trans[i] ~ normal(alpha_mu, alpha_sigma);
+  }
+  alpha_mu ~ normal(0, 1);
+  alpha_sigma ~ cauchy(0, 1);
   // varying slopes, varying intercepts
   // done by cohort
   Omega ~ lkj_corr(2);
@@ -81,28 +93,28 @@ model {
   // likelihood
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {
-      increment_log_prob(weibull_cdf_log(dur_unc[i], alpha, 
+      increment_log_prob(weibull_cdf_log(dur_unc[i], alpha[cohort_unc[i]], 
             exp(-(beta[cohort_unc[i], 1] +
                 beta[cohort_unc[i], 2] * occupy_unc[i] +
                 beta[cohort_unc[i], 3] * env[i] +
                 beta[cohort_unc[i], 4] * (env[i] * env[i]) +
-                beta[cohort_unc[i], 5] * size_unc[i]) / alpha)));
+                beta[cohort_unc[i], 5] * size_unc[i]) / alpha[cohort_unc[i]])));
     } else {
-      increment_log_prob(weibull_log(dur_unc[i], alpha,
+      increment_log_prob(weibull_log(dur_unc[i], alpha[cohort_unc[i]],
             exp(-(beta[cohort_unc[i], 1] +
                 beta[cohort_unc[i], 2] * occupy_unc[i] +
                 beta[cohort_unc[i], 3] * env[i] +
                 beta[cohort_unc[i], 4] * (env[i] * env[i]) +
-                beta[cohort_unc[i], 5] * size_unc[i]) / alpha)));
+                beta[cohort_unc[i], 5] * size_unc[i]) / alpha[cohort_unc[i]])));
     }
   }
   for(i in 1:N_cen) {
-    increment_log_prob(weibull_ccdf_log(dur_cen[i], alpha,
+    increment_log_prob(weibull_ccdf_log(dur_cen[i], alpha[cohort_cen[i]],
           exp(-(beta[cohort_cen[i], 1] +
               beta[cohort_cen[i], 2] * occupy_cen[i] +
               beta[cohort_cen[i], 3] * env[N_unc + i] +
               beta[cohort_cen[i], 4] * (env[N_unc + i] * env[N_unc + i]) +
-              beta[cohort_cen[i], 5] * size_cen[i]) / alpha)));
+              beta[cohort_cen[i], 5] * size_cen[i]) / alpha[cohort_cen[i]])));
   }
 }
 generated quantities {
@@ -110,27 +122,27 @@ generated quantities {
 
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {
-      log_lik[i] <- weibull_cdf_log(dur_unc[i], alpha, 
+      log_lik[i] <- weibull_cdf_log(dur_unc[i], alpha[cohort_unc[i]], 
           exp(-(beta[cohort_unc[i], 1] +
               beta[cohort_unc[i], 2] * occupy_unc[i] +
               beta[cohort_unc[i], 3] * env[i] +
               beta[cohort_unc[i], 4] * (env[i] * env[i]) +
-              beta[cohort_unc[i], 5] * size_unc[i]) / alpha));
+              beta[cohort_unc[i], 5] * size_unc[i]) / alpha[cohort_unc[i]]));
     } else {
-      log_lik[i] <- weibull_log(dur_unc[i], alpha,
+      log_lik[i] <- weibull_log(dur_unc[i], alpha[cohort_unc[i]],
           exp(-(beta[cohort_unc[i], 1] +
               beta[cohort_unc[i], 2] * occupy_unc[i] +
               beta[cohort_unc[i], 3] * env[i] +
               beta[cohort_unc[i], 4] * (env[i] * env[i]) +
-              beta[cohort_unc[i], 5] * size_unc[i]) / alpha));
+              beta[cohort_unc[i], 5] * size_unc[i]) / alpha[cohort_unc[i]]));
     }
   }
   for(i in 1:N_cen) {
-    log_lik[i + N_unc] <- weibull_ccdf_log(dur_cen[i], alpha,
+    log_lik[i + N_unc] <- weibull_ccdf_log(dur_cen[i], alpha[cohort_cen[i]],
         exp(-(beta[cohort_cen[i], 1] +
             beta[cohort_cen[i], 2] * occupy_cen[i] +
             beta[cohort_cen[i], 3] * env[N_unc + i] +
             beta[cohort_cen[i], 4] * (env[N_unc + i] * env[N_unc + i]) +
-            beta[cohort_cen[i], 5] * size_cen[i]) / alpha));
+            beta[cohort_cen[i], 5] * size_cen[i]) / alpha[cohort_cen[i]]));
   }
 }
