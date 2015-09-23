@@ -334,31 +334,10 @@ wei.grand <- data.frame(grand.med = median(wei.grandmean),
 wei.grand$stage <- 1
 wei.grand <- rbind(wei.grand, wei.grand)
 wei.grand$stage <- c(1, length(wei.med))
-
-## exponential
-#exp.grandmean <- exp.fit$mu_prior[, 1]
-#ee <- list()
-#for(ii in seq(length(unique(coh)))) {
-#  ee[[ii]] <- exp.fit$beta[, ii, 1]
-#}
-#exp.med <- laply(ee, median)
-#exp.10 <- laply(ee, function(x) quantile(x, probs = 0.1))
-#exp.90 <- laply(ee, function(x) quantile(x, probs = 0.9))
-#exp.bases <- data.frame(stage = seq(length(exp.med)), 
-#                        med = exp.med, q1 = exp.10, q9 = exp.90)
-#exp.grand <- data.frame(grand.med = median(exp.grandmean), 
-#                        grand.q1 = quantile(exp.grandmean, probs = 0.1),
-#                        grand.q9 = quantile(exp.grandmean, probs = 0.9))
-#exp.grand$stage <- 1
-#exp.grand <- rbind(exp.grand, exp.grand)
-#exp.grand$stage <- c(1, length(exp.med))
-
 # put 'em together
 wei.bases$label <- 'Weibull'
-#exp.bases$label <- 'Exponential'
 bases <- wei.bases
 wei.grand$label <- 'Weibull'
-#exp.grand$label <- 'Exponential'
 grand <- wei.grand
 
 renum <- sort(unique(mapvalues(bases$stage, 
@@ -385,9 +364,7 @@ base.line <- base.line + geom_segment(data = grand,
                                                     yend = grand.med))
 base.line <- base.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 base.line <- base.line + scale_x_reverse()
-#base.line <- base.line + geom_line()
-#base.line <- base.line + facet_grid(label ~ ., labeller = label_parsed)
-base.line <- base.line + labs(x = 'Stage', y = expression(beta[0]))
+base.line <- base.line + labs(x = 'Mya', y = expression(beta[0]), title = 'A')
 ggsave(base.line, filename = '../doc/survival/figure/intercept_cohort.pdf',
        width = 10, height = 3, dpi = 600)
 
@@ -410,31 +387,10 @@ wei.grand <- data.frame(grand.med = median(wei.grandmean),
 wei.grand$stage <- 1
 wei.grand <- rbind(wei.grand, wei.grand)
 wei.grand$stage <- c(1, length(wei.med))
-
-## exponential
-#exp.grandmean <- exp.fit$mu_prior[, 2]
-#ee <- list()
-#for(ii in seq(length(unique(coh)))) {
-#  ee[[ii]] <- exp.fit$beta[, ii, 2]
-#}
-#exp.med <- laply(ee, median)
-#exp.10 <- laply(ee, function(x) quantile(x, probs = 0.1))
-#exp.90 <- laply(ee, function(x) quantile(x, probs = 0.9))
-#exp.bases <- data.frame(stage = seq(length(exp.med)), 
-#                        med = exp.med, q1 = exp.10, q9 = exp.90)
-#exp.grand <- data.frame(grand.med = median(exp.grandmean), 
-#                        grand.q1 = quantile(exp.grandmean, probs = 0.1),
-#                        grand.q9 = quantile(exp.grandmean, probs = 0.9))
-#exp.grand$stage <- 1
-#exp.grand <- rbind(exp.grand, exp.grand)
-#exp.grand$stage <- c(1, length(exp.med))
-
 # put 'em together
 wei.bases$label <- 'Weibull'
-#exp.bases$label <- 'Exponential'
 bases <- wei.bases
 wei.grand$label <- 'Weibull'
-#exp.grand$label <- 'Exponential'
 grand <- wei.grand
 
 renum <- sort(unique(mapvalues(bases$stage, 
@@ -461,9 +417,7 @@ rage.line <- rage.line + geom_segment(data = grand,
                                                     yend = grand.med))
 rage.line <- rage.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 rage.line <- rage.line + scale_x_reverse()
-#rage.line <- rage.line + geom_line()
-#rage.line <- rage.line + facet_grid(label ~ ., labeller = label_parsed)
-rage.line <- rage.line + labs(x = 'Stage', y = expression(beta[r]))
+rage.line <- rage.line + labs(x = 'Mya', y = expression(beta[r]), title = 'B')
 ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.pdf',
        width = 10, height = 3, dpi = 600)
 
@@ -486,10 +440,8 @@ wei.grand <- rbind(wei.grand, wei.grand)
 wei.grand$stage <- c(1, length(wei.med))
 # put 'em together
 wei.bases$label <- 'Weibull'
-#exp.bases$label <- 'Exponential'
 bases <- wei.bases
 wei.grand$label <- 'Weibull'
-#exp.grand$label <- 'Exponential'
 grand <- wei.grand
 
 renum <- sort(unique(mapvalues(bases$stage, 
@@ -516,10 +468,14 @@ alph.line <- alph.line + geom_segment(data = grand,
                                                     yend = grand.med))
 alph.line <- alph.line + geom_pointrange(aes(ymax = q9, ymin = q1))
 alph.line <- alph.line + scale_x_reverse()
-alph.line <- alph.line + labs(x = 'Mya', y = expression(alpha[j]))
+alph.line <- alph.line + labs(x = 'Mya', y = expression(alpha[j]), title = 'C')
 ggsave(alph.line, filename = '../doc/survival/figure/alpha_cohort.pdf',
        width = 10, height = 3, dpi = 600)
 
+jpeg('../doc/survival/figure/cohort_series.jpg',
+     width = 10, height = 9, res = 600, units = 'in')
+multiplot(base.line, rage.line, alph.line, cols = 1)
+dev.off()
 
 # quadratics plot
 sam <- sample(nrow(wei.fit$alpha), 1000)
