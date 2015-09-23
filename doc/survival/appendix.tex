@@ -143,7 +143,7 @@ Because \(B\) is a matrix, I use a multivariate normal prior with unknown vector
 \end{equation}
 where \(\vec{\mu}\) is length \(k\) vector representing the overall mean of the distributions of \(\beta\) coefficients. \(\Sigma\) is a \(k \times k\) covariance matrix of the \(\beta\) coefficients.
 
-% hierarchical estimate of alpha!
+I also allowed estimates of the Weibull shape parameter \(\alpha\) to vary hierarchically by cohort. Cohort-specific estimates of \(\alpha\) were considered exponentially-transformed exchangable draws from a shared normal distribution with mean \(a\) and standard deviation \(\pi\), both of which were given semi-informative (hyper)priors centered at \(\alpha = 1\) (\(a \sim \mathcal{N}(0, 1)\), \(\pi \sim \mathrm{C^{+}}(1)\)).
 
 What remains is assigning priors the elements of \(\vec{\mu}\) and the covariance matrix \(\Sigma\). All elements of \(\vec{\mu}\) except for \(\mu_{r}\) were given horseshoe priors \citep{Carvalho2010,Carvalho2009} while \(\mu_{r}\) was given an informative normal prior (\(\mu_{r} \sim \mathcal{N}(-1, 1)\). Horseshoe priors are a strong regularizing priors with effectively infinite density at 0 and heavy, Cauchy-like tails \citep{Carvalho2010,Carvalho2009} which allow weakly inferred effects to be strongly drawn towards 0 while truly strong effects can remain large. The horseshoe prior consists of a normal distribution with scale term that is the product between a global shrinkage parameter \(\nu\) and a locak shrinkage parameter \(\psi\) unique to each of the parameters of interest. These parameters are themselves given half-Cauchy priors (Eq. 1 and 2).
 
