@@ -123,8 +123,8 @@ sim.surv <- wei.surv
 surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
 surv.plot <- surv.plot + geom_line(data = sim.surv, 
                                    aes(x = time, y = surv, group = group),
-                                   colour = 'grey', alpha = 0.2)
-surv.plot <- surv.plot + geom_line(size = 1)
+                                   colour = 'black', alpha = 0.05)
+surv.plot <- surv.plot + geom_line(size = 1, colour = 'blue')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 #surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
@@ -361,6 +361,17 @@ wei.grand$label <- 'Weibull'
 #exp.grand$label <- 'Exponential'
 grand <- wei.grand
 
+renum <- sort(unique(mapvalues(bases$stage, 
+                               from = unique(bases$stage), 
+                               unique(match(as.character(sepkoski.data$orig),
+                                            gts)))))
+rename <- gts[renum]
+matchy <- match(rename, as.character(lump[, 2]))
+rename <- lump[matchy, 3]
+rename <- rename - ((diff(lump$age_at_base[c(max(matchy) + 1, matchy)]) / 2) * -1)
+bases$stage <- mapvalues(bases$stage, from = unique(bases$stage), rename)
+grand$stage <- range(bases$stage)
+
 base.line <- ggplot(bases, aes(x = stage, y = med))
 base.line <- base.line + geom_ribbon(data = grand,
                                      mapping = aes(y = grand.med, 
@@ -373,6 +384,7 @@ base.line <- base.line + geom_segment(data = grand,
                                                     y = grand.med, 
                                                     yend = grand.med))
 base.line <- base.line + geom_pointrange(aes(ymax = q9, ymin = q1))
+base.line <- base.line + scale_x_reverse()
 #base.line <- base.line + geom_line()
 #base.line <- base.line + facet_grid(label ~ ., labeller = label_parsed)
 base.line <- base.line + labs(x = 'Stage', y = expression(beta[0]))
@@ -425,6 +437,17 @@ wei.grand$label <- 'Weibull'
 #exp.grand$label <- 'Exponential'
 grand <- wei.grand
 
+renum <- sort(unique(mapvalues(bases$stage, 
+                               from = unique(bases$stage), 
+                               unique(match(as.character(sepkoski.data$orig),
+                                            gts)))))
+rename <- gts[renum]
+matchy <- match(rename, as.character(lump[, 2]))
+rename <- lump[matchy, 3]
+rename <- rename - ((diff(lump$age_at_base[c(max(matchy) + 1, matchy)]) / 2) * -1)
+bases$stage <- mapvalues(bases$stage, from = unique(bases$stage), rename)
+grand$stage <- range(bases$stage)
+
 rage.line <- ggplot(bases, aes(x = stage, y = med))
 rage.line <- rage.line + geom_ribbon(data = grand,
                                      mapping = aes(y = grand.med, 
@@ -437,18 +460,72 @@ rage.line <- rage.line + geom_segment(data = grand,
                                                     y = grand.med, 
                                                     yend = grand.med))
 rage.line <- rage.line + geom_pointrange(aes(ymax = q9, ymin = q1))
+rage.line <- rage.line + scale_x_reverse()
 #rage.line <- rage.line + geom_line()
 #rage.line <- rage.line + facet_grid(label ~ ., labeller = label_parsed)
 rage.line <- rage.line + labs(x = 'Stage', y = expression(beta[r]))
 ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.pdf',
        width = 10, height = 3, dpi = 600)
 
+# alpha through time
+wei.grandmean <- exp(wei.fit$alpha_mu)
+ww <- list()
+for(ii in seq(length(unique(coh)))) {
+  ww[[ii]] <- wei.fit$alpha[, ii]
+}
+wei.med <- laply(ww, median)
+wei.10 <- laply(ww, function(x) quantile(x, probs = 0.1))
+wei.90 <- laply(ww, function(x) quantile(x, probs = 0.9))
+wei.bases <- data.frame(stage = seq(length(wei.med)), 
+                        med = wei.med, q1 = wei.10, q9 = wei.90)
+wei.grand <- data.frame(grand.med = median(wei.grandmean), 
+                        grand.q1 = quantile(wei.grandmean, probs = 0.1),
+                        grand.q9 = quantile(wei.grandmean, probs = 0.9))
+wei.grand$stage <- 1
+wei.grand <- rbind(wei.grand, wei.grand)
+wei.grand$stage <- c(1, length(wei.med))
+# put 'em together
+wei.bases$label <- 'Weibull'
+#exp.bases$label <- 'Exponential'
+bases <- wei.bases
+wei.grand$label <- 'Weibull'
+#exp.grand$label <- 'Exponential'
+grand <- wei.grand
+
+renum <- sort(unique(mapvalues(bases$stage, 
+                               from = unique(bases$stage), 
+                               unique(match(as.character(sepkoski.data$orig),
+                                            gts)))))
+rename <- gts[renum]
+matchy <- match(rename, as.character(lump[, 2]))
+rename <- lump[matchy, 3]
+rename <- rename - ((diff(lump$age_at_base[c(max(matchy) + 1, matchy)]) / 2) * -1)
+bases$stage <- mapvalues(bases$stage, from = unique(bases$stage), rename)
+grand$stage <- range(bases$stage)
+
+alph.line <- ggplot(bases, aes(x = stage, y = med))
+alph.line <- alph.line + geom_ribbon(data = grand,
+                                     mapping = aes(y = grand.med, 
+                                                   ymax = grand.q9, 
+                                                   ymin = grand.q1), 
+                                     alpha = 0.3)
+alph.line <- alph.line + geom_segment(data = grand,
+                                      mapping = aes(x = stage[1], 
+                                                    xend = stage[2],
+                                                    y = grand.med, 
+                                                    yend = grand.med))
+alph.line <- alph.line + geom_pointrange(aes(ymax = q9, ymin = q1))
+alph.line <- alph.line + scale_x_reverse()
+alph.line <- alph.line + labs(x = 'Mya', y = expression(alpha[j]))
+ggsave(alph.line, filename = '../doc/survival/figure/alpha_cohort.pdf',
+       width = 10, height = 3, dpi = 600)
+
 
 # quadratics plot
-sam <- sample(nrow(exp.fit$mu_prior), 1000)
+sam <- sample(nrow(wei.fit$alpha), 1000)
 coefs <- data.frame(first = wei.fit$mu_prior[sam, 3], 
                     second = wei.fit$mu_prior[sam, 4],
-                    alpha = wei.fit$alpha[sam])
+                    alpha = exp(wei.fit$alpha_mu[sam]))
 coefplot <- alply(as.matrix(coefs), 1, function(coef) {
                   stat_function(fun = function(x) {
                                 exp(-(coef[1] * x + coef[2] * x^2) / 
@@ -490,7 +567,7 @@ for(ii in seq(length(rename))) {
   rename[ii] <- paste0((length(rename) +1 ) - ii, '. ', rename[ii])
 }
 
-sam <- sample(nrow(exp.fit$mu_prior), 1000)
+sam <- sample(nrow(wei.fit$mu_prior), 1000)
 x <- data.frame(x = seq(-1, 1, 0.001))
 coef.list <- list()
 plotlist <- list()
@@ -505,7 +582,7 @@ for(ii in seq(unique(coh))) {
   ss <- sample(nrow(exp.fit$mu_prior), 100)
   coefs <- data.frame(first = wei.fit$beta[ss, ii, 3],
                       second = wei.fit$beta[ss, ii, 4],
-                      alpha = wei.fit$alpha[ss])
+                      alpha = wei.fit$alpha[ss, ii])
   mm <- apply(coefs, 2, median)
   dd <- apply(coefs, 2, sd)
   coefplot <- alply(as.matrix(coefs), 1, function(coef) {

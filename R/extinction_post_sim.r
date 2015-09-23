@@ -92,7 +92,7 @@ post.sim <- function(data, fit, map = FALSE, expo = TRUE) {
       wr.res <- list()
       for(ii in 1:nsim) {
         n <- data$N
-        alp <- sample(wei.fit$alpha, 1)
+        alp <- wei.fit$alpha[sample(nrow(wei.fit$alpha), 1), ]
         int <- betas[sample(nrow(betas), 1), , 1]
         bet.1 <- betas[sample(nrow(betas), 1), , 2]
         bet.2 <- betas[sample(nrow(betas), 1), , 3]
@@ -106,10 +106,11 @@ post.sim <- function(data, fit, map = FALSE, expo = TRUE) {
           bet.2[coh[jj]] * envs[jj] + 
           bet.3[coh[jj]] * (envs[jj] * envs[jj]) + 
           bet.4[coh[jj]] * size[jj]
-          oo[jj] <- rweibull(1, shape = alp, scale = exp(-(reg) / alp))
+          oo[jj] <- rweibull(1, shape = alp[coh[jj]], 
+                             scale = exp(-(reg) / alp[coh[jj]]))
           rr[jj] <- deviance.res(duration[jj], 
                                  scale = exp(reg), 
-                                 shape = alp, 
+                                 shape = alp[coh[jj]], 
                                  inclusion = extinct[jj])
         }
 
