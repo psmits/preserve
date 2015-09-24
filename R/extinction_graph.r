@@ -70,7 +70,7 @@ theme_update(axis.text = element_text(size = 10),
              legend.text = element_text(size = 15),
              legend.title = element_text(size = 16),
              legend.key.size = unit(1, 'cm'),
-             strip.text = element_text(size = 7))
+             strip.text = element_text(size = 15))
 
 # data setup
 coh <- c(data$cohort_unc, data$cohort_cen)
@@ -351,26 +351,11 @@ rename <- rename - ((diff(lump$age_at_base[c(max(matchy) + 1, matchy)]) / 2) * -
 bases$stage <- mapvalues(bases$stage, from = unique(bases$stage), rename)
 grand$stage <- range(bases$stage)
 
-base.line <- ggplot(bases, aes(x = stage, y = med))
-base.line <- base.line + geom_ribbon(data = grand,
-                                     mapping = aes(y = grand.med, 
-                                                   ymax = grand.q9, 
-                                                   ymin = grand.q1), 
-                                     alpha = 0.3)
-base.line <- base.line + geom_segment(data = grand,
-                                      mapping = aes(x = stage[1], 
-                                                    xend = stage[2],
-                                                    y = grand.med, 
-                                                    yend = grand.med))
-base.line <- base.line + geom_pointrange(aes(ymax = q9, ymin = q1))
-base.line <- base.line + scale_x_reverse()
-base.line <- base.line + labs(x = 'Mya', y = expression(beta[0]), title = 'A')
-ggsave(base.line, filename = '../doc/survival/figure/intercept_cohort.pdf',
-       width = 10, height = 3, dpi = 600)
+inter.b <- bases
+inter.g <- grand
 
 
-# change in range size effect through time
-# weibull
+# then range size
 wei.grandmean <- wei.fit$mu_prior[, 2]
 ww <- list()
 for(ii in seq(length(unique(coh)))) {
@@ -404,24 +389,11 @@ rename <- rename - ((diff(lump$age_at_base[c(max(matchy) + 1, matchy)]) / 2) * -
 bases$stage <- mapvalues(bases$stage, from = unique(bases$stage), rename)
 grand$stage <- range(bases$stage)
 
-rage.line <- ggplot(bases, aes(x = stage, y = med))
-rage.line <- rage.line + geom_ribbon(data = grand,
-                                     mapping = aes(y = grand.med, 
-                                                   ymax = grand.q9, 
-                                                   ymin = grand.q1), 
-                                     alpha = 0.3)
-rage.line <- rage.line + geom_segment(data = grand,
-                                      mapping = aes(x = stage[1], 
-                                                    xend = stage[2],
-                                                    y = grand.med, 
-                                                    yend = grand.med))
-rage.line <- rage.line + geom_pointrange(aes(ymax = q9, ymin = q1))
-rage.line <- rage.line + scale_x_reverse()
-rage.line <- rage.line + labs(x = 'Mya', y = expression(beta[r]), title = 'B')
-ggsave(rage.line, filename = '../doc/survival/figure/range_cohort.pdf',
-       width = 10, height = 3, dpi = 600)
+rage.b <- bases
+rage.g <- grand
 
-# alpha through time
+
+# the alpha through time
 wei.grandmean <- exp(wei.fit$alpha_mu)
 ww <- list()
 for(ii in seq(length(unique(coh)))) {
@@ -455,27 +427,42 @@ rename <- rename - ((diff(lump$age_at_base[c(max(matchy) + 1, matchy)]) / 2) * -
 bases$stage <- mapvalues(bases$stage, from = unique(bases$stage), rename)
 grand$stage <- range(bases$stage)
 
-alph.line <- ggplot(bases, aes(x = stage, y = med))
-alph.line <- alph.line + geom_ribbon(data = grand,
+alph.b <- bases
+alph.g <- grand
+
+inter.b$type <- 'beta[0]'
+rage.b$type <- 'beta[r]'
+alph.b$type <- 'alpha'
+bases <- rbind(inter.b, rage.b, alph.b)
+bases$type <- factor(bases$type, levels = c('beta[0]', 'beta[r]', 'alpha'))
+
+inter.g$type <- 'beta[0]'
+rage.g$type <- 'beta[r]'
+alph.g$type <- 'alpha'
+grand <- rbind(inter.g, rage.g, alph.g)
+grand$type <- factor(grand$type, levels = c('beta[0]', 'beta[r]', 'alpha'))
+
+
+gline <- ggplot(bases, aes(x = stage, y = med))
+gline <- gline + geom_ribbon(data = grand,
                                      mapping = aes(y = grand.med, 
                                                    ymax = grand.q9, 
                                                    ymin = grand.q1), 
                                      alpha = 0.3)
-alph.line <- alph.line + geom_segment(data = grand,
+gline <- gline + geom_segment(data = grand,
                                       mapping = aes(x = stage[1], 
                                                     xend = stage[2],
                                                     y = grand.med, 
                                                     yend = grand.med))
-alph.line <- alph.line + geom_pointrange(aes(ymax = q9, ymin = q1))
-alph.line <- alph.line + scale_x_reverse()
-alph.line <- alph.line + labs(x = 'Mya', y = expression(alpha[j]), title = 'C')
-ggsave(alph.line, filename = '../doc/survival/figure/alpha_cohort.pdf',
-       width = 10, height = 3, dpi = 600)
+gline <- gline + geom_pointrange(aes(ymax = q9, ymin = q1))
+gline <- gline + scale_x_reverse()
+gline <- gline + facet_grid(type ~ ., scales = 'free_y', 
+                            labeller = label_parsed)
+gline <- gline + labs(x = 'Mya', y = 'Estimate')
+gline <- gline + theme(plot.title = element_text(hjust = 0, size = 10))
+ggsave(gline, filename = '../doc/survival/figure/cohort_series.pdf',
+       width = 10, height = 9, dpi = 600)
 
-jpeg('../doc/survival/figure/cohort_series.jpg',
-     width = 10, height = 9, res = 600, units = 'in')
-multiplot(base.line, rage.line, alph.line, cols = 1)
-dev.off()
 
 # quadratics plot
 sam <- sample(nrow(wei.fit$alpha), 1000)
