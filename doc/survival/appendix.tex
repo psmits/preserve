@@ -19,10 +19,11 @@
 
 \captionsetup[subfigure]{position = top, labelfont = bf, textfont = normalfont, singlelinecheck = off, justification = raggedright}
 
-\title{Appendix for: Tempotal variation and correlation of effects of biological traits on taxonomic survival of brachiopods}
-\date{}
+\title{Appendix for: The interplay between extinction intensity and selectivity: correlation in trait effects on taxonomic survival }
 
 \begin{document}
+\linenumbers
+\modulolinenumbers[2]
 
 \maketitle
 
@@ -30,7 +31,7 @@
 \section{Uncertainty in environmental preference} \label{sec:uncer}
 The calculation and inclusion of environmental affinity in the survival model is a statistical procedure that takes into account our uncertainty based on where fossils tend to occur. Because we cannot directly observe if a fossil taxon had occurrences restricted to only a single environment, instead we can only estimate its affinity with uncertainty. One advantage of using a Bayesian analytical approach is that both parameters and data are considered random samples from some underlying distribution, which means that is is possible to model the uncertainty in our covariates of interest \citep{Gelman2013d}. My approach is conceptually similar to \citet{Simpson2009} but instead of obtaining a single point estimate, an entire posterior distribution is estimated.
 
-The first step is to determine the probability \(\theta\) at which genus \(i\) occurs in an epicontinental settings based on its own pattern of occurrences. Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. open ocean). Because the value of interest is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a Bernoulli distribution. We can then define our sampling statement as
+The first step is to determine the probability \(\theta\) at which genus \(i\) occurs in an epicontinental setting based on its observed pattern of occurrences. Define \(e_{i}\) as the number of occurrences of genus \(i\) in an epicontiental sea and \(o_{i}\) as the number of occurrences of genus \(i\) not in an epicontinental sea (e.g. open ocean). Because the value of interest is the probability of occurring in an epicontinental environment, given the observed fossil record, I assume that probability follows a Bernoulli distribution. We can then define our sampling statement as
 \begin{equation}
   e_{i} \sim \mathrm{Bernoulli}(e_{i} + o_{i}, \theta_{i}).
   \label{eq:epi_lik}
@@ -41,7 +42,7 @@ I used a flat prior for \(\theta_{i}\) defined as \(\theta_{i} \sim \mathrm{Beta
   \label{eq:epi_post}
 \end{equation}
 
-It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an additional probability \(\Theta\). Define \(E_{i}\) as the total number of other fossil occurrences (exceptfor genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(O_{i}\) as the number of other fossil occurrences not on epicontinental seas. We can then define the sampling statement as
+It is extremely important, however, to take into account the overall environmental occurrence probability of all other genera present at the same time as genus \(i\). This is incorporated as an additional probability \(\Theta\). Define \(E_{i}\) as the total number of other fossil occurrences (exceptfor genus \(i\)) in epicontinental seas during stages where \(i\) occurs and \(O_{i}\) as the number of other fossil occurrences not in epicontinental seas. We can then define the sampling statement as
 \begin{equation}
   E_{i} \sim \mathrm{Bernoulli}(E_{i} + O_{i}, \Theta_{i}).
   \label{eq:bck_lik}
@@ -55,7 +56,7 @@ Again, I used a flat prior of \(\Theta_{i}\) defined as \(\Theta_{i} \sim \mathr
 
 I then define the environmental affinity of genus \(i\) as \(v_{i} = \theta_{i} - \Theta_{i}\). \(v_{i}\) is a value that can range between -1 and 1, where negative values indicate that genus \(i\) tends to occur more frequently in open ocean environments than background while positive values indicate that genus \(i\) tends to occur in epicontiental environments.
 
-While this approach is noticeably more complicated than previous ones \citep{Foote2006,Miller2001,Simpson2009,Kiessling2007a} there are some important benefits to both using a continuous measure of affinity as well directly modeling our uncertainty. In order to show some of these benefits, I performed a simulation analysis of how modal/maximum \textit{a posteriori} (MAP) estimates versus full posterior estimates.
+While this approach is noticeably more complicated than previous ones \citep{Foote2006,Miller2001,Simpson2009,Kiessling2007a} there are some important benefits to both using a continuous measure of affinity as well directly modeling our uncertainty. In order to show some of these benefits, I performed a simulation analysis of modal/maximum \textit{a posteriori} (MAP) estimates versus full posterior estimates.
 
 In this simulation, I first defined the ``background'' epicontinental occurrence \(\theta_{b}\) as 0.50 with a small amount of noise. This was represented as a beta distribution 
 
@@ -72,7 +73,7 @@ As should be expected, as sample size increases the distribution of MAP estimate
 In contrast, we can compare the true occurrence probability distribution versus the posterior estimate for a given sample (Fig. \ref{fig:env_post}). When sample sizes are low, posterior estimates are flat and represent a compromise between the likelihood and the flat prior (Eq. \ref{eq:epi_post}). Because of this, estimates from small sizes are less likely to be overly biased towards the extremes. This is further emphasized by inspection of the estimates of environmental affinity for the simulated taxa (Fig. \ref{fig:env_diff}). Posterior estimates from simulated taxa with small sample size have a much broader distribution that both allows for the extreme observation but still captures the ``true'' value (0). 
 
 
-By defining environmental preference as the difference in full posterior estimates of occurrence probability, it is possible to include taxa with low sample sizes that are normal discarded \citep{Foote2006,Miller2001,Simpson2009,Kiessling2007a}. Additionally, 55+\% of observed Paleozoic brachiopod genera have less than 10 occurrences which is the range of sample sizes where MAP (or ML) estimates would be potentially most biased. This is preferable to finding the difference between the MAP estimates (blue line; Fig. \ref{fig:env_diff}).
+By defining environmental preference as the difference in full posterior estimates of occurrence probability, it is possible to include taxa with low sample sizes that are normally discarded \citep{Foote2006,Miller2001,Simpson2009,Kiessling2007a}. Additionally, 55+\% of observed Paleozoic brachiopod genera have less than 10 occurrences which is the range of sample sizes where MAP (or ML) estimates would be potentially most biased. This is preferable to finding the difference between the MAP estimates (blue line; Fig. \ref{fig:env_diff}).
 
 % behavior of MAP estimates
 %   as sample size increases, converge on true (10+)
@@ -86,7 +87,7 @@ By defining environmental preference as the difference in full posterior estimat
 \begin{figure}[ht]
   \centering
   \includegraphics[height = \textheight,width=\textwidth,keepaspectratio=true]{figure/env_mode_dist}
-  \caption{Histograms of the distributions of from the beta distribution defined in Eq. \ref{eq:bck_sim}. As to be expected, as sample size increases the draws better resemble the underlying true distribution. Sample size is indicated as the label of the x-axis, increasing in column major order.}
+  \caption{Histograms of the distributions from the beta distribution defined in Eq. \ref{eq:bck_sim}. As to be expected, as sample size increases the draws better resemble the underlying true distribution. Sample size is indicated as the label of the x-axis, increasing in column major order.}
   \label{fig:env_mode}
 \end{figure}
 
@@ -127,7 +128,7 @@ These simple models can then be expanded to include covariate information as pre
 \end{equation}
 The quadratic term for environmental affinity \(v\) is to allow for the possible nonlinear relationship between environmental affinity and extinction risk.
 
-The models which incorporate both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 5\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a columns of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts. We then rewrite \(\lambda\) and \(\sigma\) of equation \ref{eq:regression} in matrix notation as
+The models which incorporate both equations \ref{eq:simple} and \ref{eq:regression} can then be further expanded to allow all of the \(\beta\) coefficients, including \(\beta_{0}\), to vary with origination cohort while also modeling their covariance and correlation. This is called a varying-intercepts, varying-slopes model \citep{Gelman2007}. It is much easier to represent and explain how this is parameterized using matrix notation. First, define \(\mathbf{B}\) as \(k \times J\) matrix of the \(k\) coefficients including the intercept term (\(k = 5\)) for each of the \(J\) cohorts. Second, define \(\mathbf{X}\) as a \(n \times k\) matrix where each column is one of the covariates of interest. Importantly, \(\mathbf{X}\) includes a column of all 1s which correspond to the constant term \(\beta_{0}\). Third, define \(j[i]\) as the origination cohort of genus \(i\), where \(j = 1, \dots, J\) and \(J\) is the total number of observed cohorts. We then rewrite \(\lambda\) and \(\sigma\) of equation \ref{eq:regression} in matrix notation as
 \begin{equation}
   \begin{aligned}
     \lambda_{i} &= \exp(\mathbf{X}_{i} B_{j[i]}) \\
@@ -145,7 +146,7 @@ where \(\vec{\mu}\) is length \(k\) vector representing the overall mean of the 
 
 I also allowed estimates of the Weibull shape parameter \(\alpha\) to vary hierarchically by cohort. Cohort-specific estimates of \(\alpha\) were considered exponentially-transformed exchangable draws from a shared normal distribution with mean \(a\) and standard deviation \(\pi\), both of which were given semi-informative (hyper)priors centered at \(\alpha = 1\) (\(a \sim \mathcal{N}(0, 1)\), \(\pi \sim \mathrm{C^{+}}(1)\)).
 
-What remains is assigning priors the elements of \(\vec{\mu}\) and the covariance matrix \(\Sigma\). All elements of \(\vec{\mu}\) except for \(\mu_{r}\) were given horseshoe priors \citep{Carvalho2010,Carvalho2009} while \(\mu_{r}\) was given an informative normal prior (\(\mu_{r} \sim \mathcal{N}(-1, 1)\). Horseshoe priors are a strong regularizing priors with effectively infinite density at 0 and heavy, Cauchy-like tails \citep{Carvalho2010,Carvalho2009} which allow weakly inferred effects to be strongly drawn towards 0 while truly strong effects can remain large. The horseshoe prior consists of a normal distribution with scale term that is the product between a global shrinkage parameter \(\nu\) and a locak shrinkage parameter \(\psi\) unique to each of the parameters of interest. These parameters are themselves given half-Cauchy priors (Eq. 1 and 2).
+What remains is assigning priors the elements of \(\vec{\mu}\) and the covariance matrix \(\Sigma\). All elements of \(\vec{\mu}\) except for \(\mu_{r}\) were given horseshoe priors \citep{Carvalho2010,Carvalho2009} while \(\mu_{r}\) was given an informative normal prior (\(\mu_{r} \sim \mathcal{N}(-1, 1)\)). Horseshoe priors are strong regularizing priors with effectively infinite density at 0 and heavy, Cauchy-like tails \citep{Carvalho2010,Carvalho2009} which allow weakly inferred effects to be strongly drawn towards 0 while truly strong effects can remain large. The horseshoe prior consists of a normal distribution with scale term that is the product between a global shrinkage parameter \(\nu\) and a local shrinkage parameter \(\psi\) unique to each of the parameters of interest. These parameters are themselves given half-Cauchy priors (Eq. 1 and 2).
 
 The prior for \(\Sigma\) is a bit more complicated due to its multivariate nature. Following the \citet{stan-manual:2014}, I modeled the scale terms separate from the correlation structure of the coefficients. This is possible because of the relationship between a covariance and a correlation matrix, defined as 
 \begin{equation}
