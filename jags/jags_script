@@ -1,0 +1,28 @@
+model in "hmm_hierarchical.jags"
+data in "../data/data_dump/occurrence_dump.R"
+compile
+parameters in "hmm_inits.R"
+initialize
+update 10000
+monitor psi, thin(10)
+monitor gamma, thin(10)
+monitor phi, thin(10)
+monitor p, thin(10)
+monitor gamma_mu, thin(10)
+monitor phi_mu, thin(10)
+monitor p_mu, thin(10)
+monitor gamma_sigma, thin(10)
+monitor phi_sigma, thin(10)
+monitor p_sigma, thin(10)
+monitor gamma_group, thin(10)
+monitor phi_group, thin(10)
+monitor p_group, thin(10)
+monitor gamma_sigma_group, thin(10)
+monitor phi_sigma_group, thin(10)
+monitor p_sigma_group, thin(10)
+monitor beta, thin(10)
+monitor alpha, thin(10)
+monitor z, thin(10)
+monitor turnover, thin(10)
+update 10000
+coda *
