@@ -128,6 +128,18 @@ surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
 ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves.pdf',
        width = 4, height = 5, dpi = 600)
 
+# in b&w
+surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
+surv.plot <- surv.plot + geom_line(data = sim.surv, 
+                                   aes(x = time, y = surv, group = group),
+                                   colour = 'black', alpha = 0.05)
+surv.plot <- surv.plot + geom_line(size = 1, colour = 'grey')
+surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
+#surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
+surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
+ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves_bw.pdf',
+       width = 4, height = 5, dpi = 600)
+
 
 # deviance residuals
 # change this to be x = duration, y = residual
@@ -217,11 +229,19 @@ dev.off()
 param.est <- rbind(data.frame(p = c('mu_i', 'mu_r', 
                                     'mu_e', 'mu_e2', 'mu_m'),
                               m = apply(wei.fit$mu_prior, 2, mean), 
-                              s = apply(wei.fit$mu_prior, 2, sd)),
+                              s = apply(wei.fit$mu_prior, 2, sd),
+                              l = apply(wei.fit$mu_prior, 2, 
+                                        function(x) quantile(x, 0.1)), 
+                              h = apply(wei.fit$mu_prior, 2, 
+                                        function(x) quantile(x, 0.9))),
                    data.frame(p = c('tau_i', 'tau_r', 
                                     'tau_e', 'tau_e2', 'tau_m'),
                               m = apply(wei.fit$sigma, 2, mean), 
-                              s = apply(wei.fit$sigma, 2, sd)))
+                              s = apply(wei.fit$sigma, 2, sd),
+                              l = apply(wei.fit$sigma, 2, 
+                                        function(x) quantile(x, 0.1)), 
+                              h = apply(wei.fit$sigma, 2, 
+                                        function(x) quantile(x, 0.9))))
 param.table <- xtable(param.est, label = 'tab:param')
 print.xtable(param.table, file = '../doc/survival/table_param.tex')
 
@@ -279,6 +299,22 @@ vp1 <- plotViewport(c(1.8, 1, 0, 1))
 # plot the ggplot using the print command
 print(tb.cv, vp=vp1)
 dev.off()
+
+png(file = '../doc/survival/figure/cor_mixed_bw.png', 
+    width = 3000, height = 1500)
+par(mfrow=c(1,2))
+my.plotcorr(wei.covcor[[1]], upper.panel = 'number', 
+            col = col2[((wei.covcor[[1]] + 1)/2) * 200], 
+            cex = 4, cex.lab = 4.5, 
+            cex.main = 4.5, main = 'A', adj = 0)
+plot.new()
+vps <- baseViewports()
+pushViewport(vps$figure)
+vp1 <- plotViewport(c(1.8, 1, 0, 1))
+# plot the ggplot using the print command
+print(tb.cv, vp=vp1)
+dev.off()
+
 
 
 # change in baseline through time
