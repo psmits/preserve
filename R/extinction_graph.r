@@ -7,6 +7,7 @@ library(rstan)
 library(survival)
 library(stringr)
 library(grid)
+library(gridBase)
 library(gridExtra)
 library(xtable)
 library(ellipse)
@@ -224,30 +225,17 @@ param.est <- rbind(data.frame(p = c('mu_i', 'mu_r',
 param.table <- xtable(param.est, label = 'tab:param')
 print.xtable(param.table, file = '../doc/survival/table_param.tex')
 
-
 # histogram of posterior of correlation between inter and env
-baseline.covar <- data.frame(value = c(#exp.fit$Omega[, 1, 2], 
-                                       wei.fit$Omega[, 1, 2],
-                                       #exp.fit$Omega[, 1, 3], 
+baseline.covar <- data.frame(value = c(wei.fit$Omega[, 1, 2],
                                        wei.fit$Omega[, 1, 3],
-                                       #exp.fit$Omega[, 1, 4], 
                                        wei.fit$Omega[, 1, 4],
-                                       #exp.fit$Omega[, 1, 5], 
                                        wei.fit$Omega[, 1, 5]),
-                             lab = c(#rep('Exponential', 
-                                     #    length(exp.fit$Omega[, 1, 3])),
-                                     rep('Weibull', 
+                             lab = c(rep('Weibull', 
                                          length(exp.fit$Omega[, 1, 3])),
-                                     #rep('Exponential', 
-                                     #    length(wei.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3])),
-                                     #rep('Exponential', 
-                                     #    length(wei.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3])),
-                                     #rep('Exponential', 
-                                     #    length(wei.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3]))))
 baseline.covar$var <- c(rep('Cor(beta[0], beta[r])',
@@ -267,9 +255,30 @@ tb.cv <- ggplot(baseline.covar, aes(x = value))
 tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
 tb.cv <- tb.cv + facet_grid(var ~ ., labeller = label_parsed)
-tb.cv <- tb.cv + labs(x = 'Correlation', y = 'Prob. Density')
+tb.cv <- tb.cv + labs(x = 'Correlation', y = 'Prob. Density', title = 'B')
+tb.cv <- tb.cv + theme(axis.text = element_text(size = 30),
+                       axis.title = element_text(size = 40),
+                       strip.text = element_text(size = 30),
+                       plot.title = element_text(size = 50, hjust = 0))
 ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.pdf',
        width = 10, height = 9, dpi = 600)
+
+# mixed figure
+png(file = '../doc/survival/figure/cor_mixed.png', 
+    width = 3000, height = 1500)
+par(mfrow=c(1,2))
+my.plotcorr(wei.covcor[[1]], upper.panel = 'number', 
+            col = col1[((wei.covcor[[1]] + 1)/2) * 200], 
+            #mar = rep(0, 4), 
+            cex = 4, cex.lab = 4.5, 
+            cex.main = 4.5, main = 'A', adj = 0)
+plot.new()
+vps <- baseViewports()
+pushViewport(vps$figure)
+vp1 <- plotViewport(c(1.8, 1, 0, 1))
+# plot the ggplot using the print command
+print(tb.cv, vp=vp1)
+dev.off()
 
 
 # change in baseline through time
