@@ -9,10 +9,12 @@ library(stringr)
 library(grid)
 library(gridExtra)
 library(xtable)
+library(ellipse)
 source('../R/waic.r')
 source('../R/mung.r')
 source('../R/multiplot.r')
 source('../R/extinction_post_sim.r')
+source('../R/borrow_plotcorr.r')
 set.seed(420)
 
 data.file <- list.files('../data', pattern = 'Occs')
@@ -30,12 +32,6 @@ sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
                         gts = gts,
                         cuts = 'Chang',
                         bot = 'Trem')
-
-#oops <- fossil[fossil$occurrences.genus_name %in% sepkoski.data$genus, ]
-#ord.rate <- table(as.character(oops$occurrences.order_name))
-#ords <- names(ord.rate)
-#fam.rate <- table(as.character(oops$occurrences.family_name))
-#fams <- names(fam.rate)
 
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
@@ -195,65 +191,25 @@ get.covcor <- function(stanfit) {
 wei.covcor <- get.covcor(wei.fit)
 exp.covcor <- get.covcor(exp.fit)
 
-relab.x <- scale_x_discrete(labels = c('i' = expression(beta[0]), 
-                                       'r' = expression(beta[r]),
-                                       'e' = expression(beta[v]), 
-                                       'e2' = expression(beta[v^2]), 
-                                       'm' = expression(beta[m])))
-relab.y <- scale_y_discrete(labels = c('i' = expression(beta[intercept]), 
-                                       'r' = expression(beta[range]),
-                                       'e' = expression(beta[environment]), 
-                                       'e2' = expression(beta[environment^2]), 
-                                       'm' = expression(beta[size])))
-## correlation matrix
-#omega.med <- melt(list(Exponential = exp.covcor[[1]], 
-#                       Weibull = wei.covcor[[1]]))
-#omega.plot <- ggplot(omega.med, aes(x = Var1, y = Var2, fill = value))
-#omega.plot <- omega.plot + geom_tile()
-#omega.plot <- omega.plot + geom_text(aes(label = round(value, 2)))
-#omega.plot <- omega.plot + facet_grid(. ~ L1, labeller = label_parsed)
-#omega.plot <- omega.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
-#                                                low = 'blue', 
-#                                                mid = 'white', 
-#                                                high = 'red')
-#omega.plot <- omega.plot + relab.x + relab.y
-#omega.plot <- omega.plot + labs(x = '', y = '')
-#omega.plot <- omega.plot + theme(axis.text = element_text(size = 15))
-#ggsave(omega.plot, filename = '../doc/survival/figure/correlation_heatmap.pdf',
-#       width = 10, height = 5, dpi = 600)
-
 # just for the weibull
-omega.wei <- melt(list(Weibull = wei.covcor[[1]]))
-weicor.plot <- ggplot(omega.wei, aes(x = Var1, y = Var2, fill = value))
-weicor.plot <- weicor.plot + geom_tile()
-weicor.plot <- weicor.plot + geom_text(aes(label = round(value, 2)))
-weicor.plot <- weicor.plot + scale_fill_gradient2(name = 'Median\nCorrelation',
-                                                  low = muted('blue'), 
-                                                  mid = 'white', 
-                                                  high = muted('red'))
-weicor.plot <- weicor.plot + relab.x + relab.y
-weicor.plot <- weicor.plot + labs(x = '', y = '')
-weicor.plot <- weicor.plot + theme(axis.text = element_text(size = 15))
-ggsave(weicor.plot, filename = '../doc/survival/figure/wei_cor_heatmap.pdf',
-       width = 7, height = 5, dpi = 600)
+col1 <- colorRampPalette(c("red", "white", "blue"))
+col1<- col1(200)
+col2 <- colorRampPalette(c("grey", "white", "grey"))
+col2 <- col2(200)
 
-## covariance matrix
-#sigma.med <- melt(list(Exponential = exp.covcor[[5]], 
-#                       Weibull = wei.covcor[[5]]))
-#sigma.plot <- ggplot(sigma.med, aes(x = Var1, y = Var2, fill = value))
-#sigma.plot <- sigma.plot + geom_tile()
-#sigma.plot <- sigma.plot + geom_text(aes(label = round(value, 2)))
-#sigma.plot <- sigma.plot + facet_grid(. ~ L1, labeller = label_parsed)
-#sigma.plot <- sigma.plot + scale_fill_gradient2(name = 'Median\nCovariance', 
-#                                                low = 'blue', 
-#                                                mid = 'white', 
-#                                                high = 'red')
-#sigma.plot <- sigma.plot + relab.x + relab.y
-#sigma.plot <- sigma.plot + labs(x = '', y = '')
-#sigma.plot <- sigma.plot + theme(axis.text = element_text(size = 15))
-#ggsave(sigma.plot, filename = '../doc/survival/figure/covariance_heatmap.pdf',
-#       width = 10, height = 5, dpi = 600)
+png(file = '../doc/survival/figure/wei_cor_heatmap.png', 
+    width = 1500, height = 1500)
+my.plotcorr(wei.covcor[[1]], upper.panel = 'number', 
+            col = col1[((wei.covcor[[1]] + 1)/2) * 200], 
+            mar = rep(0, 4), cex = 4, cex.lab = 4.5)
+dev.off()
 
+png(file = '../doc/survival/figure/wei_cor_bw.png', 
+    width = 1500, height = 1500)
+my.plotcorr(wei.covcor[[1]], upper.panel = 'number', 
+            col = col2[((wei.covcor[[1]] + 1)/2) * 200], 
+            mar = rep(0, 4), cex = 4, cex.lab = 4.5)
+dev.off()
 
 # mean of all coefficients
 # sd of all coefficients

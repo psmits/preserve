@@ -1,7 +1,7 @@
 model in "hmm_hierarchical.jags"
 data in "../data/data_dump/occurrence_dump.R"
-compile
-parameters in "hmm_inits.R"
+compile, nchains(4)
+parameters in "../data/data_dump/hmm_inits.R"
 initialize
 update 10000
 monitor psi, thin(10)

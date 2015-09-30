@@ -32,6 +32,6 @@ save(data, file = '../data/data_dump/occurrence_data.rdata')
 with(data, {dump(c('nindiv', 'nyear', 'nprov', 'y'), 
                 file = '../data/data_dump/occurrence_dump.R')})
 
-p <- array(0, dim = c(data$nyear, data$nprov))
+p_norm <- array(0, dim = c(data$nyear, data$nprov))
 z <- data$y
-dump(c('p', 'z'), file = '../data/data_dump/hmm_inits.R')
+dump(c('p_norm', 'z'), file = '../data/data_dump/hmm_inits.R')
