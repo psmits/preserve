@@ -255,7 +255,7 @@ In summary, patterns of Paleozoic brachiopod survival were analyzed using a full
 
 
 \section*{Acknowledgements}
-I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, and R. Ree for and M. Marites Villarosa Garcia for draft comments. Additionally, thank you A. Miller for the epicontinental versus open-ocean assignments. This entire study would would not have been possible without the Herculean effort of the many contributors to the Paleobiology Database. In particular, I would like to thank J. Alroy, M. Aberhan, D. Bottjer, M. Clapham, F. F\"{u}rsich, N. Heim, A. Hendy, S. Holland, L. Ivany, W. Kiessling, B. Kr\"{o}ger, A. McGowan, T. Olszewski, P. Novack-Gottshall, M. Patzkowsky, M. Uhen, L. Villier, and P. Wager. This work was supported by a NASA Exobiology grant (NNX10AQ446) to A. Miller and M. Foote. I declare no conflicts of interest. This is Paleobiology Database publication XXX.
+I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, and R. Ree for and M. Villarosa Garcia for draft comments. Additionally, thank you A. Miller for the epicontinental versus open-ocean assignments. This entire study would would not have been possible without the Herculean effort of the many contributors to the Paleobiology Database. In particular, I would like to thank J. Alroy, M. Aberhan, D. Bottjer, M. Clapham, F. F\"{u}rsich, N. Heim, A. Hendy, S. Holland, L. Ivany, W. Kiessling, B. Kr\"{o}ger, A. McGowan, T. Olszewski, P. Novack-Gottshall, M. Patzkowsky, M. Uhen, L. Villier, and P. Wager. This work was supported by a NASA Exobiology grant (NNX10AQ446) to A. Miller and M. Foote. I declare no conflicts of interest. This is Paleobiology Database publication XXX.
 
 \clearpage
 
@@ -281,17 +281,18 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, and R. Ree for and M
 
 \begin{figure}[ht]
   \centering
-  \begin{subfigure}[b]{0.5\textwidth}
+  \begin{subfigure}[b]{\textwidth}
     \caption{}
-    \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap}
+    \includegraphics[height = 0.4\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap}
     \label{fig:omega}
   \end{subfigure}
-  \begin{subfigure}[b]{0.4\textwidth}
+
+  \begin{subfigure}[b]{\textwidth}
     \caption{}
-    \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_marginal}
+    \includegraphics[height = 0.35\textheight,width=\textwidth,keepaspectratio=true]{figure/correlation_marginal}
     \label{fig:corr}
   \end{subfigure}
-  \caption{\textbf{A}: Heatmap for the median estimates of the terms of the correlation matrix \(\Omega\) between cohort-level covariate effects. Both the exponential (left) and Weibull (right) models are presented. The off-diagonal terms are the correlation between the estimates of the cohort-level estimates of the effects of covariates, along with intercept/baseline extinction risk. \textbf{B}: Marginal posterior distributions of the correlations between intercept terms/baseline extinction risk and the effects of each of the covariates. These are presented for both the exponential (left) and Weibull (right) models.}
+  \caption{\textbf{A}: Graphical representation of the correlation matrix \(\Omega\) between cohort-level covariate effects. These correlations are between the estimates of the cohort-level effects of covariates, along with intercept/baseline extinction risk. The median estimates of the correlations are presented numerically (upper-triangle) and as idealized ellipses representing that much correlation (lower-triangle). \textbf{B}: Marginal posterior distributions of the correlations between intercept terms/baseline extinction risk and the effects of each of the covariates.}
   \label{fig:cor_posterior}
 \end{figure}
 

@@ -269,7 +269,7 @@ tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
 tb.cv <- tb.cv + facet_grid(var ~ ., labeller = label_parsed)
 tb.cv <- tb.cv + labs(x = 'Correlation', y = 'Prob. Density')
 ggsave(tb.cv, filename = '../doc/survival/figure/correlation_marginal.pdf',
-       width = 7, height = 5, dpi = 600)
+       width = 10, height = 9, dpi = 600)
 
 
 # change in baseline through time
