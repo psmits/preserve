@@ -23,6 +23,10 @@ Greater recruitment and/or loss in tropical or temperate zones?
 
 Correlation between recruitment and loss?
 
+Also, density dependence within and between regions. The idea being that if
+diversity has intrisic limits, are they due to within region limits, between
+region limits, or global limits. also, which provinces are "most" limited.
+
 
 Data
 ----
@@ -44,5 +48,5 @@ origination/migration.
 Density-dependent effect is considered constant over time while intercept is
 hierarchical across time.
 
-All regions affect the DD of all other regions (i.e. 4 regression coefs, one for
-each).
+All regions affect the DD of all other regions. Each province has all provinces
+effect it, independently.
