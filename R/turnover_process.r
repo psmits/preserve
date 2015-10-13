@@ -5,12 +5,13 @@ library(stringr)
 library(parallel)
 source('../R/turnover_functions.r')
 
-cod <- mclapply(1:4, function(x){
-                oo <- paste0('../data/mcmc_out/CODAchain', x, '.txt')
-                cc <- read.coda(output.file = oo, 
-                                index.file = '../data/mcmc_out/CODAindex.txt')
-                cc}, mc.cores = detectCores())
-post.samp <- mcmc.list(cod)
+cc <- list()
+for(ii in seq(1:4)) {
+  oo <- paste0('../data/mcmc_out/CODAchain', ii, '.txt')
+  cc[[ii]] <- read.coda(output.file = oo, 
+                        index.file = '../data/mcmc_out/CODAindex.txt')
+}
+post.samp <- mcmc.list(cc)
 
 # read in 4 coda files
 # make multi mcmc object
