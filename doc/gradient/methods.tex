@@ -18,12 +18,13 @@
 \subsection{Geographic provinces}
 
 \subsection{Model specification}
-Taxon presence was modeled has a hierarchical two-state hidden Markov model (HMM) where the three ``process parameters'' of gain (\(\gamma\)), persistance (\(\phi\)), and observation (\(p\)). For each province, each of these process parameters were modeled hierarchically so that estimates were allowed to vary over time but in cases of little information those estimates were drawn to the overall mean for that province. The estimates for each province were also estimated hierarchically in relation to each other; this way all estimates were relative to each other. The hierarchical structure of this model helps control for both overfitting and multiple comparisons during posterior analysis \citep{Gelman2007,Gelman2013d}.
+Taxon presence was modeled has a hierarchical two-state hidden Markov model (HMM) where the three ``process parameters'' of gain/newly entering a province (\(\gamma\)), persistance/survival (\(\phi\)), and observation (\(p\)). For each province, each of these process parameters were modeled hierarchically so that estimates were allowed to vary over time but in cases of little information those estimates were drawn to the overall mean for that province. The estimates for each province were also estimated hierarchically in relation to each other; this way all estimates were relative to each other. The hierarchical structure of this model helps control for both overfitting and multiple comparisons during posterior analysis \citep{Gelman2007,Gelman2013d}. 
 
+Note that the following model is strongly inspired by the dynamic occupancy model presented in \citep{Royle2008}.
 
 \(y_{i, j, t}\) is the observed occurrence of taxon \(i\) in province \(j\) at time \(t\), where \(i = 1, 2, \dots, N\), \(j = 1, 2, \dots, J\), and \(t = 1, 2, \dots, T\). \(y = 1\) is occupied while \(y = 0\) is unoccupied. \(z_{i, j, t}\) is the ``true'' occurrence of taxon \(i\) in province \(j\) at time \(t\), given the estimate of sampling. Just as with \(y\), \(z = 1\) is occupied while \(z = 0\) is unoccupied. 
 
-\(\phi_{j, t}\) is the probability of surviving, in province \(j\), from time \(t\) to time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 1)\)). \(\gamma_{j, t}\) is the probability of newly entering province \(j\) at time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 0)\)). \(p_{j, t}\) is the probability of preservation (\(Pr(y = 1 | z = 1)\)) in province \(j\) at time \(t\). 
+\(\phi_{j, t}\) is the probability of surviving, in province \(j\), from time \(t\) to time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 1)\)). \(\gamma_{j, t}\) is the probability of newly entering province \(j\) at time \(t + 1\) (\(Pr(z_{t + 1} = 1 | z_{t} = 0)\)). \(p_{j, t}\) is the probability of observing a true occurrence (\(Pr(y = 1 | z = 1)\)) in province \(j\) at time \(t\). 
 
 \(\psi\) is probability of sit occupancy/probability of occurrence (\(Pr(z_{i, t = 1} = 1)\). The first time point is defined in terms of \(\psi\) because there is (assumed) no previous time points.
 
@@ -63,7 +64,6 @@ In total, the model can be summarized by the following statements:
 \end{equation}
 
 
-\subsection{Posterior inference}
-Posterior distributions were estimated using MCMC sampling via NUTS as implemented in the Stan probablistic programming language.
+The joint posterior distribution of the HMM model was approximated using a Gibbs sampling MCMC routine as implemented in the JAGS probablistic programming language CITATION. Four chains were run for 20000 steps, thined to every 10th sample, ans split evenly between warm-up and sampling phases. Chain sampling convergence was assessed using the \(\hat{R}\) statistic with values close to 1 (less than 1.1) indicating approximate convergence \citep{Gelman2013d}.
 
 \end{document}
