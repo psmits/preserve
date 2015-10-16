@@ -83,6 +83,10 @@ prov.est <- prov.est + labs(x = 'time', y = 'estimated diversity')
 ggsave(plot = prov.est, filename = '../doc/gradient/figure/est_div.pdf',
        width = 10, height = 5)
 
+# need to make an easier to understand figure
+#   relative diversity -- lets identification of "gradient"
+
+
 # turnover probability
 turnover.prob <- function(data, post) {
   samp <- sample(4000, 1)
@@ -175,13 +179,15 @@ birth.count <- function(data, post) {
   for(jj in seq(data$J)) {
     hold <- c()
     for(ii in seq(from = 1, to = data$C - 1)) {
-      hold[ii] <- sum((1 - post$z[[1]][samp, , ii]) * post$z[[1]][samp, , ii + 1])
+      hold[ii] <- sum((1 - post$z[[1]][samp, , ii]) * 
+                      post$z[[1]][samp, , ii + 1])
     }
     birth[[jj]] <- hold
   }
   birth
 }
-est.birth <- replicate(1000, birth.count(data = data, post = post), simplify = FALSE)
+est.birth <- replicate(1000, birth.count(data = data, post = post), 
+                       simplify = FALSE)
 est.birth <- llply(seq(data$J), function(y) 
                    Reduce(rbind, llply(est.birth, function(x) x[[y]])))
 
@@ -200,13 +206,15 @@ death.count <- function(data, post) {
   for(jj in seq(data$J)) {
     hold <- c()
     for(ii in seq(from = 1, to = data$C - 1)) {
-      hold[ii] <- sum(post$z[[1]][samp, , ii] * (1 - post$z[[1]][samp, , ii + 1]))
+      hold[ii] <- sum(post$z[[1]][samp, , ii] * 
+                      (1 - post$z[[1]][samp, , ii + 1]))
     }
     death[[jj]] <- hold
   }
   death  
 }
-est.death <- replicate(1000, death.count(data = data, post = post), simplify = FALSE)
+est.death <- replicate(1000, death.count(data = data, post = post), 
+                       simplify = FALSE)
 est.death <- llply(seq(data$J), function(y) 
                    Reduce(rbind, llply(est.death, function(x) x[[y]])))
 

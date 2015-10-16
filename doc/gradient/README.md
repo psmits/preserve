@@ -50,3 +50,7 @@ hierarchical across time.
 
 All regions affect the DD of all other regions. Each province has all provinces
 effect it, independently.
+
+Convert probabilities into rates a la Liow et al 2015 Ecology Letters
+
+rate = -log(1 - prob) / stage length

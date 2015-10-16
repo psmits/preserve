@@ -16,8 +16,8 @@ post.samp <- mcmc.list(cc)
 # read in 4 coda files
 # make multi mcmc object
 # process into stan like format because easier to read
-#load('../data/data_dump/occurrence_data.rdata')  # data
-load('../data/mcmc_out/turnover_jags.rdata')  # post.samp
+load('../data/data_dump/occurrence_data.rdata')  # data
+#load('../data/mcmc_out/turnover_jags.rdata')  # post.samp
 
 post <- process.coda(post.samp, data)
 save(post, file = '../data/mcmc_out/turnover_custom.rdata')
