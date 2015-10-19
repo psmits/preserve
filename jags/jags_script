@@ -22,7 +22,6 @@ monitor phi_sigma_group, thin(10)
 monitor p_sigma_group, thin(10)
 monitor beta, thin(10)
 monitor alpha, thin(10)
-monitor z, thin(10)
 monitor turnover, thin(10)
 update 10000
 coda *

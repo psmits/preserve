@@ -32,7 +32,7 @@ The parameters \(\phi\), \(\gamma\), and \(p\) are then all defined hierarchical
 
 Diversity dependent origination and survival was included as a regression coefficients in the parameterizations of \(\phi_{j, t}\), and \(\gamma_{j, t}\). In particular, the diversity of any province can affect the origination and survival probabilities of an province; this is conceptually and mathematically similar to how clade competition was modeled by \citet{Silvestro2015b}. 
 
-\(\alpha\) and \(\beta\) are both \(J \times J\) matrices of regression coefficients, where \(\beta_{j}\) would be a column vector. \(X\) is a \(J \times T\) matrix where \(X_{t}\) is a column vector where each element is defined \(X_{j, t} = \Sigma_{i = 1}^{N} z_{i, j, t}\) (i.e. the sum of the diversity in province \(j\) at time \(t\)). All regression coefficients (i.e. all elements of the matrices) are given weakly-informative independent normally distributed priors.
+\(\alpha\) and \(\beta\) are both \(J \times J\) matrices of regression coefficients, where \(\beta_{j}\) would be a column vector. \(X\) is a \(J \times T\) matrix where \(X_{t}\) is a column vector where each element is defined \(X_{j, t} = \Sigma_{i = 1}^{N} z_{i, j, t}\) (i.e. the sum of the diversity in province \(j\) at time \(t\)). These regression coefficients were given informative priors based on the theory that as diversity increases, origination should decrease and extinction should increase/survival should decrease.
 
 And finally, I use independent uniform priors for \(\psi_{j}\) by province \(j\): \(\psi_{j} \sim \mathrm{U}(0, 1)\).
 
@@ -52,11 +52,11 @@ In total, the model can be summarized by the following statements:
     \sigma_{\phi, j} &\sim \mathrm{C}^{+}(1) \\
     M_{\phi} &\sim \mathrm{N}(0, 1) \\
     \sigma_{\Phi} &\sim \mathrm{C}^{+}(1) \\
-    \beta &\sim \mathrm{N}(0, 1) \\
+    \beta &\sim \mathrm{N}(-1, 1) \\
     \sigma_{\gamma, j} &\sim \mathrm{C}^{+}(1) \\
     M_{\gamma} &\sim \mathrm{N}(0, 1) \\
     \sigma_{\Gamma} &\sim \mathrm{C}^{+}(1) \\
-    \alpha &\sim \mathrm{N}(0, 1) \\
+    \alpha &\sim \mathrm{N}(-1, 1) \\
     \sigma_{p, j} &\sim \mathrm{C}^{+}(1) \\
     M_{p} &\sim \mathrm{N}(0, 1) \\
     \sigma_{P} &\sim \mathrm{C}^{+}(1) \\
@@ -65,5 +65,14 @@ In total, the model can be summarized by the following statements:
 
 
 The joint posterior distribution of the HMM model was approximated using a Gibbs sampling MCMC routine as implemented in the JAGS probablistic programming language CITATION. Four chains were run for 20000 steps, thined to every 10th sample, ans split evenly between warm-up and sampling phases. Chain sampling convergence was assessed using the \(\hat{R}\) statistic with values close to 1 (less than 1.1) indicating approximate convergence \citep{Gelman2013d}.
+
+
+% turnover
+Given the estimate of the joint posterior distribution, some downstream metapopulation summary statistics can be calculated. The first of these is turnover \(\tau\) defined as the probability that the occurrence of a taxon at time \(t\) is new (\(Pr(z_{t - 1} = 0 | z_{t} = 1)\))\citep{Royle2008}. Turnover is calculated as
+
+\begin{equation}
+  \tau_{t} = \frac{\gamma_{t - 1} (1 - \gamma_{t - 1}}{\gamma_{t - 1} (1 - \psi_{t - 1}) + \phi_{t - 1} \psi_{t - 1}}
+\end{equation}
+
 
 \end{document}
