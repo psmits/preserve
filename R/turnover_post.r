@@ -9,6 +9,19 @@ source('../R/turnover_functions.r')
 load('../data/data_dump/occurrence_data.rdata')  # data
 load('../data/mcmc_out/turnover_custom.rdata')  # post
 
+# beta is orig
+# alpha is surv
+#apply(post$beta[, , 1], 2, summary)
+#apply(post$beta[, , 2], 2, summary)
+#apply(post$beta[, , 3], 2, summary)
+#apply(post$beta[, , 4], 2, summary)
+#
+#apply(post$alpha[, , 1], 2, summary)
+#apply(post$alpha[, , 2], 2, summary)
+#apply(post$alpha[, , 3], 2, summary)
+#apply(post$alpha[, , 4], 2, summary)
+
+
 # posterior predicitive check
 #   if simulate data from same starting point, do we get the same pattern 
 #   of **observed** diversity (visually)?
