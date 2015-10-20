@@ -129,3 +129,57 @@ check.count <- function(out, set = 'true') {
   }
   chck
 }
+
+# extract certain value types from the posterior
+macro.prob <- function(data, post, ww = 'gamma') {
+  samp <- sample(4000, 1)
+  regions <- list()
+  for(jj in seq(data$nprov)) {
+    hold <- c()
+    for(cc in seq(data$nyear - 1)) {
+      hold[cc] <- post[[ww]][samp, cc, jj]
+    }
+    regions[[jj]] <- hold
+  }
+  regions
+}
+
+# calculate, recursively, occpuancy probability
+occ.prob <- function(post, data) {
+  samp <- sample(4000, 1)
+  regions <- list()
+  for(jj in seq(data$nprov)) {
+    hold <- c()
+    for(cc in seq(data$nyear)) {
+      if(cc == 1) {
+        psi <- post$psi[samp, jj]
+        hold[cc] <- psi
+      } else {
+        psi <- hold[cc - 1]
+        phi <- post$phi[samp, cc - 1, jj]
+        gam <- post$gamma[samp, cc - 1, jj]
+        hold[cc] <- psi * phi + (1 - psi) * gam
+      }
+    }
+    regions[[jj]] <- hold
+  }
+  regions
+}
+
+growth.rate <- function(occupancy, data = data) {
+  est <- llply(seq(data$nprov), function(y) 
+               Reduce(rbind, llply(occupancy, function(x) x[[y]])))
+  regions <- list()
+  for(jj in seq(data$nprov)) {
+    out <- matrix(ncol = ncol(est[[1]]) - 1, nrow = nrow(est[[1]]))
+    for(ii in seq(nrow(est[[1]]))) {
+      hold <- c()
+      for(cc in seq(from = 1, to = data$nyear - 1)) {
+        hold[cc] <- est[[jj]][ii, cc + 1] / est[[jj]][ii, cc]
+      }
+      out[ii, ] <- hold
+    }
+    regions[[jj]] <- out
+  }
+  regions
+}

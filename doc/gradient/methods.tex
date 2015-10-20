@@ -68,11 +68,21 @@ The joint posterior distribution of the HMM model was approximated using a Gibbs
 
 
 % turnover
-Given the estimate of the joint posterior distribution, some downstream metapopulation summary statistics can be calculated. The first of these is turnover \(\tau\) defined as the probability that the occurrence of a taxon at time \(t\) is new (\(Pr(z_{t - 1} = 0 | z_{t} = 1)\))\citep{Royle2008}. Turnover is calculated as
-
+Given the estimate of the joint posterior distribution, some downstream metapopulation summary statistics can be calculated. The first of these is turnover \(\tau\) defined as the probability that the occurrence of a taxon at time \(t\) is new (\(Pr(z_{t - 1} = 0 | z_{t} = 1)\)) \citep{Royle2008}. First, the occupancy probability \(\psi\) at times \(t = 2, \dots, T\) can calculated recursively as
+\begin{equation}
+  \psi_{t} = \psi_{t - 1}\phi_{t - 1} + (1 - \psi_{t - 1})\gamma_{t - 1}.
+\end{equation}
+Turnover can then be calculated as
 \begin{equation}
   \tau_{t} = \frac{\gamma_{t - 1} (1 - \gamma_{t - 1}}{\gamma_{t - 1} (1 - \psi_{t - 1}) + \phi_{t - 1} \psi_{t - 1}}
 \end{equation}
-
+An additional summary is the growth rate \(\lambda\) \citep{MacKenzie2003,Royle2008} which is calculated as
+\begin{equation}
+  \lambda_{t} = \frac{\psi_{t + 1}}{\psi_{t}}.
+\end{equation}
+%The final summary static of interest is the equilibrium occupancy probability \citep{MacKenzie2006,Royle2008}
+%\begin{equation}
+%  \psi_{t}^{\text{eq}} = \frac{\gamma_{t}}{\gamma_{t} + (1 - \phi_{t})}
+%\end{equation}
 
 \end{document}

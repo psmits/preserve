@@ -8,6 +8,7 @@ library(igraph)
 library(grid)
 library(scales)
 source('../R/turnover_functions.r')
+source('../R/turnover_plot_foo.r')
 set.seed(420)
 
 load('../data/data_dump/occurrence_data.rdata')  # data
@@ -93,6 +94,9 @@ div.dist <- llply(1:4, function(y)
 div.dist <- Map(function(x) {
                 rownames(x) <- seq(nrow(x))
                 x}, div.dist)
+div.mean <- melt(laply(div.dist, colMeans))
+names(div.mean) <- c('prov', 'year', 'div')
+
 div.melt <- melt(div.dist)
 names(div.melt) <- c('sim', 'year', 'div', 'prov')
 div.melt$prov <- factor(div.melt$prov)
@@ -102,19 +106,29 @@ div.melt$prov <- mapvalues(div.melt$prov, unique(div.melt$prov),
                            c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
 div.melt$prov <- factor(div.melt$prov, levels = 
                         c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
+div.mean$prov <- mapvalues(div.mean$prov, unique(div.mean$prov), 
+                           c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
+div.mean$prov <- factor(div.mean$prov, levels = 
+                        c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
 
 # make in years
 time.slice <- lump[seq(from = 5, to = data$nyear + 4), ]
 div.melt$year <- mapvalues(div.melt$year, 
                            unique(div.melt$year), time.slice[, 3])
+div.mean$year <- mapvalues(div.mean$year, 
+                           unique(div.mean$year), time.slice[, 3])
 
 prov.est <- ggplot(div.melt, aes(x = year, y = div, group = sim))
-prov.est <- prov.est + geom_line(alpha = 0.01) + facet_grid(prov ~ .)
-prov.est <- prov.est + scale_x_reverse()
+prov.est <- prov.est + geom_line(alpha = 0.01)
+prov.est <- prov.est + geom_line(data = div.mean,
+                                 mapping = aes(x = year, y = div, group = NULL), 
+                                 colour = 'blue')
+prov.est <- prov.est + scale_x_reverse() + facet_grid(prov ~ .)
 prov.est <- prov.est + coord_cartesian(ylim = c(0, 250))
 prov.est <- prov.est + labs(x = 'time', y = 'estimated diversity')
 ggsave(plot = prov.est, filename = '../doc/gradient/figure/true_div.png',
        width = 10, height = 5)
+
 
 # need to make an easier to understand figure
 #   relative diversity -- lets identification of "gradient"
@@ -153,159 +167,58 @@ rel.plot <- rel.plot + scale_x_reverse() + labs(x = 'Time (Mya)', y = 'Region')
 ggsave(plot = rel.plot, filename = '../doc/gradient/figure/rel_div.png',
        width = 10, height = 5)
 
+
 # occupancy probability??
 #   uses psi
+#
+est.occ <- replicate(1000, occ.prob(post = post, data = data), simplify = FALSE)
+est.growth <- growth.rate(est.occ, data)
+macro.plot(posterior = est.growth, 
+           time = lump, 
+           label = 'Growth rate', 
+           filename = '../doc/gradient/figure/growth.png',
+           process = FALSE,
+           log = TRUE)
 
-# turnover probability
-turnover.prob <- function(data, post) {
-  samp <- sample(4000, 1)
-  regions <- list()
-  for(jj in seq(data$nprov)) {
-    hold <- c()
-    for(cc in seq(data$nyear - 1)) {
-      hold[cc] <- post$turnover[samp, cc, jj]
-    }
-    regions[[jj]] <- hold
-  }
-  regions
-}
-est.turn <- replicate(1000, turnover.prob(data = data, post = post), 
+macro.plot(posterior = est.occ, 
+           time = lump, 
+           label = 'Occupancy probability', 
+           filename = '../doc/gradient/figure/occupancy.png')
+
+# macro probabilities
+est.turn <- replicate(1000, macro.prob(data = data, 
+                                       post = post, 
+                                       ww = 'turnover'), 
                      simplify = FALSE)
-est.turn <- llply(seq(data$nprov), function(y) 
-                 Reduce(rbind, llply(est.turn, function(x) x[[y]])))
+macro.plot(posterior = est.turn, time = lump)
 
-est.turn <- Map(function(x) {
-               rownames(x) <- seq(nrow(x))
-               x}, est.turn)
-est.turn <- melt(est.turn)
-names(est.turn) <- c('sim', 'year', 'div', 'prov')
-est.turn$prov <- factor(est.turn$prov)
-
-# province names
-est.turn$prov <- mapvalues(est.turn$prov, unique(est.turn$prov), 
-                           c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
-est.turn$prov <- factor(est.turn$prov, levels = 
-                        c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
-
-# make in years
-time.slice <- lump[seq(from = 6, to = data$nyear + 4), ]
-est.turn$year <- mapvalues(est.turn$year, 
-                           unique(est.turn$year), time.slice[, 3])
-
-turn.est <- ggplot(est.turn, aes(x = year, y = div, group = sim))
-turn.est <- turn.est + geom_line(alpha = 0.01) + facet_grid(prov ~ .)
-turn.est <- turn.est + scale_x_reverse()
-turn.est <- turn.est + labs(x = 'time', y = 'Pr(z(i,t - 1) = 0 | z(i, t) = 1)')
-ggsave(plot = turn.est, filename = '../doc/gradient/figure/turnover.png',
-       width = 10, height = 5)
-
-# gain probabilities
-macro.prob <- function(data, post, ww = 'gamma') {
-  samp <- sample(4000, 1)
-  regions <- list()
-  for(jj in seq(data$nprov)) {
-    hold <- c()
-    for(cc in seq(data$nyear - 1)) {
-      hold[cc] <- post[[ww]][samp, cc, jj]
-    }
-    regions[[jj]] <- hold
-  }
-  regions
-}
-est.orig <- replicate(1000, macro.prob(data = data, post = post, ww = 'gamma'), 
+est.orig <- replicate(1000, macro.prob(data = data, 
+                                       post = post, 
+                                       ww = 'gamma'), 
                       simplify = FALSE)
-est.orig <- llply(seq(data$nprov), function(y) 
-                 Reduce(rbind, llply(est.orig, function(x) x[[y]])))
+macro.plot(posterior = est.orig, 
+           time = lump, 
+           label = 'Pr(z(i, t) = 1 | z(i, t - 1) = 0)',
+           filename = '../doc/gradient/figure/entrance.png')
 
-est.orig <- Map(function(x) {
-               rownames(x) <- seq(nrow(x))
-               x}, est.orig)
-est.orig <- melt(est.orig)
-names(est.orig) <- c('sim', 'year', 'div', 'prov')
-est.orig$prov <- factor(est.orig$prov)
-
-# province names
-est.orig$prov <- mapvalues(est.orig$prov, unique(est.orig$prov), 
-                           c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
-est.orig$prov <- factor(est.orig$prov, levels = 
-                        c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
-# make in years
-time.slice <- lump[seq(from = 6, to = data$nyear + 4), ]
-est.orig$year <- mapvalues(est.orig$year, 
-                           unique(est.orig$year), time.slice[, 3])
-
-# make a rate
-width <- rev(diff(rev(lump[seq(from = 5, to = data$nyear + 4), 3])))
-split.orig <- split(est.orig, est.orig$year)
-est.orig$rate <- 0
-for(ii in seq(length(split.orig))) {
-  ss <- split.orig[[ii]]$div
-  est.orig$rate <- -log(1 - ss) / width[ii]
-}
-
-orig.est <- ggplot(est.orig, aes(x = year, y = div, group = sim))
-orig.est <- orig.est + geom_line(alpha = 0.01) + facet_grid(prov ~ .)
-orig.est <- orig.est + scale_x_reverse()
-orig.est <- orig.est + labs(x = 'time', y = 'Pr(z(i, t) = 1 | z(i, t - 1) = 0)')
-ggsave(plot = orig.est, filename = '../doc/gradient/figure/entrance.png',
-       width = 10, height = 5)
-
-orig.est <- ggplot(est.orig, aes(x = year, y = rate, group = sim))
-orig.est <- orig.est + geom_line(alpha = 0.01) + facet_grid(prov ~ .)
-orig.est <- orig.est + scale_x_reverse() + coord_trans(y = 'log')
-orig.est <- orig.est + labs(x = 'time', y = 'Origination/entrance rate')
-ggsave(plot = orig.est, filename = '../doc/gradient/figure/ent_rate.png',
-       width = 10, height = 5)
-
-
-# and the other...
-est.surv <- replicate(1000, macro.prob(data = data, post = post, ww = 'phi'), 
+est.surv <- replicate(1000, macro.prob(data = data, 
+                                       post = post, 
+                                       ww = 'phi'), 
                       simplify = FALSE)
+macro.plot(posterior = est.surv, 
+           time = lump, 
+           label = 'Pr(z(i, t) = 0 | z(i, t - 1) = 1)',
+           filename = '../doc/gradient/figure/survival.png',
+           subtract = TRUE)
 
-est.surv <- llply(seq(data$nprov), function(y) 
-                 Reduce(rbind, llply(est.surv, function(x) x[[y]])))
-
-est.surv <- Map(function(x) {
-               rownames(x) <- seq(nrow(x))
-               x}, est.surv)
-est.surv <- melt(est.surv)
-names(est.surv) <- c('sim', 'year', 'div', 'prov')
-est.surv$prov <- factor(est.surv$prov)
-est.surv$div <- 1 - est.surv$div
-
-# province names
-est.surv$prov <- mapvalues(est.surv$prov, unique(est.surv$prov), 
-                           c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
-est.surv$prov <- factor(est.surv$prov, levels = 
-                        c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
-
-# make in years
-time.slice <- lump[seq(from = 6, to = data$nyear + 4), ]
-est.surv$year <- mapvalues(est.surv$year, 
-                           unique(est.surv$year), time.slice[, 3])
-
-# make a rate
-width <- rev(diff(rev(lump[seq(from = 5, to = data$nyear + 4), 3])))
-split.surv <- split(est.surv, est.surv$year)
-est.surv$rate <- 0
-for(ii in seq(length(split.surv))) {
-  ss <- split.orig[[ii]]$div
-  est.surv$rate <- -log(1 - ss) / width[ii]
-}
-
-surv.est <- ggplot(est.surv, aes(x = year, y = div, group = sim))
-surv.est <- surv.est + geom_line(alpha = 0.01) + facet_grid(prov ~ .)
-surv.est <- surv.est + scale_x_reverse()
-surv.est <- surv.est + labs(x = 'time', y = 'Pr(z(i, t) = 0 | z(i, t - 1) = 1)')
-ggsave(plot = surv.est, filename = '../doc/gradient/figure/survival.png',
-       width = 10, height = 5)
-
-surv.est <- ggplot(est.surv, aes(x = year, y = rate, group = sim))
-surv.est <- surv.est + geom_line(alpha = 0.01) + facet_grid(prov ~ .)
-surv.est <- surv.est + scale_x_reverse() + coord_trans(y = 'log')
-surv.est <- surv.est + labs(x = 'time', y = 'Extinction/loss rate')
-ggsave(plot = surv.est, filename = '../doc/gradient/figure/surv_rate.png',
-       width = 10, height = 5)
+est.obs <- replicate(1000, macro.prob(data = data, 
+                                      post = post, 
+                                      ww = 'p'), 
+                      simplify = FALSE)
+macro.plot(posterior = est.obs, 
+           time = lump, 
+           label = 'Pr(y(i, t) = 1 | z(i, t) = 1)',
+           '../doc/gradient/figure/observation.png')
 
 
 # div dep graphs
@@ -368,6 +281,23 @@ plot(exti.graph,
 #dev.off()
 
 
+## make a rate
+#width <- rev(diff(rev(lump[seq(from = 5, to = data$nyear + 4), 3])))
+#split.surv <- split(est.surv, est.surv$year)
+#est.surv$rate <- 0
+#for(ii in seq(length(split.surv))) {
+#  ss <- split.orig[[ii]]$div
+#  est.surv$rate <- -log(1 - ss) / width[ii]
+#}
+#
+#surv.est <- ggplot(est.surv, aes(x = year, y = rate, group = sim))
+#surv.est <- surv.est + geom_line(alpha = 0.01) + facet_grid(prov ~ .)
+#surv.est <- surv.est + scale_x_reverse() + coord_trans(y = 'log')
+#surv.est <- surv.est + labs(x = 'time', y = 'Extinction/loss rate')
+#ggsave(plot = surv.est, filename = '../doc/gradient/figure/surv_rate.png',
+#       width = 10, height = 5)
+
+
 
 ## count the number of gains!
 ## b = sum (1 - z[i, t - 1]) z[i, t]
@@ -423,6 +353,3 @@ plot(exti.graph,
 #est.death <- melt(est.death)
 #names(est.death) <- c('sim', 'year', 'div', 'prov')
 #est.death$prov <- factor(est.death$prov)
-
-
-
