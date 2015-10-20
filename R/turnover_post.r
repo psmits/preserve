@@ -83,8 +83,8 @@ prov.div <- prov.div + geom_line(data = obs,
                                  colour = 'blue')
 prov.div <- prov.div + facet_grid(prov ~ .)
 prov.div <- prov.div + scale_x_reverse()
-prov.div <- prov.div + coord_cartesian(ylim = c(0, 250))
-prov.div <- prov.div + labs(x = 'time', y = 'observed diversity')
+prov.div <- prov.div + scale_y_continuous(trans = log10_trans())
+prov.div <- prov.div + labs(x = 'time', y = 'log observed diversity')
 ggsave(plot = prov.div, filename = '../doc/gradient/figure/obs_div.png',
        width = 10, height = 5)
 
@@ -124,8 +124,8 @@ prov.est <- prov.est + geom_line(data = div.mean,
                                  mapping = aes(x = year, y = div, group = NULL), 
                                  colour = 'blue')
 prov.est <- prov.est + scale_x_reverse() + facet_grid(prov ~ .)
-prov.est <- prov.est + coord_cartesian(ylim = c(0, 250))
-prov.est <- prov.est + labs(x = 'time', y = 'estimated diversity')
+prov.est <- prov.est + scale_y_continuous(trans = log10_trans())
+prov.est <- prov.est + labs(x = 'time', y = 'log estimated diversity')
 ggsave(plot = prov.est, filename = '../doc/gradient/figure/true_div.png',
        width = 10, height = 5)
 
@@ -171,21 +171,18 @@ ggsave(plot = rel.plot, filename = '../doc/gradient/figure/rel_div.png',
 # occupancy probability??
 #   uses psi
 #
-est.occ <- replicate(1000, occ.prob(post = post, data = data), simplify = FALSE)
+est.occ <- replicate(1000, occ.prob(post = post, data = data), 
+                     simplify = FALSE)
 est.growth <- growth.rate(est.occ, data)
 macro.plot(posterior = est.growth, 
            time = lump, 
-           label = 'Growth rate', 
+           label = 'log growth rate', 
            filename = '../doc/gradient/figure/growth.png',
            process = FALSE,
            log = TRUE)
 
-macro.plot(posterior = est.occ, 
-           time = lump, 
-           label = 'Occupancy probability', 
-           filename = '../doc/gradient/figure/occupancy.png')
-
 # macro probabilities
+# need to write conversion to rates bit...
 est.turn <- replicate(1000, macro.prob(data = data, 
                                        post = post, 
                                        ww = 'turnover'), 
@@ -199,7 +196,9 @@ est.orig <- replicate(1000, macro.prob(data = data,
 macro.plot(posterior = est.orig, 
            time = lump, 
            label = 'Pr(z(i, t) = 1 | z(i, t - 1) = 0)',
-           filename = '../doc/gradient/figure/entrance.png')
+           filename = '../doc/gradient/figure/entrance.png',
+           log = FALSE,
+           rate = FALSE)
 
 est.surv <- replicate(1000, macro.prob(data = data, 
                                        post = post, 
@@ -208,7 +207,9 @@ est.surv <- replicate(1000, macro.prob(data = data,
 macro.plot(posterior = est.surv, 
            time = lump, 
            label = 'Pr(z(i, t) = 0 | z(i, t - 1) = 1)',
-           filename = '../doc/gradient/figure/survival.png',
+           filename = '../doc/gradient/figure/extinction.png',
+           log = FALSE,
+           rate = FALSE,
            subtract = TRUE)
 
 est.obs <- replicate(1000, macro.prob(data = data, 
@@ -218,7 +219,9 @@ est.obs <- replicate(1000, macro.prob(data = data,
 macro.plot(posterior = est.obs, 
            time = lump, 
            label = 'Pr(y(i, t) = 1 | z(i, t) = 1)',
-           '../doc/gradient/figure/observation.png')
+           filename = '../doc/gradient/figure/observation.png',
+           log = FALSE,
+           rate = FALSE)
 
 
 # div dep graphs

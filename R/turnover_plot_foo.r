@@ -4,7 +4,8 @@ macro.plot <- function(posterior,
                        filename = '../doc/gradient/figure/turnover.png',
                        subtract = FALSE,
                        process = TRUE, 
-                       log = FALSE) {
+                       log = FALSE,
+                       rate = FALSE) {
 
   if(process) {
     est.turn <- llply(seq(data$nprov), function(y) 
@@ -45,14 +46,27 @@ macro.plot <- function(posterior,
   est.mean$year <- mapvalues(est.mean$year, 
                              unique(est.mean$year), time.slice[, 3])
 
+  if(rate) {
+    width <- rev(diff(rev(lump[seq(from = 5, to = data$nyear + 4), 3])))   
+    split.turn <- split(est.turn, est.turn$year)   
+    for(ii in seq(length(split.turn))) {   
+      ss <- split.turn[[ii]]$div   
+      est.turn$div <- -log(ss) / width[ii]    
+    }
+  }
+
   turn.est <- ggplot(est.turn, aes(x = year, y = div, group = sim))
   turn.est <- turn.est + geom_line(alpha = 0.01) 
-  turn.est <- turn.est + geom_line(data = est.mean,
-                                   mapping = aes(x = year, y = div, group = NULL), 
-                                   colour = 'blue')
+  if(!rate) {
+    turn.est <- turn.est + geom_line(data = est.mean,
+                                     mapping = aes(x = year, 
+                                                   y = div, 
+                                                   group = NULL), 
+                                     colour = 'blue')
+  }
   turn.est <- turn.est + scale_x_reverse() + facet_grid(prov ~ .)
   if(log) {
-    turn.est <- turn.est + scale_y_continuous(trans=log10_trans())
+    turn.est <- turn.est + scale_y_continuous(trans = log10_trans())
   }
   turn.est <- turn.est + labs(x = 'time', y = label)
   ggsave(plot = turn.est, filename = filename,
