@@ -1,8 +1,8 @@
 model {
   # prior
-  # hierarchical "time series" of all parameters by provice
+  # hierarchical of all parameters by provice
 
-  # these are the overall global means, averaged over groups and time
+  # overall means
   gamma_group ~ dnorm(0, 1)
   phi_group ~ dnorm(0, 1)
   p_group ~ dnorm(0, 1)
@@ -20,37 +20,43 @@ model {
       beta[j, k] ~ dnorm(-1, 1)
       alpha[j, k] ~ dnorm(1, 1)
     }
+    psi[j] ~ dunif(0, 1)  # initial state probability
   }
+  
+  # swap nprov and nindiv and make it clearer
+  p_sigma[nyear] ~ dt(0, 1, 1) T(0, )
+  p_mu[nyear] ~ dnorm(p_group, p_tau_group)
+  p_tau[nyear] <- pow(p_sigma[nyear], -2)
   for(j in 1:nprov) {
-    psi[j] ~ dunif(0, 1)  # initial state
-
-    # province level mean
-    gamma_mu[j] ~ dnorm(gamma_group, gamma_tau_group)
-    phi_mu[j] ~ dnorm(phi_group, phi_tau_group)
-    p_mu[j] ~ dnorm(p_group, p_tau_group)
+    p_norm[nyear, j] ~ dnorm(p_mu[nyear], p_tau[nyear])
+    p[nyear, j] <- ilogit(p_norm[nyear, j])
+  }
+  for(i in 1:(nyear - 1)) {
+    # temporal mean
+    gamma_mu[i] ~ dnorm(gamma_group, gamma_tau_group)
+    phi_mu[i] ~ dnorm(phi_group, phi_tau_group)
+    p_mu[i] ~ dnorm(p_group, p_tau_group)
 
     # super annoying parameterization bullshit
-    gamma_sigma[j] ~ dt(0, 1, 1) T(0, )
-    phi_sigma[j] ~ dt(0, 1, 1) T(0, )
-    p_sigma[j] ~ dt(0, 1, 1) T(0, )
-    gamma_tau[j] <- pow(gamma_sigma[j], -2)
-    phi_tau[j] <- pow(phi_sigma[j], -2)
-    p_tau[j] <- pow(p_sigma[j], -2)
+    gamma_sigma[i] ~ dt(0, 1, 1) T(0, )
+    phi_sigma[i] ~ dt(0, 1, 1) T(0, )
+    p_sigma[i] ~ dt(0, 1, 1) T(0, )
+    gamma_tau[i] <- pow(gamma_sigma[i], -2)
+    phi_tau[i] <- pow(phi_sigma[i], -2)
+    p_tau[i] <- pow(p_sigma[i], -2)
  
-    # draw from province to get time point
-    p_norm[nyear, j] ~ dnorm(p_mu[j], p_tau[j])
-    for(i in 1:(nyear - 1)) {
-      gamma_norm[i, j] ~ dnorm(gamma_mu[j] + 
+    # given whatever year we are on, go through all the provinces
+    for(j in 1:nprov) {
+      gamma_norm[i, j] ~ dnorm(gamma_mu[i] + 
         beta[j, 1] * sum(z[, i, 1]) + beta[j, 2] * sum(z[, i, 2]) +
-        beta[j, 3] * sum(z[, i, 3]) + beta[j, 4] * sum(z[, i, 4]), gamma_tau[j])
-      phi_norm[i, j] ~ dnorm(phi_mu[j] + 
+        beta[j, 3] * sum(z[, i, 3]) + beta[j, 4] * sum(z[, i, 4]), gamma_tau[i])
+      phi_norm[i, j] ~ dnorm(phi_mu[i] + 
         alpha[j, 1] * sum(z[, i, 1]) + alpha[j, 2] * sum(z[, i, 2]) +
-        alpha[j, 3] * sum(z[, i, 3]) + alpha[j, 4] * sum(z[, i, 4]), phi_tau[j])
-      p_norm[i, j] ~ dnorm(p_mu[j], p_tau[j])
+        alpha[j, 3] * sum(z[, i, 3]) + alpha[j, 4] * sum(z[, i, 4]), phi_tau[i])
+      p_norm[i, j] ~ dnorm(p_mu[i], p_tau[i])
     }
     # transforms
-    p[nyear, j] <- ilogit(p_norm[nyear, j])
-    for(i in 1:(nyear - 1)) {
+    for(j in 1:nprov) {
       gamma[i, j] <- ilogit(gamma_norm[i, j])
       phi[i, j] <- ilogit(phi_norm[i, j])
       p[i, j] <- ilogit(p_norm[i, j])
@@ -60,8 +66,10 @@ model {
   # process model (2 states, p/a)
   # by province
   for(j in 1:nprov) {
+    # by individual
     for(i in 1:nindiv) {
-      z[i, 1, j] ~ dbern(psi[j])
+      z[i, 1, j] ~ dbern(psi[j])  # initial occupancy probability
+      # by year (starting at 2)
       for(t in 2:nyear) {
         muZ[i, t, j] <- z[i, t - 1, j] * phi[t - 1, j] + 
           (1 - z[i, t - 1, j]) * gamma[t - 1, j]
@@ -72,12 +80,10 @@ model {
 
   # observation model
   # by province
-  # data matrix y
-  #   matrix where rows are 1:prov[1], (prov[j - 1] + 1):prov[j], etc. 
-  #   columns are time
-  # TO DO
   for(j in 1:nprov) {
+    # by individual
     for(i in 1:nindiv) {
+      # by year
       for(t in 1:nyear) {
         Py[i, t, j] <- z[i, t, j] * p[t, j]
         y[i, t, j] ~ dbern(Py[i, t, j])

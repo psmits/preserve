@@ -302,57 +302,7 @@ plot(exti.graph,
 
 
 
-## count the number of gains!
-## b = sum (1 - z[i, t - 1]) z[i, t]
-#birth.count <- function(data, post) {
-#  samp <- sample(4000, 1)
-#  birth <- list()
-#  for(jj in seq(data$nprov)) {
-#    hold <- c()
-#    for(ii in seq(from = 1, to = data$nyear - 1)) {
-#      hold[ii] <- sum((1 - post$z[[1]][samp, , ii]) * 
-#                      post$z[[1]][samp, , ii + 1])
-#    }
-#    birth[[jj]] <- hold
-#  }
-#  birth
-#}
-#est.birth <- replicate(1000, birth.count(data = data, post = post), 
-#                       simplify = FALSE)
-#est.birth <- llply(seq(data$nprov), function(y) 
-#                   Reduce(rbind, llply(est.birth, function(x) x[[y]])))
-#
-#est.birth <- Map(function(x) {
-#               rownames(x) <- seq(nrow(x))
-#               x}, est.birth)
-#est.birth <- melt(est.birth)
-#names(est.birth) <- c('sim', 'year', 'div', 'prov')
-#est.birth$prov <- factor(est.birth$prov)
-#
-#
-## count the number of losses! 
-## d = sum (z[i, t - 1]) (1 - z[i, t])
-#death.count <- function(data, post) {
-#  samp <- sample(4000, 1)
-#  death <- list()
-#  for(jj in seq(data$nprov)) {
-#    hold <- c()
-#    for(ii in seq(from = 1, to = data$nyear - 1)) {
-#      hold[ii] <- sum(post$z[[1]][samp, , ii] * 
-#                      (1 - post$z[[1]][samp, , ii + 1]))
-#    }
-#    death[[jj]] <- hold
-#  }
-#  death  
-#}
-#est.death <- replicate(1000, death.count(data = data, post = post), 
-#                       simplify = FALSE)
-#est.death <- llply(seq(data$nprov), function(y) 
-#                   Reduce(rbind, llply(est.death, function(x) x[[y]])))
-#
-#est.death <- Map(function(x) {
-#               rownames(x) <- seq(nrow(x))
-#               x}, est.death)
-#est.death <- melt(est.death)
-#names(est.death) <- c('sim', 'year', 'div', 'prov')
-#est.death$prov <- factor(est.death$prov)
+# count the number of gains!
+# b = sum (1 - z[i, t - 1]) z[i, t]
+birth.count <- function(data, post) {
+}

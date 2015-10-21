@@ -27,11 +27,13 @@ data <- list(nindiv = ntaxa,
              nprov = length(sight), 
              y = total.occur)
 
-
 save(data, file = '../data/data_dump/occurrence_data.rdata')
 with(data, {dump(c('nindiv', 'nyear', 'nprov', 'y'), 
                 file = '../data/data_dump/occurrence_dump.R')})
 
-p_norm <- array(0, dim = c(data$nyear, data$nprov))
+p_norm <- array(0.5, dim = c(data$nyear, data$nprov))
+gamma_norm <- phi_norm <- array(0.5, dim = c(data$nyear - 1, data$nprov))
 z <- data$y
-dump(c('p_norm', 'z'), file = '../data/data_dump/hmm_inits.R')
+psi <- rep(0.5, data$nprov)
+dump(c('gamma_norm', 'phi_norm', 'p_norm', 'z', 'psi'), 
+     file = '../data/data_dump/hmm_inits.R')
