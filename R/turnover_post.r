@@ -129,6 +129,42 @@ prov.est <- prov.est + labs(x = 'time', y = 'log estimated diversity')
 ggsave(plot = prov.est, filename = '../doc/gradient/figure/true_div.png',
        width = 10, height = 5)
 
+# count the number of gains!
+# b = sum (1 - z[i, t - 1]) z[i, t]
+count.change <- function(x, t1, t2, type = 'birth') {
+  if(type == 'birth') {
+    t1 <- x$true[, t1] == 0
+    t2 <- x$true[, t2] == 1
+  } else if(type == 'death') {
+    t1 <- x$true[, t1] == 1
+    t2 <- x$true[, t2] == 0
+  }
+  sum(t1 & t2)
+}
+birth <- list()
+for(ii in seq(data$nyear - 1)) {
+  birth[[ii]] <- laply(post.check, function(x) 
+                       laply(x, count.change, t1 = ii, t2 = ii + 1))
+}
+birth.mat <- llply(seq(data$nprov), function(y)
+                   Reduce(cbind, llply(birth, function(x) x[, y])))
+diversity.plot(mat = birth.mat, lump = lump)
+
+
+death <- list()
+for(ii in seq(data$nyear - 1)) {
+  death[[ii]] <- laply(post.check, function(x) 
+                       laply(x, count.change, t1 = ii, t2 = ii + 1, 
+                             type = 'death'))
+}
+death.mat <- llply(seq(data$nprov), function(y)
+                   Reduce(cbind, llply(death, function(x) x[, y])))
+div.mat <- llply(div.dist, function(x) x[, -(ncol(x))])
+diversity.plot(mat = death.mat, lump = lump, 
+               filename = '../doc/gradient/figure/est_death.png',
+               ylab = 'log estimated deaths')
+
+
 
 # need to make an easier to understand figure
 #   relative diversity -- lets identification of "gradient"
@@ -186,7 +222,7 @@ macro.plot(posterior = est.growth,
 est.turn <- replicate(1000, macro.prob(data = data, 
                                        post = post, 
                                        ww = 'turnover'), 
-                     simplify = FALSE)
+                      simplify = FALSE)
 macro.plot(posterior = est.turn, time = lump)
 
 est.orig <- replicate(1000, macro.prob(data = data, 
@@ -215,7 +251,7 @@ macro.plot(posterior = est.surv,
 est.obs <- replicate(1000, macro.prob(data = data, 
                                       post = post, 
                                       ww = 'p'), 
-                      simplify = FALSE)
+                     simplify = FALSE)
 macro.plot(posterior = est.obs, 
            time = lump, 
            label = 'Pr(y(i, t) = 1 | z(i, t) = 1)',
@@ -302,7 +338,3 @@ plot(exti.graph,
 
 
 
-# count the number of gains!
-# b = sum (1 - z[i, t - 1]) z[i, t]
-birth.count <- function(data, post) {
-}

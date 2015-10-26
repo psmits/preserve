@@ -18,7 +18,7 @@
 \subsection{Geographic provinces}
 
 \subsection{Model specification}
-Taxon presence was modeled has a hierarchical two-state hidden Markov model (HMM) where the three ``process parameters'' of gain/newly entering a province (\(\gamma\)), persistance/survival (\(\phi\)), and observation (\(p\)). For each province, each of these process parameters were modeled hierarchically so that estimates were allowed to vary over time but in cases of little information those estimates were drawn to the overall mean for that province. The estimates for each province were also estimated hierarchically in relation to each other; this way all estimates were relative to each other. The hierarchical structure of this model helps control for both overfitting and multiple comparisons during posterior analysis \citep{Gelman2007,Gelman2013d}. 
+Taxon presence was modeled has a hierarchical hidden Markov model (HMM) where the three ``process parameters'' of gain/newly entering a province (\(\gamma\)), persistance/survival (\(\phi\)), and observation (\(p\)). For each province, each of these process parameters were modeled hierarchically so that estimates were allowed to vary over time but in cases of little information those estimates were drawn to the overall mean for that province. The estimates for each province were also estimated hierarchically in relation to each other; this way all estimates were relative to each other. The hierarchical structure of this model helps control for both overfitting and multiple comparisons during posterior analysis \citep{Gelman2007,Gelman2013d}. 
 
 Note that the following model is strongly inspired by the dynamic occupancy model presented in \citep{Royle2008}.
 
@@ -28,7 +28,7 @@ Note that the following model is strongly inspired by the dynamic occupancy mode
 
 \(\psi\) is probability of sit occupancy/probability of occurrence (\(Pr(z_{i, t = 1} = 1)\). The first time point is defined in terms of \(\psi\) because there is (assumed) no previous time points.
 
-The parameters \(\phi\), \(\gamma\), and \(p\) are then all defined hierarchically within each province, hierarchical by time bin with the mean of that hierarchical by province. \(\Phi_{j}\), \(\Gamma_{j}\), and \(P_{j}\) are the overall probabilities for province \(j\). \(M_{\phi}\), \(M_{\gamma}\), and \(M_{p}\) are the overall estimates of survival, origination, and preservation probabilities. 
+The parameters \(\phi\), \(\gamma\), and \(p\) are then all defined hierarchically within time bins as samples from the shared mean between provinces. \(\Phi_{t}\), \(\Gamma_{t}\), and \(P_{t}\) are the mean probabilities for a given point in time \(t\). \(M_{\phi}\), \(M_{\gamma}\), and \(M_{p}\) are the overall mean estimates of survival, origination, and preservation probabilities. 
 
 Diversity dependent origination and survival was included as a regression coefficients in the parameterizations of \(\phi_{j, t}\), and \(\gamma_{j, t}\). In particular, the diversity of any province can affect the origination and survival probabilities of an province; this is conceptually and mathematically similar to how clade competition was modeled by \citet{Silvestro2015b}. 
 
@@ -43,20 +43,20 @@ In total, the model can be summarized by the following statements:
     y_{i, t, j} &\sim \mathrm{Bern}(p_{t, j} z_{i, t, j}) \\
     z_{i, t = 1, j} &\sim \mathrm{Bern}(\psi_{j}) \\
     z_{i, t, j} &\sim \mathrm{Bern}(\phi_{j, t - 1} z_{i, t - 1, j} + \gamma_{j, t - 1} (1 - z_{i, t - 1, j})) \\
-    \mathrm{logit}(\phi_{j, t}) &\sim \mathrm{N}(\Phi_{j} + X_{t - 1}\beta_{j}, \sigma_{\phi, j}) \\
-    \mathrm{logit}(\gamma_{j, t}) &\sim \mathrm{N}(\Gamma_{j} + X_{t - 1}\alpha_{j}, \sigma_{\gamma, j}) \\
-    \mathrm{logit}(p_{j, t}) &\sim \mathrm{N}(P_{j}, \sigma_{p, j}) \\
-    \Phi_{j} &\sim \mathrm{N}(M_{\phi}, \sigma_{\Phi}) \\
-    \Gamma_{j} &\sim \mathrm{N}(M_{\gamma}, \sigma_{\Gamma}) \\
-    P_{j} &\sim \mathrm{N}(M_{p}, \sigma_{P}) \\
-    \sigma_{\phi, j} &\sim \mathrm{C}^{+}(1) \\
+    \mathrm{logit}(\phi_{j, t}) &\sim \mathrm{N}(\Phi_{t} + X_{t - 1}\beta_{j, \_}, \sigma_{\phi, t}) \\
+    \mathrm{logit}(\gamma_{j, t}) &\sim \mathrm{N}(\Gamma_{t} + X_{t - 1}\alpha_{j, \_}, \sigma_{\gamma, t}) \\
+    \mathrm{logit}(p_{j, t}) &\sim \mathrm{N}(P_{t}, \sigma_{p, j}) \\
+    \Phi_{i} &\sim \mathrm{N}(M_{\phi}, \sigma_{\Phi}) \\
+    \Gamma_{i} &\sim \mathrm{N}(M_{\gamma}, \sigma_{\Gamma}) \\
+    P_{i} &\sim \mathrm{N}(M_{p}, \sigma_{P}) \\
+    \sigma_{\phi, i} &\sim \mathrm{C}^{+}(1) \\
     M_{\phi} &\sim \mathrm{N}(0, 1) \\
     \sigma_{\Phi} &\sim \mathrm{C}^{+}(1) \\
-    \beta &\sim \mathrm{N}(-1, 1) \\
+    \beta_{j, k} &\sim \mathrm{N}(-1, 1) \\
     \sigma_{\gamma, j} &\sim \mathrm{C}^{+}(1) \\
     M_{\gamma} &\sim \mathrm{N}(0, 1) \\
     \sigma_{\Gamma} &\sim \mathrm{C}^{+}(1) \\
-    \alpha &\sim \mathrm{N}(-1, 1) \\
+    \alpha_{i, k} &\sim \mathrm{N}(-1, 1) \\
     \sigma_{p, j} &\sim \mathrm{C}^{+}(1) \\
     M_{p} &\sim \mathrm{N}(0, 1) \\
     \sigma_{P} &\sim \mathrm{C}^{+}(1) \\
@@ -64,10 +64,16 @@ In total, the model can be summarized by the following statements:
 \end{equation}
 
 
-The joint posterior distribution of the HMM model was approximated using a Gibbs sampling MCMC routine as implemented in the JAGS probablistic programming language CITATION. Four chains were run for 20000 steps, thined to every 10th sample, ans split evenly between warm-up and sampling phases. Chain sampling convergence was assessed using the \(\hat{R}\) statistic with values close to 1 (less than 1.1) indicating approximate convergence \citep{Gelman2013d}.
+The joint posterior distribution of the HMM model was approximated using a Gibbs sampling MCMC routine as implemented in the JAGS probabilistic programming language CITATION. Four chains were run for 20000 steps, thined to every 10th sample, ans split evenly between warm-up and sampling phases. Chain sampling convergence was assessed using the \(\hat{R}\) statistic with values close to 1 (less than 1.1) indicating approximate convergence \citep{Gelman2013d}.
 
 
 % turnover
+% is this actually necessary as an estimate?
+%   would be extremely difficult to explain to a paleontological audience when they are thinking of a ratio of per captia rates and this is a probability.
+%   estimate number of 0 --> 1 changes (gains) and number of 1 --> 0 changes (losses) from time t to t - 1.
+%     already have the diversity estimate of each point in time.
+%     divide b/N and d/N for per captia rates (units: number of genera gained/lost per genus per stage).
+%       technically geologic unit not stage, though they are the ``foote-arnie'' stages.
 Given the estimate of the joint posterior distribution, some downstream metapopulation summary statistics can be calculated. The first of these is turnover \(\tau\) defined as the probability that the occurrence of a taxon at time \(t\) is new (\(Pr(z_{t - 1} = 0 | z_{t} = 1)\)) \citep{Royle2008}. First, the occupancy probability \(\psi\) at times \(t = 2, \dots, T\) can calculated recursively as
 \begin{equation}
   \psi_{t} = \psi_{t - 1}\phi_{t - 1} + (1 - \psi_{t - 1})\gamma_{t - 1}.

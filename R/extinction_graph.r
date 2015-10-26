@@ -124,9 +124,10 @@ surv.plot <- surv.plot + geom_line(data = sim.surv,
 surv.plot <- surv.plot + geom_line(size = 1, colour = 'blue')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 #surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
-surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
+surv.plot <- surv.plot + labs(x = 'Duration (t)', 
+                              y = 'Probability surviving longer than t')
 ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves.pdf',
-       width = 4, height = 5, dpi = 600)
+       width = 6, height = 5, dpi = 600)
 
 # in b&w
 surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
@@ -136,36 +137,37 @@ surv.plot <- surv.plot + geom_line(data = sim.surv,
 surv.plot <- surv.plot + geom_line(size = 1, colour = 'grey')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 #surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
-surv.plot <- surv.plot + labs(x = 'Duration in stages', y = 'P(T > t)')
+surv.plot <- surv.plot + labs(x = 'Duration t', 
+                              y = 'Probability surviving greater than t')
 ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves_bw.pdf',
-       width = 4, height = 5, dpi = 600)
+       width = 6, height = 5, dpi = 600)
 
 
-# deviance residuals
-# change this to be x = duration, y = residual
-std.res <- melt(wr.res)
-std.res <- std.res[std.res$L1 %in% 1:12, ]
-std.res$index <- rep(duration, 12)
-res <- ggplot(std.res, aes(x = index, y = value))
-res <- res + geom_hline(aes(yintercept = 0), colour = 'grey', size = 1)
-res <- res + geom_hline(aes(yintercept = 2), colour = 'grey', size = 1, 
-                        linetype = 'dashed')
-res <- res + geom_hline(aes(yintercept = -2), colour = 'grey', size = 1, 
-                        linetype = 'dashed')
-res <- res + geom_point(alpha = 0.5, size = 1, position = 'jitter')
-res <- res + coord_cartesian(xlim = c(-0.5, 8))
-res <- res + facet_wrap( ~ L1, nrow = 3, ncol = 4)
-res <- res + labs(x = 'Duration in stages', y = 'Deviance residual')
-ggsave(res, filename = '../doc/survival/figure/residual_plot.pdf',
-       width = 8, height = 5, dpi = 600)
-
-
-## posterior predictive point checks
-quant <- laply(wr, function(x) quantile(x, seq(0.1, 0.9, by = 0.05)))
-qudur <- quantile(duration, seq(0.1, 0.9, by = 0.05))
-qp <- colSums(t(apply(quant, 1, function(x) x > qudur))) / nrow(quant)
-bad <- which(qp > 0.975 | qp < 0.025)
-# quality of fit is weak, though a lot is captured
+## deviance residuals
+## change this to be x = duration, y = residual
+#std.res <- melt(wr.res)
+#std.res <- std.res[std.res$L1 %in% 1:12, ]
+#std.res$index <- rep(duration, 12)
+#res <- ggplot(std.res, aes(x = index, y = value))
+#res <- res + geom_hline(aes(yintercept = 0), colour = 'grey', size = 1)
+#res <- res + geom_hline(aes(yintercept = 2), colour = 'grey', size = 1, 
+#                        linetype = 'dashed')
+#res <- res + geom_hline(aes(yintercept = -2), colour = 'grey', size = 1, 
+#                        linetype = 'dashed')
+#res <- res + geom_point(alpha = 0.5, size = 1, position = 'jitter')
+#res <- res + coord_cartesian(xlim = c(-0.5, 8))
+#res <- res + facet_wrap( ~ L1, nrow = 3, ncol = 4)
+#res <- res + labs(x = 'Duration in stages', y = 'Deviance residual')
+#ggsave(res, filename = '../doc/survival/figure/residual_plot.pdf',
+#       width = 8, height = 5, dpi = 600)
+#
+#
+### posterior predictive point checks
+#quant <- laply(wr, function(x) quantile(x, seq(0.1, 0.9, by = 0.05)))
+#qudur <- quantile(duration, seq(0.1, 0.9, by = 0.05))
+#qp <- colSums(t(apply(quant, 1, function(x) x > qudur))) / nrow(quant)
+#bad <- which(qp > 0.975 | qp < 0.025)
+## quality of fit is weak, though a lot is captured
 
 # make plot of correlation and covariance matrices
 # row is sample
@@ -431,17 +433,17 @@ grand$stage <- range(bases$stage)
 alph.b <- bases
 alph.g <- grand
 
-inter.b$type <- 'beta[0]'
-rage.b$type <- 'beta[r]'
+inter.b$type <- 'beta[intercept]'
+rage.b$type <- 'beta[range]'
 alph.b$type <- 'alpha'
 bases <- rbind(inter.b, rage.b, alph.b)
-bases$type <- factor(bases$type, levels = c('beta[0]', 'beta[r]', 'alpha'))
+bases$type <- factor(bases$type, levels = c('beta[intercept]', 'beta[range]', 'alpha'))
 
-inter.g$type <- 'beta[0]'
-rage.g$type <- 'beta[r]'
+inter.g$type <- 'beta[intercept]'
+rage.g$type <- 'beta[range]'
 alph.g$type <- 'alpha'
 grand <- rbind(inter.g, rage.g, alph.g)
-grand$type <- factor(grand$type, levels = c('beta[0]', 'beta[r]', 'alpha'))
+grand$type <- factor(grand$type, levels = c('beta[intercept]', 'beta[range]', 'alpha'))
 
 
 gline <- ggplot(bases, aes(x = stage, y = med))
@@ -462,7 +464,7 @@ gline <- gline + facet_grid(type ~ ., scales = 'free_y',
 gline <- gline + labs(x = 'Mya', y = 'Estimate')
 gline <- gline + theme(plot.title = element_text(hjust = 0, size = 10))
 ggsave(gline, filename = '../doc/survival/figure/cohort_series.pdf',
-       width = 10, height = 9, dpi = 600)
+       width = 10, height = 10, dpi = 600)
 
 
 # quadratics plot
@@ -494,8 +496,10 @@ quad <- quad + stat_function(fun = function(x) {
 quad <- quad + geom_text(y = 1.75, x = 0, 
                          label = paste(lab), size = 10)
 quad <- quad + coord_cartesian(ylim = c(0, 2))
-quad <- quad + labs(x = expression(v[i]), 
-                    y = expression(paste(tilde(sigma[i])/tilde(sigma))))
+#quad <- quad + labs(x = expression(v[i]), 
+#                    y = expression(paste(tilde(sigma[i])/tilde(sigma))))
+quad <- quad + labs(x = 'environmental preference', 
+                    y = 'multiplier of duration')
 ggsave(quad, filename = '../doc/survival/figure/environ_quad.pdf',
        width = 7, height = 5, dpi = 600)
 
@@ -563,9 +567,14 @@ for(ii in seq(unique(coh))) {
                                  label = paste(lab), size = 10)#, colour = cols)
   quadcoh <- quadcoh + coord_cartesian(ylim = c(0, 2))
   quadcoh <- quadcoh + labs(x = paste(rename[ii]), 
-                            y = expression(paste(tilde(sigma[i])/tilde(sigma))))
+                            #y = expression(paste(tilde(sigma[i])/tilde(sigma))))
+                            y = 'mulitplier')
   plotlist[[ii]] <- quadcoh
 }
+png(file = '../doc/survival/figure/cohort_quads_short.png', 
+    width = 1000, height = 300)
+do.call('grid.arrange', c(rev(plotlist)[1:3], ncol = 3))
+dev.off()
 png(file = '../doc/survival/figure/cohort_quads.png', 
     width = 3000, height = 1500)
 do.call('grid.arrange', c(rev(plotlist), ncol = 7))

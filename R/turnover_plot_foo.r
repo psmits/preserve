@@ -72,3 +72,36 @@ macro.plot <- function(posterior,
   ggsave(plot = turn.est, filename = filename,
          width = 10, height = 5)
 }
+
+
+# diversity graphs
+diversity.plot <- function(mat, lump = lump, 
+                           filename = '../doc/gradient/figure/est_birth.png',
+                           ylab = 'log estimated births') {
+  birth.mat <- Map(function(x) {
+                   colnames(x) <- seq(ncol(x))
+                   x}, mat)
+  birth.melt <- melt(birth.mat)
+  names(birth.melt) <- c('sim', 'year', 'div', 'prov')
+  birth.melt$prov <- factor(birth.melt$prov)
+
+  # province names
+  birth.melt$prov <- mapvalues(birth.melt$prov, unique(birth.melt$prov), 
+                               c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
+  birth.melt$prov <- factor(birth.melt$prov, levels = 
+                            c('N. Temp', 'N. Trop', 'S. Trop', 'S. Temp'))
+
+  # make in years
+  time.slice <- lump[seq(from = 6, to = data$nyear + 4), ]
+  birth.melt$year <- mapvalues(birth.melt$year, 
+                               unique(birth.melt$year), time.slice[, 3])
+
+  prov.bir <- ggplot(birth.melt, aes(x = year, y = div, group = sim))
+  prov.bir <- prov.bir + geom_line(alpha = 0.01)
+  prov.bir <- prov.bir + facet_grid(prov ~ .)
+  prov.bir <- prov.bir + scale_x_reverse()
+  prov.bir <- prov.bir + scale_y_continuous(trans = log10_trans())
+  prov.bir <- prov.bir + labs(x = 'time', y = ylab)
+  ggsave(plot = prov.bir, filename = filename,
+         width = 10, height = 5)
+}
