@@ -7,7 +7,7 @@ source('../R/turnover_functions.r')
 
 cc <- list()
 for(ii in seq(1:4)) {
-  oo <- paste0('../data/mcmc_out/CODAchain', ii, '.txt')
+  oo <- paste0('../data/mcmc_out/mainchain', ii, '.txt')
   cc[[ii]] <- read.coda(output.file = oo, 
                         index.file = '../data/mcmc_out/CODAindex.txt')
 }

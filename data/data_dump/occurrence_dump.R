@@ -1,7 +1,7 @@
 nindiv <-
 1350L
 nyear <-
-33
+33L
 nprov <-
 4L
 y <-

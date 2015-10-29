@@ -16,10 +16,6 @@ model {
   p_tau_group <- pow(gamma_sigma_group, -2)
 
   for(j in 1:nprov) {
-    for(k in 1:nprov) {
-      beta[j, k] ~ dnorm(-1, 1)
-      alpha[j, k] ~ dnorm(1, 1)
-    }
     psi[j] ~ dunif(0, 1)  # initial state probability
   }
   
@@ -47,12 +43,8 @@ model {
  
     # given whatever year we are on, go through all the provinces
     for(j in 1:nprov) {
-      gamma_norm[i, j] ~ dnorm(gamma_mu[i] + 
-        beta[j, 1] * sum(z[, i, 1]) + beta[j, 2] * sum(z[, i, 2]) +
-        beta[j, 3] * sum(z[, i, 3]) + beta[j, 4] * sum(z[, i, 4]), gamma_tau[i])
-      phi_norm[i, j] ~ dnorm(phi_mu[i] + 
-        alpha[j, 1] * sum(z[, i, 1]) + alpha[j, 2] * sum(z[, i, 2]) +
-        alpha[j, 3] * sum(z[, i, 3]) + alpha[j, 4] * sum(z[, i, 4]), phi_tau[i])
+      gamma_norm[i, j] ~ dnorm(gamma_mu[i], gamma_tau[i])
+      phi_norm[i, j] ~ dnorm(phi_mu[i], phi_tau[i])
       p_norm[i, j] ~ dnorm(p_mu[i], p_tau[i])
     }
     # transforms

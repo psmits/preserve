@@ -12,6 +12,7 @@ source('../R/turnover_plot_foo.r')
 set.seed(420)
 
 load('../data/data_dump/occurrence_data.rdata')  # data
+#load('../data/data_dump/occurrence_holdout.rdata')  # test/train split
 load('../data/mcmc_out/turnover_custom.rdata')  # post
 
 lump.file <- list.files('../data', pattern = 'lump')
@@ -77,6 +78,7 @@ div.melt$year <- mapvalues(div.melt$year,
 obs$year <- mapvalues(obs$year, unique(obs$year), time.slice[, 3])
 
 prov.div <- ggplot(div.melt, aes(x = year, y = div, group = sim))
+prov.div <- prov.div + geom_hline(yintercept = 0, colour = 'grey')
 prov.div <- prov.div + geom_line(alpha = 0.01)
 prov.div <- prov.div + geom_line(data = obs, 
                                  mapping = aes(x = year, y = div, group = NULL),
@@ -119,6 +121,7 @@ div.mean$year <- mapvalues(div.mean$year,
                            unique(div.mean$year), time.slice[, 3])
 
 prov.est <- ggplot(div.melt, aes(x = year, y = div, group = sim))
+prov.est <- prov.est + geom_hline(yintercept = 0, colour = 'grey')
 prov.est <- prov.est + geom_line(alpha = 0.01)
 prov.est <- prov.est + geom_line(data = div.mean,
                                  mapping = aes(x = year, y = div, group = NULL), 
@@ -148,8 +151,8 @@ for(ii in seq(data$nyear - 1)) {
 }
 birth.mat <- llply(seq(data$nprov), function(y)
                    Reduce(cbind, llply(birth, function(x) x[, y])))
-diversity.plot(mat = birth.mat, lump = lump)
-
+diversity.plot(mat = birth.mat, lump = lump, 
+               ylab = 'estimated births', log = FALSE)
 
 death <- list()
 for(ii in seq(data$nyear - 1)) {
@@ -159,10 +162,15 @@ for(ii in seq(data$nyear - 1)) {
 }
 death.mat <- llply(seq(data$nprov), function(y)
                    Reduce(cbind, llply(death, function(x) x[, y])))
-div.mat <- llply(div.dist, function(x) x[, -(ncol(x))])
 diversity.plot(mat = death.mat, lump = lump, 
                filename = '../doc/gradient/figure/est_death.png',
-               ylab = 'log estimated deaths')
+               ylab = 'estimated deaths', log = FALSE)
+
+diff.mat <- Map(function(x, y) x - y, birth.mat, death.mat)
+diversity.plot(mat = diff.mat, lump = lump, 
+               filename = '../doc/gradient/figure/est_diff.png',
+               ylab = 'change in diversity', log = FALSE)
+
 
 
 
@@ -260,81 +268,59 @@ macro.plot(posterior = est.obs,
            rate = FALSE)
 
 
-# div dep graphs
-# beta is orig
-orig.test <- orig.sd <- orig.eff <- matrix(ncol = data$nprov, nrow = data$nprov)
-for(ii in seq(data$nprov)) {
-  orig.eff[ii, ] <- colMeans(post$beta[, , ii])
-  orig.sd[ii, ] <- apply(post$beta[, , ii], 2, sd)
-
-  for(jj in seq(data$nprov)) {
-    if(orig.eff[ii, jj] > 0) {
-      orig.test[ii, jj] <- orig.eff[ii, jj] - 1 * orig.sd[ii, jj]
-    } else {
-      orig.test[ii, jj] <- orig.eff[ii, jj] + 1 * orig.sd[ii, jj]
-    }
-  }
-}
-orig.eff[sign(orig.eff) != sign(orig.test)] = 0
-
-orig.graph <- graph_from_adjacency_matrix(orig.eff, 
-                                          mode = 'directed', 
-                                          weighted = TRUE)
-orig.col <- ifelse(E(orig.graph)$weight <= 0, 'red', 'blue')
-
-#png(file = '../doc/gradient/figure/orig_graph.png',
-#    width = 300, height = 150)
-plot(orig.graph, 
-     edge.width = abs(E(orig.graph)$weight) * 100, 
-     edge.color = orig.col,
-     edge.curved = TRUE, layout = layout_in_circle(orig.graph))
-#dev.off()
-
-# alpha is surv
-exti.test <- exti.sd <- exti.eff <- matrix(ncol = data$nprov, nrow = data$nprov)
-for(ii in seq(data$nprov)) {
-  exti.eff[ii, ] <- colMeans(post$alpha[, , ii])
-  exti.sd[ii, ] <- apply(post$alpha[, , ii], 2, sd)
-
-  for(jj in seq(data$nprov)) {
-    if(exti.eff[ii, jj] > 0) {
-      exti.test[ii, jj] <- exti.eff[ii, jj] - 1 * exti.sd[ii, jj]
-    } else {
-      exti.test[ii, jj] <- exti.eff[ii, jj] + 1 * exti.sd[ii, jj]
-    }
-  }
-}
-exti.eff[sign(exti.eff) != sign(exti.test)] = 0
-
-exti.graph <- graph_from_adjacency_matrix(exti.eff, 
-                                          mode = 'directed', 
-                                          weighted = TRUE)
-exti.col <- ifelse(E(exti.graph)$weight <= 0, 'red', 'blue')
-
-#png(file = '../doc/gradient/figure/exti_graph.png',
-#    width = 300, height = 150)
-plot(exti.graph, 
-     edge.width = abs(E(exti.graph)$weight) * 100,
-     edge.color = exti.col,
-     edge.curved = TRUE, layout = layout_in_circle(exti.graph))
-#dev.off()
-
-
-## make a rate
-#width <- rev(diff(rev(lump[seq(from = 5, to = data$nyear + 4), 3])))
-#split.surv <- split(est.surv, est.surv$year)
-#est.surv$rate <- 0
-#for(ii in seq(length(split.surv))) {
-#  ss <- split.orig[[ii]]$div
-#  est.surv$rate <- -log(1 - ss) / width[ii]
-#}
+## div dep graphs
+## beta is orig
+#orig.test <- orig.sd <- orig.eff <- matrix(ncol = data$nprov, nrow = data$nprov)
+#for(ii in seq(data$nprov)) {
+#  orig.eff[ii, ] <- colMeans(post$beta[, , ii])
+#  orig.sd[ii, ] <- apply(post$beta[, , ii], 2, sd)
 #
-#surv.est <- ggplot(est.surv, aes(x = year, y = rate, group = sim))
-#surv.est <- surv.est + geom_line(alpha = 0.01) + facet_grid(prov ~ .)
-#surv.est <- surv.est + scale_x_reverse() + coord_trans(y = 'log')
-#surv.est <- surv.est + labs(x = 'time', y = 'Extinction/loss rate')
-#ggsave(plot = surv.est, filename = '../doc/gradient/figure/surv_rate.png',
-#       width = 10, height = 5)
-
-
-
+#  for(jj in seq(data$nprov)) {
+#    if(orig.eff[ii, jj] > 0) {
+#      orig.test[ii, jj] <- orig.eff[ii, jj] - 1 * orig.sd[ii, jj]
+#    } else {
+#      orig.test[ii, jj] <- orig.eff[ii, jj] + 1 * orig.sd[ii, jj]
+#    }
+#  }
+#}
+#orig.eff[sign(orig.eff) != sign(orig.test)] = 0
+#
+#orig.graph <- graph_from_adjacency_matrix(orig.eff, 
+#                                          mode = 'directed', 
+#                                          weighted = TRUE)
+#orig.col <- ifelse(E(orig.graph)$weight <= 0, 'red', 'blue')
+#
+#png(file = '../doc/gradient/figure/orig_graph.png')
+#plot(orig.graph, 
+#     edge.width = abs(E(orig.graph)$weight) * 100, 
+#     edge.color = orig.col,
+#     edge.curved = TRUE, layout = layout_in_circle(orig.graph))
+#dev.off()
+#
+## alpha is surv
+#exti.test <- exti.sd <- exti.eff <- matrix(ncol = data$nprov, nrow = data$nprov)
+#for(ii in seq(data$nprov)) {
+#  exti.eff[ii, ] <- colMeans(post$alpha[, , ii])
+#  exti.sd[ii, ] <- apply(post$alpha[, , ii], 2, sd)
+#
+#  for(jj in seq(data$nprov)) {
+#    if(exti.eff[ii, jj] > 0) {
+#      exti.test[ii, jj] <- exti.eff[ii, jj] - 1 * exti.sd[ii, jj]
+#    } else {
+#      exti.test[ii, jj] <- exti.eff[ii, jj] + 1 * exti.sd[ii, jj]
+#    }
+#  }
+#}
+#exti.eff[sign(exti.eff) != sign(exti.test)] = 0
+#
+#exti.graph <- graph_from_adjacency_matrix(exti.eff, 
+#                                          mode = 'directed', 
+#                                          weighted = TRUE)
+#exti.col <- ifelse(E(exti.graph)$weight >= 0, 'red', 'blue')
+#
+#png(file = '../doc/gradient/figure/surv_graph.png')
+#plot(exti.graph, 
+#     edge.width = abs(E(exti.graph)$weight) * 100,
+#     edge.color = exti.col,
+#     edge.curved = TRUE, layout = layout_in_circle(exti.graph))
+#dev.off()

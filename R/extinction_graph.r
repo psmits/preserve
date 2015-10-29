@@ -62,12 +62,12 @@ exp.waic <- waic(efit)$waic
 theme_set(theme_bw())
 cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
          '#0072B2', '#D55E00', '#CC79A7')
-theme_update(axis.text = element_text(size = 10),
-             axis.title = element_text(size = 20),
-             legend.text = element_text(size = 15),
-             legend.title = element_text(size = 16),
+theme_update(axis.text = element_text(size = 20),
+             axis.title = element_text(size = 40),
+             legend.text = element_text(size = 30),
+             legend.title = element_text(size = 32),
              legend.key.size = unit(1, 'cm'),
-             strip.text = element_text(size = 15))
+             strip.text = element_text(size = 30))
 
 # data setup
 coh <- c(data$cohort_unc, data$cohort_cen)
@@ -462,9 +462,10 @@ gline <- gline + scale_x_reverse()
 gline <- gline + facet_grid(type ~ ., scales = 'free_y', 
                             labeller = label_parsed)
 gline <- gline + labs(x = 'Mya', y = 'Estimate')
-gline <- gline + theme(plot.title = element_text(hjust = 0, size = 10))
+gline <- gline + theme(plot.title = element_text(hjust = 0, size = 10),
+                       strip.text.y = element_text(angle = 90))
 ggsave(gline, filename = '../doc/survival/figure/cohort_series.pdf',
-       width = 10, height = 10, dpi = 600)
+       width = 12.5, height = 10, dpi = 600)
 
 
 # quadratics plot
