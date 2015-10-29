@@ -63,9 +63,9 @@ theme_set(theme_bw())
 cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
          '#0072B2', '#D55E00', '#CC79A7')
 theme_update(axis.text = element_text(size = 20),
-             axis.title = element_text(size = 40),
-             legend.text = element_text(size = 30),
-             legend.title = element_text(size = 32),
+             axis.title = element_text(size = 30),
+             legend.text = element_text(size = 25),
+             legend.title = element_text(size = 27),
              legend.key.size = unit(1, 'cm'),
              strip.text = element_text(size = 30))
 
@@ -126,6 +126,8 @@ surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 #surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
                               y = 'Probability surviving longer than t')
+surv.plot <- surv.plot + theme(axis.title = element_text(size = 25),
+                               axis.title.y = element_text(size = 20))
 ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -139,6 +141,7 @@ surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 #surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration t', 
                               y = 'Probability surviving greater than t')
+surv.plot <- surv.plot + theme(axis.title = element_text(size = 25))
 ggsave(surv.plot, filename = '../doc/survival/figure/survival_curves_bw.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -463,7 +466,7 @@ gline <- gline + facet_grid(type ~ ., scales = 'free_y',
                             labeller = label_parsed)
 gline <- gline + labs(x = 'Mya', y = 'Estimate')
 gline <- gline + theme(plot.title = element_text(hjust = 0, size = 10),
-                       strip.text.y = element_text(angle = 90))
+                       strip.text.y = element_text(angle = 0))
 ggsave(gline, filename = '../doc/survival/figure/cohort_series.pdf',
        width = 12.5, height = 10, dpi = 600)
 
@@ -574,7 +577,7 @@ for(ii in seq(unique(coh))) {
 }
 png(file = '../doc/survival/figure/cohort_quads_short.png', 
     width = 1000, height = 300)
-do.call('grid.arrange', c(rev(plotlist)[1:3], ncol = 3))
+do.call('grid.arrange', c(rev(plotlist)[25:27], ncol = 3))
 dev.off()
 png(file = '../doc/survival/figure/cohort_quads.png', 
     width = 3000, height = 1500)
