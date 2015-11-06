@@ -60,7 +60,7 @@ In total, the model can be summarized by the following statements:
   \end{aligned}
 \end{equation}
 
-The joint posterior distribution of the HMM model was approximated using a Gibbs sampling MCMC routine as implemented in the JAGS probabilistic programming language CITATION. Four chains were run for 20000 steps, thined to every 10th sample, ans split evenly between warm-up and sampling phases. Chain sampling convergence was assessed using the \(\hat{R}\) statistic with values close to 1 (less than 1.1) indicating approximate convergence \citep{Gelman2013d}.
+The joint posterior distribution of the HMM model was approximated using a Gibbs sampling MCMC routine as implemented in the JAGS probabilistic programming language CITATION. Four chains were run for 40000 steps, thined to every 20th sample, and split evenly between warm-up and sampling phases. Chain sampling convergence was assessed using the \(\hat{R}\) statistic with values close to 1 (less than 1.1) indicating approximate convergence \citep{Gelman2013d}.
 
 % assessing model fit
 %   posterior predictive check

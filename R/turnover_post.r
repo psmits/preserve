@@ -13,11 +13,25 @@ set.seed(420)
 
 load('../data/data_dump/occurrence_data.rdata')  # data
 #load('../data/data_dump/occurrence_holdout.rdata')  # test/train split
-load('../data/mcmc_out/turnover_custom.rdata')  # post
 
+# time scale information
 lump.file <- list.files('../data', pattern = 'lump')
 lump <- read.csv(paste0('../data/', lump.file))
-#
+
+# read in 4 coda files
+# make multi mcmc object
+cc <- list()
+for(ii in seq(1:4)) {
+  oo <- paste0('../data/mcmc_out/CODAchain', ii, '.txt')
+  cc[[ii]] <- read.coda(output.file = oo, 
+                        index.file = '../data/mcmc_out/CODAindex.txt')
+}
+post.samp <- mcmc.list(cc)
+conv <- gelman.diag(post.samp)$psrf[, 1]
+# process into stan like format because easier to read
+post <- process.coda(post.samp, data)
+
+# plotting theme
 theme_set(theme_bw())
 cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
          '#0072B2', '#D55E00', '#CC79A7')

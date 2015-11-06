@@ -11,56 +11,41 @@ process.coda <- function(post, data) {
   for(ii in seq(length(vars))) {
     temp <- post[, str_detect(colnames(post), 
                               paste0(vars[[ii]], '\\['))]
-    dim.check <- str_count(colnames(temp), pattern = '\\,')
-    col.num <- ncol(temp) / data$nprov
-   
-    if(sum(temp) == 0) {
-      temp <- post[, vars[[ii]]]
-      col.num <- 1
-    }
+    comma.detect <- unique(str_count(colnames(temp), pattern = '\\,'))
+    col.detect <- ncol(temp)
     
-    if(col.num == 1) {   # don't vary by time, but by region
+    if(ncol(temp) == 0) {
+      temp <- post[, str_detect(colnames(post), vars[[ii]])]
+    }
+
+    if(comma.detect == 0 && col.detect == data$nprov) { 
+      # goes by province ONLY
+      colnames(temp) <- NULL
       new.post[[ii]] <- temp
-    } else if (all(dim.check <= 1)){  # vary by time, but only one variable
-      holder <- array(dim = c(nrow(temp), col.num, data$nprov))
+    } else if(comma.detect == 1  && col.detect > data$nprov) { 
+      # goes by time AND prov
+      hold <- array(dim = c(nrow(temp), col.detect / data$nprov, data$nprov))
       
-      colseq <- list()
-      colseq[[1]] <- seq(col.num)
-      for(jj in seq(from = 2, to = data$nprov)) {
-        val <- colseq[[jj - 1]][length(colseq[[jj - 1]])]
-        colseq[[jj]] <- seq(from = val + 1, to = val + col.num)
-      }
-     
+      colnames(temp) <- NULL
       for(jj in seq(data$nprov)) {
-        holder[, , jj] <- temp[, colseq[[jj]]]
-      }
-      new.post[[ii]] <- holder
-    } else if (all(dim.check > 1)) {  # generated 3-way array z (list by region)
-      holder <- list()
-      regionholder <- array(dim = c(nrow(temp), col.num, data$nprov))
-      
-      colseq <- list()
-      colseq[[1]] <- seq(col.num)
-      for(jj in seq(from = 2, to = data$nprov)) {
-        val <- colseq[[jj - 1]][length(colseq[[jj - 1]])]
-        colseq[[jj]] <- seq(from = val + 1, to = val + col.num)
-      }
-     
-      for(jj in seq(data$nprov)) {
-        regionholder <- temp[, colseq[[jj]]]
-
-        timeseq <- matrix(ncol = 2, nrow = data$nyear)
-        timeseq[1, ] <- c(1, data$nindiv)
-        for(kk in seq(from = 2, to = data$nyear))
-          timeseq[kk, ] <- c((data$inidiv * (kk - 1)) + 1, data$nindiv * kk)
-
-        timeholder <- array(dim = c(nrow(temp), data$nindiv, data$nyear))
-        for(cc in seq(from = 1, to = data$nyear)) {
-          timeholder[, , cc] <- regionholder[, timeseq[cc, 1]:timeseq[cc, 2]]
+        if(jj == 1) {
+          grab <- seq(from = 1, to = col.detect / data$nprov)
+        } else {
+          grab <- seq(from = ((col.detect / data$nprov) * (jj - 1)) + 1, 
+                      to = (col.detect / data$nprov) * jj)
         }
-        holder[[jj]] <- timeholder
+        hold[, , jj] <- temp[, grab]
       }
-      new.post[[ii]] <- holder
+      new.post[[ii]] <- hold
+    } else if(comma.detect == 0 && 
+              (col.detect == data$nyear | 
+               col.detect == (data$nyear - 1))) { 
+      # goes by time ONLY
+      colnames(temp) <- NULL
+      new.post[[ii]] <- temp
+    } else if(is.null(dim(temp))) {
+      names(temp) <- NULL
+      new.post[[ii]] <- temp
     }
   }
   names(new.post) <- unlist(vars)
