@@ -1,0 +1,82 @@
+Cruise	core	species	Water 	Temp	O. umbonatus	O. umbonatus	C. pachyderma 	Combined  	Data source
+			Depth	(degrees C)	 Mg/Ca 	 Mg/Ca - 0.2	Mg/Ca	C. pachyderma	
+			(m)		(mmol/mol)	(mmol/mol)	(mmol/mol)	and 	
+								O. umbonatus 	
+								Mg/Ca	
+								(mmol/mol)	
+
+KNR166-2	11MC	C pachyderma	751	5.8			1.34	1.34	"Bryan and Marchitto, 2008"
+KNR166-2	28MC	C pachyderma	648	6.3			1.42	1.42	"Bryan and Marchitto, 2008"
+KNR166-2	28MC	C pachyderma	648	6.3			1.54	1.54	"Bryan and Marchitto, 2008"
+KNR166-2	62MC	C pachyderma	547	7			2.19	2.19	"Bryan and Marchitto, 2008"
+KNR166-2	5MC	C pachyderma	447	8.5			2.09	2.09	"Bryan and Marchitto, 2008"
+KNR166-2	5MC	C pachyderma	447	8.5			2	2	"Bryan and Marchitto, 2008"
+KNR166-2	22MC	C pachyderma	398	9			2.63	2.63	"Bryan and Marchitto, 2008"
+KNR166-2	22MC	C pachyderma	398	9			2.49	2.49	"Bryan and Marchitto, 2008"
+KNR166-2	55MC	C pachyderma	359	9.1			2.34	2.34	"Bryan and Marchitto, 2008"
+KNR166-2	55MC	C pachyderma	359	9.1			2.24	2.24	"Bryan and Marchitto, 2008"
+KNR166-2	103MC	C pachyderma	683	9.3			2.31	2.31	"Bryan and Marchitto, 2008"
+KNR166-2	103MC	C pachyderma	683	9.3			2.34	2.34	"Bryan and Marchitto, 2008"
+KNR166-2	125MC	C pachyderma	694	9.4			2.48	2.48	"Bryan and Marchitto, 2008"
+KNR166-2	13MC	C pachyderma	348	9.7			2.33	2.33	"Bryan and Marchitto, 2008"
+KNR166-2	13MC	C pachyderma	348	9.7			2.44	2.44	"Bryan and Marchitto, 2008"
+KNR166-2	53MC	C pachyderma	302	10			2.37	2.37	"Bryan and Marchitto, 2008"
+KNR166-2	53MC	C pachyderma	302	10			2.2	2.2	"Bryan and Marchitto, 2008"
+KNR166-2	84MC	C pachyderma	638	10.5			2.48	2.48	"Bryan and Marchitto, 2008"
+KNR166-2	123MC	C pachyderma	632	10.6			2.44	2.44	"Bryan and Marchitto, 2008"
+KNR166-2	123MC	C pachyderma	632	10.6			2.65	2.65	"Bryan and Marchitto, 2008"
+KNR166-2	16MC	C pachyderma	248	10.8			2.4	2.4	"Bryan and Marchitto, 2008"
+KNR166-2	16MC	C pachyderma	248	10.8			2.27	2.27	"Bryan and Marchitto, 2008"
+KNR166-2	72MC	C pachyderma	542	10.8			2.88	2.88	"Bryan and Marchitto, 2008"
+KNR166-2	72MC	C pachyderma	542	10.8			2.83	2.83	"Bryan and Marchitto, 2008"
+KNR166-2	76MC	C pachyderma	539	11			2.87	2.87	"Bryan and Marchitto, 2008"
+KNR166-2	76MC	C pachyderma	539	11			2.78	2.78	"Bryan and Marchitto, 2008"
+KNR166-2	121MC	C pachyderma	578	11.9			2.48	2.48	"Bryan and Marchitto, 2008"
+KNR166-2	121MC	C pachyderma	578	11.9			2.67	2.67	"Bryan and Marchitto, 2008"
+KNR166-2	50MC	C pachyderma	198	12.1			2.39	2.39	"Bryan and Marchitto, 2008"
+KNR166-2	50MC	C pachyderma	198	12.1			2.47	2.47	"Bryan and Marchitto, 2008"
+KNR166-2	79MC	C pachyderma	486	12.1			3.35	3.35	"Bryan and Marchitto, 2008"
+KNR166-2	79MC	C pachyderma	486	12.1			3.15	3.15	"Bryan and Marchitto, 2008"
+KNR166-2	19MC	C pachyderma	173	12.7			2.09	2.09	"Bryan and Marchitto, 2008"
+KNR166-2	19MC	C pachyderma	173	12.7			2.73	2.73	"Bryan and Marchitto, 2008"
+KNR166-2	118MC	C pachyderma	531	14.5			2.68	2.68	"Bryan and Marchitto, 2008"
+KNR166-2	92MC	C pachyderma	478	15.7			3.19	3.19	"Bryan and Marchitto, 2008"
+KNR166-2	68MC	C pachyderma	431	16.6			3.29	3.29	"Bryan and Marchitto, 2008"
+KNR166-2	68MC	C pachyderma	431	16.6			3.39	3.39	"Bryan and Marchitto, 2008"
+KNR166-2	138MC	C pachyderma	484	16.8			2.56	2.56	"Bryan and Marchitto, 2008"
+KNR166-2	112MC	C pachyderma	404	17.1			2.92	2.92	"Bryan and Marchitto, 2008"
+KNR166-2	134MC	C pachyderma	441	17.2			2.94	2.94	"Bryan and Marchitto, 2008"
+KNR166-2	134MC	C pachyderma	441	17.2			3.14	3.14	"Bryan and Marchitto, 2008"
+KNR166-2	110MC	C pachyderma	390	17.3			3.31	3.31	"Bryan and Marchitto, 2008"
+KNR166-2	89MC	C pachyderma	353	17.8			3.44	3.44	"Bryan and Marchitto, 2008"
+KNR166-2	94MC	C pachyderma	259	18.5			3.34	3.34	"Bryan and Marchitto, 2008"
+KNR166-2	94MC	C pachyderma	259	18.5			3.47	3.47	"Bryan and Marchitto, 2008"
+KNR166-2	97MC	C pachyderma	303	18.6			3.27	3.27	"Bryan and Marchitto, 2008"
+KNR166-2	97MC	C pachyderma	303	18.6			3.25	3.25	"Bryan and Marchitto, 2008"
+KNR177-2	MC-50	O. umbonatus	1906	-0.8	1.52	1.32		1.32	(previously unpublished)
+KNR177-2	MC-21	O. umbonatus	2640	-0.9	1.17	0.97		0.97	(previously unpublished)
+KNR177-2	MC-45	O. umbonatus	2799	-0.9	1.17	0.97		0.97	(previously unpublished)
+KNR177-2	MC-24	O. umbonatus	3036	-0.8	1.34	1.14		1.14	(previously unpublished)
+KNR177-2	MC-27	O. umbonatus	3341	-0.8	1.26	1.05		1.05	(previously unpublished)
+KNR177-2	MC-27	O. umbonatus	3341	-0.8	1.32	1.12		1.12	(previously unpublished)
+KNR177-2	MC-31	O. umbonatus	3873	-0.8	1.12	0.91		0.91	(previously unpublished)
+KNR177-2	MC-35	O. umbonatus	3924	-0.8	1.11	0.91		0.91	(previously unpublished)
+KNR177-2	MC-14	O. umbonatus	965	-0.6	1.42	1.22		1.22	(previously unpublished)
+KNR177-2	MC-14	O. umbonatus	965	-0.6	1.44	1.23		1.23	(previously unpublished)
+KNR177-2	MC-11	O. umbonatus	1285	-0.7	1.28	1.08		1.08	(previously unpublished)
+KNR177-2	MC-50	O. umbonatus	1906	-0.8	1.39	1.19		1.19	(previously unpublished)
+KNR177-2	MC-21	O. umbonatus	2640	-0.9	1.34	1.13		1.13	(previously unpublished)
+KNR177-2	MC-24	O. umbonatus	3036	-0.8	1.2	1		1	(previously unpublished)
+KNR177-2	MC-27	O. umbonatus	3341	-0.8	1.27	1.06		1.06	(previously unpublished)
+KNR177-2	MC-31	O. umbonatus	3873	-0.8	1.15	0.94		0.94	(previously unpublished)
+KNR177-2	MC-35	O. umbonatus	3924	-0.8	1.13	0.92		0.92	(previously unpublished)
+OC205-1	 BC69	O. umbonatus	735	9.9	2.3	2.1		2.1	"Lear et al., 2002"
+OC205-1	 BC69	O. umbonatus	735	8.2	2.26	2.06		2.06	"Lear et al., 2002"
+OC205-1	 BC69	O. umbonatus	735	4	2.04	1.84		1.84	"Lear et al., 2002"
+NEAP	13B	O. umbonatus	2546	3.3	1.84	1.64		1.64	"Lear et al., 2002"
+NEAP	19B	O. umbonatus	3283	2.7	1.84	1.64		1.64	"Lear et al., 2002"
+Sonne-185	18500	O. umbonatus	538	4.6	1.69	1.49		1.49	"Lear et al., 2002"
+Sonne-185	18499	O. umbonatus	402	3.7	1.69	1.48		1.48	(previously unpublished)
+Sonne-185	18478	O. umbonatus	386	2.9	1.54	1.33		1.33	(previously unpublished)
+Sonne-185	18506	O. umbonatus	420	1.9	1.38	1.17		1.17	(previously unpublished)
+RR05-03	MC-76	O. umbonatus	1165	3.2	1.88	1.68		1.68	(previously unpublished)

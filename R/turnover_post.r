@@ -20,14 +20,17 @@ lump <- read.csv(paste0('../data/', lump.file))
 
 # read in 4 coda files
 # make multi mcmc object
+f <- list.files(path = '../data/mcmc_out')
+oo <- f[str_detect(string = f, pattern = '[a-z]chain[1-9].txt')]
+nn <- f[str_detect(string = f, pattern = '[a-z]index.txt')]
 cc <- list()
 for(ii in seq(1:4)) {
-  oo <- paste0('../data/mcmc_out/CODAchain', ii, '.txt')
-  cc[[ii]] <- read.coda(output.file = oo, 
-                        index.file = '../data/mcmc_out/CODAindex.txt')
+  mm <- paste0('../data/mcmc_out/', oo[ii])
+  ind <- paste0('../data/mcmc_out/', nn[ii])
+  cc[[ii]] <- read.coda(output.file = mm, index.file = ind)
 }
 post.samp <- mcmc.list(cc)
-conv <- gelman.diag(post.samp)$psrf[, 1]
+conv <- gelman.diag(post.samp)
 # process into stan like format because easier to read
 post <- process.coda(post.samp, data)
 
