@@ -2,6 +2,7 @@ library(rstan)
 library(arm)
 library(parallel)
 library(stringr)
+library(ppcor)
 source('../R/gts.r')
 source('../R/mung.r')
 
@@ -27,6 +28,14 @@ ss <- ss[!(str_detect(ss[, 2], 'sp') | str_detect(ss[, 2], '[A-Z]')), ]
 ss.gen <- ddply(ss, .(occurrences.genus_name), summarize, 
                 o <- length(occurrences.species_name))
 
+#tt <- data.frame(dur = short.data$duration, 
+#                 obs = short.data$occupy,
+#                 avg = short.data$epi + short.data$off / short.data$duration)
+#cor(tt$dur, tt$obs)
+#cor(tt$dur, tt$avg)
+#cor(tt$obs, tt$avg)
+#pcor(tt)
+
 
 # sepkoski.data
 num.samp <- nrow(short.data)
@@ -35,9 +44,6 @@ con.orig <- match(as.character(short.data$orig), rev(as.character(lump[, 2])))
 con.orig <- mapvalues(con.orig, from = unique(con.orig), 
                       to = rank(unique(con.orig)))
 num.orig <- length(unique(con.orig))
-
-con.class <- as.numeric(as.factor(short.data$class))
-num.class <- length(unique(short.data$class))
 
 
 # do it so i can propegate error
@@ -72,7 +78,6 @@ data <- list(dur_unc = unc$duration,
 
 data$N <- num.samp
 data$O <- num.orig
-data$C <- num.class
 
 with(data, {stan_rdump(list = c('N', 'O',
                                 'N_unc', 'N_cen',
