@@ -28,14 +28,6 @@ ss <- ss[!(str_detect(ss[, 2], 'sp') | str_detect(ss[, 2], '[A-Z]')), ]
 ss.gen <- ddply(ss, .(occurrences.genus_name), summarize, 
                 o <- length(occurrences.species_name))
 
-#tt <- data.frame(dur = short.data$duration, 
-#                 obs = short.data$occupy,
-#                 avg = short.data$epi + short.data$off / short.data$duration)
-#cor(tt$dur, tt$obs)
-#cor(tt$dur, tt$avg)
-#cor(tt$obs, tt$avg)
-#pcor(tt)
-
 
 # sepkoski.data
 num.samp <- nrow(short.data)
@@ -46,15 +38,23 @@ con.orig <- mapvalues(con.orig, from = unique(con.orig),
 num.orig <- length(unique(con.orig))
 
 
-# do it so i can propegate error
-idv.epi <- short.data$epi
-idv.off <- short.data$off
+# environmental preference
+prob.epi <- qbeta(short.data$epi / (short.data$epi + short.data$off), 
+                  short.data$epi.bck + 1, short.data$off.bck + 1)
+env.odds <- rescale(prob.epi)
 
+
+# number of occurrences
+samples <- (short.data$epi + short.data$off) / short.data$duration
+samples <- rescale(log(samples))
+
+
+# now just setup the data
 data <- list(duration = short.data$duration, 
              cohort = con.orig, 
-             epi = idv.epi, 
-             off = idv.off, 
              occupy = rescale(logit(short.data$occupy)),
+             env = env.odds,
+             samp = samples,
              size = rescale(log(short.data$size)))
 
 dead <- short.data$censored != 1
@@ -64,15 +64,15 @@ cen <- llply(data, function(x) x[!dead])
 data <- list(dur_unc = unc$duration,
              cohort_unc = unc$cohort,
              occupy_unc = unc$occupy,
-             epi_unc = unc$epi,
-             off_unc = unc$off,
+             env_unc = unc$env,
+             samp_unc= unc$samp,
              size_unc = unc$size,
              N_unc = length(unc$duration),
              dur_cen = cen$duration,
              cohort_cen = cen$cohort,
              occupy_cen = cen$occupy,
-             epi_cen = cen$epi,
-             off_cen = cen$off,
+             env_cen = cen$env,
+             samp_cen = cen$samp,
              size_cen = cen$size,
              N_cen = length(cen$duration))
 
@@ -84,7 +84,7 @@ with(data, {stan_rdump(list = c('N', 'O',
                                 'dur_unc', 'cohort_unc', 
                                 'dur_cen', 'cohort_cen',
                                 'occupy_unc', 'occupy_cen',
-                                'epi_unc', 'epi_cen', 
-                                'off_unc', 'off_cen',
+                                'env_unc', 'env_cen',
+                                'samp_unc', 'samp_cen',
                                 'size_unc', 'size_cen'),
                        file = '../data/data_dump/fauna_info.data.R')})

@@ -7,38 +7,16 @@ data {
   int cohort_unc[N_unc];  // cohort membership
   real occupy_unc[N_unc];  // range size
   real size_unc[N_unc];  // body size
-  int epi_unc[N_unc];  // number of epicontinental occ
-  int off_unc[N_unc];  // number of open ocean occ
+  real env_unc[N_unc];  // number of epicontinental occ
+  real samp_unc[N_unc];  // number of open ocean occ
   real<lower=0> dur_cen[N_cen];
   int cohort_cen[N_cen];
   real occupy_cen[N_cen];
-  int epi_cen[N_cen];
-  int off_cen[N_cen];
+  real env_cen[N_cen];
+  real samp_cen[N_cen];
   real size_cen[N_cen];
 }
-transformed data {
-  vector[N] samples;
-
-  for(n in 1:N_unc) {
-    samples[n] <- log(epi_unc[n] + off_unc[n]);
-  }
-  for(n in 1:N_cen) {
-    samples[n + N_unc] <- log(epi_cen[n] + off_cen[n]);
-  }
-
-  for(n in 1:N) {
-    samples[n] <- (samples[n] - mean(samples)) / (2 * sd(samples));
-  }
-}
 parameters {
-  // measures environmental preference
-  //  vary mean by cohort
-  real<lower=0,upper=1> theta_taxon[N_unc + N_cen];
-  real theta_cohort[O];
-  real<lower=0> sigma_cohort[O];
-  //real theta_mu;
-  //real<lower=0> sigma_theta[O];
-
   real alpha_trans[N];
   real alpha_mu;  // shared (transformed) shape
   real<lower=0> sigma_alpha;
@@ -53,54 +31,26 @@ parameters {
   vector<lower=0>[5] sigma; 
 }
 transformed parameters {
-  real theta_taxon_real[N_unc + N_cen];
   real<lower=0> alpha[N];  // individual shape
   cov_matrix[5] Sigma;
 
   for(n in 1:N) {
-    theta_taxon_real[n] <- logit(theta_taxon[n]);
     alpha[n] <- exp(alpha_trans[n]);
   }
   Sigma <- quad_form_diag(Omega, sigma);
 }
 model {
-  // environmental preference: probability of appearing in an epicontinental environment
-  //  unobserved covariate
-  //  modeled based observed occurrences
-  //  each taxon is a realization from distribution of brachiopod preference
-  //theta_mu ~ normal(0, 1);
-  //sigma_theta ~ cauchy(0, 1);
-
-  theta_cohort ~ normal(0, 1);
-  sigma_cohort ~ cauchy(0, 1);
-
-  for(n in 1:N_unc) {
-    increment_log_prob(normal_log(theta_taxon_real, 
-          theta_cohort[cohort_unc[n]], sigma_cohort[cohort_unc[n]]));
-  }
-  for(n in 1:N_cen) {
-    increment_log_prob(normal_log(theta_taxon_real, 
-          theta_cohort[cohort_cen[n]], 
-          sigma_cohort[cohort_cen[n]]));
-  }
-
-  for(n in 1:N_unc) {
-    increment_log_prob(binomial_log(epi_unc[n], 
-          epi_unc[n] + off_unc[n], theta_taxon[n]));
-  }
-  for(n in 1:N_cen) {
-    increment_log_prob(binomial_log(epi_cen[n], 
-          epi_cen[n] + off_cen[n], theta_taxon[N_unc + n]));
-  }
-
-  # sampling as time dilation
+  // sampling as time dilation
+  //   this makes alpha defined at the individual level
+  //   modeled as a linear regression with one covariate and varying intercept
+  //     vary by origination cohort
   for(n in 1:N_unc) {
     alpha_trans[n] ~ normal(alpha_mu + alpha_cohort[cohort_unc[n]] + 
-        gamma * samples[n], sigma_alpha);
+        gamma * samp_unc[n], sigma_alpha);
   }
   for(n in 1:N_cen) {
-    alpha_trans[n] ~ normal(alpha_mu + alpha_cohort[cohort_cen[n]] + 
-        gamma * samples[n + N_unc], sigma_alpha);
+    alpha_trans[n + N_unc] ~ normal(alpha_mu + alpha_cohort[cohort_cen[n]] + 
+        gamma * samp_cen[n], sigma_alpha);
   }
   alpha_mu ~ normal(0, 1);
   sigma_alpha ~ cauchy(0, 1);
@@ -127,15 +77,15 @@ model {
       increment_log_prob(weibull_cdf_log(dur_unc[i], alpha[i],
             exp(-(beta[cohort_unc[i], 1] + 
                 beta[cohort_unc[i], 2] * occupy_unc[i] + 
-                beta[cohort_unc[i], 3] * theta_taxon_real[i] + 
-                beta[cohort_unc[i], 4] * (theta_taxon_real[i]^2) +
+                beta[cohort_unc[i], 3] * env_unc[i] + 
+                beta[cohort_unc[i], 4] * (env_unc[i]^2) +
                 beta[cohort_unc[i], 5] * size_unc[i]) / alpha[i])));
     } else {
       increment_log_prob(weibull_log(dur_unc[i], alpha[i],
             exp(-(beta[cohort_unc[i], 1] + 
                 beta[cohort_unc[i], 2] * occupy_unc[i] + 
-                beta[cohort_unc[i], 3] * theta_taxon_real[i] + 
-                beta[cohort_unc[i], 4] * (theta_taxon_real[i]^2) +
+                beta[cohort_unc[i], 3] * env_unc[i] + 
+                beta[cohort_unc[i], 4] * (env_unc[i]^2) +
                 beta[cohort_unc[i], 5] * size_unc[i]) / alpha[i])));
     }
   }
@@ -143,8 +93,8 @@ model {
     increment_log_prob(weibull_ccdf_log(dur_unc[i], alpha[N_unc + i],
           exp(-(beta[cohort_cen[i], 1] + 
               beta[cohort_cen[i], 2] * occupy_cen[i] + 
-              beta[cohort_cen[i], 3] * theta_taxon_real[N_unc + i] + 
-              beta[cohort_cen[i], 4] * (theta_taxon_real[N_unc + i]^2) +
+              beta[cohort_cen[i], 3] * env_cen[i] + 
+              beta[cohort_cen[i], 4] * (env_cen[i]^2) +
               beta[cohort_cen[i], 5] * size_cen[i]) / alpha[N_unc + i])));
   }
 }
@@ -156,15 +106,15 @@ generated quantities {
   for(i in 1:N_unc) {
     hold[i] <- exp(-(beta[cohort_unc[i], 1] +
           beta[cohort_unc[i], 2] * occupy_unc[i] +
-          beta[cohort_unc[i], 3] * theta_taxon_real[i] + 
-          beta[cohort_unc[i], 4] * (theta_taxon_real[i]^2) +
+          beta[cohort_unc[i], 3] * env_unc[i] + 
+          beta[cohort_unc[i], 4] * (env_unc[i]^2) +
           beta[cohort_unc[i], 5] * size_unc[i]) / alpha[i]);
   }
   for(i in 1:N_cen) {
     hold[i + N_unc] <- exp(-(beta[cohort_cen[i], 1] +
           beta[cohort_cen[i], 2] * occupy_cen[i] +
-          beta[cohort_cen[i], 3] * theta_taxon_real[N_unc + i] + 
-          beta[cohort_cen[i], 4] * (theta_taxon_real[N_unc + i]^2) +
+          beta[cohort_cen[i], 3] * env_cen[i] + 
+          beta[cohort_cen[i], 4] * (env_cen[i]^2) +
           beta[cohort_cen[i], 5] * size_unc[i]) / alpha[N_unc + i]);
   }
 
