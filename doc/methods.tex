@@ -20,7 +20,9 @@ The dataset analyzed here was sourced from the Paleobiology Database (http://www
 % justification of using genus level versus specific
 Fossil occurrences were analyzed at the genus level which is common for paleobiological, macroevolution, or macroecological studies of marine invertebrates \citep{Alroy2010,Foote2013,Harnik2013,Kiessling2007a,Miller2009a,Nurnberg2013a,Nurnberg2015,Payne2007,Simpson2009,Vilhena2013}. While species diversity dynamics are of much greater interest than those of higher taxa, the nature of the fossil record makes accurate and precise taxonomic assignments at the species level for all occurrences. In particular, the simplicity of brachiopod external morphology and the quality of preservation makes it very difficult for assignments below the genus level. As such, the choice to analyze genera as opposed to species was in order to assure a minimum level of confidence and accuracy in the data analyzed here.
 
-Sampled occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to fossils themselves but instead fossils are known from a geological interval which represents some temporal range. Stages are effectively irreducible temporal intervals in which taxa may occur.
+Sampled occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. 
+
+Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to fossils themselves but instead fossils are known from a geological interval which represents some temporal range. Stages are effectively irreducible temporal intervals in which taxa may occur.
 
 Genera with a last occurrence in or after Changhsingian stage were right censored at the Changhsingian. Genera with a duration of only one stage were left censored (Appendix \ref{sec:cen}). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), and body size (\(m\)). 
 
@@ -30,77 +32,79 @@ For each stage, the total number of occupied grid cells, or cells in which a fos
 
 Body size data was sourced directly from \citet{Payne2014}. Because those measurements are presented without error, a measurement error model similar to the one for environmental affinity could not be implemented (Appendix \ref{sec:uncer}).
 
-Prior to analysis, geographic range and body size were transformed and standardized in order to improve interpretability of the results. Geographic range, which can only vary between 0 and 1, was logit transformed. Body size, which is defined for all positive real values, was natural log transformed. These covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}.
+Environmental preference \(v\) was defined as the probability of observing the ratio of epicontinental occurrences to total occurrences (\(e_{i} / E_{i}\)) is represented by \(\theta_{i}\), given the probability of an epicontinental environment occurring \(\theta^{\prime}_{i}\). This second probability is estimated from the observed occurrences (\(e^{\prime}_{i}, E^{\prime}_{i}\)) of all other taxa that occur during the duration of taxon \(i\), which is given a flat Beta prior. This measure of environmental preference is expressed.
+\begin{equation}
+  \begin{aligned}
+    p\left(\theta^{\prime}_{i} \middle| \frac{e^{\prime}_{i}}{E^{\prime}_{i}}\right) &\propto \mathrm{Beta}(e^{\prime}_{i}, E^{\prime}_{i} - e^{\prime}_{i}) \mathrm{Beta}(1, 1) \\
+    &= \mathrm{Beta}(e^{\prime}_{i} + 1, E^{\prime}_{i} - e^{\prime}_{i} + 1) \\
+    v &= p(\theta_{i} | \theta^{\prime}_{i}) \\
+  \end{aligned}
+  \label{eq:envpref}
+\end{equation}
+
+Prior to analysis, geographic range \(r\) and body size \(m\) were transformed and standardized in order to improve interpretability of the results. Geographic range, which can only vary between 0 and 1, was logit transformed. Body size, which is defined for all positive real values, was natural log transformed. These covariates were then standardized by mean centering and dividing by two times their standard deviation following \citet{Gelman2007}. Environmental preference \(v\) was rescaled in the same manner. This standardization allows for all regression coefficients to be comparable as the estimate represents the change in risk per change in standard deviation of the covariate.
+
 
 \subsection{Analytical approach}
 
-Hierarchical modelling, sometimes called ``mixed-effects modeling,'' is a statistical approach which explicitly takes into account the structure of the observed data in order to model both the within and between group variance \citep{Gelman2013d,Gelman2007}. The units of study (e.g. genera) each belong to a single grouping (e.g. origination cohort). These groups are considered draws from a shared probability distribution (e.g. all cohorts, observed and unobserved). The group-level parameters are then estimated simultaneously as the other parameters of interest (e.g. covariate effects) \citep{Gelman2013d}. The subsequent estimates are partially pooled together, where parameters from groups with large samples or effects remain large while those of groups with small samples or effects are pulled towards the overall group mean. 
+Hierarchical modelling is a statistical approach which explicitly takes into account the structure of the observed data in order to model both the within and between group variance \citep{Gelman2013d,Gelman2007}. The units of study (e.g. genera) each belong to a single grouping (e.g. origination cohort). These groups are considered draws from a shared probability distribution (e.g. all cohorts, observed and unobserved). The group-level parameters are then estimated simultaneously as the other parameters of interest (e.g. covariate effects) \citep{Gelman2013d}. The subsequent estimates are partially pooled together, where parameters from groups with large samples or effects remain large while those of groups with small samples or effects are pulled towards the overall group mean. 
 
 This partial pooling is one of the greatest advantages of hierarchical modeling. By letting the groups ``support'' each other, parameter estimates then better reflect our statistical uncertainty. Additionally, this partial pooling helps control for multiple comparisons and possibly spurious results as effects with little support are drawn towards the overall group mean \citep{Gelman2013d,Gelman2007}. 
 
 All covariate effects (regression coefficients), as well as the intercept term (baseline extinction risk), were allowed to vary by group (origination cohort). The covariance/correlation between covariate effects was also modeled. This hierarchical structure allows inference for how covariates effects may change with respect to each other while simultaneously estimating the effects themselves, propagating our uncertainty through all estimates. 
 
-Additionally, instead of relying on point estimates of environmental affinity, I treat environmental affinity as a continuous measure of the difference between the taxon's environmental occurrence pattern and the background occurrence pattern (Appendix \ref{sec:uncer}).
-
-\subsection{Environmental preference}
-
-Environmental preference was estimated as the log-odds of occuring in an epicontinental environment. This estimate is drawn from a hierarchical binomial distribution as esimated from all taxa originating in the same cohort. The resulting probability of occuring in an epicontinental environment \(\theta\) is then logit transformed. This model of environmental occurrence is defined as
-
-\begin{equation}
-  \begin{aligned}
-    e_{i} &\sim \mathrm{Binomial}(o_{i}, \theta_{c[i]}) \\
-    \theta_{c} &\sim \mathrm{logit}^{-1}(\mathcal{N}(\mu_{c}, \sigma_{c}) \\
-    \mu ~ \mathcal{N}(0, 1) \\
-    \sigma ~ \mathrm{C}^{+}(1)
-  \end{aligned}
-  \label{eq:env_prob}
-\end{equation}
-
-where \(e_{i}\) is the number of epicontinental occurrences for species \(i\), and \(o_{i}\) is the total number of occurrences for species \(i\). \(\mu_{c}\) is the mean of the log-odds of the probability of occuring in an epicontinental environment, and \(\sigma_{c}\) the standard deviation. 
-
-
 
 \subsection{Survival model}
 
-Genus durations were modeled as time-till-event data \citep{Klein2003}, with covariate information used in estimates of extinction risk as a hierarchical regression model. Genus durations were assumed to follow a Weibull distribution. The use of either of these distributions makes assumptions about how duration may effect extinction risk \citep{Klein2003}. The exponential distribution assumes that extinction risk is independent of duration. In contrast, the Weibull distribution allows for age dependent extinction via the shape parameter \(\alpha\), though only as a monotonic function of duration. Importantly, the Weibull distribution is equivalent to the exponential distribution when \(\alpha = 1\). 
+Genus durations were modeled as time-till-event data \citep{Klein2003}, with covariate information used in estimates of extinction risk as a hierarchical regression model. Genus durations were assumed to follow a Weibull distribution. While the exponential distribution assumes that extinction risk is independent of duration, the Weibull distribution allows for age dependent extinction \citep{Klein2003}. The Weibull distribution has two parameters: a scale \(\sigma\), and a shape \(\alpha\). When \(\alpha = 1\), \(\sigma\) is equal to the expected duration of any taxon. \(\alpha\) acts as a time dilation effect where values greater than 1 indicate that extinction risk increases with age, and values less than 1 indicate that extinction risk decreases with age. Note that the Weibull distribution is equivalent to the exponential distribution when \(\alpha = 1\). 
 
-The following variables are defined: \(y_{i}\) is the duration of genus \(i\) in geologic stages, \(X\) is the matrix of covariates including a constant term, \(B_{j}\) is the vector of regression coefficients for origination cohort \(j\), \(\Sigma\) is the covariance matrix of the regression coefficients, \(\tau\) is the vector of scales the standard deviations of the between-cohort variation in regression coefficient estimates, and \(\Omega\) is the correlation matrix of the regression coefficients.
+The scale parameter \(\sigma\) was modeled as a regression with both varying intercept and varying slopes. The following variables are defined: \(y_{i}\) is the duration of genus \(i\) in geologic stages, \(X\) is the matrix of covariates including a constant term, \(B_{j}\) is the vector of regression coefficients for origination cohort \(j\), \(\mu\) is the vector of means of each regression coefficient, \(\Sigma\) is the covariance matrix of the regression coefficients, \(\tau\) is the vector of the standard deviations of the between-cohort variation of the regression coefficient estimates, and \(\Omega\) is the correlation matrix of the regression coefficients. The elements of the vector \(\mu\) were given independent normally distributed priors. The effects of geographic range size and the breadth of environmental preference were given informative priors. The correlation matrix \(\Omega\) was given an almost flat LKJ distributed prior following CITATION STAN manual.
 
-Similarly, the Weibull model is defined
+The shape parameter \(\alpha\) was also modeled as a regression with intercept \(\alpha^{\prime}\) and standard deviation \(\sigma^{\alpha}\). The effect of origination cohort \(a_{j}\) is modeled as draws from a shared normal distribution with mean 0 and standard deviation \(\sigma^{a}\). \(\gamma\) is the regression coefficient for the effect of the rescaled logarithm of the number of samples \(s\) of taxon \(i\).
+
+Except where noted, regression coefficients were given a weakly informative normally distributed prior, scale (e.g. standard deviation) parameters were given a weakly informative half-Cauchy prior following the CITATION Gelman textbook, STAN manual. 
+
+The full sampling statement, along with all necessary transformations and priors, is expressed as
 \begin{equation}
   \begin{aligned}
-    y_{i} &\sim \mathrm{Weibull}(\alpha, \sigma) \\
-    \sigma_{i} &= \exp\left(\frac{-(\mathbf{X}_{i} B_{j[i]})}{\alpha}\right) \\
-    B &\sim \mathrm{MVN}(\vec{\mu}, \Sigma) \\
-    \Sigma &= \text{Diag}(\vec{\tau}) \Omega \text{Diag}(\vec{\tau}) \\
-    \alpha &\sim \mathrm{C^{+}}(2) \\
-    \mu_{k} &\sim 
-    \begin{cases} 
-      \mathcal{N}(0, \psi_{k} \nu) & \text{if } k \neq r, or \\
-      \mathcal{N}(-1, 1) & \text{if } k = r \\ 
-    \end{cases} \\
-    \tau_{k} &\sim \mathrm{C^{+}}(1) \\
-    \psi_{k} &\sim \mathrm{C^{+}}(1) \text{if } k \neq r \\
-    \nu &\sim \mathrm{C^{+}}(1) \\
-    \Omega &\sim \text{LKJ}(2).
+    y_{i} &\sim \mathrm{Weibull}(\alpha_{i}, \sigma_{i}) \\
+    \sigma_{i} &= \exp\left(\frac{-(\mathbf{X}_{i} B_{j[i]})}{\alpha_{i}}\right) \\
+    B_{j} &\sim \mathrm{MVN}(\mu, \Sigma) \\
+    \mu_{0} &\sim \mathcal{N}(0, 5) \\
+    \mu_{r} &\sim \mathcal{N}(-1, 1) \\
+    \mu_{v} &\sim \mathcal{N}(0, 1) \\
+    \mu_{v^{2}} &\sim \mathcal{N}(1, 1) \\
+    \mu_{m} &\sim \mathcal{N}(0, 1) \\
+    \Sigma &= \text{Diag}(\tau) \Omega \text{Diag}(\tau) \\
+    \tau &\sim \mathrm{C^{+}}(1) \\
+    \Omega &\sim \text{LKJ}(2) \\
+    \alpha_{i} &= \exp\left(\mathcal{N}(\alpha^{\prime} + a_{j[i]} + \gamma s_{i}, \sigma^{\alpha})\right) \\
+    \alpha^{\prime} &\sim \mathcal{N}(0, 1) \\
+    a_{j} &\sim \mathcal{N}(0, \sigma^{a}) \\
+    \sigma^{a} &\sim \mathrm{C^{+}}(1) \\
+    \gamma &\sim \mathcal{N}(0, 1) \\
+    \sigma^{\alpha} &\sim \mathrm{C^{+}}(1). \\
   \end{aligned}
   \label{eq:wei_total}
 \end{equation}
 
-For an explanation of how this model was developed, parameter explanations, and choice of priors, please see Appendix \ref{sec:survival}. Note that this model (Eq. \ref{eq:wei_total}) do not include how the uncertainty in environmental affinity is included nor how censored observations are included. For an explanation of both of these aspects, see Appendices \ref{sec:uncer} and \ref{sec:cen}.
 
 \subsection{Parameter estimation}
 The  joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 draws each, split half warm-up and half sampling and thinned to every 10th sample for a total of 5000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
 
 \subsection{Model evaluation}
-
+% this whole section needs to be re-written
+%   multiclass ROC
+%     true positive rate (sensitivity) versus false positive rate (1 - specificity)
+%     probability that a randomly chosen member of a given class will be ranked more probable than a random draw from any other class
+%       averaged across all class' ROC curves
+%   citation in the turtle paper
 Models were evaluated using both posterior predictive checks and an estimate of out-of-sample predictive accuracy. The motivation behind posterior predictive checks as tools for determining model adequacy is that replicated data sets using the fitted model should be similar to the original data \citep{Gelman2013d}. Systematic differences between the simulations and observations indicate weaknesses of the model fit. An example of a technique that is very similar would be inspecting the residuals from a linear regression.
 
 The strategy behind posterior predictive checks is to draw simulated values from the joint posterior predictive distribution, \(p(y^{rep} | y)\), and then compare those draws to the empirically observed values \citep{Gelman2013d}. To accomplish this, for each replicate, a single value is drawn from the marginal posterior distributions of each regression coefficient from the final model as well as \(\alpha\) for the Weibull model (Eq. \ref{eq:wei_total}). Then, given the covariate information \(\mathbf{X}\), a new set of \(n\) genus durations are generated giving a single replicated data set \(y^{rep}\). This is repeated 1000 times in order to provide a distribution of possible values that could have been observed given the model. 
 
 In order to compare the fitted model to the observed data, various graphical comparisons or test quantities need to be defined. The principal comparison used here is a comparison between non-parameteric approximation of the survival function \(S(t)\) as estimated from both the observed data and each of the replicated data sets. The purpose of this comparison is to determine if the model approximates the same survival/extinction pattern as the original data. 
 
-The exponential and Weibull models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}. Out-of-sample predictive accuracy is a measure of the expected fit of the model to new data. However, because the Weibull model reduces to the exponential model when \(\alpha = 1\) my interest is not in choosing between these models. Instead, comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. For an explanation of how WAIC is calculated, see Appendix \ref{sec:waic}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
 
 \end{document}

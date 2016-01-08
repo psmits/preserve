@@ -47,12 +47,12 @@ wr <- wei.fit$y_tilde[sample(4000, 1000), ]
 theme_set(theme_bw())
 cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
          '#0072B2', '#D55E00', '#CC79A7')
-theme_update(axis.text = element_text(size = 20),
-             axis.title = element_text(size = 30),
-             legend.text = element_text(size = 25),
-             legend.title = element_text(size = 27),
+theme_update(axis.text = element_text(size = 10),
+             axis.title = element_text(size = 15),
+             legend.text = element_text(size = 15),
+             legend.title = element_text(size = 15),
              legend.key.size = unit(1, 'cm'),
-             strip.text = element_text(size = 30))
+             strip.text = element_text(size = 15))
 
 # data setup
 coh <- c(data$cohort_unc, data$cohort_cen)
@@ -84,9 +84,7 @@ wei.surv <- Reduce(rbind, Map(function(x, y) {
                               x = wei.surv, 
                               y = seq(length(wei.surv))))
 wei.surv$label <- 'Weibull'
-
-
-# combine both simulation sets
+# naming/legacy code issue
 sim.surv <- wei.surv
 
 # fit model
@@ -119,12 +117,12 @@ ggsave(surv.plot, filename = '../doc/figure/survival_curves_bw.pdf',
        width = 6, height = 5, dpi = 600)
 
 
-# posterior predictive point checks
-quant <- laply(wr, function(x) quantile(x, seq(0.1, 0.9, by = 0.05)))
-qudur <- quantile(duration, seq(0.1, 0.9, by = 0.05))
-qp <- colSums(t(apply(quant, 1, function(x) x > qudur))) / nrow(quant)
-bad <- which(qp > 0.975 | qp < 0.025)
-# quality of fit is weak, though a lot is captured
+## posterior predictive point checks
+#quant <- laply(wr, function(x) quantile(x, seq(0.1, 0.9, by = 0.05)))
+#qudur <- quantile(duration, seq(0.1, 0.9, by = 0.05))
+#qp <- colSums(t(apply(quant, 1, function(x) x > qudur))) / nrow(quant)
+#bad <- which(qp > 0.975 | qp < 0.025)
+## quality of fit is weak, though a lot is captured
 
 
 # make plot of correlation and covariance matrices
@@ -162,7 +160,6 @@ get.covcor <- function(stanfit) {
   out
 }
 wei.covcor <- get.covcor(wei.fit)
-#exp.covcor <- get.covcor(exp.fit)
 
 # just for the weibull
 col1 <- colorRampPalette(c("red", "white", "blue"))
@@ -187,7 +184,7 @@ dev.off()
 # mean of all coefficients
 # sd of all coefficients
 param.est <- rbind(data.frame(p = c('mu_i', 'mu_r', 
-                                    'mu_e', 'mu_e2', 'mu_m'),
+                                    'mu_v', 'mu_v2', 'mu_m'),
                               m = apply(wei.fit$mu_prior, 2, mean), 
                               s = apply(wei.fit$mu_prior, 2, sd),
                               l = apply(wei.fit$mu_prior, 2, 
@@ -195,7 +192,7 @@ param.est <- rbind(data.frame(p = c('mu_i', 'mu_r',
                               h = apply(wei.fit$mu_prior, 2, 
                                         function(x) quantile(x, 0.9))),
                    data.frame(p = c('tau_i', 'tau_r', 
-                                    'tau_e', 'tau_e2', 'tau_m'),
+                                    'tau_v', 'tau_v2', 'tau_m'),
                               m = apply(wei.fit$sigma, 2, mean), 
                               s = apply(wei.fit$sigma, 2, sd),
                               l = apply(wei.fit$sigma, 2, 
@@ -276,182 +273,99 @@ print(tb.cv, vp=vp1)
 dev.off()
 
 
+# mean cohort effects
+efmu <- colMeans(wei.fit$mu_prior)
+efmurange <- apply(wei.fit$mu_prior, 2, function(x) 
+                   quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9)))
 
-# change in baseline through time
-# weibull
-wei.grandmean <- wei.fit$mu_prior[, 1]
-ww <- list()
-for(ii in seq(length(unique(coh)))) {
-  ww[[ii]] <- wei.fit$beta[, ii, 1]
+# effects for each cohort
+efbeta <- colMeans(wei.fit$beta)
+efbetarange <- efbetaprob <- list()
+for(ii in seq(data$O)) {
+  efbetarange[[ii]] <- apply(wei.fit$beta[, ii, ], 2, function(x) 
+                             quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9)))
+  efbetaprob[[ii]] <- apply(wei.fit$beta[, ii, ], 2, function(x) 
+                            sum(x > 0) / length(x))
 }
-wei.med <- laply(ww, median)
-wei.10 <- laply(ww, function(x) quantile(x, probs = 0.1))
-wei.90 <- laply(ww, function(x) quantile(x, probs = 0.9))
-wei.bases <- data.frame(stage = seq(length(wei.med)), 
-                        med = wei.med, q1 = wei.10, q9 = wei.90)
-wei.grand <- data.frame(grand.med = median(wei.grandmean), 
-                        grand.q1 = quantile(wei.grandmean, probs = 0.1),
-                        grand.q9 = quantile(wei.grandmean, probs = 0.9))
-wei.grand$stage <- 1
-wei.grand <- rbind(wei.grand, wei.grand)
-wei.grand$stage <- c(1, length(wei.med))
-# put 'em together
-wei.bases$label <- 'Weibull'
-bases <- wei.bases
-wei.grand$label <- 'Weibull'
-grand <- wei.grand
 
-renum <- sort(unique(mapvalues(bases$stage, 
-                               from = unique(bases$stage), 
-                               unique(match(as.character(sepkoski.data$orig),
-                                            gts)))))
-rename <- gts[renum]
-matchy <- match(rename, as.character(lump[, 2]))
-rename <- lump[matchy, 3]
-rename <- rename - ((diff(lump$age_at_base[c(max(matchy) + 1, matchy)]) / 2) * -1)
-bases$stage <- mapvalues(bases$stage, from = unique(bases$stage), rename)
-grand$stage <- range(bases$stage)
+ef.df <- t(rbind(mean = efmu, efmurange, pred = seq(5)))
+ef.df <- cbind(rbind(ef.df, ef.df), 
+               time = c(rep(1, times = 5), rep(data$O, times = 5)))
+ef.df <- data.frame(ef.df)
 
-inter.b <- bases
-inter.g <- grand
+efbeta.h <- Map(function(x) t(rbind(mean = efbeta[x, ], efbetarange[[x]])), 
+                seq(data$O))
+efbeta.h <- Map(function(x) data.frame(efbeta.h[[x]], 
+                                       time = x, 
+                                       pred = seq(5)), seq(data$O))
+efbeta.df <- Reduce(rbind, efbeta.h)
 
 
-# then range size
-wei.grandmean <- wei.fit$mu_prior[, 2]
-ww <- list()
-for(ii in seq(length(unique(coh)))) {
-  ww[[ii]] <- wei.fit$beta[, ii, 2]
-}
-wei.med <- laply(ww, median)
-wei.10 <- laply(ww, function(x) quantile(x, probs = 0.1))
-wei.90 <- laply(ww, function(x) quantile(x, probs = 0.9))
-wei.bases <- data.frame(stage = seq(length(wei.med)), 
-                        med = wei.med, q1 = wei.10, q9 = wei.90)
-wei.grand <- data.frame(grand.med = median(wei.grandmean), 
-                        grand.q1 = quantile(wei.grandmean, probs = 0.1),
-                        grand.q9 = quantile(wei.grandmean, probs = 0.9))
-wei.grand$stage <- 1
-wei.grand <- rbind(wei.grand, wei.grand)
-wei.grand$stage <- c(1, length(wei.med))
-# put 'em together
-wei.bases$label <- 'Weibull'
-bases <- wei.bases
-wei.grand$label <- 'Weibull'
-grand <- wei.grand
-
-renum <- sort(unique(mapvalues(bases$stage, 
-                               from = unique(bases$stage), 
-                               unique(match(as.character(sepkoski.data$orig),
-                                            gts)))))
-rename <- gts[renum]
-matchy <- match(rename, as.character(lump[, 2]))
-rename <- lump[matchy, 3]
-rename <- rename - ((diff(lump$age_at_base[c(max(matchy) + 1, matchy)]) / 2) * -1)
-bases$stage <- mapvalues(bases$stage, from = unique(bases$stage), rename)
-grand$stage <- range(bases$stage)
-
-rage.b <- bases
-rage.g <- grand
-
-
-# the alpha through time
-wei.grandmean <- exp(wei.fit$alpha_mu)
-ww <- list()
-for(ii in seq(length(unique(coh)))) {
-  ww[[ii]] <- wei.fit$alpha[, ii]
-}
-wei.med <- laply(ww, median)
-wei.10 <- laply(ww, function(x) quantile(x, probs = 0.1))
-wei.90 <- laply(ww, function(x) quantile(x, probs = 0.9))
-wei.bases <- data.frame(stage = seq(length(wei.med)), 
-                        med = wei.med, q1 = wei.10, q9 = wei.90)
-wei.grand <- data.frame(grand.med = median(wei.grandmean), 
-                        grand.q1 = quantile(wei.grandmean, probs = 0.1),
-                        grand.q9 = quantile(wei.grandmean, probs = 0.9))
-wei.grand$stage <- 1
-wei.grand <- rbind(wei.grand, wei.grand)
-wei.grand$stage <- c(1, length(wei.med))
-# put 'em together
-wei.bases$label <- 'Weibull'
-bases <- wei.bases
-wei.grand$label <- 'Weibull'
-grand <- wei.grand
-
-renum <- sort(unique(mapvalues(bases$stage, 
-                               from = unique(bases$stage), 
-                               unique(match(as.character(sepkoski.data$orig),
-                                            gts)))))
-rename <- gts[renum]
-matchy <- match(rename, as.character(lump[, 2]))
-rename <- lump[matchy, 3]
-rename <- rename - ((diff(lump$age_at_base[c(max(matchy) + 1, matchy)]) / 2) * -1)
-bases$stage <- mapvalues(bases$stage, from = unique(bases$stage), rename)
-grand$stage <- range(bases$stage)
-
-alph.b <- bases
-alph.g <- grand
-
-inter.b$type <- 'beta[intercept]'
-rage.b$type <- 'beta[range]'
-alph.b$type <- 'alpha'
-bases <- rbind(inter.b, rage.b, alph.b)
-bases$type <- factor(bases$type, levels = c('beta[intercept]', 'beta[range]', 'alpha'))
-
-inter.g$type <- 'beta[intercept]'
-rage.g$type <- 'beta[range]'
-alph.g$type <- 'alpha'
-grand <- rbind(inter.g, rage.g, alph.g)
-grand$type <- factor(grand$type, levels = c('beta[intercept]', 'beta[range]', 'alpha'))
-
-
-gline <- ggplot(bases, aes(x = stage, y = med))
-gline <- gline + geom_ribbon(data = grand,
-                                     mapping = aes(y = grand.med, 
-                                                   ymax = grand.q9, 
-                                                   ymin = grand.q1), 
-                                     alpha = 0.3)
-gline <- gline + geom_segment(data = grand,
-                                      mapping = aes(x = stage[1], 
-                                                    xend = stage[2],
-                                                    y = grand.med, 
-                                                    yend = grand.med))
-gline <- gline + geom_pointrange(aes(ymax = q9, ymin = q1))
-gline <- gline + scale_x_reverse()
-gline <- gline + facet_grid(type ~ ., scales = 'free_y', 
-                            labeller = label_parsed)
-gline <- gline + labs(x = 'Mya', y = 'Estimate')
-gline <- gline + theme(plot.title = element_text(hjust = 0, size = 10),
-                       strip.text.y = element_text(angle = 0))
-ggsave(gline, filename = '../doc/figure/cohort_series.pdf',
+efbeta.plot <- ggplot(efbeta.df, aes(x = time, y = X50.))
+efbeta.plot <- efbeta.plot + geom_pointrange(mapping = aes(ymin = X10., 
+                                                           ymax = X90.),
+                                             fatten = 2)
+efbeta.plot <- efbeta.plot + facet_grid(pred ~ ., 
+                                        scales = 'free_y', switch = 'y')
+efbeta.plot <- efbeta.plot + geom_ribbon(data = ef.df, 
+                                         mapping = aes(ymin = X10.,
+                                                       ymax = X90.),
+                                         alpha = 0.2)
+efbeta.plot <- efbeta.plot + geom_line(data = ef.df, 
+                                       mapping = aes(y = X50.),
+                                       alpha = 0.5)
+efbeta.plot <- efbeta.plot + labs(x = 'Time', y = 'beta')
+ggsave(efbeta.plot, filename = '../doc/figure/cohort_series.pdf',
        width = 12.5, height = 10, dpi = 600)
 
 
-# quadratics plot
-sam <- sample(nrow(wei.fit$alpha), 100)
-coefs <- data.frame(inter = wei.fit$mu_prior[sam, 1],
-                    first = wei.fit$mu_prior[sam, 3], 
-                    second = wei.fit$mu_prior[sam, 4],
-                    alpha = wei.fit$alpha[sam])
-coefplot <- alply(as.matrix(coefs), 1, function(coef) {
-                  stat_function(fun = function(x) {
-                                coef[1] + coef[2] * x + coef[3] * x^2},
-                                colour = 'black',
-                                alpha = 0.2)})
-lab <- round(sum(coefs$second < 0))
-x <- data.frame(x = seq(-5, 5, .0001))
-quad <- ggplot(x, aes(x = x)) + coefplot
-quad <- quad + stat_function(fun = function(x) {
-                             mean(coefs$inter) +
-                             mean(coefs$first) * x + 
-                             mean(coefs$second) * x^2},
-                             colour = 'black',
-                             alpha = 1,
-                             size = 1.5)
-quad <- quad + labs(x = 'environmental preference', 
-                    y = 'tilde{sigma}')
-ggsave(quad, filename = '../doc/figure/environ_quad.pdf',
-       width = 7, height = 5, dpi = 600)
+efalrange <- quantile(wei.fit$alpha_mu, c(0.1, 0.25, 0.5, 0.75, 0.9))
+efalcoh <- apply(wei.fit$alpha_cohort, 2, function(x) 
+                 quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9)))
 
+efalcoh <- apply(efalcoh, 1, function(x) x + efalrange[3])
+efalcoh.df <- data.frame(cbind(efalcoh, time = seq(data$O)))
+
+efalcoh.df
+
+efalcoh.plot <- ggplot(efalcoh.df, aes(x = time, y = X50.))
+efalcoh.plot <- efalcoh.plot + geom_pointrange(mapping = aes(ymin = X10., 
+                                                             ymax = X90.),
+                                               fatten = 2)
+
+
+
+efsamp <- quantile(wei.fit$gamma, c(0.1, 0.25, 0.5, 0.75, 0.9))
+
+#plot(c(data$samp_unc, data$samp_cen), colMeans(wei.fit$alpha))
+
+
+## quadratics plot
+#sam <- sample(nrow(wei.fit$alpha), 100)
+#coefs <- data.frame(inter = wei.fit$mu_prior[sam, 1],
+#                    first = wei.fit$mu_prior[sam, 3], 
+#                    second = wei.fit$mu_prior[sam, 4],
+#                    alpha = wei.fit$alpha[sam])
+#coefplot <- alply(as.matrix(coefs), 1, function(coef) {
+#                  stat_function(fun = function(x) {
+#                                coef[1] + coef[2] * x + coef[3] * x^2},
+#                                colour = 'black',
+#                                alpha = 0.2)})
+#lab <- round(sum(coefs$second < 0))
+#x <- data.frame(x = seq(-5, 5, .0001))
+#quad <- ggplot(x, aes(x = x)) + coefplot
+#quad <- quad + stat_function(fun = function(x) {
+#                             mean(coefs$inter) +
+#                             mean(coefs$first) * x + 
+#                             mean(coefs$second) * x^2},
+#                             colour = 'black',
+#                             alpha = 1,
+#                             size = 1.5)
+#quad <- quad + labs(x = 'environmental preference', 
+#                    y = 'tilde{sigma}')
+#ggsave(quad, filename = '../doc/figure/environ_quad.pdf',
+#       width = 7, height = 5, dpi = 600)
+#
 ## now do quadratics plot with facet for each cohort
 ## cohort one
 #renum <- sort(unique(mapvalues(coh, 

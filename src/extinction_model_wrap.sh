@@ -6,7 +6,7 @@ for f in $FILES;
 do
   for i in `seq 1 4`;
   do
-    ./weibull_review sample num_samples=100000 num_warmup=100000 thin=100 \
+    ./weibull_review sample num_samples=10000 num_warmup=10000 thin=10 \
       init=0 \
       id=$i \
       data file=$f \
