@@ -20,19 +20,18 @@ parameters {
   real alpha_trans[N];
   real alpha_mu;  // shared (transformed) shape
   real<lower=0> sigma_alpha;
-  real gamma;  // sampling effect
   real alpha_cohort[O];
   real<lower=0> sigma_alpcoh;
 
   // regression coefficients
-  vector[5] mu_prior;
-  vector[5] beta[O];  // cohort coef 
-  corr_matrix[5] Omega;
-  vector<lower=0>[5] sigma; 
+  vector[7] mu_prior;
+  vector[7] beta[O];  // cohort coef 
+  corr_matrix[7] Omega;
+  vector<lower=0>[7] sigma; 
 }
 transformed parameters {
   real<lower=0> alpha[N];  // individual shape
-  cov_matrix[5] Sigma;
+  cov_matrix[7] Sigma;
 
   for(n in 1:N) {
     alpha[n] <- exp(alpha_trans[n]);
@@ -40,23 +39,20 @@ transformed parameters {
   Sigma <- quad_form_diag(Omega, sigma);
 }
 model {
-  // sampling as time dilation
-  //   this makes alpha defined at the individual level
-  //   modeled as a linear regression with one covariate and varying intercept
-  //     vary by origination cohort
   for(n in 1:N_unc) {
-    alpha_trans[n] ~ normal(alpha_mu + alpha_cohort[cohort_unc[n]] + 
-        gamma * samp_unc[n], sigma_alpha);
+    alpha_trans[n] ~ normal(alpha_mu + alpha_cohort[cohort_unc[n]], 
+        sigma_alpha);
   }
   for(n in 1:N_cen) {
-    alpha_trans[n + N_unc] ~ normal(alpha_mu + alpha_cohort[cohort_cen[n]] + 
-        gamma * samp_cen[n], sigma_alpha);
+    alpha_trans[n + N_unc] ~ normal(alpha_mu + alpha_cohort[cohort_cen[n]], 
+        sigma_alpha);
   }
   alpha_mu ~ normal(0, 1);
   sigma_alpha ~ cauchy(0, 1);
-  gamma ~ normal(0, 1);
+  
   alpha_cohort ~ normal(0, sigma_alpcoh);
   sigma_alpcoh ~ cauchy(0, 1);
+
 
   // regression coefficients
   Omega ~ lkj_corr(2);
@@ -66,6 +62,8 @@ model {
   mu_prior[3] ~ normal(0, 1);
   mu_prior[4] ~ normal(1, 1);
   mu_prior[5] ~ normal(0, 1);
+  mu_prior[6] ~ normal(-1, 1);
+  mu_prior[7] ~ normal(0, 1);
 
   for(i in 1:O) {
     beta[i] ~ multi_normal(mu_prior, Sigma);
@@ -79,14 +77,20 @@ model {
                 beta[cohort_unc[i], 2] * occupy_unc[i] + 
                 beta[cohort_unc[i], 3] * env_unc[i] + 
                 beta[cohort_unc[i], 4] * (env_unc[i]^2) +
-                beta[cohort_unc[i], 5] * size_unc[i]) / alpha[i])));
+                beta[cohort_unc[i], 5] * size_unc[i] +
+                beta[cohort_unc[i], 6] * samp_unc[i] +
+                beta[cohort_unc[i], 7] * (occupy_unc[i] * samp_unc[i])) 
+              / alpha[i])));
     } else {
       increment_log_prob(weibull_log(dur_unc[i], alpha[i],
             exp(-(beta[cohort_unc[i], 1] + 
                 beta[cohort_unc[i], 2] * occupy_unc[i] + 
                 beta[cohort_unc[i], 3] * env_unc[i] + 
                 beta[cohort_unc[i], 4] * (env_unc[i]^2) +
-                beta[cohort_unc[i], 5] * size_unc[i]) / alpha[i])));
+                beta[cohort_unc[i], 5] * size_unc[i] +
+                beta[cohort_unc[i], 6] * samp_unc[i] +
+                beta[cohort_unc[i], 7] * (occupy_unc[i] * samp_unc[i])) 
+              / alpha[i])));
     }
   }
   for(i in 1:N_cen) {
@@ -95,7 +99,10 @@ model {
               beta[cohort_cen[i], 2] * occupy_cen[i] + 
               beta[cohort_cen[i], 3] * env_cen[i] + 
               beta[cohort_cen[i], 4] * (env_cen[i]^2) +
-              beta[cohort_cen[i], 5] * size_cen[i]) / alpha[N_unc + i])));
+              beta[cohort_cen[i], 5] * size_cen[i] +
+              beta[cohort_cen[i], 6] * samp_cen[i] +
+              beta[cohort_cen[i], 7] * (occupy_cen[i] * samp_cen[i])) 
+            / alpha[i])));
   }
 }
 generated quantities {
@@ -108,14 +115,18 @@ generated quantities {
           beta[cohort_unc[i], 2] * occupy_unc[i] +
           beta[cohort_unc[i], 3] * env_unc[i] + 
           beta[cohort_unc[i], 4] * (env_unc[i]^2) +
-          beta[cohort_unc[i], 5] * size_unc[i]) / alpha[i]);
+          beta[cohort_unc[i], 5] * size_unc[i] +
+          beta[cohort_unc[i], 6] * samp_unc[i] +
+          beta[cohort_unc[i], 7] * (occupy_unc[i] * samp_unc[i])) / alpha[i]);
   }
   for(i in 1:N_cen) {
     hold[i + N_unc] <- exp(-(beta[cohort_cen[i], 1] +
           beta[cohort_cen[i], 2] * occupy_cen[i] +
           beta[cohort_cen[i], 3] * env_cen[i] + 
           beta[cohort_cen[i], 4] * (env_cen[i]^2) +
-          beta[cohort_cen[i], 5] * size_unc[i]) / alpha[N_unc + i]);
+          beta[cohort_cen[i], 5] * size_cen[i] +
+          beta[cohort_cen[i], 6] * samp_cen[i] +
+          beta[cohort_cen[i], 7] * (occupy_cen[i] * samp_cen[i])) / alpha[i]);
   }
 
   // log_lik

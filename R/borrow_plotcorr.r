@@ -29,7 +29,7 @@ my.plotcorr <- function (corr, outline = FALSE, col = "grey", upper.panel = c("e
   #collabs <- as.character(collabs)
   collabs <- rowlabs <- c(expression(beta[intercept]), expression(beta[range]), 
     expression(beta[preference]), expression(beta[breadth]), 
-    expression(beta[size]))
+    expression(beta[size]), expression(beta[sampling]))
   #collabs <- rowlabs <- c(expression(beta[intercept]), expression(beta[range]), 
   #  expression(beta[environment]), expression(beta[environment^2]), 
   #  expression(beta[size]))
