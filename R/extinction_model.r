@@ -45,8 +45,9 @@ env.odds <- rescale(prob.epi)
 
 
 # number of occurrences
-samples <- (short.data$epi + short.data$off) / short.data$duration
-samples <- rescale(log(samples))
+no <- (short.data$epi + short.data$off)
+no <- no / (no + short.data$epi.bck + short.data$off.bck)
+samples <- rescale(log(no / short.data$duration))
 
 
 # now just setup the data

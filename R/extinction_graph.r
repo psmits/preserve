@@ -154,16 +154,16 @@ ggsave(shot.plot, filename = '../doc/figure/shotgun.pdf',
 # dim 2 is row
 # dim 3 is col
 get.covcor <- function(stanfit) {
-  cor.median <- matrix(, ncol = 6, nrow = 6)
-  cor.mean <- matrix(, ncol = 6, nrow = 6)
-  cor.10 <- matrix(, ncol = 6, nrow = 6)
-  cor.90 <- matrix(, ncol = 6, nrow = 6)
-  cov.median <- matrix(, ncol = 6, nrow = 6)
-  cov.mean <- matrix(, ncol = 6, nrow = 6)
-  cov.10 <- matrix(, ncol = 6, nrow = 6)
-  cov.90 <- matrix(, ncol = 6, nrow = 6)
-  for(ii in seq(6)) {
-    for(jj in seq(6)) {
+  cor.median <- matrix(, ncol = 8, nrow = 8)
+  cor.mean <- matrix(, ncol = 8, nrow = 8)
+  cor.10 <- matrix(, ncol = 8, nrow = 8)
+  cor.90 <- matrix(, ncol = 8, nrow = 8)
+  cov.median <- matrix(, ncol = 8, nrow = 8)
+  cov.mean <- matrix(, ncol = 8, nrow = 8)
+  cov.10 <- matrix(, ncol = 8, nrow = 8)
+  cov.90 <- matrix(, ncol = 8, nrow = 8)
+  for(ii in seq(8)) {
+    for(jj in seq(8)) {
       cor.median[jj, ii] <- median(stanfit$Omega[, jj, ii])
       cor.mean[jj, ii] <- mean(stanfit$Omega[, jj, ii])
       cor.10[jj, ii] <- quantile(stanfit$Omega[, jj, ii], probs = .1)
@@ -178,8 +178,8 @@ get.covcor <- function(stanfit) {
   out <- list(cor.median, cor.mean, cor.10, cor.90, 
               cov.median, cov.mean, cov.10, cov.90)
   out <- llply(out, function(x) {
-               rownames(x) <- c('i', 'r', 'e', 'e2', 'm', 's')
-               colnames(x) <- c('i', 'r', 'e', 'e2', 'm', 's')
+               rownames(x) <- c('i', 'r', 'e', 'e2', 'm', 's', 'sXr', 'sXv')
+               colnames(x) <- c('i', 'r', 'e', 'e2', 'm', 's', 'sXr', 'sXv')
                x})
   out
 }
@@ -209,7 +209,8 @@ dev.off()
 # sd of all coefficients
 param.est <- rbind(data.frame(p = c('mu_i', 'mu_r', 
                                     'mu_v', 'mu_v2', 
-                                    'mu_m', 'mu_s'),
+                                    'mu_m', 'mu_s',
+                                    'mu_rXs', 'mu_vXs'),
                               m = apply(wei.fit$mu_prior, 2, mean), 
                               s = apply(wei.fit$mu_prior, 2, sd),
                               l = apply(wei.fit$mu_prior, 2, 
@@ -218,7 +219,8 @@ param.est <- rbind(data.frame(p = c('mu_i', 'mu_r',
                                         function(x) quantile(x, 0.9))),
                    data.frame(p = c('tau_i', 'tau_r', 
                                     'tau_v', 'tau_v2', 
-                                    'tau_m', 'tau_s'),
+                                    'tau_m', 'tau_s',
+                                    'tau_rXs', 'tau_vXs'),
                               m = apply(wei.fit$sigma, 2, mean), 
                               s = apply(wei.fit$sigma, 2, sd),
                               l = apply(wei.fit$sigma, 2, 
@@ -233,8 +235,14 @@ baseline.covar <- data.frame(value = c(wei.fit$Omega[, 1, 2],
                                        wei.fit$Omega[, 1, 3],
                                        wei.fit$Omega[, 1, 4],
                                        wei.fit$Omega[, 1, 5],
-                                       wei.fit$Omega[, 1, 6]),
+                                       wei.fit$Omega[, 1, 6],
+                                       wei.fit$Omega[, 1, 7],
+                                       wei.fit$Omega[, 1, 8]),
                              lab = c(rep('Weibull', 
+                                         length(wei.fit$Omega[, 1, 3])),
+                                     rep('Weibull', 
+                                         length(wei.fit$Omega[, 1, 3])),
+                                     rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3])),
                                      rep('Weibull', 
                                          length(wei.fit$Omega[, 1, 3])),
@@ -253,13 +261,19 @@ baseline.covar$var <- c(rep('Cor(beta[0], beta[r])',
                         rep('Cor(beta[0], beta[m])',
                             length(wei.fit$Omega[, 1, 3])),
                         rep('Cor(beta[0], beta[s])',
+                            length(wei.fit$Omega[, 1, 3])),
+                        rep('Cor(beta[0], beta[rXs])',
+                            length(wei.fit$Omega[, 1, 3])),
+                        rep('Cor(beta[0], beta[vXs])',
                             length(wei.fit$Omega[, 1, 3])))
 baseline.covar$var <- factor(baseline.covar$var, 
                              levels = c('Cor(beta[0], beta[r])',
                                         'Cor(beta[0], beta[v])',
                                         'Cor(beta[0], beta[v^2])',
                                         'Cor(beta[0], beta[m])',
-                                        'Cor(beta[0], beta[s])'))
+                                        'Cor(beta[0], beta[s])',
+                                        'Cor(beta[0], beta[rXs])',
+                                        'Cor(beta[0], beta[vXs])'))
 tb.cv <- ggplot(baseline.covar, aes(x = value))
 tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
 tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
@@ -321,37 +335,41 @@ for(ii in seq(data$O)) {
                             sum(x > 0) / length(x))
 }
 
-ef.df <- t(rbind(mean = efmu, efmurange, pred = seq(6)))
+ef.df <- t(rbind(mean = efmu, efmurange, pred = seq(8)))
 ef.df <- cbind(rbind(ef.df, ef.df), 
-               time = c(rep(1, times = 6), rep(data$O, times = 6)))
+               time = c(rep(1, times = 8), rep(data$O, times = 8)))
 ef.df <- data.frame(ef.df)
-ef.df$time
+#ef.df$time
 
 efbeta.h <- Map(function(x) t(rbind(mean = efbeta[x, ], efbetarange[[x]])), 
                 seq(data$O))
 efbeta.h <- Map(function(x) data.frame(efbeta.h[[x]], 
                                        time = x, 
-                                       pred = seq(6)), seq(data$O))
+                                       pred = seq(8)), seq(data$O))
 efbeta.df <- Reduce(rbind, efbeta.h)
 efbeta.df$pred <- mapvalues(efbeta.df$pred, 
-                            from = seq(6), 
+                            from = seq(8), 
                             to = c('beta[0]', 'beta[r]', 
                                    'beta[v]', 'beta[v^2]', 
-                                   'beta[m]', 'beta[s]'))
+                                   'beta[m]', 'beta[s]',
+                                   'beta[rXs]', 'beta[vXs]'))
 ef.df$pred <- mapvalues(ef.df$pred, 
-                        from = seq(6), 
+                        from = seq(8), 
                         to = c('beta[0]', 'beta[r]', 
                                'beta[v]', 'beta[v^2]', 
-                               'beta[m]', 'beta[s]'))
+                               'beta[m]', 'beta[s]',
+                               'beta[rXs]', 'beta[vXs]'))
 
 efbeta.df$pred <- factor(efbeta.df$pred, 
                          levels = c('beta[0]', 'beta[r]', 
                                     'beta[v]', 'beta[v^2]', 
-                                    'beta[m]', 'beta[s]'))
+                                    'beta[m]', 'beta[s]',
+                                    'beta[rXs]', 'beta[vXs]'))
 ef.df$pred <- factor(ef.df$pred, 
                      levels = c('beta[0]', 'beta[r]', 
                                 'beta[v]', 'beta[v^2]', 
-                                'beta[m]', 'beta[s]'))
+                                'beta[m]', 'beta[s]',
+                                'beta[rXs]', 'beta[vXs]'))
 
 efbeta.df$time <- mapvalues(efbeta.df$time, seq(33), lump[5:(5+33-1), 3])
 ef.df$time <- mapvalues(ef.df$time, seq(33), lump[5:(5+33-1), 3])
@@ -361,7 +379,7 @@ efbeta.plot <- ggplot(efbeta.df, aes(x = time, y = X50.))
 efbeta.plot <- efbeta.plot + geom_pointrange(mapping = aes(ymin = X10., 
                                                            ymax = X90.),
                                              fatten = 2)
-efbeta.plot <- efbeta.plot + facet_grid(pred ~ ., 
+efbeta.plot <- efbeta.plot + facet_grid(pred ~ .,
                                         scales = 'free_y', switch = 'y')
 efbeta.plot <- efbeta.plot + geom_ribbon(data = ef.df, 
                                          mapping = aes(ymin = X10.,
@@ -373,7 +391,7 @@ efbeta.plot <- efbeta.plot + geom_line(data = ef.df,
 efbeta.plot <- efbeta.plot + labs(x = 'Time', y = 'beta')
 efbeta.plot <- efbeta.plot + scale_x_reverse()
 ggsave(efbeta.plot, filename = '../doc/figure/cohort_series.pdf',
-       width = 12.5, height = 10, dpi = 600)
+       width = 12.5, height = 15, dpi = 600)
 
 
 
