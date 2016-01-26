@@ -23,4 +23,4 @@
 
 
 # Execute the program
-bash ../src/extinction_model_wrap.sh
+bash /home/psmits/preserve/src/extinction_model_wrap.sh
