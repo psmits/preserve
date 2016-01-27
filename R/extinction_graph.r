@@ -11,7 +11,7 @@ library(gridBase)
 library(gridExtra)
 library(xtable)
 library(ellipse)
-source('../R/waic.r')
+library(loo)
 source('../R/mung.r')
 source('../R/multiplot.r')
 source('../R/extinction_post_sim.r')
@@ -29,17 +29,27 @@ lump <- read.csv(paste0('../data/', lump.file))
 gts <- rev(as.character(lump[, 2]))
 
 sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
-                        bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
-                        gts = gts,
-                        cuts = 'Chang',
-                        bot = 'Trem')
+                           bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
+                           gts = gts,
+                           cuts = 'Chang',
+                           bot = 'Trem')
 
 data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
-pat <- 'faun_weib_[0-9].csv'
+pat <- 'faun_'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
-wfit <- read_stan_csv(outs)
-wei.fit <- rstan::extract(wfit, permuted = TRUE)
+ids <- rep(1:(length(outs) / 4), each = 4)
+outs <- split(outs, ids)
+
+wfit <- llply(outs, read_stan_csv)
+log.liks <- llply(wfit, extract_log_lik)
+loo.est <- llply(log.liks, loo)
+waic.est <- llply(log.liks, waic)
+
+best <- which.max(Reduce(loo::compare, loo.est)[3:4])
+#best <- which.max(Reduce(loo::compare, waic.est)[3:4])
+
+wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
 
 wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 1000), ]
 
@@ -127,7 +137,7 @@ point.plot <- ggplot(point.check, aes(x = quan, y = percent))
 point.plot <- point.plot + geom_point(size = 1.5)
 point.plot <- point.plot + labs(x = 'quantile of observed duration',
                                 y = 'P(quantile of simulated > 
-                                       quantile of observed)')
+                                quantile of observed)')
 ggsave(point.plot, filename = '../doc/figure/quantile.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -395,53 +405,55 @@ ggsave(efbeta.plot, filename = '../doc/figure/cohort_series.pdf',
 
 
 
+# if best != 2
+if(best == 2) {
+  efalrange <- c(mean = mean(wei.fit$alpha_mu), 
+                 quantile(wei.fit$alpha_mu, c(0.1, 0.25, 0.5, 0.75, 0.9)))
+  scalrange <- rbind(mean = colMeans(wei.fit$sigma), 
+                     apply(wei.fit$sigma, 2, function(x) 
+                           quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
+  rbind(t(efalrange), t(scalrange))
+  #### TODO start here finish a table!
 
-efalrange <- c(mean = mean(wei.fit$alpha_mu), 
-               quantile(wei.fit$alpha_mu, c(0.1, 0.25, 0.5, 0.75, 0.9)))
-scalrange <- rbind(mean = colMeans(wei.fit$sigma), 
-                   apply(wei.fit$sigma, 2, function(x) 
+  efalcoh <- rbind(mean = colMeans(wei.fit$alpha_cohort),
+                   apply(wei.fit$alpha_cohort, 2, function(x) 
                          quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
-rbind(t(efalrange), t(scalrange))
-#### TODO start here finish a table!
+  efalcoh <- exp(mean(wei.fit$alpha_mu) + efalcoh)
 
-efalcoh <- rbind(mean = colMeans(wei.fit$alpha_cohort),
-                 apply(wei.fit$alpha_cohort, 2, function(x) 
-                       quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
-efalcoh <- exp(mean(wei.fit$alpha_mu) + efalcoh)
+  efalcoh.df <- data.frame(cbind(t(efalcoh), time = seq(data$O)))
+  efalcoh.df$time <- mapvalues(efalcoh.df$time, seq(33), lump[5:(5+33-1), 3])
 
-efalcoh.df <- data.frame(cbind(t(efalcoh), time = seq(data$O)))
-efalcoh.df$time <- mapvalues(efalcoh.df$time, seq(33), lump[5:(5+33-1), 3])
+  al.h <- c(exp(quantile(wei.fit$alpha_mu, c(0.1, 0.5, 0.9))))
+  al.df <- data.frame(rbind(al.h, al.h), 
+                      time = c(max(efalcoh.df$time), min(efalcoh.df$time)))
 
-al.h <- c(exp(quantile(wei.fit$alpha_mu, c(0.1, 0.5, 0.9))))
-al.df <- data.frame(rbind(al.h, al.h), 
-                    time = c(max(efalcoh.df$time), min(efalcoh.df$time)))
-
-efalcoh.plot <- ggplot(efalcoh.df, aes(x = time, y = X50.))
-efalcoh.plot <- efalcoh.plot + geom_pointrange(mapping = aes(ymin = X10., 
-                                                             ymax = X90.),
-                                               fatten = 2)
-efalcoh.plot <- efalcoh.plot + geom_ribbon(data = al.df, 
-                                           mapping = aes(ymin = X10.,
-                                                         ymax = X90.),
-                                           alpha = 0.2)
-efalcoh.plot <- efalcoh.plot + geom_line(data = al.df, 
+  efalcoh.plot <- ggplot(efalcoh.df, aes(x = time, y = X50.))
+  efalcoh.plot <- efalcoh.plot + geom_pointrange(mapping = aes(ymin = X10., 
+                                                               ymax = X90.),
+                                                 fatten = 2)
+  efalcoh.plot <- efalcoh.plot + geom_ribbon(data = al.df, 
+                                             mapping = aes(ymin = X10.,
+                                                           ymax = X90.),
+                                             alpha = 0.2)
+  efalcoh.plot <- efalcoh.plot + geom_line(data = al.df, 
                                            mapping = aes(ymin = X50.),
                                            alpha = 0.5)
-efalcoh.plot <- efalcoh.plot + geom_hline(yintercept = 1, colour = 'grey')
-efalcoh.plot <- efalcoh.plot + scale_x_reverse()
-ggsave(efalcoh.plot, filename = '../doc/figure/shape_series.pdf',
-       width = 12.5, height = 10, dpi = 600)
+  efalcoh.plot <- efalcoh.plot + geom_hline(yintercept = 1, colour = 'grey')
+  efalcoh.plot <- efalcoh.plot + scale_x_reverse()
+  ggsave(efalcoh.plot, filename = '../doc/figure/shape_series.pdf',
+         width = 12.5, height = 10, dpi = 600)
+}
 
 
 
 quad <- function(x, sam) {
   bet <- wei.fit$mu_prior[sam, 1]
   bet <- bet + (wei.fit$mu_prior[sam, 3] * x) + (wei.fit$mu_prior[sam, 4] * x^2)
-  -(bet) / exp(wei.fit$alpha_mu[sam])
+  -(bet) / (wei.fit$alpha[sam])
 }
 
 val <- seq(from = -0.5, to = 0.5, by = 0.001)
-sam <- sample(nrow(wei.fit$alpha), 1000)
+sam <- sample(nrow(wei.fit$lp__), 1000)
 quadval <- list()
 for(ii in seq(length(sam))) {
   quadval[[ii]] <- data.frame(env = val, resp = quad(val, sam[ii]), sim = ii)
@@ -449,7 +461,7 @@ for(ii in seq(length(sam))) {
 quadframe <- Reduce(rbind, quadval)
 
 quad.mean <- function(x, mcoef) {
-  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / exp(mean(wei.fit$alpha_mu))
+  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / mean(wei.fit$alpha)
 }
 mcoef <- colMeans(wei.fit$mu_prior)[c(1, 3, 4)]
 meanquad <- data.frame(env = val, resp = quad.mean(val, mcoef))

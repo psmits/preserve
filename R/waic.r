@@ -1,3 +1,6 @@
+# let's write a function to help with underflow errors....maybe?
+logxpy <- function(lx, ly) max(lx, ly) + log1p(exp(-abs(lx - ly)))
+
 # this is all gelman code
 # Little function to calculate posterior variances from simulation
 colVars <- function (a){
