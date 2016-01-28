@@ -1,4 +1,4 @@
-my.plotcorr <- function (corr, outline = FALSE, col = "grey", upper.panel = c("ellipse", "number", "none"), lower.panel = c("ellipse", "number", "none"), diag = c("none", "ellipse", "number"), digits = 2, bty = "n", axes = FALSE, xlab = "", ylab = "", asp = 1, cex.lab = par("cex.lab"), cex = 0.75 * par("cex"), mar = 0.1 + c(2, 2, 4, 2), ...) {
+my.plotcorr <- function (corr, outline = FALSE, col = "grey", upper.panel = c("ellipse", "number", "none"), lower.panel = c("ellipse", "number", "none"), diag = c("none", "ellipse", "number"), digits = 2, bty = "n", axes = FALSE, xlab = "", ylab = "", asp = 1, cex.lab = par("cex.lab"), cex = 0.75 * par("cex"), mar = 0.1 + c(2, 2, 4, 2), npred, ...) {
   # this is a modified version of the plotcorr function from the ellipse package
   # this prints numbers and ellipses on the same plot but upper.panel and lower.panel changes what is displayed
   # diag now specifies what to put in the diagonal (numbers, ellipses, nothing)
@@ -31,6 +31,7 @@ my.plotcorr <- function (corr, outline = FALSE, col = "grey", upper.panel = c("e
     expression(beta[preference]), expression(beta[breadth]), 
     expression(beta[size]), expression(beta[sampling]),
     expression(beta[rXs]), expression(beta[vXs]))
+  collabs <- rowlabs <- rowlabs[npred]
   #collabs <- rowlabs <- c(expression(beta[intercept]), expression(beta[range]), 
   #  expression(beta[environment]), expression(beta[environment^2]), 
   #  expression(beta[size]))

@@ -89,7 +89,7 @@ model {
               beta[cohort_cen[i], 2] * occupy_cen[i] + 
               beta[cohort_cen[i], 3] * env_cen[i] + 
               beta[cohort_cen[i], 4] * (env_cen[i]^2) +
-              beta[cohort_cen[i], 5] * size_cen[i])/ alpha[i])));
+              beta[cohort_cen[i], 5] * size_cen[i])/ alpha[N_unc + i])));
   }
 }
 generated quantities {
@@ -109,7 +109,7 @@ generated quantities {
           beta[cohort_cen[i], 2] * occupy_cen[i] +
           beta[cohort_cen[i], 3] * env_cen[i] + 
           beta[cohort_cen[i], 4] * (env_cen[i]^2) +
-          beta[cohort_cen[i], 5] * size_cen[i]) / alpha[i]);
+          beta[cohort_cen[i], 5] * size_cen[i]) / alpha[N_unc + i]);
   }
 
   // log_lik
