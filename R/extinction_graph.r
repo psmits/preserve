@@ -193,7 +193,8 @@ get.covcor <- function(stanfit, npred) {
   out <- list(cor.median, cor.mean, cor.10, cor.90, 
               cov.median, cov.mean, cov.10, cov.90)
   out <- llply(out, function(x) {
-               nn <- c('i', 'r', 'e', 'e2', 'm', 's', 'sXr', 'sXv')[npred]
+               nn <- c('i', 'r', 'e', 'e2', 'm', 's', 'sXr', 'sXv')
+               nn <- nn[seq(npred)]
                rownames(x) <- colnames(x) <- nn
                x})
   out
@@ -263,9 +264,9 @@ for(ii in seq(data$O)) {
                             sum(x > 0) / length(x))
 }
 
-ef.df <- t(rbind(mean = efmu, efmurange, pred = seq(8)))
+ef.df <- t(rbind(mean = efmu, efmurange, pred = seq(npred)))
 ef.df <- cbind(rbind(ef.df, ef.df), 
-               time = c(rep(1, times = 8), rep(data$O, times = 8)))
+               time = c(rep(1, times = npred), rep(data$O, times = npred)))
 ef.df <- data.frame(ef.df)
 #ef.df$time
 
@@ -273,31 +274,19 @@ efbeta.h <- Map(function(x) t(rbind(mean = efbeta[x, ], efbetarange[[x]])),
                 seq(data$O))
 efbeta.h <- Map(function(x) data.frame(efbeta.h[[x]], 
                                        time = x, 
-                                       pred = seq(8)), seq(data$O))
+                                       pred = seq(npred)), seq(data$O))
 efbeta.df <- Reduce(rbind, efbeta.h)
+too <- c('beta[0]', 'beta[r]', 'beta[v]', 'beta[v^2]', 'beta[m]', 
+         'beta[s]', 'beta[rXs]', 'beta[vXs]')[seq(npred)]
 efbeta.df$pred <- mapvalues(efbeta.df$pred, 
                             from = seq(npred), 
-                            to = c('beta[0]', 'beta[r]', 
-                                   'beta[v]', 'beta[v^2]', 
-                                   'beta[m]', 'beta[s]',
-                                   'beta[rXs]', 'beta[vXs]')[npred])
+                            to = too)
 ef.df$pred <- mapvalues(ef.df$pred, 
                         from = seq(npred), 
-                        to = c('beta[0]', 'beta[r]', 
-                               'beta[v]', 'beta[v^2]', 
-                               'beta[m]', 'beta[s]',
-                               'beta[rXs]', 'beta[vXs]')[npred])
+                        to = too)
 
-efbeta.df$pred <- factor(efbeta.df$pred, 
-                         levels = c('beta[0]', 'beta[r]', 
-                                    'beta[v]', 'beta[v^2]', 
-                                    'beta[m]', 'beta[s]',
-                                    'beta[rXs]', 'beta[vXs]')[npred])
-ef.df$pred <- factor(ef.df$pred, 
-                     levels = c('beta[0]', 'beta[r]', 
-                                'beta[v]', 'beta[v^2]', 
-                                'beta[m]', 'beta[s]',
-                                'beta[rXs]', 'beta[vXs]')[npred])
+efbeta.df$pred <- factor(efbeta.df$pred, levels = too)
+ef.df$pred <- factor(ef.df$pred, levels = too)
 
 efbeta.df$time <- mapvalues(efbeta.df$time, seq(33), lump[5:(5+33-1), 3])
 ef.df$time <- mapvalues(ef.df$time, seq(33), lump[5:(5+33-1), 3])
@@ -364,24 +353,25 @@ if(best != 1) {
 
 
 
+# environmental effect
+sam <- sample(nrow(wei.fit$lp__), 1000)
 quad <- function(x, sam) {
   bet <- wei.fit$mu_prior[sam, 1]
   bet <- bet + (wei.fit$mu_prior[sam, 3] * x) + (wei.fit$mu_prior[sam, 4] * x^2)
   -(bet) / (wei.fit$alpha[sam])
 }
+quad.mean <- function(x, mcoef) {
+  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / mean(wei.fit$alpha[sam])
+}
 
 val <- seq(from = -0.5, to = 0.5, by = 0.001)
-sam <- sample(nrow(wei.fit$lp__), 1000)
 quadval <- list()
 for(ii in seq(length(sam))) {
   quadval[[ii]] <- data.frame(env = val, resp = quad(val, sam[ii]), sim = ii)
 }
 quadframe <- Reduce(rbind, quadval)
 
-quad.mean <- function(x, mcoef) {
-  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / mean(wei.fit$alpha)
-}
-mcoef <- colMeans(wei.fit$mu_prior)[c(1, 3, 4)]
+mcoef <- colMeans(wei.fit$mu_prior[sam, ])[c(1, 3, 4)]
 meanquad <- data.frame(env = val, resp = quad.mean(val, mcoef))
 
 mustache <- ggplot(quadframe, aes(x = env, y = resp, group = sim))
@@ -394,95 +384,22 @@ ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
        width = 6, height = 5, dpi = 600)
 
 
+# by cohort
+bet.coh <- wei.fit$beta[sam, , c(1, 3, 4)]
+alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
+                 x + wei.fit$alpha_mu[sam])
 
-## histogram of posterior of correlation between inter and env
-#baseline.covar <- data.frame(value = c(wei.fit$Omega[, 1, 2],
-#                                       wei.fit$Omega[, 1, 3],
-#                                       wei.fit$Omega[, 1, 4],
-#                                       wei.fit$Omega[, 1, 5],
-#                                       wei.fit$Omega[, 1, 6],
-#                                       wei.fit$Omega[, 1, 7],
-#                                       wei.fit$Omega[, 1, 8]),
-#                             lab = c(rep('Weibull', 
-#                                         length(wei.fit$Omega[, 1, 3])),
-#                                     rep('Weibull', 
-#                                         length(wei.fit$Omega[, 1, 3])),
-#                                     rep('Weibull', 
-#                                         length(wei.fit$Omega[, 1, 3])),
-#                                     rep('Weibull', 
-#                                         length(wei.fit$Omega[, 1, 3])),
-#                                     rep('Weibull', 
-#                                         length(wei.fit$Omega[, 1, 3])),
-#                                     rep('Weibull', 
-#                                         length(wei.fit$Omega[, 1, 3])),
-#                                     rep('Weibull', 
-#                                         length(wei.fit$Omega[, 1, 3]))))
-#baseline.covar$var <- c(rep('Cor(beta[0], beta[r])',
-#                            length(wei.fit$Omega[, 1, 3])),
-#                        rep('Cor(beta[0], beta[v])',
-#                            length(wei.fit$Omega[, 1, 3])),
-#                        rep('Cor(beta[0], beta[v^2])',
-#                            length(wei.fit$Omega[, 1, 3])),
-#                        rep('Cor(beta[0], beta[m])',
-#                            length(wei.fit$Omega[, 1, 3])),
-#                        rep('Cor(beta[0], beta[s])',
-#                            length(wei.fit$Omega[, 1, 3])),
-#                        rep('Cor(beta[0], beta[rXs])',
-#                            length(wei.fit$Omega[, 1, 3])),
-#                        rep('Cor(beta[0], beta[vXs])',
-#                            length(wei.fit$Omega[, 1, 3])))
-#baseline.covar$var <- factor(baseline.covar$var, 
-#                             levels = c('Cor(beta[0], beta[r])',
-#                                        'Cor(beta[0], beta[v])',
-#                                        'Cor(beta[0], beta[v^2])',
-#                                        'Cor(beta[0], beta[m])',
-#                                        'Cor(beta[0], beta[s])',
-#                                        'Cor(beta[0], beta[rXs])',
-#                                        'Cor(beta[0], beta[vXs])'))
-#baseline.covar
-#tb.cv <- ggplot(baseline.covar, aes(x = value))
-#tb.cv <- tb.cv + geom_vline(xintercept = 0, colour = 'grey', size = 2)
-#tb.cv <- tb.cv + geom_histogram(aes(y = ..density..))
-#tb.cv <- tb.cv + facet_grid(var ~ ., labeller = label_parsed)
-#tb.cv <- tb.cv + labs(x = 'Correlation', y = 'Prob. Density', title = 'B')
-#tb.cv <- tb.cv + theme(axis.text = element_text(size = 30),
-#                       axis.title = element_text(size = 40),
-#                       strip.text = element_text(size = 30),
-#                       plot.title = element_text(size = 50, hjust = 0))
-#ggsave(tb.cv, filename = '../doc/figure/correlation_marginal.pdf',
-#       width = 10, height = 9, dpi = 600)
-#
-## mixed figure
-#png(file = '../doc/figure/cor_mixed.png', 
-#    width = 3000, height = 1500)
-#par(mfrow=c(1,2))
-#my.plotcorr(wei.covcor[[1]], upper.panel = 'number', 
-#            col = col1[((wei.covcor[[1]] + 1)/2) * 200], 
-#            #mar = rep(0, 4), 
-#            cex = 4, cex.lab = 4.5, 
-#            cex.main = 4.5, main = 'A', adj = 0, 
-#            npred = npred)
-#plot.new()
-#vps <- baseViewports()
-#pushViewport(vps$figure)
-#vp1 <- plotViewport(c(1.8, 1, 0, 1))
-## plot the ggplot using the print command
-#print(tb.cv, vp=vp1)
-#dev.off()
-#
-#png(file = '../doc/figure/cor_mixed_bw.png', 
-#    width = 3000, height = 1500)
-#par(mfrow=c(1,2))
-#my.plotcorr(wei.covcor[[1]], upper.panel = 'number', 
-#            col = col2[((wei.covcor[[1]] + 1)/2) * 200], 
-#            cex = 4, cex.lab = 4.5, 
-#            cex.main = 4.5, main = 'A', adj = 0,
-#            npred = npred)
-#plot.new()
-#vps <- baseViewports()
-#pushViewport(vps$figure)
-#vp1 <- plotViewport(c(1.8, 1, 0, 1))
-## plot the ggplot using the print command
-#print(tb.cv, vp=vp1)
-#dev.off()
+val <- seq(from = -0.5, to = 0.5, by = 0.001)
+dat <- cbind(1, val, val^2)
 
+coh.est <- list()
+for(ii in seq(data$O)) {
+  h <- list()
+  for(jj in seq(length(val))) {
+    # all posterior estimates for env value of dat[1, ]
+    h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / alp.coh[, ii]
+  }
+  coh.est[[ii]] <- h
+}
+
+coh.map <- Map(function(x) Reduce(cbind, x), coh.est)

@@ -6,7 +6,7 @@ for f in $FILES;
 do
   for i in `seq 1 4`;
   do
-    /home/psmits/perserve/stan/survival_full sample num_samples=10000 num_warmup=10000 thin=10 \
+    /home/psmits/preserve/stan/survival_full sample num_samples=10000 num_warmup=10000 thin=10 \
       init=0 \
       id=$i \
       data file=$f \
@@ -19,7 +19,7 @@ do
       init=0 \
       id=$i \
       data file=$f \
-      output file=/home/psmits/perserve/data/mcmc_out/faun_nosamp_${i}.csv &
+      output file=/home/psmits/preserve/data/mcmc_out/faun_nosamp_${i}.csv &
   done
   wait
   for i in `seq 1 4`;

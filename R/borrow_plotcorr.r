@@ -31,7 +31,7 @@ my.plotcorr <- function (corr, outline = FALSE, col = "grey", upper.panel = c("e
     expression(beta[preference]), expression(beta[breadth]), 
     expression(beta[size]), expression(beta[sampling]),
     expression(beta[rXs]), expression(beta[vXs]))
-  collabs <- rowlabs <- rowlabs[npred]
+  collabs <- rowlabs <- rowlabs[seq(npred)]
   #collabs <- rowlabs <- c(expression(beta[intercept]), expression(beta[range]), 
   #  expression(beta[environment]), expression(beta[environment^2]), 
   #  expression(beta[size]))
