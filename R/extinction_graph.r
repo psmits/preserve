@@ -9,12 +9,10 @@ library(stringr)
 library(grid)
 library(gridBase)
 library(gridExtra)
-library(xtable)
 library(ellipse)
 library(loo)
 source('../R/mung.r')
 source('../R/multiplot.r')
-source('../R/extinction_post_sim.r')
 source('../R/borrow_plotcorr.r')
 set.seed(420)
 
@@ -44,9 +42,11 @@ outs <- split(outs, ids)
 wfit <- llply(outs, read_stan_csv)
 log.liks <- llply(wfit, extract_log_lik)
 
+# this will need to be updated with number of models
 loo.est <- llply(log.liks, loo)
 loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], loo.est[[3]])
 
+# this will need to be updated with number of models
 waic.est <- llply(log.liks, waic)
 waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], waic.est[[3]])
 
@@ -56,7 +56,8 @@ best <- as.numeric(best)
 wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
 wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 1000), ]
 
-npred <- ifelse(best == 2, 5, 8)
+# this will need to be updated with number of models
+npred <- ifelse(best %in% c(2, 3), 5, 8)  
 
 #
 theme_set(theme_bw())
@@ -107,7 +108,7 @@ surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
 surv.plot <- surv.plot + geom_line(data = sim.surv, 
                                    aes(x = time, y = surv, group = group),
                                    colour = 'black', alpha = 0.01)
-surv.plot <- surv.plot + geom_line(size = 0.75, colour = 'blue')
+surv.plot <- surv.plot + geom_line(colour = 'blue')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 #surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
@@ -122,7 +123,7 @@ surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
 surv.plot <- surv.plot + geom_line(data = sim.surv, 
                                    aes(x = time, y = surv, group = group),
                                    colour = 'black', alpha = 0.01)
-surv.plot <- surv.plot + geom_line(size = 0.75, colour = 'grey')
+surv.plot <- surv.plot + geom_line(colour = 'grey')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 #surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration t', 
@@ -139,7 +140,7 @@ qp <- colSums(t(apply(quant, 1, function(x) x > qudur))) / nrow(quant)
 
 point.check <- data.frame(quan = seq(0.1, 0.9, by = 0.05), percent = qp)
 point.plot <- ggplot(point.check, aes(x = quan, y = percent))
-point.plot <- point.plot + geom_point(size = 1.5)
+point.plot <- point.plot + geom_point()
 point.plot <- point.plot + labs(x = 'quantile of observed duration',
                                 y = 'P(quantile of simulated > 
                                 quantile of observed)')
@@ -152,10 +153,9 @@ est.shotgun <- data.frame(obs = duration,
 
 shot.plot <- ggplot(est.shotgun, aes(x = obs, y = sim))
 shot.plot <- shot.plot + stat_function(fun = function(x) x, 
-                                       size = 1.5,
                                        lty = 'dashed', 
                                        colour = 'grey')
-shot.plot <- shot.plot + geom_point(alpha = 0.5, size = 1.5)
+shot.plot <- shot.plot + geom_point(alpha = 0.5)
 shot.plot <- shot.plot + labs(x = 'Observed durations',
                               y = '\\tilde{sigma}')
 ggsave(shot.plot, filename = '../doc/figure/shotgun.pdf',
@@ -223,31 +223,6 @@ my.plotcorr(wei.covcor[[1]], upper.panel = 'number',
             npred = npred)
 dev.off()
 
-# mean of all coefficients
-# sd of all coefficients
-name.mu <- c('mu_i', 'mu_r', 'mu_v', 'mu_v2', 'mu_m', 
-             'mu_s', 'mu_rXs', 'mu_vXs')
-name.tau <- c('tau_i', 'tau_r', 'tau_v', 'tau_v2', 'tau_m', 
-              'tau_s', 'tau_rXs', 'tau_vXs')
-param.est <- rbind(data.frame(p = name.mu[npred],
-                              m = apply(wei.fit$mu_prior, 2, mean), 
-                              s = apply(wei.fit$mu_prior, 2, sd),
-                              l = apply(wei.fit$mu_prior, 2, 
-                                        function(x) quantile(x, 0.1)), 
-                              h = apply(wei.fit$mu_prior, 2, 
-                                        function(x) quantile(x, 0.9))),
-                   data.frame(p = name.tau[npred],
-                              m = apply(wei.fit$sigma, 2, mean), 
-                              s = apply(wei.fit$sigma, 2, sd),
-                              l = apply(wei.fit$sigma, 2, 
-                                        function(x) quantile(x, 0.1)), 
-                              h = apply(wei.fit$sigma, 2, 
-                                        function(x) quantile(x, 0.9))))
-param.table <- xtable(param.est, label = 'tab:param')
-print.xtable(param.table, file = '../doc/table_param.tex')
-
-
-
 # effect of all the covariates
 # mean cohort effects
 efmu <- colMeans(wei.fit$mu_prior)
@@ -308,24 +283,24 @@ efbeta.plot <- efbeta.plot + geom_line(data = ef.df,
 efbeta.plot <- efbeta.plot + labs(x = 'Time', y = 'beta')
 efbeta.plot <- efbeta.plot + scale_x_reverse()
 ggsave(efbeta.plot, filename = '../doc/figure/cohort_series.pdf',
-       width = 12.5, height = 15, dpi = 600)
+       width = 7.5, height = 10, dpi = 600)
 
 
 
 # if best != 1
-if(best != 1) {
-  efalrange <- c(mean = mean(wei.fit$alpha_mu), 
-                 quantile(wei.fit$alpha_mu, c(0.1, 0.25, 0.5, 0.75, 0.9)))
-  scalrange <- rbind(mean = colMeans(wei.fit$sigma), 
-                     apply(wei.fit$sigma, 2, function(x) 
-                           quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
-  rbind(t(efalrange), t(scalrange))
-  #### TODO start here finish a table!
+if(!(best %in% c(1, 2)) {
+  #efalrange <- c(mean = mean(wei.fit$alpha_mu), 
+  #               quantile(wei.fit$alpha_mu, c(0.1, 0.25, 0.5, 0.75, 0.9)))
+  #scalrange <- rbind(mean = colMeans(wei.fit$sigma), 
+  #                   apply(wei.fit$sigma, 2, function(x) 
+  #                         quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
+  #rbind(t(efalrange), t(scalrange))
+  #### TODO start here to finish a table with above!
 
   efalcoh <- rbind(mean = colMeans(wei.fit$alpha_cohort),
                    apply(wei.fit$alpha_cohort, 2, function(x) 
                          quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
-  efalcoh <- exp(mean(wei.fit$alpha_mu) + efalcoh)
+  efalcoh <- exp(median(wei.fit$alpha_mu) + efalcoh)
 
   efalcoh.df <- data.frame(cbind(t(efalcoh), time = seq(data$O)))
   efalcoh.df$time <- mapvalues(efalcoh.df$time, seq(33), lump[5:(5+33-1), 3])
@@ -358,10 +333,10 @@ sam <- sample(nrow(wei.fit$lp__), 1000)
 quad <- function(x, sam) {
   bet <- wei.fit$mu_prior[sam, 1]
   bet <- bet + (wei.fit$mu_prior[sam, 3] * x) + (wei.fit$mu_prior[sam, 4] * x^2)
-  -(bet) / (wei.fit$alpha[sam])
+  -(bet) / exp((wei.fit$alpha_mu[sam]))
 }
 quad.mean <- function(x, mcoef) {
-  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / mean(wei.fit$alpha[sam])
+  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / exp(mean(wei.fit$alpha_mu[sam]))
 }
 
 val <- seq(from = -0.5, to = 0.5, by = 0.001)
@@ -378,17 +353,17 @@ mustache <- ggplot(quadframe, aes(x = env, y = resp, group = sim))
 mustache <- mustache + geom_line(alpha = 1 / 100)
 mustache <- mustache + geom_line(data = meanquad,
                                  mapping = aes(group = NULL),
-                                 colour = 'black', size = 1.5)
+                                 colour = 'blue')
 mustache <- mustache + labs(x = 'Environmental preference', y = 'log(sigma)')
 ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
        width = 6, height = 5, dpi = 600)
 
 
 # by cohort
+sam <- sample(nrow(wei.fit$lp__), 100)
 bet.coh <- wei.fit$beta[sam, , c(1, 3, 4)]
 alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
                  x + wei.fit$alpha_mu[sam])
-
 val <- seq(from = -0.5, to = 0.5, by = 0.001)
 dat <- cbind(1, val, val^2)
 
@@ -397,9 +372,34 @@ for(ii in seq(data$O)) {
   h <- list()
   for(jj in seq(length(val))) {
     # all posterior estimates for env value of dat[1, ]
-    h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / alp.coh[, ii]
+    h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[, ii])
   }
   coh.est[[ii]] <- h
 }
 
-coh.map <- Map(function(x) Reduce(cbind, x), coh.est)
+# massage into shape
+#   val, resp (V2), sim, coh
+coh.map <- list()
+for(jj in seq(data$O)) {
+  h <- Map(function(x, y) {
+           cbind(val = x, resp = coh.est[[jj]][[y]], sim = seq(1000))}, 
+           x = val, y = seq(length(val)))
+  h <- Reduce(rbind, h)
+  coh.map[[jj]] <- data.frame(h, coh = jj)  # update coh to be stage name (use jj as index)
+}
+coh.df <- Reduce(rbind, coh.map)
+
+
+cohmust <- ggplot(coh.df, aes(x = val, y = V2, group = sim))
+cohmust <- cohmust + geom_line(data = meanquad,
+                               mapping = aes(x = env,
+                                             y = resp,
+                                             group = NULL),
+                               colour = 'blue')
+cohmust <- cohmust + geom_line(alpha = 1 / 100)
+cohmust <- cohmust + facet_wrap(~ coh, switch = 'x')
+cohmust <- cohmust + theme(axis.text = element_text(size = 6),
+                           strip.text = element_text(size = 6))
+cohmust <- cohmust + labs(x = 'Environmental preference', y = 'log(sigma)')
+ggsave(cohmust, filename = '../doc/figure/env_cohort.pdf',
+       width = 7.5, height = 10, dpi = 600)
