@@ -45,7 +45,7 @@ log.liks <- llply(wfit, extract_log_lik)
 
 # this will need to be updated with number of models
 loo.est <- llply(log.liks, loo)
-loo.table <- loo::compare(loo.est[[1]], #loo.est[[2]], 
+loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], 
                           loo.est[[3]], loo.est[[4]])
 
 # this will need to be updated with number of models
@@ -70,20 +70,42 @@ name.mu <- c('mu_i', 'mu_r', 'mu_v', 'mu_v2', 'mu_m',
              'mu_s', 'mu_rXs', 'mu_vXs')
 name.tau <- c('tau_i', 'tau_r', 'tau_v', 'tau_v2', 'tau_m', 
               'tau_s', 'tau_rXs', 'tau_vXs')
-qq <- c(0.05, 0.25, 0.5, 0.75, 0.95)
-param.est <- rbind(data.frame(p = name.mu[npred],
+qq <- c(0.1, 0.5, 0.9)
+param.est <- rbind(data.frame(p = name.mu[1:npred],
                               m = apply(wei.fit$mu_prior, 2, mean), 
                               s = apply(wei.fit$mu_prior, 2, sd),
-                              l = apply(wei.fit$mu_prior, 2, 
-                                        function(x) quantile(x, qq)), 
-                              h = apply(wei.fit$mu_prior, 2, 
-                                        function(x) quantile(x, qq))),
-                   data.frame(p = name.tau[npred],
+                              qa = t(apply(wei.fit$mu_prior, 2, 
+                                           function(x) quantile(x, qq)))), 
+                   data.frame(p = name.tau[1:npred],
                               m = apply(wei.fit$sigma, 2, mean), 
                               s = apply(wei.fit$sigma, 2, sd),
-                              l = apply(wei.fit$sigma, 2, 
-                                        function(x) quantile(x, qq)), 
-                              h = apply(wei.fit$sigma, 2, 
-                                        function(x) quantile(x, qq))))
+                              qa = t(apply(wei.fit$sigma, 2, 
+                                     function(x) quantile(x, qq)))))
 param.table <- xtable(param.est, label = 'tab:param')
 print.xtable(param.table, file = '../doc/table_param.tex')
+
+# probabilty of negative correlation term
+cor.int.range <- sum((wei.fit$Omega[, 1, 2] < 0)) / 4000
+cor.inf.env <- sum((wei.fit$Omega[, 1, 3] < 0)) / 4000
+# but but but
+#   massive difference in the between cohort variances of these two regression coefficients
+#   see param.est table!
+tv.gt.sr <- sum(apply(wei.fit$sigma[, 2:3], 1, function(x) x[2] > x[1])) / 4000
+
+
+# inflection point is defined - (beta_v) / 2(beta_v2)
+# probability that average of the parabola defined
+#   log(sigma) = -(mu_i + mu_v * v + mu_v2 * v^2) / alpha
+# midpoint favors epicontinental
+coef.inf <- wei.fit$mu_prior[, 3:4]
+inf.rel <- sum((-(coef.inf[, 1])) / (2 * coef.inf[, 2]) > 0) / 4000
+
+
+inf.cohort <- inf.crazy.low <- inf.crazy.hgh <- c()
+
+for(ii in seq(data$O)) {
+  h <- wei.fit$beta[, ii, 3:4]
+  inf.cohort[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0) / 4000
+  inf.crazy.low[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0.5) / 4000
+  inf.crazy.hgh[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) < (-0.5)) / 4000
+}

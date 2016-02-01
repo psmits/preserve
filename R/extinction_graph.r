@@ -44,11 +44,13 @@ log.liks <- llply(wfit, extract_log_lik)
 
 # this will need to be updated with number of models
 loo.est <- llply(log.liks, loo)
-loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], loo.est[[3]])
+loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], 
+                          loo.est[[3]], loo.est[[4]])
 
 # this will need to be updated with number of models
 waic.est <- llply(log.liks, waic)
-waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], waic.est[[3]])
+waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], 
+                           waic.est[[3]], waic.est[[4]])
 
 best <- str_extract(names(which.max(waic.table[, ncol(waic.table)])), '[0-9]')
 best <- as.numeric(best)
@@ -154,7 +156,7 @@ est.shotgun <- data.frame(obs = duration,
 shot.plot <- ggplot(est.shotgun, aes(x = obs, y = sim))
 shot.plot <- shot.plot + stat_function(fun = function(x) x, 
                                        lty = 'dashed', 
-                                       colour = 'grey')
+                                       colour = 'darkgrey')
 shot.plot <- shot.plot + geom_point(alpha = 0.5)
 shot.plot <- shot.plot + labs(x = 'Observed durations',
                               y = '\\tilde{sigma}')
@@ -288,7 +290,7 @@ ggsave(efbeta.plot, filename = '../doc/figure/cohort_series.pdf',
 
 
 # if best != 1
-if(!(best %in% c(1, 2)) {
+if(!(best %in% c(1, 2))) {
   #efalrange <- c(mean = mean(wei.fit$alpha_mu), 
   #               quantile(wei.fit$alpha_mu, c(0.1, 0.25, 0.5, 0.75, 0.9)))
   #scalrange <- rbind(mean = colMeans(wei.fit$sigma), 
@@ -320,7 +322,7 @@ if(!(best %in% c(1, 2)) {
   efalcoh.plot <- efalcoh.plot + geom_line(data = al.df, 
                                            mapping = aes(ymin = X50.),
                                            alpha = 0.5)
-  efalcoh.plot <- efalcoh.plot + geom_hline(yintercept = 1, colour = 'grey')
+  efalcoh.plot <- efalcoh.plot + geom_hline(yintercept = 1, colour = 'darkgrey')
   efalcoh.plot <- efalcoh.plot + scale_x_reverse()
   ggsave(efalcoh.plot, filename = '../doc/figure/shape_series.pdf',
          width = 12.5, height = 10, dpi = 600)
@@ -333,10 +335,20 @@ sam <- sample(nrow(wei.fit$lp__), 1000)
 quad <- function(x, sam) {
   bet <- wei.fit$mu_prior[sam, 1]
   bet <- bet + (wei.fit$mu_prior[sam, 3] * x) + (wei.fit$mu_prior[sam, 4] * x^2)
-  -(bet) / exp((wei.fit$alpha_mu[sam]))
+  if(!(best %in% 1:2)) {
+    -(bet) / exp(wei.fit$alpha_mu[sam])  # depends on if alpha varies by cohort
+  } else {
+    -(bet) / exp(wei.fit$alpha_trans[sam])  # depends on if alpha varies by cohort
+  }
 }
 quad.mean <- function(x, mcoef) {
-  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / exp(mean(wei.fit$alpha_mu[sam]))
+  if(!(best %in% 1:2)) {
+    -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / exp(mean(wei.fit$alpha_mu[sam]))
+  } else {
+    -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / 
+      exp(mean(wei.fit$alpha_trans[sam]))
+  }
+  # depends on if alpha varies by cohort
 }
 
 val <- seq(from = -0.5, to = 0.5, by = 0.001)
@@ -362,8 +374,12 @@ ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
 # by cohort
 sam <- sample(nrow(wei.fit$lp__), 100)
 bet.coh <- wei.fit$beta[sam, , c(1, 3, 4)]
-alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
-                 x + wei.fit$alpha_mu[sam])
+if(!(best %in% 1:2)) {
+  alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
+                   x + wei.fit$alpha_mu[sam])
+} else {
+  alp.coh <- wei.fit$alpha_trans[sam]
+}
 val <- seq(from = -0.5, to = 0.5, by = 0.001)
 dat <- cbind(1, val, val^2)
 
@@ -372,7 +388,11 @@ for(ii in seq(data$O)) {
   h <- list()
   for(jj in seq(length(val))) {
     # all posterior estimates for env value of dat[1, ]
-    h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[, ii])
+    if(!(best %in% 1:2)) {
+      h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[, ii])
+    } else {
+      h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii])
+    }
   }
   coh.est[[ii]] <- h
 }
@@ -395,8 +415,8 @@ cohmust <- cohmust + geom_line(data = meanquad,
                                mapping = aes(x = env,
                                              y = resp,
                                              group = NULL),
-                               colour = 'blue')
-cohmust <- cohmust + geom_line(alpha = 1 / 100)
+                               colour = 'darkgrey')
+cohmust <- cohmust + geom_line(alpha = 1 / 100, colour = 'blue')
 cohmust <- cohmust + facet_wrap(~ coh, switch = 'x')
 cohmust <- cohmust + theme(axis.text = element_text(size = 6),
                            strip.text = element_text(size = 6))

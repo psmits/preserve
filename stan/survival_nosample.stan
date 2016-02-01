@@ -122,7 +122,7 @@ generated quantities {
   }
   for(i in 1:N_cen) {
     log_lik[i + N_unc] <- weibull_ccdf_log(dur_cen[i], 
-        alpha[i + N_unc], hold[i]);
+        alpha[i + N_unc], hold[i + N_unc]);
   }
 
   // posterior predictive simulations
@@ -130,7 +130,7 @@ generated quantities {
     y_tilde[i] <- weibull_rng(alpha[i], hold[i]);
   }
   for(i in 1:N_cen) {
-    y_tilde[i + N_unc] <- weibull_rng(alpha[N_unc + i], hold[i]);
+    y_tilde[i + N_unc] <- weibull_rng(alpha[N_unc + i], hold[i + N_unc]);
   }
 }
 
