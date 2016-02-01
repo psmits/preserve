@@ -86,7 +86,7 @@ print.xtable(param.table, file = '../doc/table_param.tex')
 
 # probabilty of negative correlation term
 cor.int.range <- sum((wei.fit$Omega[, 1, 2] < 0)) / 4000
-cor.inf.env <- sum((wei.fit$Omega[, 1, 3] < 0)) / 4000
+cor.int.env <- sum((wei.fit$Omega[, 1, 3] < 0)) / 4000
 # but but but
 #   massive difference in the between cohort variances of these two regression coefficients
 #   see param.est table!

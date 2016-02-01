@@ -351,7 +351,7 @@ quad.mean <- function(x, mcoef) {
   # depends on if alpha varies by cohort
 }
 
-val <- seq(from = -0.5, to = 0.5, by = 0.001)
+val <- seq(from = -2, to = 2, by = 0.01)
 quadval <- list()
 for(ii in seq(length(sam))) {
   quadval[[ii]] <- data.frame(env = val, resp = quad(val, sam[ii]), sim = ii)
@@ -380,7 +380,7 @@ if(!(best %in% 1:2)) {
 } else {
   alp.coh <- wei.fit$alpha_trans[sam]
 }
-val <- seq(from = -0.5, to = 0.5, by = 0.001)
+val <- seq(from = -2, to = 2, by = 0.01)
 dat <- cbind(1, val, val^2)
 
 coh.est <- list()
