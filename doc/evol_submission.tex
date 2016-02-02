@@ -71,6 +71,12 @@ Given these findings, I predict that as extinction risk increases, the extinctio
 
 Body size, measured as shell length, was also considered as a potential trait that influences extinction risk \citep{Payne2014}. Body size is a proxy for metabolic activity and other correlated life history traits \citep{Payne2014}. There is no strong hypothesis of how body size effects extinction risk in brachiopods, such that a positive, negative, or zero effect are all plausible. 
 
+% sampling and samplings interaction with other covariates (i.e. geographic range, environmental preference)
+%   what's the functional form of how sampling affects observed duration? background etc.
+%   my thoughts on sampling are much more akin to ``commonness'' or chance of being observed in any stage during its duration
+%     combines preservation and abundance into one value
+%     why? 
+%   why not do something more like your measure of environmental preference?
 
 
 \section{Materials and Methods}
@@ -82,18 +88,18 @@ The dataset analyzed here was sourced from the Paleobiology Database (http://www
 % justification of using genus level versus specific
 Fossil occurrences were analyzed at the genus level which is common for paleobiological, macroevolution, or macroecological studies of marine invertebrates \citep{Alroy2010,Foote2013,Harnik2013,Kiessling2007a,Miller2009a,Nurnberg2013a,Nurnberg2015,Payne2007,Simpson2009,Vilhena2013}. While species diversity dynamics are of much greater interest than those of higher taxa, the nature of the fossil record makes accurate and precise taxonomic assignments at the species level for all occurrences. In particular, the simplicity of brachiopod external morphology and the quality of preservation makes it very difficult for assignments below the genus level. As such, the choice to analyze genera as opposed to species was in order to assure a minimum level of confidence and accuracy in the data analyzed here.
 
-Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to fossils themselves but instead fossils are known from a geological interval which represents some temporal range. Stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage were right censored at the Changhsingian. Genera with a duration of only one stage were left censored (Appendix \ref{sec:cen}). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), and body size (\(m\)). 
+Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to fossils themselves but instead fossils are known from a geological interval which represents some temporal range. Stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage were right censored at the Changhsingian. Genera with a duration of only one stage were left censored (Appendix \ref{sec:cen}). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), body size (\(m\)), sampling (\(s\)), and both the interaction of sampling and geographic range (\(sXr\)) and sampling and environmental preference (\(sXv\)). 
 
 Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}. For each stage, the total number of occupied grid cells was calculated. Then, for each genus, the number of grid cells occupied by that genus was calculated. Dividing the genus occupancy by the total occupancy gives the relative occupancy of that genus. Mean relative genus occupancy was then calculated as the mean of the per stage relative occupancies of that genus. 
 
 Sampling was calculated as the average relative number of occurrences per temporal unit. That is, for each geographic unit between the first and last appearance of a taxon, the total number of occurrences of that taxon is divided by the total number of occurrences during that temporal unit. The average of all these ratios is that taxon's average sampling \(s\). Sampling was included as a covariate along with its interactions with geographic range and environmental preference. No other interaction terms were considered.
 
-Environmental preference \(v\) was defined as probability of observing the ratio of epicontinental occurrences to total occurrences (\(e_{i} / E_{i}\)) or greater given the background occurrence probability \(\theta^{\prime}_{i}\) as estimated from all other taxa occurring at the same time (\(e^{\prime}_{i} / E^{\prime}_{i}\)). This measure of environmental preference is expressed.
+Environmental preference \(v\) was defined as probability of observing the ratio of epicontinental occurrences to total occurrences (\(\theta_{i} = e_{i} / E_{i}\)) or greater given the background occurrence probability \(\theta^{\prime}_{i}\) as estimated from all other taxa occurring at the same time (\(e^{\prime}_{i} / E^{\prime}_{i}\)). This measure of environmental preference is expressed.
 \begin{equation}
   \begin{aligned}
     p\left(\theta^{\prime}_{i} \middle| \frac{e^{\prime}_{i}}{E^{\prime}_{i}}\right) &\propto \mathrm{Beta}(e^{\prime}_{i}, E^{\prime}_{i} - e^{\prime}_{i}) \mathrm{Beta}(1, 1) \\
     &= \mathrm{Beta}(e^{\prime}_{i} + 1, E^{\prime}_{i} - e^{\prime}_{i} + 1) \\
-    v &= p(\theta_{i} > \theta^{\prime}_{i}) \\
+    v &= Pr(\theta_{i} > \theta^{\prime}_{i}) \\
   \end{aligned}
   \label{eq:envpref}
 \end{equation}
@@ -130,26 +136,29 @@ The full sampling statement, along with all necessary transformations and priors
     \mu_{v} &\sim \mathcal{N}(0, 1) \\
     \mu_{v^{2}} &\sim \mathcal{N}(1, 1) \\
     \mu_{m} &\sim \mathcal{N}(0, 1) \\
+    \mu_{s} &\sim \mathcal{N}(-1, 1) \\
+    \mu_{sXr} &\sim \mathcal{N}(0, 1) \\
+    \mu_{sXv} &\sim \mathcal{N}(0, 1) \\
     \Sigma &= \text{Diag}(\tau) \Omega \text{Diag}(\tau) \\
     \tau &\sim \mathrm{C^{+}}(1) \\
     \Omega &\sim \text{LKJ}(2) \\
-    \alpha_{i} &= \exp\left(\mathcal{N}(\alpha^{\prime} + a_{j[i]} + \gamma s_{i}, \sigma^{\alpha})\right) \\
+    \alpha_{i} &= \exp\left(\mathcal{N}(\alpha^{\prime} + a_{j[i]}, \sigma^{\alpha})\right) \\
     \alpha^{\prime} &\sim \mathcal{N}(0, 1) \\
     a_{j} &\sim \mathcal{N}(0, \sigma^{a}) \\
     \sigma^{a} &\sim \mathrm{C^{+}}(1) \\
-    \gamma &\sim \mathcal{N}(0, 1) \\
     \sigma^{\alpha} &\sim \mathrm{C^{+}}(1). \\
   \end{aligned}
   \label{eq:wei_total}
 \end{equation}
 
-The  joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 draws each, split half warm-up and half sampling and thinned to every 10th sample for a total of 5000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
+The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 steps each, split half warm-up and half sampling and thinned to every 10th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
 The fit of the above model (Eq. \ref{eq:wei_total}; the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling or sampling interaction terms as covariates, or both constant \(\alpha\) and no sampling covariates. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling CITATIONS.
+%Out-of-sample predictive accuracy is a measure of the expected fit of the model to new data. 
 
-The four models were compared for out-of-sample predictive accuracy using the widely-applicable information criterion (WAIC) \citep{Watanabe2010a}, a more fully Bayesian alternative to AIC or DIC \citep{Gelman2013d}. Out-of-sample predictive accuracy is a measure of the expected fit of the model to new data. However, because the Weibull distribution reduces to the exponential distribution when \(\alpha = 1\), my interest is not in choosing between these models. Instead, comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
+WAIC is a more fully Bayesian alternative to AIC or DIC \citep{Watanabe2010a,Gelman2013d}; comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
 
-WAIC can be considered a fully Bayesian alternative to the Akaike information criterion, where WAIC acts as an approximation of leave-one-out cross-validation which acts as a measure of out-of-sample predictive accuracy \citep{Gelman2013d}. WAIC is calculated starting with the log pointwise posterior predictive density calculated as
+WAIC is calculated starting with the log pointwise posterior predictive density calculated as
 \begin{equation}
   \mathrm{lppd} = \sum_{i = 1}^{n} \log \left(\frac{1}{S} \sum_{s = 1}^{S} p(y_{i}|\Theta^{S})\right),
   \label{eq:lppd}
@@ -179,8 +188,6 @@ Model adequacy was evaluated using a couple of posterior predictive checks. The 
 
 
 \section{Results}
-
-As stated above, posterior approximations for both the exponential and Weibull models achieved approximate stationarity after 10,000 steps, as all parameter estimates have an \(\hat{R} < 1.1\).
 
 Comparisons of the survival functions estimated from 1000 posterior predictive data sets to the estimated survival function of the observed genera demonstrates that Weibull models approximately capture the observed pattern of extinction (Fig. \ref{fig:surv}). This is partially expected given that the unit of analysis is genus duration instead of species duration, which can alter the shape of \(S(t)\) \citep{Raup1975,Raup1978,Raup1985,Foote2001a}. Additionally, the Weibull model is expected to have better out-of-sample predictive accuracy than the exponential model (WAIC 4534 versus 4604). Because the difference in WAIC between these two models is large, only those results from the Weibull model will be discussed.
 

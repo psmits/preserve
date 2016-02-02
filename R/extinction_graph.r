@@ -112,11 +112,11 @@ surv.plot <- surv.plot + geom_line(data = sim.surv,
                                    colour = 'black', alpha = 0.01)
 surv.plot <- surv.plot + geom_line(colour = 'blue')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
-#surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
                               y = 'Probability surviving longer than t')
 surv.plot <- surv.plot + theme(axis.title = element_text(size = 25),
                                axis.title.y = element_text(size = 20))
+surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans())
 ggsave(surv.plot, filename = '../doc/figure/survival_curves.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -127,10 +127,10 @@ surv.plot <- surv.plot + geom_line(data = sim.surv,
                                    colour = 'black', alpha = 0.01)
 surv.plot <- surv.plot + geom_line(colour = 'grey')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
-#surv.plot <- surv.plot + facet_grid(. ~ label, labeller = label_parsed)
 surv.plot <- surv.plot + labs(x = 'Duration t', 
                               y = 'Probability surviving greater than t')
 surv.plot <- surv.plot + theme(axis.title = element_text(size = 25))
+surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans())
 ggsave(surv.plot, filename = '../doc/figure/survival_curves_bw.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -151,7 +151,7 @@ ggsave(point.plot, filename = '../doc/figure/quantile.pdf',
 
 
 est.shotgun <- data.frame(obs = duration, 
-                          sim = wei.fit$hold[2, ])
+                          sim = colMeans(wei.fit$hold))
 
 shot.plot <- ggplot(est.shotgun, aes(x = obs, y = sim))
 shot.plot <- shot.plot + stat_function(fun = function(x) x, 
@@ -399,13 +399,14 @@ for(ii in seq(data$O)) {
 
 # massage into shape
 #   val, resp (V2), sim, coh
+stg.name <- as.character(lump[5:(5+33-1), 4])
 coh.map <- list()
 for(jj in seq(data$O)) {
   h <- Map(function(x, y) {
            cbind(val = x, resp = coh.est[[jj]][[y]], sim = seq(1000))}, 
            x = val, y = seq(length(val)))
   h <- Reduce(rbind, h)
-  coh.map[[jj]] <- data.frame(h, coh = jj)  # update coh to be stage name (use jj as index)
+  coh.map[[jj]] <- data.frame(h, coh = stg.name[jj])
 }
 coh.df <- Reduce(rbind, coh.map)
 
@@ -417,9 +418,9 @@ cohmust <- cohmust + geom_line(data = meanquad,
                                              group = NULL),
                                colour = 'darkgrey')
 cohmust <- cohmust + geom_line(alpha = 1 / 100, colour = 'blue')
-cohmust <- cohmust + facet_wrap(~ coh, switch = 'x')
+cohmust <- cohmust + facet_wrap(~ coh, switch = 'x', ncol = 7)
 cohmust <- cohmust + theme(axis.text = element_text(size = 6),
                            strip.text = element_text(size = 6))
 cohmust <- cohmust + labs(x = 'Environmental preference', y = 'log(sigma)')
 ggsave(cohmust, filename = '../doc/figure/env_cohort.pdf',
-       width = 7.5, height = 10, dpi = 600)
+       width = 7.5, height = 8, dpi = 600)
