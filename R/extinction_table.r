@@ -12,6 +12,7 @@ library(gridExtra)
 library(xtable)
 library(ellipse)
 library(loo)
+library(ppcor)
 source('../R/mung.r')
 source('../R/multiplot.r')
 source('../R/borrow_plotcorr.r')
@@ -53,23 +54,51 @@ waic.est <- llply(log.liks, waic)
 waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], 
                            waic.est[[3]], waic.est[[4]])
 
+
+
 best <- str_extract(names(which.max(waic.table[, ncol(waic.table)])), '[0-9]')
 best <- as.numeric(best)
 
 wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
-
 # this will need to be updated with number of models
-npred <- ifelse(best %in% c(2, 3), 5, 8)
+npred <- ifelse(best %in% c(2, 3), 5, 6)
 
 
 # start asking questions and making tables
 
+
+# partial correlation between duration, occupancy, preservation
+par.cor <- data.frame(dur = sepkoski.data$duration, 
+                      oc = rescale(logit(sepkoski.data$occupy)), 
+                      gp = rescale(sepkoski.data$gap))
+cor.mat <- cor(par.cor)            # correlation matrix
+pcor.mat <- pcor(par.cor)$estimate  # partial correlation matrix
+
+n <- c('duration', 'geographic range', 'gap ratio')
+rownames(cor.mat) <- colnames(cor.mat) <- n
+rownames(pcor.mat) <- colnames(pcor.mat) <- n
+diag(cor.mat) <- diag(pcor.mat) <- NA
+cor.tex <- xtable(cor.mat, label = 'tab:corr')
+pcor.tex <- xtable(pcor.mat, label = 'tab:pcor')
+print.xtable(cor.tex, file = '../doc/covariate_cor.tex')
+print.xtable(pcor.tex, file = '../doc/covariate_pcor.tex')
+
+
+
+# waic, loo comparison table
+comparison.tab <- data.frame(waic = waic.table[, 1], looic = loo.table[, 1])
+comparison.tab <- comparison.tab[c(2, 1, 3, 4), ]
+rownames(comparison.tab) <- c('constant alpha', 'constant alpha, no sampling',
+                              'no sampling', 'full model')
+comparison.tex <- xtable(comparison.tab, label = 'tab:comparison')
+print.xtable(comparison.tex, file = '../doc/comparison_table.tex')
+
+
+
 # mean of all coefficients
 # sd of all coefficients
-name.mu <- c('mu_i', 'mu_r', 'mu_v', 'mu_v2', 'mu_m', 
-             'mu_s', 'mu_rXs', 'mu_vXs')
-name.tau <- c('tau_i', 'tau_r', 'tau_v', 'tau_v2', 'tau_m', 
-              'tau_s', 'tau_rXs', 'tau_vXs')
+name.mu <- c('mu_i', 'mu_r', 'mu_v', 'mu_v2', 'mu_m', 'mu_s')
+name.tau <- c('tau_i', 'tau_r', 'tau_v', 'tau_v2', 'tau_m', 'tau_s')
 qq <- c(0.1, 0.5, 0.9)
 param.est <- rbind(data.frame(p = name.mu[1:npred],
                               m = apply(wei.fit$mu_prior, 2, mean), 
@@ -100,12 +129,11 @@ tv.gt.sr <- sum(apply(wei.fit$sigma[, 2:3], 1, function(x) x[2] > x[1])) / 4000
 coef.inf <- wei.fit$mu_prior[, 3:4]
 inf.rel <- sum((-(coef.inf[, 1])) / (2 * coef.inf[, 2]) > 0) / 4000
 
-
-inf.cohort <- inf.crazy.low <- inf.crazy.hgh <- c()
+inf.cohort <- inf.low <- inf.hgh <- c()
 
 for(ii in seq(data$O)) {
   h <- wei.fit$beta[, ii, 3:4]
   inf.cohort[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0) / 4000
-  inf.crazy.low[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0.5) / 4000
-  inf.crazy.hgh[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) < (-0.5)) / 4000
+  inf.low[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0.5) / 4000
+  inf.hgh[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) < (-0.5)) / 4000
 }

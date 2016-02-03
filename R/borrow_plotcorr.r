@@ -29,12 +29,8 @@ my.plotcorr <- function (corr, outline = FALSE, col = "grey", upper.panel = c("e
   #collabs <- as.character(collabs)
   collabs <- rowlabs <- c(expression(beta[intercept]), expression(beta[range]), 
     expression(beta[preference]), expression(beta[breadth]), 
-    expression(beta[size]), expression(beta[sampling]),
-    expression(beta[rXs]), expression(beta[vXs]))
+    expression(beta[size]), expression(beta[sampling]))
   collabs <- rowlabs <- rowlabs[seq(npred)]
-  #collabs <- rowlabs <- c(expression(beta[intercept]), expression(beta[range]), 
-  #  expression(beta[environment]), expression(beta[environment^2]), 
-  #  expression(beta[size]))
   col <- rep(col, length = length(corr))
   dim(col) <- dim(corr)
   upper.panel <- match.arg(upper.panel)

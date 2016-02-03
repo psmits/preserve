@@ -54,17 +54,30 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   bibr <- bibr[bibr$occurrences.class_name == taxon, ]
   bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
 
-  ## lithology
-  ## high chance of removing occurrences
-  #bibr$collections.lithology1 <- as.character(bibr$collections.lithology1)
-  #bibr <- bibr[!is.na(bibr$collections.lithology1), ]
-  #lith <- bibr$collections.lithology1
-  #lith <- gsub(pattern = '[\\"?]', replacement = '', lith, perl = TRUE)
-  #bibr$collections.lithology1 <- clean.lith(lith)
-  #bibr <- bibr[!(bibr$collections.lithology1 %in% c('', 'mixed')), ]
+  # gap-iness of each stage
+  dd <- split(bibr, bibr[, bins])
+  dd <- llply(dd, function(x) unique(x$occurrences.genus_name))
+ 
+  mm <- as.character(lump[, 2]) %in% names(dd)
+  mm <- as.character(lump[mm, 2])
+  
+  dd <- dd[names(dd) %in% as.character(lump[, 2])]
+  dd <- dd[names(dd)[match(mm, names(dd))]]
 
-  #bibr <- bibr[bibr[, bins] %in% gts, ] 
+  gap.ratio <- c()  # gap / range through
+  for(ii in seq(from = 1, to = length(dd) - 2)) {
+    # before and after
+    rngthr <- dd[[ii]][dd[[ii]] %in% dd[[ii + 2]]]
+    # in?
+    no.gap <- dd[[ii + 1]][dd[[ii + 1]] %in% rngthr]
+    gap.ratio[ii] <- (length(rngthr) - length(no.gap)) / length(rngthr)
+    gap.ratio[ii] <- ifelse(is.nan(gap.ratio[ii]), 0, gap.ratio[ii])
+  }
+  gap.ratio <- data.frame(stg = as.character(names(dd)[seq(length(dd) - 2)]), 
+                          gap.ratio)
+  
 
+  #
   straight.occ <- dlply(bibr, .(occurrences.genus_name), 
                         function(x) unique(x[, bins]))
   # find out which range into the paleozoic
@@ -102,6 +115,14 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
 
   taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
                        table(x[, bins])})
+
+  taxon.gap <- c()
+  for(ii in seq(length(taxon.occur))) {
+    tm <- match(names(taxon.occur[[ii]]), gap.ratio[, 1])
+    taxon.gap[ii] <- mean(gap.ratio[seq(from = min(tm), to = max(tm)), 2])
+  }
+  names(taxon.gap) <- names(taxon.occur)
+
 
   # this is about geographic range size
   eq <- CRS("+proj=cea +lat_0=0 +lon_0=0 +lat_ts=30 +a=6371228.0 +units=m")
@@ -148,25 +169,6 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
     onoff[ii, 5] <- off.back
   }
 
-  ## do the above based on lithology
-  #litho <- ddply(bibr, .(occurrences.genus_name), summarize,
-  #               carbonate = sum(collections.lithology1 == 'carbonate'),
-  #               clastic = sum(collections.lithology1 == 'clastic'))
-  ## now for each stage, get the epi and off
-  #big.litho <- ddply(bibr, .(colstage), summarize,
-  #                   carbonate = sum(collections.lithology1 == 'carbonate'),
-  #                   clastic = sum(collections.lithology1 == 'clastic'))
-  #for(ii in seq(length(taxon.occur))) {
-  #  app <- which(gts %in% names(taxon.occur[[ii]]))
-  #  wh <- gts[seq(min(app), max(app))]
-  #  background <- big.litho[big.litho[, 1] %in% wh, ]
-  #  car.back <- sum(background$car) - litho[ii, 2]
-  #  cla.back <- sum(background$cla) - litho[ii, 3]
-  #  litho[ii, 4] <- car.back
-  #  litho[ii, 5] <- cla.back
-  #}
-
-
   # the number of collections to offset each observation by 
   off <- list()
   for(ii in seq(length(taxon.occur))) {
@@ -184,6 +186,10 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
     taxon.occur[[ii]] <- keep
   }
   occurs <- lapply(taxon.occur, length)
+
+
+  # average gap percent of stages of taxon duration
+  #   those before and after but not during, relative to total before after
 
   # get species duration along with if died in stage at/after mass extinction
   wh.stage <- llply(off, names)
@@ -247,6 +253,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   sepkoski.data$fauna <- as.character(sepkoski.data$fauna)
   sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
   sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]
+  sepkoski.data$gap <- taxon.gap[match(sepkoski.data$genus, names(taxon.gap))]
   sepkoski.data
 }
 

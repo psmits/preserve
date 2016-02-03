@@ -15,6 +15,12 @@ lump <- read.csv(paste0('../data/', lump.file))
 
 payne <- read.table('../data/payne_bodysize/Occurrence_PaleoDB.txt',
                     header = TRUE, stringsAsFactors = FALSE)
+
+#taxon = 'Rhynchonellata'
+#bins = 'StageNewOrdSplitNoriRhae20Nov2013'
+#gts = rev(as.character(lump[, 2]))
+#cuts = 'Chang'
+#bot = 'Trem'
 short.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
                         bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
                         gts = rev(as.character(lump[, 2])),
@@ -38,6 +44,7 @@ con.orig <- mapvalues(con.orig, from = unique(con.orig),
 num.orig <- length(unique(con.orig))
 
 
+
 # environmental preference
 prob.epi <- qbeta(short.data$epi / (short.data$epi + short.data$off), 
                   short.data$epi.bck + 1, short.data$off.bck + 1)
@@ -56,7 +63,9 @@ data <- list(duration = short.data$duration,
              occupy = rescale(logit(short.data$occupy)),
              env = env.odds,
              samp = samples,
-             size = rescale(log(short.data$size)))
+             size = rescale(log(short.data$size)),
+             gap = rescale(short.data$gap))
+
 
 dead <- short.data$censored != 1
 unc <- llply(data, function(x) x[dead])
@@ -67,6 +76,7 @@ data <- list(dur_unc = unc$duration,
              occupy_unc = unc$occupy,
              env_unc = unc$env,
              samp_unc= unc$samp,
+             gap_unc= unc$gap,
              size_unc = unc$size,
              N_unc = length(unc$duration),
              dur_cen = cen$duration,
@@ -74,6 +84,7 @@ data <- list(dur_unc = unc$duration,
              occupy_cen = cen$occupy,
              env_cen = cen$env,
              samp_cen = cen$samp,
+             gap_cen= cen$gap,
              size_cen = cen$size,
              N_cen = length(cen$duration))
 
@@ -87,5 +98,6 @@ with(data, {stan_rdump(list = c('N', 'O',
                                 'occupy_unc', 'occupy_cen',
                                 'env_unc', 'env_cen',
                                 'samp_unc', 'samp_cen',
+                                'gap_unc', 'gap_cen',
                                 'size_unc', 'size_cen'),
                        file = '../data/data_dump/fauna_info.data.R')})

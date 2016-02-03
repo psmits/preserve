@@ -59,7 +59,7 @@ wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
 wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 1000), ]
 
 # this will need to be updated with number of models
-npred <- ifelse(best %in% c(2, 3), 5, 8)  
+npred <- ifelse(best %in% c(2, 3), 5, 6)  # 
 
 #
 theme_set(theme_bw())
@@ -76,7 +76,7 @@ theme_update(axis.text = element_text(size = 10),
 coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 rage <- c(data$occupy_unc, data$occupy_cen)
-envs <- c(data$env_unc, data$env_cen)  # maximum a posteriori estimate
+envs <- c(data$env_unc, data$env_cen)
 size <- c(data$size_unc, data$size_cen)
 duration <- c(data$dur_unc, data$dur_cen)
 
@@ -94,7 +94,7 @@ emp.surv <- rbind(c(0, 1), emp.surv)
 wei.surv <- apply(wr, 1, function(x) survfit(Surv(x) ~ 1))
 wei.surv <- llply(wei.surv, function(x) {
                   y <- data.frame(time = x$time, surv = x$surv)
-                  y <- rbind(c(0, 1), y)
+                  y <- rbind(c(0, 1), y[-nrow(y), ])
                   y})
 wei.surv <- Reduce(rbind, Map(function(x, y) {
                               x$group <- y
@@ -116,7 +116,8 @@ surv.plot <- surv.plot + labs(x = 'Duration (t)',
                               y = 'Probability surviving longer than t')
 surv.plot <- surv.plot + theme(axis.title = element_text(size = 25),
                                axis.title.y = element_text(size = 20))
-surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans())
+surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans(),
+                                            breaks = c(0.01, 0.1, 0.5, 1))
 ggsave(surv.plot, filename = '../doc/figure/survival_curves.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -130,7 +131,8 @@ surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + labs(x = 'Duration t', 
                               y = 'Probability surviving greater than t')
 surv.plot <- surv.plot + theme(axis.title = element_text(size = 25))
-surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans())
+surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans(),
+                                            breaks = c(0.01, 0.1, 0.5, 1))
 ggsave(surv.plot, filename = '../doc/figure/survival_curves_bw.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -158,8 +160,8 @@ shot.plot <- shot.plot + stat_function(fun = function(x) x,
                                        lty = 'dashed', 
                                        colour = 'darkgrey')
 shot.plot <- shot.plot + geom_point(alpha = 0.5)
-shot.plot <- shot.plot + labs(x = 'Observed durations',
-                              y = '\\tilde{sigma}')
+shot.plot <- shot.plot + labs(x = 'Observed duration',
+                              y = expression(tilde(sigma)))
 ggsave(shot.plot, filename = '../doc/figure/shotgun.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -195,7 +197,7 @@ get.covcor <- function(stanfit, npred) {
   out <- list(cor.median, cor.mean, cor.10, cor.90, 
               cov.median, cov.mean, cov.10, cov.90)
   out <- llply(out, function(x) {
-               nn <- c('i', 'r', 'e', 'e2', 'm', 's', 'sXr', 'sXv')
+               nn <- c('i', 'r', 'e', 'e2', 'm', 's')
                nn <- nn[seq(npred)]
                rownames(x) <- colnames(x) <- nn
                x})
@@ -254,7 +256,7 @@ efbeta.h <- Map(function(x) data.frame(efbeta.h[[x]],
                                        pred = seq(npred)), seq(data$O))
 efbeta.df <- Reduce(rbind, efbeta.h)
 too <- c('beta[0]', 'beta[r]', 'beta[v]', 'beta[v^2]', 'beta[m]', 
-         'beta[s]', 'beta[rXs]', 'beta[vXs]')[seq(npred)]
+         'beta[s]')[seq(npred)]
 efbeta.df$pred <- mapvalues(efbeta.df$pred, 
                             from = seq(npred), 
                             to = too)
@@ -274,7 +276,8 @@ efbeta.plot <- efbeta.plot + geom_pointrange(mapping = aes(ymin = X10.,
                                                            ymax = X90.),
                                              fatten = 2)
 efbeta.plot <- efbeta.plot + facet_grid(pred ~ .,
-                                        scales = 'free_y', switch = 'y')
+                                        scales = 'free_y', switch = 'y',
+                                        labeller = label_parsed)
 efbeta.plot <- efbeta.plot + geom_ribbon(data = ef.df, 
                                          mapping = aes(ymin = X10.,
                                                        ymax = X90.),
@@ -366,7 +369,7 @@ mustache <- mustache + geom_line(alpha = 1 / 100)
 mustache <- mustache + geom_line(data = meanquad,
                                  mapping = aes(group = NULL),
                                  colour = 'blue')
-mustache <- mustache + labs(x = 'Environmental preference', y = 'log(sigma)')
+mustache <- mustache + labs(x = 'Environmental preference', y = expression(paste('log ', sigma)))
 ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
        width = 6, height = 5, dpi = 600)
 

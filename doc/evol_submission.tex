@@ -32,11 +32,11 @@
 
   \textbf{Keywords:} macroevolution, extinction, macroecology, Bayesian, brachiopods
 
-  \textbf{Word count:} approximately 5800.
+  \textbf{Word count:} 
   
-  \textbf{Table count:} 1.
+  \textbf{Table count:}
  
-  \textbf{Figure count:} 5.
+  \textbf{Figure count:}
 
   \textbf{Data archival location:} If accepted, all data and code necessary to duplicate this analysis will be made available on DRYAD.
 
@@ -69,44 +69,43 @@ Epicontinental seas are a shallow-marine environment where the ocean has spread 
 
 Given these findings, I predict that as extinction risk increases, the extinction risk associated with favoring open-ocean environments should generally increase. Additionally, there is a possible nonlinear relationship between environmental preference and taxon duration. A long standing hypothesis is that generalists or unspecialized taxa will have greater survival than specialists \citep{Simpson1944,Liow2004a,Liow2007b,Nurnberg2013a,Nurnberg2015,Baumiller1993}. In this analysis I allowed for environmental preference to have a parabolic effect on taxon duration 
 
-Body size, measured as shell length, was also considered as a potential trait that influences extinction risk \citep{Payne2014}. Body size is a proxy for metabolic activity and other correlated life history traits \citep{Payne2014}. There is no strong hypothesis of how body size effects extinction risk in brachiopods, such that a positive, negative, or zero effect are all plausible. 
+Body size, measured as shell length, was also considered as a potential trait that influences extinction risk \citep{Payne2014}. Body size is a proxy for metabolic activity and other correlated life history traits \citep{Payne2014}. Given no strong evidence that body size effects extinction risk in brachiopods, the effect is most likely small and could be either positive, negative, or even absent.
 
-% sampling and samplings interaction with other covariates (i.e. geographic range, environmental preference)
-%   what's the functional form of how sampling affects observed duration? background etc.
-%   my thoughts on sampling are much more akin to ``commonness'' or chance of being observed in any stage during its duration
-%     combines preservation and abundance into one value
-%     why? 
-%   why not do something more like your measure of environmental preference?
+% sampling
+%   potential confounding factor
+%   gap ratio
+%   how would this effect duration? no clue
+%     assume linear
 
 
 \section{Materials and Methods}
 
 \subsection{Fossil occurrence information}
 
-The dataset analyzed here was sourced from the Paleobiology Database (http://www.paleodb.org) which was then filtered based on taxonomic, temporal, stratigraphic, and other occurrence information that was necessary for this analysis. These filtering criteria are very similar to those from \citet{Foote2013} with an additional constraint of being present in the body size data set from \citet{Payne2014}. Epicontinental versus open-ocean assignments for each fossil occurrence are partially based on those from \citet{Miller2009a}, with additional occurrences assigned similarly (Miller and Foote, personal communication). Sampled occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. 
+The dataset analyzed here was sourced from the Paleobiology Database (http://www.paleodb.org) which was then filtered based on taxonomic, temporal, stratigraphic, and other occurrence information used in this analysis. These filtering criteria are very similar to those from \citet{Foote2013} with an additional constraint of being present in the body size data set from \citet{Payne2014}. Epicontinental versus open-ocean assignments for each fossil occurrence are partially based on those from \citet{Miller2009a}, with additional occurrences assigned similarly (Miller and Foote, personal communication). Analyzed occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. 
 
 % justification of using genus level versus specific
-Fossil occurrences were analyzed at the genus level which is common for paleobiological, macroevolution, or macroecological studies of marine invertebrates \citep{Alroy2010,Foote2013,Harnik2013,Kiessling2007a,Miller2009a,Nurnberg2013a,Nurnberg2015,Payne2007,Simpson2009,Vilhena2013}. While species diversity dynamics are of much greater interest than those of higher taxa, the nature of the fossil record makes accurate and precise taxonomic assignments at the species level for all occurrences. In particular, the simplicity of brachiopod external morphology and the quality of preservation makes it very difficult for assignments below the genus level. As such, the choice to analyze genera as opposed to species was in order to assure a minimum level of confidence and accuracy in the data analyzed here.
+Fossil occurrences were analyzed at the genus level which is common for paleobiological, macroevolution, or macroecological studies of marine invertebrates \citep{Alroy2010,Foote2013,Harnik2013,Kiessling2007a,Miller2009a,Nurnberg2013a,Nurnberg2015,Payne2007,Simpson2009,Vilhena2013}. While species diversity dynamics is frequently of much greater interest than those of higher taxa (though see \citealt{Foote2014b,Harnik2014a,Hoehn2015}), the nature of the fossil record makes accurate and precise taxonomic assignments at the species level for all occurrences. In particular, the simplicity of brachiopod external morphology and the quality of preservation makes it very difficult for assignments below the genus level. As such, the choice to analyze genera as opposed to species was in order to assure a minimum level of confidence and accuracy in the data analyzed here.
 
-Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to fossils themselves but instead fossils are known from a geological interval which represents some temporal range. Stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage were right censored at the Changhsingian. Genera with a duration of only one stage were left censored (Appendix \ref{sec:cen}). The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), body size (\(m\)), sampling (\(s\)), and both the interaction of sampling and geographic range (\(sXr\)) and sampling and environmental preference (\(sXv\)). 
+Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to fossils themselves but instead fossils are known from a geological interval which represents some temporal range. Stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage were right censored at the Changhsingian; genera with a duration of only one stage were left censored \citep{Klein2003}. The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), body size (\(m\)), and sampling (\(s\)).
 
 Geographic range was calculated using an occupancy approach. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}. For each stage, the total number of occupied grid cells was calculated. Then, for each genus, the number of grid cells occupied by that genus was calculated. Dividing the genus occupancy by the total occupancy gives the relative occupancy of that genus. Mean relative genus occupancy was then calculated as the mean of the per stage relative occupancies of that genus. 
 
-Sampling was calculated as the average relative number of occurrences per temporal unit. That is, for each geographic unit between the first and last appearance of a taxon, the total number of occurrences of that taxon is divided by the total number of occurrences during that temporal unit. The average of all these ratios is that taxon's average sampling \(s\). Sampling was included as a covariate along with its interactions with geographic range and environmental preference. No other interaction terms were considered.
+Sampling \(s\) was calcualted as the average ``gap ratio'' of all stages in which a taxon existed. The basis of the gap ratio are range-through taxa, which are taxa, for any stage \(t\), that are present in stages \(t-1\) and \(t+1\) CITATION FOOTE ALROY. A gap is when a range-through taxon is not present in stage \(t\). The gap ratio for a stage is the number of gaps divided by the total number of range-through taxa, and the gap ratio for an individual taxon is the average of all gap ratios for each stage the taxon is present (inclusive). Additional occurrence information for the late Cambrian and earliest Trassic were used to calculate the gap ratios of the first and last stages included in this analysis. 
 
 Environmental preference \(v\) was defined as probability of observing the ratio of epicontinental occurrences to total occurrences (\(\theta_{i} = e_{i} / E_{i}\)) or greater given the background occurrence probability \(\theta^{\prime}_{i}\) as estimated from all other taxa occurring at the same time (\(e^{\prime}_{i} / E^{\prime}_{i}\)). This measure of environmental preference is expressed.
 \begin{equation}
   \begin{aligned}
-    p\left(\theta^{\prime}_{i} \middle| \frac{e^{\prime}_{i}}{E^{\prime}_{i}}\right) &\propto \mathrm{Beta}(e^{\prime}_{i}, E^{\prime}_{i} - e^{\prime}_{i}) \mathrm{Beta}(1, 1) \\
+    p\left(\theta^{\prime}_{i} \middle| e^{\prime}_{i}, E^{\prime}_{i} \right) &\propto \mathrm{Beta}(e^{\prime}_{i}, E^{\prime}_{i} - e^{\prime}_{i}) \mathrm{Beta}(1, 1) \\
     &= \mathrm{Beta}(e^{\prime}_{i} + 1, E^{\prime}_{i} - e^{\prime}_{i} + 1) \\
     v &= Pr(\theta_{i} > \theta^{\prime}_{i}) \\
   \end{aligned}
   \label{eq:envpref}
 \end{equation}
 
-Body size data was sourced directly from \citet{Payne2014}.
+Body size, measured as shell length, was sourced directly from \citet{Payne2014}.
 
-Prior to analysis, geographic range \(r\) and sampling \(s\) were both logit transformed and body size \(m\) was natural-log transformed prior to analysis. All covariates were standardized by subtracting the mean from all values and dividing by twice its standard deviation, which follows \citet{Gelman2007}. This standardization means that all regression coefficients are comparable as the expected change per 1-unit change in any of the covariates. 
+Prior to analysis, geographic range \(r\) was logit transformed and body size \(m\) was natural-log transformed. All covariates were then standardized by subtracting the mean from all values and dividing by twice its standard deviation, which follows \citet{Gelman2007}. This standardization means that all regression coefficients are comparable as the expected change per 1-unit change in the rescaled covariates. 
 
 
 \subsection{Analytical approach}
@@ -117,11 +116,11 @@ This partial pooling is one of the greatest advantages of hierarchical modeling.
 
 All covariate effects (regression coefficients), as well as the intercept term (baseline extinction risk), were allowed to vary by group (origination cohort). The covariance/correlation between covariate effects was also modeled. This hierarchical structure allows inference for how covariates effects may change with respect to each other while simultaneously estimating the effects themselves, propagating our uncertainty through all estimates. 
 
-Genus durations were modeled as time-till-event data \citep{Klein2003}, with covariate information used in estimates of extinction risk as a hierarchical regression model. Genus durations were assumed to follow a Weibull distribution. While the exponential distribution assumes that extinction risk is independent of duration, the Weibull distribution allows for age dependent extinction \citep{Klein2003}. The Weibull distribution has two parameters: a scale \(\sigma\), and a shape \(\alpha\). When \(\alpha = 1\), \(\sigma\) is equal to the expected duration of any taxon. \(\alpha\) acts as a time dilation effect where values greater than 1 indicate that extinction risk increases with age, and values less than 1 indicate that extinction risk decreases with age. Note that the Weibull distribution is equivalent to the exponential distribution when \(\alpha = 1\). 
+Genus durations were assumed to follow a Weibull distribution which allows for age dependent extinction \citep{Klein2003}. The Weibull distribution has two parameters: a scale \(\sigma\), and a shape \(\alpha\). When \(\alpha = 1\), \(\sigma\) is equal to the expected duration of any taxon. \(\alpha\) acts as a time dilation effect where values greater than 1 indicate that extinction risk increases with age, and values less than 1 indicate that extinction risk decreases with age. Note that the Weibull distribution is equivalent to the exponential distribution when \(\alpha = 1\). 
 
 The scale parameter \(\sigma\) was modeled as a regression with both varying intercept and varying slopes. The following variables are defined: \(y_{i}\) is the duration of genus \(i\) in geologic stages, \(X\) is the matrix of covariates including a column of ones for the intercept/constant term, \(B_{j}\) is the vector of regression coefficients for origination cohort \(j\), \(\mu\) is the vector of means of each regression coefficient, \(\Sigma\) is the covariance matrix of the regression coefficients, \(\tau\) is the vector of the standard deviations of the between-cohort variation of the regression coefficient estimates, and \(\Omega\) is the correlation matrix of the regression coefficients. The elements of the vector \(\mu\) were given independent normally distributed priors. The effects of geographic range size and the breadth of environmental preference were given informative priors. The correlation matrix \(\Omega\) was given an almost flat LKJ distributed prior following CITATION STAN manual.
 
-The shape parameter \(\alpha\) was also modeled as a regression with intercept \(\alpha^{\prime}\) and standard deviation \(\sigma^{\alpha}\). The effect of origination cohort \(a_{j}\) is modeled as draws from a shared normal distribution with mean 0 and standard deviation \(\sigma^{a}\). \(\gamma\) is the regression coefficient for the effect of the rescaled logarithm of the number of samples \(s\) of taxon \(i\).
+The shape parameter \(\alpha\) was allowed to vary by cohort. The log of \(\alpha\) was modeled as a regression with intercept \(\alpha^{\prime}\) and standard deviation \(\sigma^{\alpha}\) where the effect of origination cohort \(a_{j}\) is modeled as draws from a shared normal distribution with mean 0 and standard deviation \(\sigma^{a}\). 
 
 Except where noted, regression coefficients were given a weakly informative normally distributed prior, scale (e.g. standard deviation) parameters were given a weakly informative half-Cauchy prior following the CITATION Gelman textbook, STAN manual. 
 
@@ -136,9 +135,7 @@ The full sampling statement, along with all necessary transformations and priors
     \mu_{v} &\sim \mathcal{N}(0, 1) \\
     \mu_{v^{2}} &\sim \mathcal{N}(1, 1) \\
     \mu_{m} &\sim \mathcal{N}(0, 1) \\
-    \mu_{s} &\sim \mathcal{N}(-1, 1) \\
-    \mu_{sXr} &\sim \mathcal{N}(0, 1) \\
-    \mu_{sXv} &\sim \mathcal{N}(0, 1) \\
+    \mu_{s} &\sim \mathcal{N}(0, 1) \\
     \Sigma &= \text{Diag}(\tau) \Omega \text{Diag}(\tau) \\
     \tau &\sim \mathrm{C^{+}}(1) \\
     \Omega &\sim \text{LKJ}(2) \\
@@ -153,35 +150,34 @@ The full sampling statement, along with all necessary transformations and priors
 
 The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 steps each, split half warm-up and half sampling and thinned to every 10th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
-The fit of the above model (Eq. \ref{eq:wei_total}; the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling or sampling interaction terms as covariates, or both constant \(\alpha\) and no sampling covariates. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling CITATIONS.
-%Out-of-sample predictive accuracy is a measure of the expected fit of the model to new data. 
+The fit of the above model (Eq. \ref{eq:wei_total}; the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling as a covariate, or both constant \(\alpha\) and no sampling covariate. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling CITATIONS. Both of these are estimates of the out-of-sample predictive accuracy or the expected quality of fit of the model to new data. 
 
 WAIC is a more fully Bayesian alternative to AIC or DIC \citep{Watanabe2010a,Gelman2013d}; comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
 
-WAIC is calculated starting with the log pointwise posterior predictive density calculated as
-\begin{equation}
-  \mathrm{lppd} = \sum_{i = 1}^{n} \log \left(\frac{1}{S} \sum_{s = 1}^{S} p(y_{i}|\Theta^{S})\right),
-  \label{eq:lppd}
-\end{equation}
-where \(n\) is sample size, \(S\) is the number posterior simulation draws, and \(\Theta\) represents all of the estimated parameters of the model. This is similar to calculating the likelihood of each observation given the entire posterior. A correction for the effective number of parameters is then added to lppd to adjust for overfitting. The effective number of parameters is calculated, following the recommendations of \citet{Gelman2013d}, as
-\begin{equation}
-  p_{\mathrm{WAIC}} = \sum_{i = 1}^{n} V_{s = 1}^{S} (\log p(y_{i}|\Theta^{S})).
-  \label{eq:pwaic}
-\end{equation}
-where \(V\) is the sample posterior variance of the log predictive density for each data point.
-
-Given both equations \ref{eq:lppd} and \ref{eq:pwaic}, WAIC is then calculated
-\begin{equation}
-  \mathrm{WAIC} = \mathrm{lppd} - p_{\mathrm{WAIC}}.
-  \label{eq:waic}
-\end{equation}
-When comparing two or more models, lower WAIC values indicate better out-of-sample predictive accuracy. Importantly, WAIC is just one way of comparing models. When combined with posterior predictive checks it is possible to get a more complete understanding of a model's fit to the data.
+%WAIC is calculated starting with the log pointwise posterior predictive density calculated as
+%\begin{equation}
+%  \mathrm{lppd} = \sum_{i = 1}^{n} \log \left(\frac{1}{S} \sum_{s = 1}^{S} p(y_{i}|\Theta^{S})\right),
+%  \label{eq:lppd}
+%\end{equation}
+%where \(n\) is sample size, \(S\) is the number posterior simulation draws, and \(\Theta\) represents all of the estimated parameters of the model. This is similar to calculating the likelihood of each observation given the entire posterior. A correction for the effective number of parameters is then added to lppd to adjust for overfitting. The effective number of parameters is calculated, following the recommendations of \citet{Gelman2013d}, as
+%\begin{equation}
+%  p_{\mathrm{WAIC}} = \sum_{i = 1}^{n} V_{s = 1}^{S} (\log p(y_{i}|\Theta^{S})).
+%  \label{eq:pwaic}
+%\end{equation}
+%where \(V\) is the sample posterior variance of the log predictive density for each data point.
+%
+%Given both equations \ref{eq:lppd} and \ref{eq:pwaic}, WAIC is then calculated
+%\begin{equation}
+%  \mathrm{WAIC} = \mathrm{lppd} - p_{\mathrm{WAIC}}.
+%  \label{eq:waic}
+%\end{equation}
+%When comparing two or more models, lower WAIC values indicate better out-of-sample predictive accuracy. Importantly, WAIC is just one way of comparing models. When combined with posterior predictive checks it is possible to get a more complete understanding of a model's fit to the data.
 
 
 PSIS-LOO explanation here.
 
 
-Model adequacy was evaluated using a couple of posterior predictive checks. The posterior predictive checks are estimates of model adequacy in that replicated data sets using the fitted model should be similar to the original data where systematic differences between the simulations and observations indicate weaknesses of the model fit \citep{Gelman2013d}. 1000 posterior predictive datasets were generated from 1000 unique draws from the posterior distribution of each parameter. The two posterior predictive checks used in this analysis are a comparison of a non-parameteric estimate of the survival function \(S(t)\) from the empirical dataset to the non-parameteric estimates of \(S(t)\) from the 1000 posterior predictive datasets, and comparison of the observed genus durations to estimates of \(\log(\sigma)\) of each observation (Eq. \ref{eq:wei_total}). The former is to see if simulated data has a similar survival pattern to the observed, and the latter is to see if the model systematically over or under estimates taxon survival.
+Model adequacy was evaluated using a couple of posterior predictive checks. The posterior predictive checks are estimates of model adequacy in that replicated data sets using the fitted model should be similar to the original data where systematic differences between the simulations and observations indicate weaknesses of the model fit \citep{Gelman2013d}. 1000 posterior predictive datasets were generated from 1000 unique draws from the posterior distribution of each parameter. The two posterior predictive checks used in this analysis are a comparison of a non-parameteric estimate of the survival function \(S(t)\) from the empirical dataset to the non-parameteric estimates of \(S(t)\) from the 1000 posterior predictive datasets, and comparison of the observed genus durations to the average posterior predictive estimate of \(\log(\sigma_{i})\) (Eq. \ref{eq:wei_total}). The former is to see if simulated data has a similar survival pattern to the observed, and the latter is to see if the model systematically over or under estimates taxon survival.
 
 
 
@@ -189,50 +185,186 @@ Model adequacy was evaluated using a couple of posterior predictive checks. The 
 
 \section{Results}
 
-Comparisons of the survival functions estimated from 1000 posterior predictive data sets to the estimated survival function of the observed genera demonstrates that Weibull models approximately capture the observed pattern of extinction (Fig. \ref{fig:surv}). This is partially expected given that the unit of analysis is genus duration instead of species duration, which can alter the shape of \(S(t)\) \citep{Raup1975,Raup1978,Raup1985,Foote2001a}. Additionally, the Weibull model is expected to have better out-of-sample predictive accuracy than the exponential model (WAIC 4534 versus 4604). Because the difference in WAIC between these two models is large, only those results from the Weibull model will be discussed.
+% correlation matrices
 
-Estimates of the overall mean covariate effects \(\mu\) can be considered time-invariant generalizations for brachiopod survival during the Paleozoic (Table \ref{tab:param}). Consistent with prior expectations, geographic range size has a negative effect on extinction risk: genera with large ranges are expected to have greater durations than genera with small ranges. 
+%\begin{table}
+%  \caption{Correlation and partial correlation matrices of duration, rescaled and transformed geographic range, and rescaled gap ratio.}
+%  \begin{subtable}[ht]{0.5\textwidth}
+%    \begin{tabular}{rrrr}
+%      \hline
+%      & duration & geographic range & gap ratio \\ 
+%      \hline
+%      duration &  & 0.43 & -0.06 \\ 
+%      geographic range & 0.43 &  & -0.00 \\ 
+%      gap ratio & -0.06 & -0.00 &  \\ 
+%      \hline
+%    \end{tabular}
+%    \label{tab:corr}
+%  \end{subtable}
+%
+%  \begin{subtable}[ht]{0.5\textwidth}
+%    \begin{tabular}{rrrr}
+%      \hline
+%      & duration & geographic range & gap ratio \\ 
+%      \hline
+%      duration &  & 0.43 & -0.07 \\ 
+%      geographic range & 0.43 &  & 0.03 \\ 
+%      gap ratio & -0.07 & 0.03 &  \\ 
+%      \hline
+%    \end{tabular}
+%    \label{tab:pcor}
+%  \end{subtable}
+%\end{table}
 
-I infer that body size has no distinguishable effect on brachiopod taxonomic survival. While the mean estimate of the effect of body size on extinction risk is negative, this estimate is within 2 standard deviations of 0 (mean \(\mu_{m} = -0.07\), standard deviation 0.08; Table \ref{tab:param}). 
 
-Interpretation of the effect of environmental preference \(v\) on duration is slightly more involved. Because a quadratic term is the equivalent of an interaction term, both \(\mu_{v}\) and \(\mu_{v^{2}}\) have to be interpreted together because it is illogical to change values of \(v\) without also changing values \(v^{2}\). To determine the nature of the effect of \(v\) on duration I calculated the multiplicative effect of environmental preference on extinction risk.
+% model comparison
+%   WAIC and PSIS-LOO table(s)
+The model with greatest estimated out-of-sample predictive accuracy by a large margin, as estimted via both LOOIC and WAIC, has both constant \(\alpha\) and no sampling covariate (Table \ref{tab:comparison}). Because of this, only the results from this model will be presented here. 
 
-Given mean estimated extinction risk \(\tilde{\sigma}\), we can define the extinction risk multiplier of an observation with environmental preference \(v_{i}\) as 
-\begin{equation}
-  f(v_{i}) = \exp\left(\frac{-(\mu_{v} v_{i} + \mu_{v^{2}} v^{2})}{\exp(a)}\right).
-  \label{eq:env}
-\end{equation}
-This function \(f(v_{i})\) has a y-intercept of \(\exp(0)\) or 1 because it does not have a non-zero intercept term. Equation \ref{eq:env} can be either concave up or down. A concave down \(f(v_{i})\) may indicate that genera of intermediate environmental preference have greater durations than either extreme, and \textit{vice versa} for concave up function.
+\begin{table}[ht]
+  \centering
+  \caption{Widely applicable information criterion (WAIC) and leave-one-out cross-validation information criterion (LOOIC) values for the four models compared in this analysis.}
+  \begin{tabular}{ r r r }
+    \hline
+    model & \uppercase{waic} & \uppercase{looic} \\ 
+    \hline
+    constant \(\alpha\) & 9080.39 & 4823.13 \\ 
+    constant \(\alpha\), no sampling & 4676.84 & 4621.95 \\ 
+    no sampling & 8250.22 & 5563.97 \\ 
+    full model & 759172.46 & 109417.64 \\ 
+    \hline
+  \end{tabular}
+  \label{tab:comparison}
+\end{table}
 
-The expected effect of environmental preference as a multiplier of expected extinction risk can then be visualized (Fig. \ref{fig:env_mean}). This figure depicts 1000 posterior predictive estimates of Eq. \ref{eq:env} across all possible values of \(v\). The number indicates the posterior probability that the function is concave down, with generalists having lower extinction risk/greater duration than either type of specialist. Note that the inflection point of Figure \ref{fig:env_mean} is approximately \(x = 0\), something that is expected given the estimate of \(\mu_{v}\) (Table \ref{tab:param}). Given the amount of variation (Fig. \ref{fig:env_mean}), the interpretation is that while evidence for ``survival of the unspecialized'' is weak it is still more probable than not (posterior probability 74\%).
 
-Coefficients with greater values of \(\tau\) have greater between-cohort variation (Table \ref{tab:param}). The covariate effects with the greatest between origination cohort variation are \(\beta_{r}\), \(\beta_{v}\), and \(\beta_{v^{2}}\). Estimates of \(\beta_{m}\) have negligible between cohort variation, as there is less between cohort variation than the between cohort variation in baseline extinction risk \(\beta_{0}\). 
+Comparison of the distribution of posterior predictive estimates of \(S(t)\) to the empirical estimate reveal few obvious biases except for estimates of the far right tail of durations (Fig. \ref{fig:surv}). This interpretation is supported by the additional posterior predictive comparison where most estimates have no systematic biases except for the consistent under-estimate of \(\log(\sigma)\) for older taxa (Fig. \ref{fig:shot}). The results of both posterior predictive checks indicate that, for the majority of observations, model fit is not overly biased towards either over- or under-estimates of duration.
 
-The correlations between the intercept term \(\beta_{0}\) and the effects of the taxon traits are of particular interest for evaluating the \citet{Jablonski1986} scenario (Fig. \ref{fig:cor_posterior}A first row or column). The correlation terms of \(\Omega\) (Fig. \ref{fig:cor_posterior}A) describe the relationship between the coefficients and how their estimates may vary together across cohorts. Keep in mind that when \(\beta_{0}\) is low, extinction risk is low; and conversely, when \(\beta_{0}\) is high, then extinction risk is high.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/survival_curves}
+  \caption{Comparison of the empirical estimate of \(S(t)\) (highlighted) versus estimates from 1000 posterior predictive data sets (black). \(S(t)\) corresponds to the probability that the age of a genus \(t\) is less than the genus' ultimate duration \(T\).}
+  \label{fig:surv}
+\end{figure}
 
-Marginal posterior probabilities of the correlations between the level of baseline extinction risk \(\beta_{0}\) and the effects of the taxon traits indicate that the correlation between expected extinction risk and both geographic range \(\beta_{r}\) and \(\beta_{v^{2}}\) are of particular note (Fig. \ref{fig:cor_posterior}B). 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/shotgun}
+  \caption{Comparison of all observed genus durations in number of geological stages to the average posterior predictive estimates of \(\log(\sigma)\). The dashed, diagonal line correpsonds to \(x = y\).}
+  \label{fig:shot}
+\end{figure}
 
-There is an approximately 85\% probability that \(\beta_{0}\) and \(\beta_{r}\) are negatively correlated (Fig. \ref{fig:cor_posterior}B), meaning that as extinction risk increases, the effect/importance of geographic range on genus duration may increase. There is a 93\% probability that \(\beta_{0}\) and \(\beta_{v^{2}}\) are negatively correlated (Fig. \ref{fig:cor_posterior}B), meaning that as extinction risk decreases, the peakedness of \(f(v_{i})\) may increase and the relationship tends towards concave down. Additionally, there is a 94\% probability that values of \(\beta_{r}\) and \(\beta_{v^{2}}\) are positively correlated (Mean correlation 0.45, standard deviation 0.26).
 
-While the overall group level estimates are of particular importance when defining time-invariant differences in extinction risk, it is also important and useful to analyze the individual level parameter estimates in order to better understand how parameters actually vary across cohorts.
 
-In comparison to the overall mean extinction risk \(\mu_{0}\), cohort level estimates \(\beta_{0}\) show some amount of variation through time as expected by estimates of \(\tau_{0}\) (Fig. \ref{fig:cohort_series}). A similar, if slightly greater, amount of variation is also observable in cohort estimates of the effect of geographic range \(\beta_{r}\) (Fig. \ref{fig:cohort_series}). Again, smaller values of \(\beta_{0}\) correspond to lower expected extinction risk. Similarly, smaller values of \(\beta_{r}\) correspond to greater decrease in extinction risk with increasing geographic range 
+% overall
+%   mu, tau table
+\begin{table}
+  \centering
+  \begin{tabular}{ l r r r r r }
+    \hline
+    parameter & mean & standard deviation & 10\% & 50\% & 90\% \\ 
+    \hline
+    \(\mu_{i}\) & -2.32 & 0.14 & -2.50 & -2.32 & -2.15 \\ 
+    \(\mu_{r}\) & -0.76 & 0.11 & -0.91 & -0.76 & -0.62 \\ 
+    \(\mu_{v}\) & -0.66 & 0.17 & -0.88 & -0.66 & -0.43 \\ 
+    \(\mu_{v^{2}}\) & 2.88 & 0.31 & 2.48 & 2.88 & 3.27 \\ 
+    \(\mu_{m}\) & 0.04 & 0.12 & -0.12 & 0.04 & 0.19 \\ 
+    \(\tau_{i}\) & 0.50 & 0.10 & 0.37 & 0.49 & 0.63 \\ 
+    \(\tau_{r}\) & 0.27 & 0.13 & 0.11 & 0.26 & 0.45 \\ 
+    \(\tau_{v}\) & 0.76 & 0.16 & 0.56 & 0.74 & 0.97 \\ 
+    \(\tau_{v^{2}}\) & 1.24 & 0.33 & 0.84 & 1.21 & 1.67 \\ 
+    \(\tau_{m}\) & 0.47 & 0.12 & 0.33 & 0.47 & 0.63 \\ 
+    \hline
+  \end{tabular}
+  \caption{Group-level estimates of the effects of biological traits on brachiopod generic survival. \(\mu\) values are the location parameters of the effects, while \(\tau\) values are the scale terms describing the variation between cohorts. The mean, standard deviation, 10th, 50th, and 90th quantiles of the posterior are presented.}
+  \label{tab:param}
+\end{table}
 
-How the effect of environmental affinity varies between cohorts can be observed by using the cohort specific coefficients estimates. Following the same procedure used earlier (Eq. \ref{eq:env}), but substituting cohort specific estimates of \(\beta_{v}\) and \(\beta_{v^{2}}\) for \(\mu_{v}\) and \(\mu_{v^{2}}\), the cohort specific effect of environmental preference as a multiplier of mean extinction risk can be calculated. This was done only for the Weibull model, though the observed pattern should be similar for the exponential model. 
+%   average environmental effect
 
-As expected based on the estimates of \(\tau_{v}\) and \(\tau_{v^{2}}\), there is greater variation in the peakedness of \(f(v_{i})\) than there is variation between convave up and down functions (Fig. \ref{fig:env_cohort}). Twelve of the 33 cohorts have less than 50\% posterior probability that generalists are potentially expected to be shorter lived than specialists, though two of those cases have approximately a 50\% probability of being either concave up or down. This is congruent with the 0.74 posterior probability that \(\mu_{v^{2}}\) is positive/\(f(v_{i})\) is concave down.
 
-Additionally, for some cohorts there is a quite striking pattern where the effect of environmental preference \(v\) has a nearly-linear relationship (Fig. \ref{fig:env_cohort}). These are scenarios where one of the end member preferences is expected to have a greater duration than either intermediate or the opposite end member preference. Whatever curvature is present in these nearly-linear cases is due to the definition of \(f(v)\) as it is not defined for non-negative values of \(\sigma\) (Eq. \ref{eq:env}). For all stages between the Givetian through the Vis\'{e}an, inclusive, intermediate preferences are expected to be of intermediate extinction risk when compared with epicontinental specialists (lowest risk) or open-ocean specialists (highest risk). This time period represents most of the Devonian through the early Carboniferous.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/env_effect}
+  \caption{The overall expected relationship between environmental affinity \(v_{i}\) and a \(\log(\sigma)\) when r = 0 and m = 0. Each grey line corresponds to a single draw from the posterior predictive distribution, while the highlighted line corresponds to the median of the posterior predictive distribution. The overall relationship is concave down with an optimum greater than 0, which means that taxa favoring epicontinental environments are expected to have longer durations than those favoring open-ocean environments.}
+  \label{fig:env_mean}
+\end{figure}
 
-Interestingly, the estimates of \(\alpha_{j}\) have low between cohort variation with most cohorts having approximately the same estimate as the overall estimate of \(\alpha\) (Fig. \ref{fig:cohort_series}). Also, for the majority of the time analyzed there is evidence for accelerating extinction with taxon age. If this is due to biological causes \citep{Wagner2014b,Rosindell2015a} or an artifact of preservation/the minimum observable duration of a genus \citep{Sepkoski1975} is unknown. While it is expected that a non-exponential model will better fit genus-level data, this would be reflected as decelerating extinction risk with taxon age as opposed to accelerating \citep{Raup1975,Raup1978,Raup1985,Foote2001a}. This uncertainty remains an open issue for future analysis.
+
+%   correlation matrix
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.8\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap}
+  \caption{Mixed graphical and numerical representation of the correlation matrix \(\Omega\) of variation in cohort-specific covariate estimates. These correlations are between the estimates of the cohort-level effects of covariates, along with intercept/baseline extinction risk. The median estimates of the correlations are presented numerically (upper-triangle) and as idealized ellipses representing that much correlation (lower-triangle).}
+  \label{fig:cor_posterior}
+\end{figure}
+
+
+% cohort-specific
+%   beta through time
+%   cohort-specific environmental effect
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width = \textwidth,height = \textheight,keepaspectratio=true]{figure/cohort_series}
+  \caption{Comparison of cohort-specific estimates of \(\beta_{0}\) (first row), the effect of geographic range on extinction risk \(\beta_{r}\) (second row), the effect of environmental preference \(\beta_{v}\) and \(\beta_{v^{2}}\) (third, fourth rows), and body size \(\beta_{m}\) (fifth row). Points correspond to the median of the cohort-specific estimate, along with 80\% credible intervals. The horizontal axis is time in millions of years; points are ploted at the midpoint of the origination cohort. Black, horizontal lines are the overall estimates of covariate effects along with 80\% credible intervals (shaded).}
+  \label{fig:cohort_series}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width = \textwidth,height = \textheight,keepaspectratio=true]{figure/env_cohort}
+  \caption{}
+  \label{fig:env_cohort}
+\end{figure}
+
+
+
 
 \section{Discussion}
+
+% basic idea
+% g ~ Gamma(k, \mu)
+%   g is vector of gaps
+%   \mu is mean gap length
+%   \k is shape
+% y = y^{*} - 2\mu
+% difficulty including 1, 2, or even 3 duration taxa
+%   no gaps
+% removing would remove so much valuable information
+%   law of constant extinction/surival analysis : young observations are really important
+%     truncation by still tremendous loss of data
+% simplify by making all taxa have sample average gap -- makes sampling have no effect
+%   equal for all
+
+% Solow and Smith and Tanja's BDSS use duration / number occurrences
+%   MLE
+%   how much would this actually affect duration when resolution is stage
+
+By not knowing the function form of \(f\), measurement error in duration probably leads to additional noise to all estimates of model parameters; this is the case with linear regression when the dependent variable is known with error. Specifically, 
+\begin{equation}
+  \begin{aligned}
+    y &= y^{*} + \nu \\
+    y^{*} &= X\beta + \epsilon \\
+    y &= X\beta + \epsilon + \nu \\
+    y &= X\beta + \epsilon^{*} \\
+  \end{aligned}
+\end{equation}
+
+My approach is just checking of duration is associated with a level of sampling ability. If so, it might be misleading results (interaction effects worth thinking about).
+
+% what else could i have done?
+%   option is to change to capture-recapture with imperfect detection survival model (like Liow)
+%   would effectively only model S(t) but not h(t) slash the whole lifetime distribution
+%   i am modeling all of the above: S(t), h(t), and the lifetime distribution!
+
 
 % hypotheses
 %   Jablonski1986 hypothesis
 My results demonstrate that both the effects of geographic range and the peakedness/concavity of environmental preference are both negatively correlated with baseline extinction risk, meaning that as baseline extinction risk increases the effect size of geographic range increases but the curvature of the effect of environmental preference decreases (Fig. \ref{fig:cor_posterior}B). 
 
-However, the interaction between geographic range and origination cohort, although weak, indicates that neither of the two proposed end-member macroevolutionary mechanisms is strictly right. The evidence for a correlation between changes in the effect of geographic range and the curvature of the effect of environmental preference may help explain this result. I hypothesize that because taxa with large geographic ranges encompass more possible environments, when extinction intensity is high there is little coherent difference in the environmental preference among the surviving taxa. The intensity decreases the selectivity such that the effect of environmental preference is effectively washed out by the strength of the effect of geographic range; this is consistent with similar hypotheses presented in \citet{Raup1991b}. 
+However, the correlation between geographic range and origination cohort, although weak, indicates that neither of the two proposed end-member macroevolutionary mechanisms is strictly right. The evidence for a correlation between changes in the effect of geographic range and the curvature of the effect of environmental preference may help explain this result. I hypothesize that because taxa with large geographic ranges encompass more possible environments, when extinction intensity is high there is little coherent difference in the environmental preference among the surviving taxa. The intensity decreases the selectivity such that the effect of environmental preference is effectively washed out by the strength of the effect of geographic range; this is consistent with similar hypotheses presented in \citet{Raup1991b}. 
 
 For the approximately 233 My period analyzed there is an approximate 74\% posterior probability that brachiopod genera with intermediate environmental preferences are expected to have a lower extinction risk than either end members. However, the over all curvature of \(f(v_{i})\) is not very peaked meaning that when averaged over the entire Phanerozoic this relationship may not lead to large differences in extinction risk (Fig. \ref{fig:env_mean}). Note that the duration of the period analyzed is approximately four times then length of the Cenozoic (e.g. time since the extinction of the non-avian dinosaurs). This result gives very weak support for the universality of the hypothesis that environmental generalists have greater survival than environmental specialists \citep{Simpson1944,Liow2004a,Liow2007b,Nurnberg2013a,Nurnberg2015}.
 
@@ -278,67 +410,6 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, and R. Ree for helpf
 
 \clearpage
 
-%\begin{figure}[ht]
-%  \centering
-%  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/survival_curves}
-%  \caption{Comparison of the empirical estimate of \(S(t)\) (blue) versus estimates from 1000 posterior predictive data sets (black). \(S(t)\) corresponds to \(P(T > t)\) as it is the probability that a given genus observed at age \(t\) will continue to live. This is equivalent to the probability that \(t\) is less than the genus' ultimate duration \(T\).}
-%  \label{fig:surv}
-%\end{figure}
-%
-%\begin{figure}[ht]
-%  \centering
-%  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/environ_quad}
-%  \caption{The overall expected relationship \(f(v_{i})\) between environmental affinity \(v_{i}\) and a multiplier of extinction risk (Eq. \ref{eq:env}). Each grey line corresponds to a single draw from the posterior predictive distribution, the solid black line corresponds to the median of the posterior predictive distribution, and the dashed black lines correspond to the median relationship plus or minus one standard deviation. The overall shape of \(f(v_{i})\) is concave down with an optimum of close 0, which corresponds to affinity approximately equal to the expectation based on background environmental occurrence rates.}
-%  \label{fig:env_mean}
-%\end{figure}
-%
-%
-%\begin{figure}[ht]
-%  \centering
-%  \includegraphics[height = 0.8\textheight,width=\textwidth,keepaspectratio=true]{figure/cor_mixed}
-%  \caption{\textbf{A}: Graphical representation of the correlation matrix \(\Omega\) between cohort-level covariate effects. These correlations are between the estimates of the cohort-level effects of covariates, along with intercept/baseline extinction risk. The median estimates of the correlations are presented numerically (upper-triangle) and as idealized ellipses representing that much correlation (lower-triangle). \textbf{B}: Marginal posterior distributions of the correlations between intercept terms/baseline extinction risk and the effects of each of the covariates.}
-%  \label{fig:cor_posterior}
-%\end{figure}
-%
-%
-%\begin{figure}[ht]
-%  \centering
-%  \includegraphics[width = \textwidth,keepaspectratio=true]{figure/cohort_series}
-%  \caption{Comparison of cohort-specific estimates of \(\beta_{0}\) (first row), cohort-specific estimates of the effect of geographic range on extinction risk \(\beta_{r}\) (second row), and cohort-specific estimates of the Weibull shape parameter \(\alpha\) where values greater than 1 correspond to accelerating extinction with age, and those below 1 to decelerating extinction with age. Points correspond to the median of the cohort-specific estimate, along with 80\% credible intervals. The horizontal line is the median estimate of the overall baseline extinction risk along with 80\% credible intervals.}
-%  \label{fig:cohort_series}
-%\end{figure}
-%
-%
-%\begin{sidewaysfigure}[ht]
-%%\begin{figure}[ht]
-%  \centering
-%  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/cohort_quads}
-%  \caption{Comparison of the cohort-specific estimates of \(f(v_{i})\) (Eq. \ref{eq:env}) for the 33 analyzed origination cohorts. The stage of origination is labeled on the x-axis of each panel. The oldest stage is in the upper left, while the youngest is in the lower left. The number in each panel corresponds to the posterior probability that \(f(v_{i})\) is concave down. Those that are highlighed in red have less than 51\% posterior predictive probability that \(f(v_{i})\) is concave down. Each grey line corresponds to a single draw from the posterior predictive distribution, the solid black line corresponds to the median of the posterior predictive distribution, and the dashed black lines correspond to the median relationship plus or minus one standard deviation. Note that all estimates must pass through y = 1 when x = 0 (Eq. \ref{eq:env}).}
-%  \label{fig:env_cohort}
-%\end{sidewaysfigure}
-%%\end{figure}
-%
-%\begin{table}
-%  \centering
-%  \begin{tabular}{ l r r r r}
-%    \hline
-%    parameter & mean & standard deviation & 10\% & 90\% \\ 
-%    \hline
-%    \(\mu_{i}\) & -1.52 & 0.16 & -1.73 & -1.32 \\ 
-%    \(\mu_{r}\) & -1.39 & 0.13 & -1.55 & -1.23 \\ 
-%    \(\mu_{v}\) & -0.04 & 0.16 & -0.24 & 0.11 \\ 
-%    \(\mu_{v2}\) & 0.30 & 0.45 & -0.07 & 0.97 \\ 
-%    \(\mu_{m}\) & -0.07 & 0.08 & -0.19 & 0.01 \\ 
-%    \(\tau_{i}\) & 0.77 & 0.14 & 0.61 & 0.95 \\ 
-%    \(\tau_{r}\) & 0.40 & 0.13 & 0.24 & 0.56 \\ 
-%    \(\tau_{v}\) & 1.05 & 0.23 & 0.79 & 1.35 \\ 
-%    \(\tau_{v^{2}}\) & 1.87 & 0.64 & 1.10 & 2.68 \\ 
-%    \(\tau_{m}\) & 0.24 & 0.13 & 0.07 & 0.40 \\ 
-%    \hline
-%  \end{tabular}
-%  \caption{Group-level estimates of the intercept terms the effects of biological traits on brachiopod generic survival from equation \ref{eq:wei_total}. \(\mu\) values are the location parameters of the effects, while \(\tau\) values are the scale terms describing the variation between cohorts. The mean, standard deviation, 10th and 90th quantiles are presented for each estimate. The subscripts correspond to the following: \(i\) intercept, \(r\) geographic range, \(v\) environmental affinity, \(v^{2}\) environmental affinity squared, \(m\) body size.}
-%  \label{tab:param}
-%\end{table}
 
 
 \end{document}
