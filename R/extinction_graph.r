@@ -113,7 +113,7 @@ surv.plot <- surv.plot + geom_line(data = sim.surv,
 surv.plot <- surv.plot + geom_line(colour = 'blue')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
-                              y = 'Probability surviving longer than t')
+                              y = 'Pr(t < T)')
 surv.plot <- surv.plot + theme(axis.title = element_text(size = 25),
                                axis.title.y = element_text(size = 20))
 surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans(),
@@ -128,8 +128,8 @@ surv.plot <- surv.plot + geom_line(data = sim.surv,
                                    colour = 'black', alpha = 0.01)
 surv.plot <- surv.plot + geom_line(colour = 'grey')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
-surv.plot <- surv.plot + labs(x = 'Duration t', 
-                              y = 'Probability surviving greater than t')
+surv.plot <- surv.plot + labs(x = 'Duration (t)', 
+                              y = 'Pr(t < T)')
 surv.plot <- surv.plot + theme(axis.title = element_text(size = 25))
 surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans(),
                                             breaks = c(0.01, 0.1, 0.5, 1))
@@ -285,7 +285,7 @@ efbeta.plot <- efbeta.plot + geom_ribbon(data = ef.df,
 efbeta.plot <- efbeta.plot + geom_line(data = ef.df, 
                                        mapping = aes(y = X50.),
                                        alpha = 0.5)
-efbeta.plot <- efbeta.plot + labs(x = 'Time', y = 'beta')
+efbeta.plot <- efbeta.plot + labs(x = 'Time (My)', y = 'Parameter estimates')
 efbeta.plot <- efbeta.plot + scale_x_reverse()
 ggsave(efbeta.plot, filename = '../doc/figure/cohort_series.pdf',
        width = 7.5, height = 10, dpi = 600)
@@ -354,7 +354,7 @@ quad.mean <- function(x, mcoef) {
   # depends on if alpha varies by cohort
 }
 
-val <- seq(from = -2, to = 2, by = 0.01)
+val <- seq(from = -1, to = 1, by = 0.01)
 quadval <- list()
 for(ii in seq(length(sam))) {
   quadval[[ii]] <- data.frame(env = val, resp = quad(val, sam[ii]), sim = ii)
@@ -364,12 +364,20 @@ quadframe <- Reduce(rbind, quadval)
 mcoef <- colMeans(wei.fit$mu_prior[sam, ])[c(1, 3, 4)]
 meanquad <- data.frame(env = val, resp = quad.mean(val, mcoef))
 
+# add rug showing observed
+#   this addition would overpower the big, by cohort graph
+env.obs <- data.frame(env = c(data$env_unc, data$env_cen))
+
 mustache <- ggplot(quadframe, aes(x = env, y = resp, group = sim))
 mustache <- mustache + geom_line(alpha = 1 / 100)
 mustache <- mustache + geom_line(data = meanquad,
                                  mapping = aes(group = NULL),
                                  colour = 'blue')
-mustache <- mustache + labs(x = 'Environmental preference', y = expression(paste('log ', sigma)))
+mustache <- mustache + geom_rug(data = env.obs,
+                                mapping = aes(x = env, y = NULL, group = NULL),
+                                sides = 'b', alpha = 0.1)
+mustache <- mustache + labs(x = 'Environmental preference (v)', 
+                            y = expression(paste('log ', sigma)))
 ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -383,7 +391,7 @@ if(!(best %in% 1:2)) {
 } else {
   alp.coh <- wei.fit$alpha_trans[sam]
 }
-val <- seq(from = -2, to = 2, by = 0.01)
+val <- seq(from = -1, to = 1, by = 0.01)
 dat <- cbind(1, val, val^2)
 
 coh.est <- list()
@@ -424,6 +432,7 @@ cohmust <- cohmust + geom_line(alpha = 1 / 100, colour = 'blue')
 cohmust <- cohmust + facet_wrap(~ coh, switch = 'x', ncol = 7)
 cohmust <- cohmust + theme(axis.text = element_text(size = 6),
                            strip.text = element_text(size = 6))
-cohmust <- cohmust + labs(x = 'Environmental preference', y = 'log(sigma)')
+cohmust <- cohmust + labs(x = 'Environmental preference (v)',
+                          y = expression(paste('log ', sigma)))
 ggsave(cohmust, filename = '../doc/figure/env_cohort.pdf',
        width = 7.5, height = 8, dpi = 600)
