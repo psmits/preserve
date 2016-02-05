@@ -377,7 +377,7 @@ mustache <- mustache + geom_rug(data = env.obs,
                                 mapping = aes(x = env, y = NULL, group = NULL),
                                 sides = 'b', alpha = 0.1)
 mustache <- mustache + labs(x = 'Environmental preference (v)', 
-                            y = expression(paste('log ', sigma)))
+                            y = expression(paste('log(', sigma, ')')))
 ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -433,6 +433,6 @@ cohmust <- cohmust + facet_wrap(~ coh, switch = 'x', ncol = 7)
 cohmust <- cohmust + theme(axis.text = element_text(size = 6),
                            strip.text = element_text(size = 6))
 cohmust <- cohmust + labs(x = 'Environmental preference (v)',
-                          y = expression(paste('log ', sigma)))
+                          y = expression(paste('log(', sigma, ')')))
 ggsave(cohmust, filename = '../doc/figure/env_cohort.pdf',
        width = 7.5, height = 8, dpi = 600)

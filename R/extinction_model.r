@@ -51,12 +51,6 @@ prob.epi <- qbeta(short.data$epi / (short.data$epi + short.data$off),
 env.odds <- rescale(prob.epi)
 
 
-# number of occurrences
-no <- (short.data$epi + short.data$off)
-no <- no / (no + short.data$epi.bck + short.data$off.bck)
-samples <- rescale(logit(no / short.data$duration))
-
-
 # now just setup the data
 data <- list(duration = short.data$duration, 
              cohort = con.orig, 
