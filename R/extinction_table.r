@@ -94,7 +94,6 @@ comparison.tex <- xtable(comparison.tab, label = 'tab:comparison')
 print.xtable(comparison.tex, file = '../doc/comparison_table.tex')
 
 
-
 # mean of all coefficients
 # sd of all coefficients
 name.mu <- c('mu_i', 'mu_r', 'mu_v', 'mu_v2', 'mu_m', 'mu_s')
@@ -110,16 +109,21 @@ param.est <- rbind(data.frame(p = name.mu[1:npred],
                               s = apply(wei.fit$sigma, 2, sd),
                               qa = t(apply(wei.fit$sigma, 2, 
                                      function(x) quantile(x, qq)))))
-param.table <- xtable(param.est, label = 'tab:param')
-print.xtable(param.table, file = '../doc/table_param.tex')
 
-# probabilty of negative correlation term
-cor.int.range <- sum((wei.fit$Omega[, 1, 2] < 0)) / 4000
-cor.int.env <- sum((wei.fit$Omega[, 1, 3] < 0)) / 4000
-# but but but
-#   massive difference in the between cohort variances of these two regression coefficients
-#   see param.est table!
-tv.gt.sr <- sum(apply(wei.fit$sigma[, 2:3], 1, function(x) x[2] > x[1])) / 4000
+
+# tail probabilities
+p.r <- 1 - (pnorm(0, wei.fit$mu_prior[, 1], wei.fit$sigma[, 1]))
+mean(p.r)
+sd(p.r)
+
+p.v <- 1 - (pnorm(0, wei.fit$mu_prior[, 3], wei.fit$sigma[, 3]))
+mean(p.v)
+sd(p.v)
+
+p.v2 <- (pnorm(0, wei.fit$mu_prior[, 4], wei.fit$sigma[, 4]))
+mean(p.v2)
+sd(p.v2)
+
 
 
 # inflection point is defined - (beta_v) / 2(beta_v2)
@@ -137,3 +141,18 @@ for(ii in seq(data$O)) {
   inf.low[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0.5) / 4000
   inf.hgh[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) < (-0.5)) / 4000
 }
+inf.cohort[6:15]
+
+
+# probabilty of negative correlation term
+cor.int.range <- sum((wei.fit$Omega[, 1, 4] < 0)) / 4000
+cor.int.env <- sum((wei.fit$Omega[, 1, 3] < 0)) / 4000
+cor.range.env <- sum((wei.fit$Omega[, 2, 3] > 0)) / 4000
+
+
+
+# but but but
+#   massive difference in the between cohort variances of these two regression coefficients
+#   see param.est table!
+tv.gt.sr <- sum(apply(wei.fit$sigma[, 2:3], 1, function(x) x[2] > x[1])) / 4000
+

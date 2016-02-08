@@ -114,8 +114,7 @@ surv.plot <- surv.plot + geom_line(colour = 'blue')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
                               y = 'Pr(t < T)')
-surv.plot <- surv.plot + theme(axis.title = element_text(size = 25),
-                               axis.title.y = element_text(size = 20))
+surv.plot <- surv.plot + theme(axis.title = element_text(size = 25))
 surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans(),
                                             breaks = c(0.01, 0.1, 0.5, 1))
 ggsave(surv.plot, filename = '../doc/figure/survival_curves.pdf',

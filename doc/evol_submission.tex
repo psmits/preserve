@@ -117,7 +117,7 @@ Genus durations were assumed to follow a Weibull distribution which allows for a
 The scale parameter \(\sigma\) was modeled as a regression following \citet{Kleinbaum2005} with both varying intercept and varying slopes; this is expressed
 \begin{equation}
   \sigma_{i} = \exp\left(\frac{-\mathbf{X}_{i} B_{j[i]}}{\alpha_{j[i]}}\right)
-  %\label{eq:sigma}
+  \label{eq:sigma}
 \end{equation}
 where \(i\) indexes across all observations, \(j[i]\) is the cohort membership of the \(i\)th observation, \(X\) is a \(N \times (D + 1)\) matrix of covariates along with a column of 1's for the intercept term, and \(B\) is a \(J \times D\) matrix of cohort-specific regression coefficients.
 
@@ -156,7 +156,7 @@ The shape parameter \(\alpha\) was allowed to vary by cohort where \(\log(\alpha
 
 The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 steps each, split half warm-up and half sampling and thinned to every 10th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
-The fit of the above model (Eq. \ref{eq:wei_total}; the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling as a covariate, or both constant \(\alpha\) and no sampling covariate. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling (PSIS-LOO) CITATIONS. Both of these are estimates of the out-of-sample predictive accuracy or the expected quality of fit of the model to new data. 
+The fit of the above model (the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling as a covariate, or both constant \(\alpha\) and no sampling covariate. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling (PSIS-LOO) CITATIONS. Both of these are estimates of the out-of-sample predictive accuracy or the expected quality of fit of the model to new data. 
 
 WAIC is a more fully Bayesian alternative to AIC or DIC \citep{Watanabe2010a,Gelman2013d}; comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
 
@@ -164,14 +164,12 @@ PSIS-LOO is similar to WAIC in that it is an approxmiation of out-of-sample pred
 
 Calcuations of WAIC and PSIS-LOO for a model fit using Stan were done using the R package ``loo'' CITATION PACKAGE. See VEHTARI GELMAN GABRY for detailed explinations of the calucations for both WAIC and PSIS-LOO.
 
-Model adequacy was evaluated using a couple of posterior predictive checks. Posterior predictive checks are a means for understanding model for or adequacy where the basic idea is that replicated data sets simulated from the fitted model should be similar to the original data and systematic differences between the simulations and observations indicate weaknesses of the model fit \citep{Gelman2013d}. For both approaches used here, 1000 posterior predictive datasets were generated from 1000 unique draws from the posterior distribution of each parameter. The two posterior predictive checks used in this analysis are a comparison of a non-parameteric estimate of the survival function \(S(t)\) from the empirical dataset to the non-parameteric estimates of \(S(t)\) from the 1000 posterior predictive datasets, and comparison of the observed genus durations to the average posterior predictive estimate of \(\log(\sigma_{i})\) (Eq. \ref{eq:wei_total}). The former is to see if simulated data has a similar survival pattern to the observed, and the latter is to see if the model systematically over- or under- estimates taxon survival.
+Model adequacy was evaluated using a couple of posterior predictive checks. Posterior predictive checks are a means for understanding model for or adequacy where the basic idea is that replicated data sets simulated from the fitted model should be similar to the original data and systematic differences between the simulations and observations indicate weaknesses of the model fit \citep{Gelman2013d}. For both approaches used here, 1000 posterior predictive datasets were generated from 1000 unique draws from the posterior distribution of each parameter. The two posterior predictive checks used in this analysis are a comparison of a non-parameteric estimate of the survival function \(S(t)\) from the empirical dataset to the non-parameteric estimates of \(S(t)\) from the 1000 posterior predictive datasets, and comparison of the observed genus durations to the average posterior predictive estimate of \(\log(\sigma_{i})\) (Eq. \ref{eq:sigma}). The former is to see if simulated data has a similar survival pattern to the observed, and the latter is to see if the model systematically over- or under- estimates taxon survival.
 
 
 
 \section{Results}
 
-% model comparison
-%   WAIC and PSIS-LOO table(s)
 The model with greatest estimated out-of-sample predictive accuracy, as estimted via both LOOIC and WAIC, has both constant \(\alpha\) and no sampling covariate (Table \ref{tab:comparison}). Because of this, only the results from this model will be presented here. The effects of either of these potential model aspects are inferred to be too small to account for the additional model complexity necessary to estimate them.
 
 \begin{table}[ht]
@@ -207,22 +205,15 @@ Comparison of the distribution of posterior predictive estimates of \(S(t)\) to 
 \end{figure}
 
 
+The cohort-level estimate of the effect of geographic range size indicates that as a taxon'sgeographic range increases, that taxon's duration is expected to increase (Table \ref{tab:param}). Given the estimates of \(\mu_{r}\) and \(\tau_{r}\), there is a less than 0.008\% (\(\pm 0.05\)) probability that this relationships would be reversed (\(\mathrm{Pr}\left(\mathcal{N}(\mu_{r}, \tau_{r}) > 0\right)\)). The between cohort variance in the cohort-specific estimates of the effect of geographic range \(\beta_{r}\) are the lowest of all the regression coefficients (Table \ref{tab:param}.
 
-% overall
-% group-level estimate of the effect of geographic range on duration (\mu_{r})
-%   high geographic range, long duration and vice versa
-%   low between cohort variation (\tau_{r})
+Body size is estimated to have no effect on taxon duration, with the estimate nearly centered at 0 (Table \ref{tab:param}). The variance between the cohort-specific estimates of the effect of body size \(\tau_{m}\) is found to be greater than the variance of between-cohort estimates of the effect of geographic range size \(\tau_{r}\). 
 
-% group-level estimate of the effect of body size (\mu_{m})
-%   no effect
-%   smallest between cohort variation (\tau_{m})
+The group-level estimate of the effect of environmental preference is estimated from both \(\mu_{v}\) and \(\mu_{v^{2}}\). 
 
-% group-level estimate of the effect of environmental preference (\mu_{v}, \mu_{v^{2}})
-%   strong support for survival of unspecialized (intermediate preference)
-%     Pr(abs(\mu_{v^{2}}) - 2\tau_{v^{2}} > 0) as way to estimate if relationship is ever convex up
-%   slightly favor epicontinental over open-ocean
-%     Pr(inflection point is > 0) 
-%   high between cohort variation (\tau_{v}, \tau_{v^{2}})
+The estimate of \(\mu_{v}\) indicates that epicontinental favoring taxa are expected to have a greater duration than open-ocean favoring taxa. Additionally, given the estimate of between cohort variance \(\tau_{v}\), there is approximately 19\% (\(\pm 8 SD\)) probability that taxa favoring open-ocean environments would have a greater expected duration than taxa favoring epicontinental environments (\(\mathrm{Pr}\left(\mathcal{N}(\mu_{v}, \tau_{v}) > 0 \right)\)). Notice the direction of the inequality given the negative size in equation \ref{eq:sigma}. There is a high amount amount of between-cohort variation in estimates of \(\beta_{v}\) (Table \ref{tab:param}).
+
+The estimate of \(\mu_{v^{2}}\) indicates that the overall relationship between environmental preference and \(\log(\sigma)\) is concave down (Fig. \ref{fig:env_mean}), with only a 1.9\% (\(\pm 2.4\)) probability that any given cohort is not concave down (\(\mathrm{Pr}\left(\mathcal{N}(\mu_{v^{2}}, \tau_{v^{2}})\right) < 0\)). As above, notice the direction of the inequality given the negative size in equation \ref{eq:sigma}. Given the estimate of \(\tau_{v^{2}}\), there is an expected high amount amount of between-cohort variation in estimates of \(\beta_{v^{2}}\) (Table \ref{tab:param}).
 
 \begin{table}
   \centering
@@ -246,8 +237,6 @@ Comparison of the distribution of posterior predictive estimates of \(S(t)\) to 
   \label{tab:param}
 \end{table}
 
-%   average environmental effect
-
 
 \begin{figure}[ht]
   \centering
@@ -257,28 +246,14 @@ Comparison of the distribution of posterior predictive estimates of \(S(t)\) to 
 \end{figure}
 
 
-% correlation matrix
-%   Pr(cor(\beta_{0}, \beta_{r}) < 0)
-%     as extinction intensity \beta_{0} increases, effect of geographic range decreases
-%   Pr(cor(\beta_{0}, \beta_{v}) < 0)
-%     as extinction intensity \beta_{0} increases, intermediate environmental preference becomes more favored
-%       never favors open-ocean because Pr(abs(\mu_{v^{2}}) - 2\tau_{v^{2}} > 0) is approx 1
-%   Pr(cor(\beta_{r}, \beta_{v}) > 0)
-%     are change in effect of range and effect of pref (e.g. position of inflection point) also correlated?
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.8\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap}
-  \caption{Mixed graphical and numerical representation of the correlation matrix \(\Omega\) of variation in cohort-specific covariate estimates. These correlations are between the estimates of the cohort-level effects of covariates, along with intercept/baseline extinction risk. The median estimates of the correlations are presented numerically (upper-triangle) and as idealized ellipses representing that much correlation (lower-triangle).}
-  \label{fig:cor_posterior}
-\end{figure}
+The cohort-specific estimates of all the regression coefficients demonstrate a lot of cohort to cohort variance, with no obvious trends. As indicated in Table \ref{tab:param} and detectable visually (Fig. \ref{fig:cohort_series}), the between-cohort estimates for \(\beta_{0}\), \(\beta_{r}\), and \(\beta_{m}\) all have much lower variance than the between-cohort estimates of both \(\beta_{v}\) and \(\beta_{v^{2}}\).
 
+While most cohort-specific estimates are very similar to the overall cohort-level estimate there are a few notable excursions away from the overall mean (Fig. \ref{fig:cohort_series}). There are simultaneous excursions in both \(\beta_{0}\) and \(\beta_{v}\) for cohorts originating in the Giventian (387-382 My) and Frasnian (382-372 My) stages; both of which directly precede the end-Devonian mass extinction event at the Frasnian/Famennian boundary. These excusions indicate notably high extinction intensity faced by these cohorts along with an increase in expected duration for taxa favoring epicontinental environments over open-ocean ones.
 
-% cohort-specific
-
-% beta through time
-%   plots give visual confirmation of analysis of Omega
-%   \tau estimates make more sense in this context; variance of between cohort estimates
+Cohorts originating from the Silurian through the Early Devonian have a slightly lower extinction intensity than the overall mean; these are the from the Landovery (443-443 My) through the Emsian (407-393 My). This is also a time period where there is the lowest probability that epicontinental favoring taxa expected to have greater duration than open-ocean favoring taxa. Both the Silurian and Devonian periods are notable for having been periods with a mostly ``hothouse'' climate, with no polar icecaps and a high sea-level.
+% Probability inflection point > 0 for cohorts 6 (Kantian) through 15 (Eifelian):
+%   0.994, 0.988, 0.777, 0.262, 0.652, 0.648, 0.34, 0.848, 0.363, 0.996
 
 \begin{figure}[ht]
   \centering
@@ -288,9 +263,13 @@ Comparison of the distribution of posterior predictive estimates of \(S(t)\) to 
 \end{figure}
 
 
+
 % cohort-specific environmental effect
 %   description of the variation in estimates
 %   mass extinction boundaries
+The cohort-specific relationships between environmental preference and \(\log(\sigma)\) were calculated from the estimates of \(\beta_{0}\), \(\beta_{v}\), and \(\beta_{v^{2}}\) (Fig. \ref{fig:env_cohort}) and reflect how these three parameters act in concert and not just individually (Fig. \ref{fig:cohort_series}). Beyond results already discussed above in the context of individual parameters, it is notable that the cohort originating in the Kungurian (279-272 My) has the most sharply curved appearance due to a high estimate \(\beta_{v^{2}}\) (Fig. \ref{fig:cohort_series}). This cohort expected to have the biggest different in extinction risk between environmtal generalists and specialists. The cohorts originating during the Emsian (407-393 My) and Frasnian (382 - 372 My) are tied for second for sharpness of curvature. The least sharply curved cohorts include those orignating during Tremadocian (484-477 My), Hirnantian (445-443 My), Llandovery (443-433 My), and Ludlow (427-423 My). Except for the Tremadocian cohort, all of these cohorts originate during the Silurian through the Early Devonian range identified earlier as having lower expected extinction intensity than what is expected from the group-level estimate.
+
+
 
 \begin{figure}[ht]
   \centering
@@ -298,6 +277,24 @@ Comparison of the distribution of posterior predictive estimates of \(S(t)\) to 
   \caption{Comparison of origination cohort-specific (posterior predictive) estimates of the effect of environmental preference on \(\log(\sigma)\) to the mean overall estimate of the effect of environmental preference. Cohort-specific estimates are from 100 posterior predictive simulations across the range of (transformed and rescaled) observed values of enviromental preference. The oldest cohort is in the top-right and younger cohorts proceed left to right, with the youngest cohort being the right-most facet of the last row. Facet names correspond to the name of the stage in which that cohort originated.}
   \label{fig:env_cohort}
 \end{figure}
+
+
+
+The correlation in between cohort-specific estimates of the regression coefficients are estimated as the off-diagonal elements of the correlation matrix \(\Omega\). Only two of the elements of \(\Omega\) are distinguishable from 0: the correlation of \(\beta_{0}\) (extinction intensity) with both \(\beta_{r}\) and \(\beta_{v}\) (Fig. \ref{fig:cor_posterior}). 
+
+There is an approximate 86\% probability that the cohort-specific estimates of baseline extinction intensity \(\beta_{0}\) and the effect of geographic range \(\beta_{r}\) are negatively correlated; this means that it is expected that for cohorts experiencing a lower extinction intensity the effect of geographic range inceases, and \textit{vice versa}. 
+
+Similarly, there is an approximate 99.9\% probability that the cohort-specific estimates of \(\beta_{0}\) and \(\beta_{v}\) are negatively correlated; this means that as extinction intensity increases it is expected that epicontinental taxa become less favored over open-ocean environments. Again, note that there is a 19\% (\(\pm 8.1 SD\) probability that, for any given cohort, open-ocean environments will be favored.
+
+Estimates of \(\beta_{r}\) and \(\beta_{v}\) are themselves not correlated, as there is only an approximate 68\% probability of a positive correlation. The lack of cross-correlation may be caused by the much higher between-cohort variance of the effect of environmental preference \(\tau_{v}\) than the very small between-cohort variance in the effect of geographic range \(\tau_{r}\) (Table \ref{tab:param}). The effect of geographic range might simply not vary enough relative to each other to detect a correlation with the much noiser effect of environmental preference.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.8\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap}
+  \caption{Mixed graphical and numerical representation of the correlation matrix \(\Omega\) of variation in cohort-specific covariate estimates. These correlations are between the estimates of the cohort-level effects of covariates, along with intercept/baseline extinction risk. The median estimates of the correlations are presented numerically (upper-triangle) and as idealized ellipses representing that much correlation (lower-triangle).}
+  \label{fig:cor_posterior}
+\end{figure}
+
 
 
 
