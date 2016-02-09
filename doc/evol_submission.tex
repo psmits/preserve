@@ -74,7 +74,7 @@ Because environmental preference is defined as the continuum between occurring e
 Body size, measured as shell length, is also considered as a potential trait that influences extinction risk \citep{Payne2014}. Body size is a proxy for metabolic activity and other correlated life history traits \citep{Payne2014}. Given no strong evidence that body size effects extinction risk in brachiopods, the effect is most likely small and could be either positive, negative, or even absent.
 
 
-It is well known that, given the incompleteness of the fossil record, the observed duration of a taxon is an underestimate of that taxon's true duration CITATIONS. Because of this, the concern is that a taxon's observed duration may reflect its relative sampling ability and not because of the covariates of interest. In this case, for sampling ability to be a confounding factor in this analysis there must be consistent relationship between sampling ability and duration (i.e. greater sampling, longer duration or \textit{vice versa}). If there is no relationship, positive or negative, between sampling ability and duration than interpretation can be made clearly; while observed durations are obviously truncated true durations, a lack of a relationship would indicate that the amount and form of this truncation is independent of the taxon's duration (e.g. taxa with better sampling also happen to be longer lived)..
+It is well known that, given the incompleteness of the fossil record, the observed duration of a taxon is an underestimate of that taxon's true duration CITATIONS. Because of this, the concern is that a taxon's observed duration may reflect its relative sampling ability and not because of the covariates of interest. In this case, for sampling ability to be a confounding factor in this analysis there must be consistent relationship between sampling ability and duration (i.e. greater sampling, longer duration or \textit{vice versa}). If there is no relationship, positive or negative, between sampling ability and duration than interpretation can be made clearly; while observed durations are obviously truncated true durations, a lack of a relationship would indicate that the amount and form of this truncation is independent of the taxon's duration (e.g. taxa with better sampling also happen to be longer lived).
 
 
 
@@ -82,7 +82,7 @@ It is well known that, given the incompleteness of the fossil record, the observ
 
 \subsection{Fossil occurrence information}
 
-The dataset analyzed here was sourced from the Paleobiology Database (http://www.paleodb.org) which was then filtered based on taxonomic, temporal, stratigraphic, and other occurrence information used in this analysis. These filtering criteria are very similar to those from \citet{Foote2013} with an additional constraint of being present in the body size data set from \citet{Payne2014}. Epicontinental versus open-ocean assignments for each fossil occurrence are partially based on those from \citet{Miller2009a}, with additional occurrences assigned similarly (Miller and Foote, personal communication). Analyzed occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. 
+The brachiopod dataset analyzed here was sourced from the Paleobiology Database (http://www.paleodb.org) which was then filtered based on taxonomic (Rhynchonellata), temporal (post-Cambrian Paleozoic), stratigraphic, and other occurrence information used in this analysis. These filtering criteria are very similar to those from \citet{Foote2013} with an additional constraint of being present in the body size data set from \citet{Payne2014}. Epicontinental versus open-ocean assignments for each fossil occurrence are partially based on those from \citet{Miller2009a}, with additional occurrences assigned similarly (Miller and Foote, personal communication). Analyzed occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. 
 
 % justification of using genus level versus specific
 Fossil occurrences were analyzed at the genus level which is common for paleobiological, macroevolution, or macroecological studies of marine invertebrates \citep{Alroy2010,Foote2013,Harnik2013,Kiessling2007a,Miller2009a,Nurnberg2013a,Nurnberg2015,Payne2007,Simpson2009,Vilhena2013}. While species diversity dynamics is frequently of much greater interest than those of higher taxa (though see, for example, \citealt{Foote2014b,Hoehn2015}), the nature of the fossil record makes accurate and precise taxonomic assignments at the species level for all occurrences. In particular, the simplicity of brachiopod external morphology and the quality of preservation makes it very difficult for assignments below the genus level. As such, the choice to analyze genera as opposed to species was in order to assure a minimum level of confidence and accuracy in the data analyzed here.
@@ -251,9 +251,10 @@ The cohort-specific estimates of all the regression coefficients demonstrate a l
 
 While most cohort-specific estimates are very similar to the overall cohort-level estimate there are a few notable excursions away from the overall mean (Fig. \ref{fig:cohort_series}). There are simultaneous excursions in both \(\beta_{0}\) and \(\beta_{v}\) for cohorts originating in the Giventian (387-382 My) and Frasnian (382-372 My) stages; both of which directly precede the end-Devonian mass extinction event at the Frasnian/Famennian boundary. These excusions indicate notably high extinction intensity faced by these cohorts along with an increase in expected duration for taxa favoring epicontinental environments over open-ocean ones.
 
-Cohorts originating from the Silurian through the Early Devonian have a slightly lower extinction intensity than the overall mean; these are the from the Landovery (443-443 My) through the Emsian (407-393 My). This is also a time period where there is the lowest probability that epicontinental favoring taxa expected to have greater duration than open-ocean favoring taxa. Both the Silurian and Devonian periods are notable for having been periods with a mostly ``hothouse'' climate, with no polar icecaps and a high sea-level.
+Cohorts originating from the Silurian through the Early Devonian have a slightly lower extinction intensity than the overall mean; these are the from the Landovery (443-443 My) through the Emsian (407-393 My). This is also a time period where there is the lowest probability that epicontinental favoring taxa expected to have greater duration than open-ocean favoring taxa. Both the Silurian and Devonian periods are notable for having been periods with a mostly ``hothouse'' climate, with no polar icecaps and a high sea-level CITATION.
 % Probability inflection point > 0 for cohorts 6 (Kantian) through 15 (Eifelian):
 %   0.994, 0.988, 0.777, 0.262, 0.652, 0.648, 0.34, 0.848, 0.363, 0.996
+
 
 \begin{figure}[ht]
   \centering
@@ -284,9 +285,9 @@ The correlation in between cohort-specific estimates of the regression coefficie
 
 There is an approximate 86\% probability that the cohort-specific estimates of baseline extinction intensity \(\beta_{0}\) and the effect of geographic range \(\beta_{r}\) are negatively correlated; this means that it is expected that for cohorts experiencing a lower extinction intensity the effect of geographic range inceases, and \textit{vice versa}. 
 
-Similarly, there is an approximate 99.9\% probability that the cohort-specific estimates of \(\beta_{0}\) and \(\beta_{v}\) are negatively correlated; this means that as extinction intensity increases it is expected that epicontinental taxa become less favored over open-ocean environments. Again, note that there is a 19\% (\(\pm 8.1 SD\) probability that, for any given cohort, open-ocean environments will be favored.
+Similarly, there is an approximate 99.9\% probability that the cohort-specific estimates of \(\beta_{0}\) and \(\beta_{v}\) are negatively correlated; this means that as extinction intensity increases it is expected that epicontinental taxa become less favored over open-ocean environments. There is a 19\% (\(\pm 8.1 SD\) probability that, for any given cohort, open-ocean environments will be favored.
 
-Estimates of \(\beta_{r}\) and \(\beta_{v}\) are themselves not correlated, as there is only an approximate 68\% probability of a positive correlation. The lack of cross-correlation may be caused by the much higher between-cohort variance of the effect of environmental preference \(\tau_{v}\) than the very small between-cohort variance in the effect of geographic range \(\tau_{r}\) (Table \ref{tab:param}). The effect of geographic range might simply not vary enough relative to each other to detect a correlation with the much noiser effect of environmental preference.
+Estimates of \(\beta_{r}\) and \(\beta_{v}\) are themselves not correlated, as there is only an approximate 68\% probability of a positive correlation. The lack of cross-correlation may be caused by the much higher between-cohort variance of the effect of environmental preference \(\tau_{v}\) than the very small between-cohort variance in the effect of geographic range \(\tau_{r}\) (Table \ref{tab:param}). The effect of geographic range might simply not vary enough relative to the much noisier environmental preference to detect a correlation.
 
 \begin{figure}[ht]
   \centering
@@ -301,31 +302,21 @@ Estimates of \(\beta_{r}\) and \(\beta_{v}\) are themselves not correlated, as t
 
 \section{Discussion}
 
-% discussion of results and their interpretation
+The generating observation behind this study was that the only biological trait that was found the affect extinction risk was geographic range while traits that had previously been beneficial had no effect \citep{Jablonski1986}. This observation raises two linked questions: how does the effect of geographic range change with changing extinction intensity, and how does the effect of other biological traits change with changing extinction intensity?
+
+I find that as intensity increases, the effect of geographic range is expected to decreases. I also find that as intensity increases, the effect of environmental preference is expected to be smaller. There is no evidence for a correlation between the effect of geographic range and environmental preference. However, the between-cohort variance in effect of geographic range is much less then the between-cohort variance of the effect of environmental preference. As stated above, this may underlie the lack of correlation between these two effects.
+
+Additionally, the lower between-cohort variance in the effect of geographic range versus that higher between-cohort variance implies that for cohorts with a greater extinction intensity than the average cohort, the difference in the effect geographic range and the group-level effect of geographic range will be smaller than the difference between the effect of environmetal preference and the group-level effect of environmental preference.
+
+I find consistent support for the ``survival of the unspecialized,'' with respect for environmental preference, as a time-invariant generalization of brachiopod survival; taxa with intermediate environmental preferences were found to have lower extinction risk than taxa specializing in either epicontinental or open-ocean environments (Fig. \ref{fig:env_mean}), though the curvature of the relationship varies from nearly flat to very peaked (Fig. \ref{fig:env_cohort}). However, this relationship is not symetric about 0 as taxa favoring epicontinental environments are expected to have a greater duration than taxa favoring open-ocean environments. 
+
+\citet{Hopkins2014a}, in their analysis of niche conservatism and substrate preference in marine invertebreates, found that brachiopods were among the least ``conservative'' groups; taxa were found change preference on short time scales. While substrate preference is not the same as environmental preference, a question arises: do ``generalists'' have a greater duration because they are ``true'' environmental generalists from orgination (e.g. can inhabit both environments) or have the taxa with longer durations evolved in preference over their duration in the face of changing envrionments (i.e. niche evolution and adaptation)? The nature of the analysis done here assumes that traits are constant over the duration of the taxon; future work should explore how environmental preference changes over lineage duration.
+
 
 % sampling and duration
-%   y = y^{*} - 2(average gap duration)
-%   difficulty including 1, 2, or even 3 duration taxa
-%     no gaps
-%   removing would remove so much valuable information
-%     law of constant extinction/surival analysis : young observations are really important
-%       truncation by still tremendous loss of data
-%   simplify by making all taxa have sample average gap -- makes sampling have no effect
-%     equal for all
-%   Solow and Smith and Tanja's BDSS use duration / number occurrences
-%     MLE
-%     how much would this actually affect duration when resolution is stage
+In this study I used the average quality of the record for the duration of a taxon as a measure of the effect of sampling; the idea being to determine if taxa with shorter or longer durations are associated with differences in sampling regime. This covariate, however, is not included in the WAIC/LOOIC best model (Table \ref{tab:comparison}). I conclude then that the effect of sampling on duration is at most small and is not acting as a confounding factor.
 
-% environmental preference
-%   are generalists older because they are generalists or because of adaptation facilitating persistence?
-%     Harnik + Simpson + Hopkins
-%   do things ``start'' specialist then ``become'' generalists over time/their duration
-%     (macro)evolution and adaptation
-%     persistance
-
-% intensity and selectivity
-%   negative cor beta_0 and beta_r
-%   negative cor beta_0 and beta_v
+The Cormack-Jolly-Seber (CJS) model is an alternative approach for modeling survival that can take into account imperfect observation CITATION. This model is a type of hidden Markov model with an absorbing state (i.e. extinction). In this model, survival is defined as the probability of surviving from time \(t\) to time \(t + 1\). Additionally, the effect of preservation and sighting is estimated as probability of observing a taxon that is present; this can extend the duration of a taxon beyond its last occurrence. This approach is a very different from the method used here; instead of modeling persistance from time \(t\) to time \(t + 1\), I model the distribution taxon durations (lifetime) which then decomposes into a function describing survival (\(S(t)\)) and a function describing instantaneous extinction risk CITATION. 
 
 
 % discussion of context of study

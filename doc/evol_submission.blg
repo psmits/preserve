@@ -4,44 +4,44 @@ The top-level auxiliary file: evol_submission.aux
 The style file: evolution.bst
 Database file #1: newbib.bib
 Database file #2: packages.bib
-You've used 55 entries,
+You've used 56 entries,
             2892 wiz_defined-function locations,
-            961 strings with 12217 characters,
-and the built_in function-call counts, 28761 in all, are:
-= -- 2535
-> -- 1027
+            968 strings with 12395 characters,
+and the built_in function-call counts, 29389 in all, are:
+= -- 2589
+> -- 1058
 < -- 47
-+ -- 346
-- -- 291
-* -- 1747
-:= -- 4718
-add.period$ -- 169
-call.type$ -- 55
-change.case$ -- 367
-chr.to.int$ -- 55
-cite$ -- 55
-duplicate$ -- 2118
-empty$ -- 2305
-format.name$ -- 416
-if$ -- 5822
++ -- 356
+- -- 300
+* -- 1794
+:= -- 4818
+add.period$ -- 172
+call.type$ -- 56
+change.case$ -- 375
+chr.to.int$ -- 56
+cite$ -- 56
+duplicate$ -- 2162
+empty$ -- 2350
+format.name$ -- 428
+if$ -- 5947
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 419
-newline$ -- 282
-num.names$ -- 220
-pop$ -- 770
+missing$ -- 428
+newline$ -- 287
+num.names$ -- 224
+pop$ -- 787
 preamble$ -- 1
-purify$ -- 317
+purify$ -- 324
 quote$ -- 0
-skip$ -- 752
+skip$ -- 764
 stack$ -- 0
-substring$ -- 1611
-swap$ -- 879
+substring$ -- 1647
+swap$ -- 899
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 474
+type$ -- 483
 warning$ -- 0
-while$ -- 246
+while$ -- 251
 width$ -- 0
-write$ -- 714
+write$ -- 727
