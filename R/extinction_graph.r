@@ -70,7 +70,7 @@ theme_update(axis.text = element_text(size = 10),
              legend.text = element_text(size = 15),
              legend.title = element_text(size = 15),
              legend.key.size = unit(1, 'cm'),
-             strip.text = element_text(size = 15))
+             strip.text = element_text(size = 18))
 
 # data setup
 coh <- c(data$cohort_unc, data$cohort_cen)
@@ -353,7 +353,8 @@ quad.mean <- function(x, mcoef) {
   # depends on if alpha varies by cohort
 }
 
-val <- seq(from = -1, to = 1, by = 0.01)
+env.d <- c(data$env_unc, data$env_cen)
+val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
 quadval <- list()
 for(ii in seq(length(sam))) {
   quadval[[ii]] <- data.frame(env = val, resp = quad(val, sam[ii]), sim = ii)
@@ -390,7 +391,7 @@ if(!(best %in% 1:2)) {
 } else {
   alp.coh <- wei.fit$alpha_trans[sam]
 }
-val <- seq(from = -1, to = 1, by = 0.01)
+val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
 dat <- cbind(1, val, val^2)
 
 coh.est <- list()

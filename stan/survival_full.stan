@@ -63,6 +63,9 @@ model {
   mu_prior[4] ~ normal(1, 1);
   mu_prior[5] ~ normal(0, 1);
   mu_prior[6] ~ normal(0, 1);
+  // mu_prior[7] ~ normal(0, 1);
+  // interaction w/ range?
+
 
   for(i in 1:O) {
     beta[i] ~ multi_normal(mu_prior, Sigma);
@@ -77,7 +80,8 @@ model {
                 beta[cohort_unc[i], 3] * env_unc[i] + 
                 beta[cohort_unc[i], 4] * (env_unc[i]^2) +
                 beta[cohort_unc[i], 5] * size_unc[i] +
-                beta[cohort_unc[i], 6] * (gap_unc[i])) 
+                beta[cohort_unc[i], 6] * (gap_unc[i]))  
+                //beta[cohort_unc[i], 6] * (gap_unc[i] * env_unc[i]))  
               / alpha[i])));
     } else {
       increment_log_prob(weibull_log(dur_unc[i], alpha[i],
