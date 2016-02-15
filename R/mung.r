@@ -51,7 +51,8 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
   bibr <- bibr[!is.na(bibr$collections.paleolatdec), ]
 
-  bibr <- bibr[bibr$occurrences.class_name == taxon, ]
+  bibr <- bibr[bibr$occurrences.class_name %in% taxon | 
+               bibr$occurrences.order_name %in% taxon, ]
   bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
 
   # gap-iness of each stage
@@ -118,10 +119,13 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
 
   taxon.gap <- c()
   for(ii in seq(length(taxon.occur))) {
-    tm <- match(names(taxon.occur[[ii]]), gap.ratio[, 1])
-    taxon.gap[ii] <- mean(gap.ratio[seq(from = min(tm), to = max(tm)), 2])
+    tm <- names(taxon.occur[[ii]])  # stage names
+    om <- gts %in% tm  # true false list
+    dm <- taxon.age[ii, 2] - 2
+    taxon.gap[ii] <- (sum(om) - 2) / dm
   }
   names(taxon.gap) <- names(taxon.occur)
+
 
 
   # this is about geographic range size
@@ -142,12 +146,21 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
                  summarize, tt = length(unique(membership)))
   big.ncell <- ddply(bibr, .(colstage), summarize,
                      total = length(unique(membership)))
+  
+  # Chao corrected occupancy
+  ncell.stage <- split(ncell, ncell[, 2])
+  inc.output <- list()
+  for(ii in seq(length(ncell.stage))) {
+    foo <- c(sum(ncell.stage[[ii]][, 3]), ncell.stage[[ii]][, 3])
+    inc.output[[ii]] <- data.frame(ncell.stage[[ii]][, 1:2], DetInc(foo))
+  }
+  ncell.fix <- Reduce(rbind, inc.output)
 
-  ncell.bygenus <- split(ncell, ncell$occurrences.genus_name)
-  occupy <- llply(ncell.bygenus, function(x) {
-                  xx <- match(x[, 2], big.ncell$colstage)
-                  xx <- x$tt / big.ncell[xx, 2]
-                  mean(xx)})
+
+  # raw occupancy
+  ncell.bygenus <- split(ncell.fix, ncell.fix$occurrences.genus_name)
+  occupy <- laply(ncell.bygenus, function(x) mean(x[, 3]))
+  names(occupy) <- names(ncell.bygenus)
 
 
   # want to find the number of epicontinental versus offshore
