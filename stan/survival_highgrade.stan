@@ -6,13 +6,15 @@ data {
   real<lower=0> dur_unc[N_unc];  // duration of uncensored obs
   int cohort_unc[N_unc];  // cohort membership
   real occupy_unc[N_unc];  // range size
-  real env_unc[N_unc];  // number of epicontinental occ
-  real size_unc[N_unc];  // body size
+//  real env_unc[N_unc];  // number of epicontinental occ
+//  real size_unc[N_unc];  // body size
+  real samp_unc[N_unc];  
   real<lower=0> dur_cen[N_cen];
   int cohort_cen[N_cen];
   real occupy_cen[N_cen];
-  real env_cen[N_cen];
-  real size_cen[N_cen];
+//  real env_cen[N_cen];
+//  real size_cen[N_cen];
+  real samp_cen[N_cen];  
 }
 parameters {
   real alpha_trans[N];
@@ -22,14 +24,14 @@ parameters {
   real<lower=0> sigma_alpcoh;
 
   // regression coefficients
-  vector[5] mu_prior;
-  vector[5] beta[O];  // cohort coef 
-  corr_matrix[5] Omega;
-  vector<lower=0>[5] sigma; 
+  vector[3] mu_prior;
+  vector[3] beta[O];  // cohort coef 
+  corr_matrix[3] Omega;
+  vector<lower=0>[3] sigma; 
 }
 transformed parameters {
   real<lower=0> alpha[N];  // individual shape
-  cov_matrix[5] Sigma;
+  cov_matrix[3] Sigma;
 
   for(n in 1:N) {
     alpha[n] <- exp(alpha_trans[n]);
@@ -58,8 +60,8 @@ model {
   mu_prior[1] ~ normal(0, 5);
   mu_prior[2] ~ normal(-1, 1);
   mu_prior[3] ~ normal(0, 1);
-  mu_prior[4] ~ normal(1, 1);
-  mu_prior[5] ~ normal(0, 1);
+  // mu_prior[7] ~ normal(0, 1);
+  // interaction w/ range?
 
 
   for(i in 1:O) {
@@ -72,17 +74,13 @@ model {
       increment_log_prob(weibull_cdf_log(dur_unc[i], alpha[i],
             exp(-(beta[cohort_unc[i], 1] + 
                 beta[cohort_unc[i], 2] * occupy_unc[i] + 
-                beta[cohort_unc[i], 3] * env_unc[i] + 
-                beta[cohort_unc[i], 4] * (env_unc[i]^2) +
-                beta[cohort_unc[i], 5] * size_unc[i])
+                beta[cohort_unc[i], 3] * samp_unc[i])
               / alpha[i])));
     } else {
       increment_log_prob(weibull_log(dur_unc[i], alpha[i],
             exp(-(beta[cohort_unc[i], 1] + 
                 beta[cohort_unc[i], 2] * occupy_unc[i] + 
-                beta[cohort_unc[i], 3] * env_unc[i] + 
-                beta[cohort_unc[i], 4] * (env_unc[i]^2) +
-                beta[cohort_unc[i], 5] * size_unc[i])
+                beta[cohort_unc[i], 3] * samp_unc[i])
               / alpha[i])));
     }
   }
@@ -90,9 +88,7 @@ model {
     increment_log_prob(weibull_ccdf_log(dur_unc[i], alpha[N_unc + i],
           exp(-(beta[cohort_cen[i], 1] + 
               beta[cohort_cen[i], 2] * occupy_cen[i] + 
-              beta[cohort_cen[i], 3] * env_cen[i] + 
-              beta[cohort_cen[i], 4] * (env_cen[i]^2) +
-              beta[cohort_cen[i], 5] * size_cen[i])
+              beta[cohort_cen[i], 3] * samp_cen[i])
             / alpha[N_unc + i])));
   }
 }
@@ -104,17 +100,13 @@ generated quantities {
   for(i in 1:N_unc) {
     hold[i] <- exp(-(beta[cohort_unc[i], 1] +
           beta[cohort_unc[i], 2] * occupy_unc[i] +
-          beta[cohort_unc[i], 3] * env_unc[i] + 
-          beta[cohort_unc[i], 4] * (env_unc[i]^2) +
-          beta[cohort_unc[i], 5] * size_unc[i])
+          beta[cohort_unc[i], 3] * samp_unc[i])
           / alpha[i]);
   }
   for(i in 1:N_cen) {
     hold[i + N_unc] <- exp(-(beta[cohort_cen[i], 1] +
           beta[cohort_cen[i], 2] * occupy_cen[i] +
-          beta[cohort_cen[i], 3] * env_cen[i] + 
-          beta[cohort_cen[i], 4] * (env_cen[i]^2) +
-          beta[cohort_cen[i], 5] * size_cen[i])
+          beta[cohort_cen[i], 3] * samp_cen[i])
           / alpha[N_unc + i]);
   }
 
@@ -139,3 +131,4 @@ generated quantities {
     y_tilde[i + N_unc] <- weibull_rng(alpha[N_unc + i], hold[i + N_unc]);
   }
 }
+
