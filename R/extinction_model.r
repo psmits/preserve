@@ -131,8 +131,15 @@ data <- list(dur_unc = unc$duration,
 
 data$N <- num.samp
 data$O <- num.orig
+data$T <- 3
 
-with(data, {stan_rdump(list = c('N', 'O',
+data$cohort_cen <- data$cohort_cen[!(data$dur_cen == 3)]
+data$occury_cen <- data$occupy_cen[!(data$dur_cen == 3)]
+data$samp_cen <- data$samp_cen[!(data$dur_cen == 3)]
+data$dur_cen <- data$dur_cen[!(data$dur_cen == 3)]
+data$N_cen <- length(data$dur_cen)
+
+with(data, {stan_rdump(list = c('N', 'O', 'T',
                                 'N_unc', 'N_cen',
                                 'dur_unc', 'cohort_unc', 
                                 'dur_cen', 'cohort_cen',

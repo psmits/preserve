@@ -87,7 +87,7 @@ model {
     }
   }
   for(i in 1:N_cen) {
-    increment_log_prob(weibull_ccdf_log(dur_unc[i], alpha[N_unc + i],
+    increment_log_prob(weibull_ccdf_log(dur_cen[i], alpha[N_unc + i],
           exp(-(beta[cohort_cen[i], 1] + 
               beta[cohort_cen[i], 2] * occupy_cen[i] + 
               beta[cohort_cen[i], 3] * env_cen[i] + 

@@ -36,30 +36,35 @@ data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
 pat <- 'faun_'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
-ids <- rep(1:(length(outs) / 4), each = 4)
-outs <- split(outs, ids)
+#ids <- rep(1:(length(outs) / 4), each = 4)
+#outs <- split(outs, ids)
 
-wfit <- llply(outs, read_stan_csv)
-log.liks <- llply(wfit, extract_log_lik)
+wfit <- read_stan_csv(outs)
+#wfit <- llply(outs, read_stan_csv)
+#log.liks <- llply(wfit, extract_log_lik)
 
-# this will need to be updated with number of models
-loo.est <- llply(log.liks, loo)
-loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], 
-                          loo.est[[3]], loo.est[[4]])
+## this will need to be updated with number of models
+#loo.est <- llply(log.liks, loo)
+#loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], 
+#                          loo.est[[3]], loo.est[[4]])
+#
+## this will need to be updated with number of models
+#waic.est <- llply(log.liks, waic)
+#waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], 
+#                           waic.est[[3]], waic.est[[4]])
+#
+#best <- str_extract(names(which.max(waic.table[, ncol(waic.table)])), '[0-9]')
+#best <- as.numeric(best)
 
-# this will need to be updated with number of models
-waic.est <- llply(log.liks, waic)
-waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], 
-                           waic.est[[3]], waic.est[[4]])
-
-best <- str_extract(names(which.max(waic.table[, ncol(waic.table)])), '[0-9]')
-best <- as.numeric(best)
-
-wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
+#wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
+wei.fit <- rstan::extract(wfit, permuted = TRUE)
 wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 1000), ]
 
 # this will need to be updated with number of models
-npred <- ifelse(best %in% c(2, 3), 5, 6)  # 
+#npred <- ifelse(best %in% c(2, 3), 5, 6)  # 
+best <- 3
+npred <- 5
+
 
 #
 theme_set(theme_bw())
