@@ -92,21 +92,7 @@ Fossil occurrences were analyzed at the genus level which is common for paleobio
 Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to individual fossils themselves but instead fossils are assigned to a geological interval which represents some temporal range. In this analysis, stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage (e.g. the final stage of the study interval) were right censored at the Changhsingian; genera with a duration of only one stage were left censored \citep{Klein2003}. % explain this
 The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), body size (\(m\)), and sampling (\(s\)).
 
-% this section has been updated
-%   because we can't sample things that aren't present
-%   we have a truncated Binomial distribution
-%   use the Chao et al 2015 method to estimate the incidence percentage 
-Geographic range was calculated using an occupancy approach corrected for incomplete sampling. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}. For each stage, the total number of occupied grid cells was calculated. Then, for each temporal bin, the relative occurrence probability of the observed taxa was calculated using the \uppercase{jade} method described in \citet{Chao2015a}. This method accounts for the fact that taxa with an occupancy of 0 cannot be observed which means that occupancy is estimated from a truncated Binomial distribution. This correction is critical when comparing occupancies from different times with different geographic sampling. Finally, for each genus, the mean relative occurrence probability was calculated as the average of that genus' occurrence probabilities for all stages it was sampled.
-
-% \uppercase{edits needed on this paragraph}
-% this section is changed
-%   sampling was only done for high grade taxa
-%   that species' gap statistic
-%     (# of stages with a sample - 2) / (duration - 2)
-%     the -2 is because FAD and LAD not counted (they HAVE to be sampled
-%   only for taxa with a duration of 3 or more stages
-Sampling was calculated as the average gap statistic of all stages in which a taxon existed. The basis of the gap ratio are range-through taxa, which are taxa, for any stage \(t\), that are present in stages \(t-1\) and \(t+1\) \citep{Foote1996e,Foote2000,Alroy2010c}. A gap is when a range-through taxon is not present in stage \(t\). The gap ratio for a stage is the number of gaps divided by the total number of range-through taxa, and the gap ratio for an individual taxon is the average of all gap ratios for each stage of the taxon's duration. Additional occurrence information for the late Cambrian and earliest Trassic were used to calculate the gap ratios of the first and last stages included in this analysis. 
-
+Geographic range was calculated using an occupancy approach corrected for incomplete sampling. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}. For each stage, the total number of occupied grid cells was calculated. Then, for each temporal bin, the relative occurrence probability of the observed taxa was calculated using the \uppercase{jade} method developed by \citet{Chao2015a}. This method accounts for the fact that taxa with an occupancy of 0 cannot be observed which means that occupancy is estimated from a truncated Binomial distribution. This correction is critical when comparing occupancies from different times with different geographic sampling. Finally, for each genus, the mean relative occurrence probability was calculated as the average of that genus' occurrence probabilities for all stages it was sampled.
 
 Environmental preference was defined as probability of observing the ratio of epicontinental occurrences to total occurrences (\(\theta_{i} = e_{i} / E_{i}\)) or greater given the background occurrence probability \(\theta^{\prime}_{i}\) as estimated from all other taxa occurring at the same time (\(e^{\prime}_{i} / E^{\prime}_{i}\)). This measure of environmental preference is expressed.
 \begin{equation}
@@ -119,6 +105,9 @@ Environmental preference was defined as probability of observing the ratio of ep
 where \(v\) is the percent of the distribution defined in equation \ref{eq:envpref} less than or equal to \(\theta_{i}\). The Beta distribution is used here because it is a continuous distribution bounded at 0 and 1, which is idea for modeling percentages.
 
 Body size, measured as shell length, was sourced directly from \citet{Payne2014}. These measurements were made from brachiopod taxa figured in the \textit{Treatise on Invertebrate Paleontology} \citep{Brunton2007}.
+
+The sampling record for individual taxa was calculated using the standard gap statistic \citep{Foote1996e,Foote2000}. The gap statistic is calculated as the number of stages in which the taxon was sampled minus two divided by the duration of the taxon minus two. Subtracting two from both the numerator and denominator is because the first and last appearance stages are by definition sampled. The minimum duration for which a gap statistic can be calculated is three stages. 
+% Sampling was only included as a covariate in the high-grade truncated model.
 
 Prior to analysis, geographic range was logit transformed and body size was natural-log transformed; both of these transformations make these variables defined for the entire real line. All covariates were then standardized by subtracting the mean from all values and dividing by twice its standard deviation, which follows \citet{Gelman2007}. This standardization means that all regression coefficients are comparable as the expected change per 1-unit change in the rescaled covariates. \(D\) is defined as the total number of covariate effects included in the model plus one for the intercept term.
 
@@ -154,7 +143,6 @@ The elements of \(\mu\) were given independent normally distributed priors. The 
     \mu_{v} &\sim \mathcal{N}(0, 1) \\
     \mu_{v^{2}} &\sim \mathcal{N}(1, 1) \\
     \mu_{m} &\sim \mathcal{N}(0, 1) \\
-    \mu_{s} &\sim \mathcal{N}(0, 1) \\
     \tau &\sim \mathrm{C^{+}}(1) \\
     \Omega &\sim \text{LKJ}(2).
   \end{aligned}
@@ -171,38 +159,32 @@ The shape parameter \(\alpha\) was allowed to vary by cohort where \(\log(\alpha
   \label{eq:alpha_prior}
 \end{equation}
 
-% similar model as above is used for the high graded data
-%   all observations are truncated at duration > 2
-%     thrown out anything with less duration as they have probability 0 given truncation
-%   only two covariates 
-%     geographic range
-%     gap statistic
-%     more?
-%   effect allowed to vary by cohort
-% p(y | \theta) = \frac{weibull_pdf(y, \alpha, \sigma)}{1 - weibull_cdf(Y, \alpha, \sigma)}
-% p(y | \theta) = \frac{weibull_pdf(y, \alpha, \sigma)}{weibull_ccdf(Y, \alpha, \sigma)}
-% log(p(y | \theta)) = \log(weibull_pdf(y, \alpha, \sigma)) - \log(weibull_ccdf(Y, \alpha, \sigma))
-%   where Y is the truncation point (i.e. 3)
-%   have to exclude the one corner case where right-censored observation at truncation point
 
-%   goal is see if effect of geographic range changes a lot given sampling
-%     because of our strong prior information, it is important
-%   does effect of geographic range correlate with effect of sampling?
-%     this has interesting consequences
-%     also really difficult interpretation
-%       foote has something about this somewhere
-%       one of his weirder papers with crampton
+The above model is for all taxa without sampling as a covariate. In order to determine if sampling is acting as a confounding factor in this analysis, an additional model was developed because sampling was only estimated for taxa with a duration of three or more which creates a left-truncated distribution of durations \citep{Klein2003}. The sampling statement and log-probability for a left-truncated Weibull distribution, truncated at time \(Y\) (e.g. three), is
+\begin{equation}
+  \begin{aligned}
+    p(y | \theta) &= \frac{\mathrm{Weibull}(y, \alpha, \sigma)}{1 - \mathrm{Weibull}_{cdf}(Y, \alpha, \sigma)} \\
+    p(y | \theta) &= \frac{\mathrm{Weibull}(y, \alpha, \sigma)}{\mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)} \\
+    \log(p(y | \theta)) &= \log(\mathrm{Weibull}(y, \alpha, \sigma)) - \log(\mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)).
+  \end{aligned}
+  \label{eq:trunc}
+\end{equation}
+Note that cdf stands for cumulative density function and ccdf is the complementary cumulative density function.
+
+The definition of \(\sigma\) (Eq. \ref{eq:sigma}) is then further modified so that \(X\), the matrix of covariates, and \(B\), the matrix of regression coefficients, now include an additional column for the sampling estimates and the cohort-specific effects of sampling. This addition then modifies the dimensions of \(\mu\) and \(\Sigma\); the new group-level effect of \(\mu_{s}\) is given a weakly informative prior: \(\mu_{s} \sim \mathcal{N}(0, 1)\).
+
+For this left-truncated model, I've excluded one observation that is right-censored with a duration equal to the truncation point; the second line of equation \ref{eq:trunc} becomes \(p(y | \theta) = \mathrm{Weibull}_{ccdf}(y, \alpha, \sigma) / \mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)\) which yields a log-probability of 0 which is undefined.
 
 
 The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 steps each, split half warm-up and half sampling and thinned to every 10th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
-The fit of the above model (the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling as a covariate, or both constant \(\alpha\) and no sampling covariate. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling (PSIS-LOO) \citep{Vehtari2015}. Both of these are estimates of the out-of-sample predictive accuracy or the expected quality of fit of the model to new data. 
-
-WAIC is a more fully Bayesian alternative to AIC or DIC \citep{Watanabe2010a,Gelman2013d}; comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. Note that BIC is not an estimate of out-of-sample predictive accuracy \citep{Gelman2013d}. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
-
-PSIS-LOO is similar to WAIC in that it is an approxmiation of out-of-sample predictive accuracy except its calculation is completely different \citep{Vehtari2015,Vehtari2015a}. Models comparison is done using a leave-one-out crossvalidation information criterion (LOOIC), which is simply the PSIS-LOO estimate multiplied by -2 so that it is on the deviance scale. As with WAIC, models with lower values of LOOIC are expected to have a greater out-of-sample predictive accuracy than models with greater values.
-
-Calcuations of WAIC and PSIS-LOO for a model fit using Stan were done using the R package ``loo'' \citep{loo}. See \citet{Vehtari2015a} for detailed explinations of the calucations for both WAIC and PSIS-LOO.
+%The fit of the above model (the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling as a covariate, or both constant \(\alpha\) and no sampling covariate. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling (PSIS-LOO) \citep{Vehtari2015}. Both of these are estimates of the out-of-sample predictive accuracy or the expected quality of fit of the model to new data. 
+%
+%WAIC is a more fully Bayesian alternative to AIC or DIC \citep{Watanabe2010a,Gelman2013d}; comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. Note that BIC is not an estimate of out-of-sample predictive accuracy \citep{Gelman2013d}. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
+%
+%PSIS-LOO is similar to WAIC in that it is an approxmiation of out-of-sample predictive accuracy except its calculation is completely different \citep{Vehtari2015,Vehtari2015a}. Models comparison is done using a leave-one-out crossvalidation information criterion (LOOIC), which is simply the PSIS-LOO estimate multiplied by -2 so that it is on the deviance scale. As with WAIC, models with lower values of LOOIC are expected to have a greater out-of-sample predictive accuracy than models with greater values.
+%
+%Calcuations of WAIC and PSIS-LOO for a model fit using Stan were done using the R package ``loo'' \citep{loo}. See \citet{Vehtari2015a} for detailed explinations of the calucations for both WAIC and PSIS-LOO.
 
 Model adequacy was evaluated using a couple of posterior predictive checks. Posterior predictive checks are a means for understanding model fit or adequacy where the basic idea is that replicated data sets simulated from the fitted model should be similar to the original data and systematic differences between the simulations and observations indicate weaknesses of the model fit \citep{Gelman2013d}. For both approaches used here, 1000 posterior predictive datasets were generated from 1000 unique draws from the posterior distribution of each parameter. The two posterior predictive checks used in this analysis are a comparison of a non-parameteric estimate of the survival function \(S(t)\) from the empirical dataset to the non-parameteric estimates of \(S(t)\) from the 1000 posterior predictive datasets, and comparison of the observed genus durations to the average posterior predictive estimate of \(\log(\sigma)\) (Eq. \ref{eq:sigma}). The former is to see if simulated data has a similar survival pattern to the observed, while the latter is to see if the model systematically over- or under- estimates taxon survival.
 
@@ -335,7 +317,7 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, R. Ree, and G. Slate
     \(\tau_{r}\) & Var(geographic range) &  0.27 & 0.13 & 0.11 & 0.26 & 0.45 \\ 
     \(\tau_{v}\) & Var(environmental preference) & 0.76 & 0.16 & 0.56 & 0.74 & 0.97 \\ 
     \(\tau_{v^{2}}\) & Var(environmental preference) & 1.24 & 0.33 & 0.84 & 1.21 & 1.67 \\ 
-    \(\tau_{m}\) & Var(body size) 0.47 & 0.12 & 0.33 & 0.47 & 0.63 \\ 
+    \(\tau_{m}\) & Var(body size) & 0.47 & 0.12 & 0.33 & 0.47 & 0.63 \\ 
     \hline
   \end{tabular}
   \label{tab:param}

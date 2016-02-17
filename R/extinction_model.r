@@ -134,7 +134,7 @@ data$O <- num.orig
 data$T <- 3
 
 data$cohort_cen <- data$cohort_cen[!(data$dur_cen == 3)]
-data$occury_cen <- data$occupy_cen[!(data$dur_cen == 3)]
+data$occupy_cen <- data$occupy_cen[!(data$dur_cen == 3)]
 data$samp_cen <- data$samp_cen[!(data$dur_cen == 3)]
 data$dur_cen <- data$dur_cen[!(data$dur_cen == 3)]
 data$N_cen <- length(data$dur_cen)
