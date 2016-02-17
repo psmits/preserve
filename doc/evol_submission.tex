@@ -51,20 +51,17 @@
 
 How do biological traits affect extinction risk? Biological traits the set of adaptations a taxon has to the set of all biotic--biotic and biotic--abiotic interactions that a taxon can experience, which is their adaptive zone \citep{Simpson1944}. \citet{Jablonski1986} observed that for bivalves at the end Cretaceous mass extinction event, the effects of some biological traits on taxonomic survival decreased. However, this pattern was not the case for the effect of geographic range on survival \citep{Jablonski1986,Payne2007}. There are multiple possible macroevolutionary mechanisms which may underlie this pattern: the effect of geographic range on survival remains constant and those of other biological traits decrease, the effect of geographic range on survival increases and those of other biological traits stay constant, or the effects of all traits decrease potentially by different degrees.
 
-% trait-dependent extinction
-% PCM literature
-% Rabosky, FitzJohn, Stadler
-
-
 While \citet{Jablonski1986} phrased his conclusions in terms of background versus mass extinction, these states are not distinguishable in terms of extinction rate alone; my analysis treats the time period analyzed as part of the same continuum \citep{Wang2003,Payne2007,Simpson2009}. Additionally, in order to test the proposed macroevolutionary mechanism behind the \citet{Jablonski1986} scenario; not only do the taxon trait effects needs to be modeled, but the correlation between trait effects need to be modeled as well. 
+
+Extinction is one half of diversification \citep{Stanley1979,Stanley1975}, second only to speciation or origination; it is also the ultimate manifestation of selection \citep{Simpson1944}. While estimation of both trait-dependent speciation and extinction rates from phylogenies of extant taxa has grown dramatically \citep{Maddison2007,Fitzjohn2010,Goldberg2011a,Goldberg2005,Rabosky2013,Stadler2013b,Stadler2011a,Stadler2013a}, there are two major ways to analyze trait-dependent extinction: analysis of the fossil record, and analysis of phylogenies of extant taxa.  These two directions, phylogenetic comparative and paleobiological, are complementary and intertwined in the field of macroevolution \citep{Rabosky2010b,Jablonski2008a,Hunt2014a}. In the case of extinction, analysis of the fossil record has the distinct advantage over phylogenies because extinction is observable; this means that extinction rate is possible to estimate \citep{Rabosky2010a,Quental2009,Liow2010a}. The approach used here is thus complementary to the analysis of trait-dependent extinction using just a phylogeny.
 
 Conceptually, taxon survival can be considered an aspect of ``taxon fitness'' along with expected lineage specific branching/origination rate \citep{Cooper1984,Palmer2012}. A taxon with a beneficial trait should persist for longer, on average, than a taxon without that beneficial trait. Here I model brachiopod taxon durations because trait based differences in extinction risk should manifest as differences in taxon durations. Brachiopods are an ideal group for this study as they are are well known for having an exceptionally complete fossil record \citep{Foote1996e,Foote2000a}. I focus on the brachiopod record from the post-Cambrian Paleozoic, from the start of the Ordovician (approximately 485 My) through the end Permian (approximately 252 My) as this represents the time of greatest global brachiopod diversity \citep{Alroy2010}.
 
-The analysis of taxon durations, or time from origination to extinction, falls under the purview of survival analysis, a field of applied statistics commonly used in health care \citep{Klein2003} but has a long history in paleontology \citep{Simpson1944,Simpson1953,VanValen1973,VanValen1979,Smits2015,Crampton2016}. I adopt a hierarchical modeling approach \citep{Gelman2007,Gelman2013d,Klein2003}, which represents both a conceptual and statistical unification of the paleontological dynamic and cohort survival analytic approaches \citep{VanValen1973,VanValen1979,Raup1978,Raup1975,Foote1988,Baumiller1993,Simpson2006,Smits2015,Crampton2016,Ezard2012b}. 
+The analysis of taxon durations, or time from origination to extinction, falls under the purview of survival analysis, a field of applied statistics commonly used in health care and engineering \citep{Klein2003} but has a long history in paleontology \citep{Simpson1944,Simpson1953,VanValen1973,VanValen1979,Smits2015,Crampton2016}. I adopt a hierarchical modeling approach \citep{Gelman2007,Gelman2013d,Klein2003}, which represents both a conceptual and statistical unification of the paleontological dynamic and cohort survival analytic approaches \citep{VanValen1973,VanValen1979,Raup1978,Raup1975,Foote1988,Baumiller1993,Simpson2006,Smits2015,Crampton2016,Ezard2012b}. 
 
 \subsection{Factors affecting brachiopod survival}
 
-Geographic range is widely considered the most important biological trait for estimating differences in extinction risk at nearly all times, with large geographic range associated with low extinction risk \citep{Jablonski1986,Jablonski1987,Jablonski2003,Payne2007,Jablonski2008a,Harnik2013,Finnegan2012a}. % reason why this works the way it does
+Geographic range is widely considered the most important biological trait for estimating differences in extinction risk at nearly all times, with large geographic range associated with low extinction risk \citep{Jablonski1986,Jablonski1987,Jablonski2003,Payne2007,Jablonski2008a,Harnik2013,Finnegan2012a}. This stands to reason even if extinction is completely at random; a taxon with in unrestricted range is less likely to go extinct randomly than a taxon with a restricted range.
 
 Epicontinental seas are a shallow-marine environment where the ocean has spread over the craton of a continental shelf with a depth typically less than 100m. In contrast, open-ocean coastline environments have much greater variance in depth, do not cover the continental craton, and can persist during periods of low sea level \citep{Miller2009a}. Because of this, it is strongly expected that taxa which favor epicontinental seas would be at great risk during periods of low sea levels, such as during glacial periods, when epicontinental seas are drained. During the Paleozoic (approximately 541--252 My), epicontinental seas were widely spread globally but declined over the Mesozoic (approximately 252--66 My) and have nearly disappeared during the Cenozoic (approximately 66--0 My) as open-ocean coastlines became the dominant shallow-marine setting \citep{Peters2008,Miller2009a,Johnson1974}. 
 
@@ -89,25 +86,25 @@ The brachiopod dataset analyzed here was sourced from the Paleobiology Database 
 % justification of using genus level versus specific
 Fossil occurrences were analyzed at the genus level which is common for paleobiological, macroevolutionary and macroecological studies of marine invertebrates \citep{Alroy2010,Foote2013,Harnik2013,Kiessling2007a,Miller2009a,Nurnberg2013a,Nurnberg2015,Payne2007,Simpson2009,Vilhena2013}. While species diversity dynamics are frequently of much greater interest than those of higher taxa (though see \citealt{Foote2014b,Hoehn2015}), the nature of the fossil record makes accurate and precise taxonomic assignments at the species level difficult for all occurrences. As such, the choice to analyze genera as opposed to species was in order to assure a minimum level of confidence and accuracy in the data analyzed here.
 
-Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to individual fossils themselves but instead fossils are assigned to a geological interval which represents some temporal range. In this analysis, stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage (e.g. the final stage of the study interval) were right censored at the Changhsingian; genera with a duration of only one stage were left censored \citep{Klein2003}. % explain this
-The covariates used to model genus duration were geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), body size (\(m\)), and sampling (\(s\)).
+Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to individual fossils themselves but instead fossils are assigned to a geological interval which represents some temporal range. In this analysis, stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage (e.g. the final stage of the study interval) were right censored at the Changhsingian; genera with a duration of only one stage were left censored \citep{Klein2003}. How the likelihood of censored observations is calculated is detailed below.
+
+The covariates detailed below are geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), body size (\(m\)), and sampling (\(s\)).
 
 Geographic range was calculated using an occupancy approach corrected for incomplete sampling. First, all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}. For each stage, the total number of occupied grid cells was calculated. Then, for each temporal bin, the relative occurrence probability of the observed taxa was calculated using the \uppercase{jade} method developed by \citet{Chao2015a}. This method accounts for the fact that taxa with an occupancy of 0 cannot be observed which means that occupancy is estimated from a truncated Binomial distribution. This correction is critical when comparing occupancies from different times with different geographic sampling. Finally, for each genus, the mean relative occurrence probability was calculated as the average of that genus' occurrence probabilities for all stages it was sampled.
 
 Environmental preference was defined as probability of observing the ratio of epicontinental occurrences to total occurrences (\(\theta_{i} = e_{i} / E_{i}\)) or greater given the background occurrence probability \(\theta^{\prime}_{i}\) as estimated from all other taxa occurring at the same time (\(e^{\prime}_{i} / E^{\prime}_{i}\)). This measure of environmental preference is expressed.
-\begin{equation}
+\begin{equation*}
   \begin{aligned}
     p\left(\theta^{\prime}_{i} \middle| e^{\prime}_{i}, E^{\prime}_{i} \right) &\propto \mathrm{Beta}(e^{\prime}_{i}, E^{\prime}_{i} - e^{\prime}_{i}) \mathrm{Beta}(1, 1) \\
     &= \mathrm{Beta}(e^{\prime}_{i} + 1, E^{\prime}_{i} - e^{\prime}_{i} + 1),
   \end{aligned}
   \label{eq:envpref}
-\end{equation}
+\end{equation*}
 where \(v\) is the percent of the distribution defined in equation \ref{eq:envpref} less than or equal to \(\theta_{i}\). The Beta distribution is used here because it is a continuous distribution bounded at 0 and 1, which is idea for modeling percentages.
 
 Body size, measured as shell length, was sourced directly from \citet{Payne2014}. These measurements were made from brachiopod taxa figured in the \textit{Treatise on Invertebrate Paleontology} \citep{Brunton2007}.
 
-The sampling record for individual taxa was calculated using the standard gap statistic \citep{Foote1996e,Foote2000}. The gap statistic is calculated as the number of stages in which the taxon was sampled minus two divided by the duration of the taxon minus two. Subtracting two from both the numerator and denominator is because the first and last appearance stages are by definition sampled. The minimum duration for which a gap statistic can be calculated is three stages. 
-% Sampling was only included as a covariate in the high-grade truncated model.
+The sampling record for individual taxa was calculated using the standard gap statistic \citep{Foote1996e,Foote2000}. The gap statistic is calculated as the number of stages in which the taxon was sampled minus two divided by the duration of the taxon minus two. Subtracting two from both the numerator and denominator is because the first and last appearance stages are by definition sampled. The minimum duration for which a gap statistic can be calculated is three stages. Sampling was only included as a covariate in the truncated model, described later.
 
 Prior to analysis, geographic range was logit transformed and body size was natural-log transformed; both of these transformations make these variables defined for the entire real line. All covariates were then standardized by subtracting the mean from all values and dividing by twice its standard deviation, which follows \citet{Gelman2007}. This standardization means that all regression coefficients are comparable as the expected change per 1-unit change in the rescaled covariates. \(D\) is defined as the total number of covariate effects included in the model plus one for the intercept term.
 
@@ -128,15 +125,10 @@ The scale parameter \(\sigma\) was modeled as a regression following \citet{Klei
 \end{equation}
 where \(i\) indexes across all observations, \(j[i]\) is the cohort membership of the \(i\)th observation, \(X\) is a \(N \times D\) matrix of covariates along with a column of 1's for the intercept term, and \(B\) is a \(J \times D\) matrix of cohort-specific regression coefficients.
 
-Each of the rows of matrix \(B\) are modeled as realizations from a multivariate normal distribution with length \(D\) location vector \(\mu\) and \(J \times J\) covariance matrix \(\Sigma\): \(B_{j} \sim \mathrm{MVN}(\mu, \Sigma)\). The coviariance matrix was then decomposed into a length \(J\) vector of scales \(\tau\) and a \(J \times J\) correlation matrix \(\Omega\), defined
-\begin{equation}
-  \Sigma = \mathrm{diag}(\tau) \Omega \mathrm{diag}(\tau)
-  %\label{eq:cov_mat}
-\end{equation}
-where ``diag'' indicates a diagonal matrix.
+Each of the rows of matrix \(B\) are modeled as realizations from a multivariate normal distribution with length \(D\) location vector \(\mu\) and \(J \times J\) covariance matrix \(\Sigma\): \(B_{j} \sim \mathrm{MVN}(\mu, \Sigma)\). The coviariance matrix was then decomposed into a length \(J\) vector of scales \(\tau\) and a \(J \times J\) correlation matrix \(\Omega\), defined \(\Sigma = \mathrm{diag}(\tau) \Omega \mathrm{diag}(\tau)\) where ``diag'' indicates a diagonal matrix.
 
 The elements of \(\mu\) were given independent normally distributed priors. The effects of geographic range size  and the breadth of environmental preference were given informative priors reflecting the previous findings while the others were given weakly informative favoring no effect. The correlation matrix \(\Omega\) was given an almost uniform LKJ distributed prior following \citep{Team2016}. These priors are defined
-\begin{equation}
+\begin{equation*}
   \begin{aligned}
     \mu_{0} &\sim \mathcal{N}(0, 5) \\
     \mu_{r} &\sim \mathcal{N}(-1, 1) \\
@@ -147,33 +139,36 @@ The elements of \(\mu\) were given independent normally distributed priors. The 
     \Omega &\sim \text{LKJ}(2).
   \end{aligned}
   \label{eq:sigma_prior}
-\end{equation}
+\end{equation*}
 
+% do i still need this?
+% adds a lot of complexity
 The shape parameter \(\alpha\) was allowed to vary by cohort where \(\log(\alpha_{j}) \sim \mathcal{N}(\alpha^{\prime} + a_{j}, \sigma_{\alpha})\). The effect of origination cohort \(a_{j}\) is modeled a shared as normal distribution such that \(a_{j} \sim \mathcal{N}(0, \sigma_{a})\). \(\alpha\), \(\sigma_{\alpha}\) and \(\sigma_{a}\) were given weakly informative normal and half-Cauchy priors as appropriate: 
-\begin{equation}
+\begin{equation*}
   \begin{aligned}
     \alpha^{\prime} &\sim \mathcal{N}(0, 1) \\
     \sigma_{a} &\sim \mathrm{C^{+}}(1) \\
     \sigma_{\alpha} &\sim \mathrm{C^{+}}(1). \\
   \end{aligned}
   \label{eq:alpha_prior}
-\end{equation}
+\end{equation*}
 
+The likelihood of a right-censored observation is calculated \(p(y | \theta) = 1 - F(y) = S(y)\) where \(F(y)\) is the cumulative distribution function \citep{Klein2003}. In contrast, the likelihood of a left-censored observation is calculated \(p(y | \theta) = F(y)\) \citep{Klein2003}.
 
-The above model is for all taxa without sampling as a covariate. In order to determine if sampling is acting as a confounding factor in this analysis, an additional model was developed because sampling was only estimated for taxa with a duration of three or more which creates a left-truncated distribution of durations \citep{Klein2003}. The sampling statement and log-probability for a left-truncated Weibull distribution, truncated at time \(Y\) (e.g. three), is
+The above model is for all taxa and does not include sampling as a covariate. In order to determine if sampling is acting as a confounding factor in this analysis, an additional model was developed because sampling was only estimated for taxa with a duration of three or more which creates a left-truncated distribution of durations \citep{Klein2003}. The sampling statement and log-probability for a left-truncated Weibull distribution, truncated at time \(Y\) (e.g. three), is
 \begin{equation}
   \begin{aligned}
     p(y | \theta) &= \frac{\mathrm{Weibull}(y, \alpha, \sigma)}{1 - \mathrm{Weibull}_{cdf}(Y, \alpha, \sigma)} \\
-    p(y | \theta) &= \frac{\mathrm{Weibull}(y, \alpha, \sigma)}{\mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)} \\
+    &= \frac{\mathrm{Weibull}(y, \alpha, \sigma)}{\mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)} \\
     \log(p(y | \theta)) &= \log(\mathrm{Weibull}(y, \alpha, \sigma)) - \log(\mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)).
   \end{aligned}
   \label{eq:trunc}
 \end{equation}
-Note that cdf stands for cumulative density function and ccdf is the complementary cumulative density function.
+Note that cdf stands for cumulative distribution function and ccdf is the complementary cumulative distribution function.
 
-The definition of \(\sigma\) (Eq. \ref{eq:sigma}) is then further modified so that \(X\), the matrix of covariates, and \(B\), the matrix of regression coefficients, now include an additional column for the sampling estimates and the cohort-specific effects of sampling. This addition then modifies the dimensions of \(\mu\) and \(\Sigma\); the new group-level effect of \(\mu_{s}\) is given a weakly informative prior: \(\mu_{s} \sim \mathcal{N}(0, 1)\).
+The definition of \(\sigma\) (Eq. \ref{eq:sigma}) is then updated so that \(X\), the matrix of covariates, and \(B\), the matrix of regression coefficients, now include an additional column for the sampling estimates and the cohort-specific effects of sampling. This addition then modifies the dimensions of \(\mu\) and \(\Sigma\); the new group-level effect of \(\mu_{s}\) is given a weakly informative prior: \(\mu_{s} \sim \mathcal{N}(0, 1)\).
 
-For this left-truncated model, I've excluded one observation that is right-censored with a duration equal to the truncation point; the second line of equation \ref{eq:trunc} becomes \(p(y | \theta) = \mathrm{Weibull}_{ccdf}(y, \alpha, \sigma) / \mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)\) which yields a log-probability of 0 which is undefined.
+For this left-truncated model, I've excluded one observation that is right-censored with a duration equal to the truncation time; the second line of equation \ref{eq:trunc} becomes \(p(y | \theta) = \mathrm{Weibull}_{ccdf}(y, \alpha, \sigma) / \mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)\) which yields a log-probability of 0.
 
 
 The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 steps each, split half warm-up and half sampling and thinned to every 10th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
@@ -192,7 +187,7 @@ Model adequacy was evaluated using a couple of posterior predictive checks. Post
 
 \section{Results}
 
-The model with greatest estimated out-of-sample predictive accuracy, as estimated via both WAIC and LOOIC, has both constant \(\alpha\) and no sampling covariate (Table \ref{tab:comparison}). The effects of either of these potential model aspects are inferred to be too small to account for the additional model complexity necessary to estimate them; because of this, only the results from the WAIC/LOOIC best model will be presented here. 
+%The model with greatest estimated out-of-sample predictive accuracy, as estimated via both WAIC and LOOIC, has both constant \(\alpha\) and no sampling covariate (Table \ref{tab:comparison}). The effects of either of these potential model aspects are inferred to be too small to account for the additional model complexity necessary to estimate them; because of this, only the results from the WAIC/LOOIC best model will be presented here. 
 
 Comparison of the posterior predictive estimates of \(S(t)\) to the empirical estimate reveal few obvious biases except for the case of estimates from the far right tail of observed durations (Fig. \ref{fig:surv}). This result is reinforced by the additional posterior predictive comparison where most estimates are not systematically biased except for a consistent under-estimate of \(\log(\sigma)\) for older taxa (Fig. \ref{fig:shot}). The results of both posterior predictive checks indicate that, for the majority of observations, model fit is generally not biased.
 
@@ -202,7 +197,7 @@ Body size is estimated to have no effect on taxon duration, with the estimate be
 
 The group-level estimate of the effect of environmental preference is estimated from both \(\mu_{v}\) and \(\mu_{v^{2}}\). 
 
-The estimate of \(\mu_{v}\) indicates that epicontinental favoring taxa are expected to have a greater duration than open-ocean favoring taxa (Table \ref{tab:comparison}). Additionally, given the estimate of between-cohort variance \(\tau_{v}\), there is approximately 19\% (\(\pm 8\) SD) probability that, for any given cohort, taxa favoring open-ocean environments would have a greater expected duration than taxa favoring epicontinental environments (\(\mathrm{Pr}\left(\mathcal{N}(\mu_{v}, \tau_{v}) > 0 \right)\)). 
+The estimate of \(\mu_{v}\) indicates that epicontinental favoring taxa are expected to have a greater duration than open-ocean favoring taxa (Table \ref{tab:param}). Additionally, given the estimate of between-cohort variance \(\tau_{v}\), there is approximately 19\% (\(\pm 8\) SD) probability that, for any given cohort, taxa favoring open-ocean environments would have a greater expected duration than taxa favoring epicontinental environments (\(\mathrm{Pr}\left(\mathcal{N}(\mu_{v}, \tau_{v}) > 0 \right)\)). 
 
 The estimate of \(\mu_{v^{2}}\) indicates that the overall relationship between environmental preference and \(\log(\sigma)\) is concave down (Fig. \ref{fig:env_mean}), with only a 1.9\% (\(\pm 2.4\) SD) probability that any given cohort is convex up (\(\mathrm{Pr}\left(\mathcal{N}(\mu_{v^{2}}, \tau_{v^{2}})\right) < 0\)).
 
@@ -221,7 +216,7 @@ The cohort-specific relationships between environmental preference and \(\log(\s
 
 The correlations of the cohort-specific estimates of the regression coefficients are estimated as the off-diagonal elements of the correlation matrix \(\Omega\). Only two of the elements of \(\Omega\) are distinguishable from 0: the correlation of \(\beta_{0}\) (extinction intensity) with both \(\beta_{r}\) and \(\beta_{v}\) (Fig. \ref{fig:cor_posterior}). 
 
-There is an approximate 86\% probability that the cohort-specific estimates of baseline extinction intensity \(\beta_{0}\) and the effect of geographic range \(\beta_{r}\) are negatively correlated; this means that for cohorts experiencing a lower extinction intensity (\(\beta_{0}\) decreases), the magnitude of the effect of geographic range is expected to decrease as well, and \textit{vice versa}. 
+There is an approximate 86\% probability that the cohort-specific estimates of baseline extinction intensity \(\beta_{0}\) and the effect of geographic range \(\beta_{r}\) are negatively correlated; this means that for cohorts experiencing a lower extinction intensity (\(\beta_{0}\) decreases), the magnitude of the effect of geographic range is expected to decrease as well, and \textit{vice versa}; this is in contrast to the observation made by \citet{Jablonski1986} in late Cretaceous bivalves.
 
 Similarly, there is an approximate 99.9\% probability that the cohort-specific estimates of \(\beta_{0}\) and \(\beta_{v}\) are negatively correlated; this means that as extinction intensity increases it is expected that epicontinental taxa become more favored over open-ocean environments (i.e. as \(\beta_{0}\) increases, \(\beta_{v}\) decreases). Additionally, there is only a 19\% (\(\pm 8.1\) SD) probability that, for any given cohort, open-ocean environments will be favored (\(\mathrm{Pr}\left(|\mu_{v}| - 2\tau_{v} > 0\right)\)).
 
@@ -240,11 +235,13 @@ I find consistent support for the ``survival of the unspecialized,'' with respec
 
 \citet{Hopkins2014a}, in their analysis of niche conservatism and substrate lithological preference in marine invertebrates, found that brachiopods were among the least ``conservative'' groups; taxa were found to easily change substrate preference on short time scales. While substrate preference is not the same as environmental preference (as defined here), a question does arise: do ``generalists'' have a greater duration because they are ``true'' environmental generalists from origination (e.g. can inhabit both environments) or have taxa with longer durations evolved their preference over their duration in the face of changing environments (i.e. niche evolution and adaptation)? The nature of the analysis here assumes that traits are constant over the duration of the taxon; future work should explore how environmental preference changes over lineage duration in relation to environmental availability.
 
+
 % sampling and duration
 % this section is no longer correct
 % needs to be changed/removed to reflect the current analysis
 %   truncated model
-In this study I used the average quality of the record for the duration of a taxon as a measure of the effect of sampling with the goal of determining if sampling is acting as a confounding variable where taxa with shorter or longer durations are associated with differences in sampling regime. This covariate, however, is not present in the WAIC or LOOIC best model (Table \ref{tab:comparison}). I conclude then that the effect of sampling on duration is at most small and is not acting as a confounding factor.
+%In this study I used the average quality of the record for the duration of a taxon as a measure of the effect of sampling with the goal of determining if sampling is acting as a confounding variable where taxa with shorter or longer durations are associated with differences in sampling regime. This covariate, however, is not present in the WAIC or LOOIC best model (Table \ref{tab:comparison}). I conclude then that the effect of sampling on duration is at most small and is not acting as a confounding factor.
+
 
 An alternative approach for specifically modeling survival that can take into account imperfect observation than the method used here is the Cormack-Jolly-Seber (CJS) model \citep{Royle2008,Liow2008,Tomiya2013,Liow2010b}. This model is a type of hidden Markov model with an absorbing state (i.e. extinction). In this model, survival is defined as the probability of surviving from time \(t\) to time \(t + 1\). Additionally, the effect of preservation and sighting is estimated as probability of observing a taxon that is present; this can extend the duration of a taxon beyond its last occurrence. This approach is a fundamentally different from the method used in the above analysis; for example, instead of modeling persistence from time \(t\) to time \(t + 1\), I model the distribution of taxon durations (lifetime) which then decomposes into a function describing survival (\(S(t)\)) and a function describing instantaneous extinction rate with taxon age \citep{Klein2003,Royle2008}. 
 
@@ -284,40 +281,40 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, R. Ree, and G. Slate
 \clearpage
 
 
-\begin{table}[h]
-  \centering
-  \caption{Comparison of widely applicable information criterion (WAIC) and leave-one-out cross-validation information criterion (LOOIC) values for the four models in this analysis. The WAIC and LOOIC values of the ``best'' model are in bold.}
-  \begin{tabular}{ r r r }
-    \hline
-    model & \uppercase{waic} & \uppercase{looic} \\ 
-    \hline
-    constant \(\alpha\) & 9080.39 & 4823.13 \\ 
-    constant \(\alpha\), no sampling & \textbf{4676.84} & \textbf{4621.95} \\ 
-    no sampling & 8250.22 & 5563.97 \\ 
-    full model & 759172.46 & 109417.64 \\ 
-    \hline
-  \end{tabular}
-  \label{tab:comparison}
-\end{table}
+%\begin{table}[h]
+%  \centering
+%  \caption{Comparison of widely applicable information criterion (WAIC) and leave-one-out cross-validation information criterion (LOOIC) values for the four models in this analysis. The WAIC and LOOIC values of the ``best'' model are in bold.}
+%  \begin{tabular}{ r r r }
+%    \hline
+%    model & \uppercase{waic} & \uppercase{looic} \\ 
+%    \hline
+%    constant \(\alpha\) & 9080.39 & 4823.13 \\ 
+%    constant \(\alpha\), no sampling & \textbf{4676.84} & \textbf{4621.95} \\ 
+%    no sampling & 8250.22 & 5563.97 \\ 
+%    full model & 759172.46 & 109417.64 \\ 
+%    \hline
+%  \end{tabular}
+%  \label{tab:comparison}
+%\end{table}
 
 
 \begin{table}[h]
   \centering
-  \caption{Group-level estimates of the effects of biological traits on brachiopod generic survival. \(\mu\) values are the location parameters of the effects, while \(\tau\) values are the scale terms describing the variation between cohorts. The mean, standard deviation, 10th, 50th, and 90th quantiles of the posterior are presented.}
+  \caption{Group-level estimates of the effects of biological traits on brachiopod generic survival. \(\mu\) values are the location parameters of the effects, while \(\tau\) values are the scale terms describing the variation between cohorts. The mean, standard deviation (SD), 10th, 50th, and 90th quantiles of the posterior are presented.}
   \begin{tabular}{ l l r r r r r }
     \hline
-    parameter & estimate & mean & standard deviation & 10\% & 50\% & 90\% \\ 
+    parameter & interpretation & mean & SD & 10\% & 50\% & 90\% \\ 
     \hline
     \(\mu_{i}\) & intercept & -2.32 & 0.14 & -2.50 & -2.32 & -2.15 \\ 
     \(\mu_{r}\) & geographic range & -0.76 & 0.11 & -0.91 & -0.76 & -0.62 \\ 
     \(\mu_{v}\) & environmental preference & -0.66 & 0.17 & -0.88 & -0.66 & -0.43 \\ 
-    \(\mu_{v^{2}}\) & environmental preference & 2.88 & 0.31 & 2.48 & 2.88 & 3.27 \\ 
+    \(\mu_{v^{2}}\) & environmental preference\(^{2}\) & 2.88 & 0.31 & 2.48 & 2.88 & 3.27 \\ 
     \(\mu_{m}\) & body size & 0.04 & 0.12 & -0.12 & 0.04 & 0.19 \\ 
-    \(\tau_{i}\) & Var(intercept) & 0.50 & 0.10 & 0.37 & 0.49 & 0.63 \\ 
-    \(\tau_{r}\) & Var(geographic range) &  0.27 & 0.13 & 0.11 & 0.26 & 0.45 \\ 
-    \(\tau_{v}\) & Var(environmental preference) & 0.76 & 0.16 & 0.56 & 0.74 & 0.97 \\ 
-    \(\tau_{v^{2}}\) & Var(environmental preference) & 1.24 & 0.33 & 0.84 & 1.21 & 1.67 \\ 
-    \(\tau_{m}\) & Var(body size) & 0.47 & 0.12 & 0.33 & 0.47 & 0.63 \\ 
+    \(\tau_{i}\) & SD(intercept) & 0.50 & 0.10 & 0.37 & 0.49 & 0.63 \\ 
+    \(\tau_{r}\) & SD(geographic range) &  0.27 & 0.13 & 0.11 & 0.26 & 0.45 \\ 
+    \(\tau_{v}\) & SD(environmental preference) & 0.76 & 0.16 & 0.56 & 0.74 & 0.97 \\ 
+    \(\tau_{v^{2}}\) & SD(environmental preference\(^{2}\)) & 1.24 & 0.33 & 0.84 & 1.21 & 1.67 \\ 
+    \(\tau_{m}\) & SD(body size) & 0.47 & 0.12 & 0.33 & 0.47 & 0.63 \\ 
     \hline
   \end{tabular}
   \label{tab:param}

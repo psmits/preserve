@@ -11,6 +11,7 @@ library(maptools)
 library(foreign)
 library(rgdal)
 
+source('../R/jade.r')
 source('../R/clean_funcs.r')
 source('../R/gts.r')
 sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya', 

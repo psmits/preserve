@@ -36,10 +36,10 @@ data <- read_rdump('../data/data_dump/fauna_info.data.R')
 
 pat <- 'faun_'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
-#ids <- rep(1:(length(outs) / 4), each = 4)
-#outs <- split(outs, ids)
+ids <- rep(1:(length(outs) / 4), each = 4)
+outs <- split(outs, ids)
 
-wfit <- read_stan_csv(outs)
+wfit <- read_stan_csv(outs[[3]])
 #wfit <- llply(outs, read_stan_csv)
 #log.liks <- llply(wfit, extract_log_lik)
 
@@ -164,7 +164,7 @@ shot.plot <- shot.plot + stat_function(fun = function(x) x,
                                        lty = 'dashed', 
                                        colour = 'darkgrey')
 shot.plot <- shot.plot + geom_point(alpha = 0.5)
-shot.plot <- shot.plot + labs(x = 'Observed duration',
+shot.plot <- shot.plot + labs(x = 'Observed duration (t)',
                               y = expression(tilde(sigma)))
 ggsave(shot.plot, filename = '../doc/figure/shotgun.pdf',
        width = 6, height = 5, dpi = 600)

@@ -121,11 +121,15 @@ cen <- llply(data, function(x) x[!dead])
 data <- list(dur_unc = unc$duration,
              cohort_unc = unc$cohort,
              occupy_unc = unc$occupy,
+             env_unc = unc$occupy,
+             size_unc = unc$occupy,
              samp_unc = unc$samp,
              N_unc = length(unc$duration),
              dur_cen = cen$duration,
              cohort_cen = cen$cohort,
              occupy_cen = cen$occupy,
+             env_cen = cen$occupy,
+             size_cen = cen$occupy,
              samp_cen = cen$samp,
              N_cen = length(cen$duration))
 
@@ -136,6 +140,8 @@ data$T <- 3
 data$cohort_cen <- data$cohort_cen[!(data$dur_cen == 3)]
 data$occupy_cen <- data$occupy_cen[!(data$dur_cen == 3)]
 data$samp_cen <- data$samp_cen[!(data$dur_cen == 3)]
+data$env_cen <- data$env_cen[!(data$dur_cen == 3)]
+data$size_cen <- data$size_cen[!(data$dur_cen == 3)]
 data$dur_cen <- data$dur_cen[!(data$dur_cen == 3)]
 data$N_cen <- length(data$dur_cen)
 
@@ -144,5 +150,7 @@ with(data, {stan_rdump(list = c('N', 'O', 'T',
                                 'dur_unc', 'cohort_unc', 
                                 'dur_cen', 'cohort_cen',
                                 'occupy_unc', 'occupy_cen',
+                                'env_unc', 'env_cen',
+                                'size_unc', 'size_cen',
                                 'samp_unc', 'samp_cen'),
                        file = '../data/data_dump/high_info.data.R')})
