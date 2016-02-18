@@ -54,16 +54,14 @@ model {
                   beta[cohort[i], 2] * occupy[i] + 
                   beta[cohort[i], 3] * env[i] + 
                   beta[cohort[i], 4] * (env[i]^2) +
-                  beta[cohort[i], 5] * leng[i])
-                / alpha)));
+                  beta[cohort[i], 5] * leng[i]) / alpha)));
       } else {
         increment_log_prob(weibull_log(dur[i], alpha,
               exp(-(beta[cohort[i], 1] + 
                   beta[cohort[i], 2] * occupy[i] + 
                   beta[cohort[i], 3] * env[i] + 
                   beta[cohort[i], 4] * (env[i]^2) +
-                  beta[cohort[i], 5] * leng[i])
-                / alpha)));
+                  beta[cohort[i], 5] * leng[i]) / alpha)));
       }
     } else {
       increment_log_prob(weibull_ccdf_log(dur[i], alpha,
@@ -71,8 +69,7 @@ model {
                 beta[cohort[i], 2] * occupy[i] + 
                 beta[cohort[i], 3] * env[i] + 
                 beta[cohort[i], 4] * (env[i]^2) +
-                beta[cohort[i], 5] * leng[i])
-              / alpha)));
+                beta[cohort[i], 5] * leng[i]) / alpha)));
     }
   }
 }
@@ -86,8 +83,7 @@ generated quantities {
           beta[cohort[i], 2] * occupy[i] +
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
-          beta[cohort[i], 5] * leng[i])
-        / alpha);
+          beta[cohort[i], 5] * leng[i]) / alpha);
   }
 
   // log_lik

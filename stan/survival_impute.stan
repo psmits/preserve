@@ -102,14 +102,16 @@ model {
                   beta[cohort[i], 2] * occupy[i] + 
                   beta[cohort[i], 3] * env[i] + 
                   beta[cohort[i], 4] * (env[i]^2) +
-                  beta[cohort[i], 5] * leng[i])/ alpha)));
+                  beta[cohort[i], 5] * leng[i] + 
+                  beta[cohort[i], 6] * samp[i])/ alpha)));
       } else {
         increment_log_prob(weibull_log(dur[i], alpha,
               exp(-(beta[cohort[i], 1] + 
                   beta[cohort[i], 2] * occupy[i] + 
                   beta[cohort[i], 3] * env[i] + 
                   beta[cohort[i], 4] * (env[i]^2) +
-                  beta[cohort[i], 5] * leng[i])/ alpha)));
+                  beta[cohort[i], 5] * leng[i] + 
+                  beta[cohort[i], 6] * samp[i])/ alpha)));
       }
     } else {
       increment_log_prob(weibull_ccdf_log(dur[i], alpha,
@@ -117,7 +119,41 @@ model {
                 beta[cohort[i], 2] * occupy[i] + 
                 beta[cohort[i], 3] * env[i] + 
                 beta[cohort[i], 4] * (env[i]^2) +
-                beta[cohort[i], 5] * leng[i])/ alpha)));
+                beta[cohort[i], 5] * leng[i] + 
+                beta[cohort[i], 6] * samp[i])/ alpha)));
     }
+  }
+}
+generated quantities {
+  vector[N] log_lik;
+  vector[N] y_tilde;
+  vector[N] hold;
+
+  for(i in 1:N) {
+    hold[i] <- exp(-(beta[cohort[i], 1] +
+          beta[cohort[i], 2] * occupy[i] +
+          beta[cohort[i], 3] * env[i] + 
+          beta[cohort[i], 4] * (env[i]^2) +
+          beta[cohort[i], 5] * leng[i] +
+          beta[cohort[i], 6] * samp[i]) / alpha);
+  }
+
+  // log_lik
+  for(i in 1:N) {
+    if(censored[i] == 0) {
+      if(dur[i] == 1) {
+        log_lik[i] <- weibull_cdf_log(dur[i], alpha, hold[i]);
+      } else {
+        log_lik[i] <- weibull_log(dur[i], alpha, hold[i]);
+      }
+    } else {
+      log_lik[i] <- weibull_ccdf_log(dur[i], 
+          alpha, hold[i]);
+    }
+  }
+
+  // posterior predictive simulations
+  for(i in 1:N) {
+    y_tilde[i] <- weibull_rng(alpha, hold[i]);
   }
 }
