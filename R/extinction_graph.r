@@ -78,6 +78,7 @@ theme_update(axis.text = element_text(size = 10),
              strip.text = element_text(size = 18))
 
 # data setup
+# HERE
 coh <- c(data$cohort_unc, data$cohort_cen)
 gro <- c(data$group_unc, data$group_cen)
 rage <- c(data$occupy_unc, data$occupy_cen)
@@ -87,6 +88,7 @@ duration <- c(data$dur_unc, data$dur_cen)
 
 
 # lets make survival curves
+# HERE
 condition <- c(rep(1, data$N_unc), rep(0, data$N_cen))
 condition[duration == 1 & condition == 1] <- 2
 
@@ -358,6 +360,8 @@ quad.mean <- function(x, mcoef) {
   # depends on if alpha varies by cohort
 }
 
+
+# HERE
 env.d <- c(data$env_unc, data$env_cen)
 val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
 quadval <- list()
@@ -371,6 +375,7 @@ meanquad <- data.frame(env = val, resp = quad.mean(val, mcoef))
 
 # add rug showing observed
 #   this addition would overpower the big, by cohort graph
+# HERE
 env.obs <- data.frame(env = c(data$env_unc, data$env_cen))
 
 mustache <- ggplot(quadframe, aes(x = env, y = resp, group = sim))

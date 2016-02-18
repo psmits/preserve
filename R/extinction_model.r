@@ -154,3 +154,52 @@ with(data, {stan_rdump(list = c('N', 'O', 'T',
                                 'size_unc', 'size_cen',
                                 'samp_unc', 'samp_cen'),
                        file = '../data/data_dump/high_info.data.R')})
+
+
+
+# imputed model
+# now just setup the data
+
+num.samp <- nrow(short.data)
+
+con.orig <- match(as.character(short.data$orig), rev(as.character(lump[, 2])))
+con.orig <- mapvalues(con.orig, from = unique(con.orig), 
+                      to = rank(unique(con.orig)))
+num.orig <- length(unique(con.orig))
+
+# environmental preference
+prob.epi <- qbeta(short.data$epi / (short.data$epi + short.data$off), 
+                  short.data$epi.bck + 1, short.data$off.bck + 1)
+env.odds <- rescale(prob.epi)
+
+
+data <- list(dur = short.data$duration, 
+             censored = short.data$censored,
+             cohort = con.orig, 
+             occupy = rescale(logit(short.data$occupy)),
+             env = env.odds,
+             leng = rescale(log(short.data$size)))
+
+
+inclusion <- (!(is.nan(short.data$gap))) & (!(is.infinite(short.data$gap)))
+
+data$samp_obs <- short.data$gap[inclusion]
+data$N <- num.samp
+data$O <- num.orig
+data$N_obs <- length(data$samp_obs)
+data$N_imp <- data$N - data$N_obs
+data$inclusion <- inclusion * 1
+
+
+with(data, {stan_rdump(list = c('N', 
+                                'O',
+                                'N_obs', 'N_imp',
+                                'censored', 
+                                'inclusion',
+                                'dur', 
+                                'cohort',
+                                'occupy',
+                                'env', 
+                                'leng', 
+                                'samp_obs'),
+                       file = '../data/data_dump/impute_info.data.R')})

@@ -15,11 +15,7 @@ data {
   real size_cen[N_cen];
 }
 parameters {
-  real alpha_trans[N];
-  real alpha_mu;  // shared (transformed) shape
-  real<lower=0> sigma_alpha;
-  real alpha_cohort[O];
-  real<lower=0> sigma_alpcoh;
+  real alpha_trans;
 
   // regression coefficients
   vector[5] mu_prior;
@@ -28,29 +24,14 @@ parameters {
   vector<lower=0>[5] sigma; 
 }
 transformed parameters {
-  real<lower=0> alpha[N];  // individual shape
+  real<lower=0> alpha;  // individual shape
   cov_matrix[5] Sigma;
 
-  for(n in 1:N) {
-    alpha[n] <- exp(alpha_trans[n]);
-  }
+  alpha <- exp(alpha_trans);
   Sigma <- quad_form_diag(Omega, sigma);
 }
 model {
-  for(n in 1:N_unc) {
-    alpha_trans[n] ~ normal(alpha_mu + alpha_cohort[cohort_unc[n]], 
-        sigma_alpha);
-  }
-  for(n in 1:N_cen) {
-    alpha_trans[n + N_unc] ~ normal(alpha_mu + alpha_cohort[cohort_cen[n]], 
-        sigma_alpha);
-  }
-  alpha_mu ~ normal(0, 1);
-  sigma_alpha ~ cauchy(0, 1);
-
-  alpha_cohort ~ normal(0, sigma_alpcoh);
-  sigma_alpcoh ~ cauchy(0, 1);
-
+  alpha_trans ~ normal(0, 1);
 
   // regression coefficients
   Omega ~ lkj_corr(2);
@@ -69,31 +50,31 @@ model {
   // likelihood / sampling statements
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {
-      increment_log_prob(weibull_cdf_log(dur_unc[i], alpha[i],
+      increment_log_prob(weibull_cdf_log(dur_unc[i], alpha,
             exp(-(beta[cohort_unc[i], 1] + 
                 beta[cohort_unc[i], 2] * occupy_unc[i] + 
                 beta[cohort_unc[i], 3] * env_unc[i] + 
                 beta[cohort_unc[i], 4] * (env_unc[i]^2) +
                 beta[cohort_unc[i], 5] * size_unc[i])
-              / alpha[i])));
+              / alpha)));
     } else {
-      increment_log_prob(weibull_log(dur_unc[i], alpha[i],
+      increment_log_prob(weibull_log(dur_unc[i], alpha,
             exp(-(beta[cohort_unc[i], 1] + 
                 beta[cohort_unc[i], 2] * occupy_unc[i] + 
                 beta[cohort_unc[i], 3] * env_unc[i] + 
                 beta[cohort_unc[i], 4] * (env_unc[i]^2) +
                 beta[cohort_unc[i], 5] * size_unc[i])
-              / alpha[i])));
+              / alpha)));
     }
   }
   for(i in 1:N_cen) {
-    increment_log_prob(weibull_ccdf_log(dur_cen[i], alpha[N_unc + i],
+    increment_log_prob(weibull_ccdf_log(dur_cen[i], alpha,
           exp(-(beta[cohort_cen[i], 1] + 
               beta[cohort_cen[i], 2] * occupy_cen[i] + 
               beta[cohort_cen[i], 3] * env_cen[i] + 
               beta[cohort_cen[i], 4] * (env_cen[i]^2) +
               beta[cohort_cen[i], 5] * size_cen[i])
-            / alpha[N_unc + i])));
+            / alpha)));
   }
 }
 generated quantities {
@@ -107,7 +88,7 @@ generated quantities {
           beta[cohort_unc[i], 3] * env_unc[i] + 
           beta[cohort_unc[i], 4] * (env_unc[i]^2) +
           beta[cohort_unc[i], 5] * size_unc[i])
-          / alpha[i]);
+          / alpha);
   }
   for(i in 1:N_cen) {
     hold[i + N_unc] <- exp(-(beta[cohort_cen[i], 1] +
@@ -115,27 +96,27 @@ generated quantities {
           beta[cohort_cen[i], 3] * env_cen[i] + 
           beta[cohort_cen[i], 4] * (env_cen[i]^2) +
           beta[cohort_cen[i], 5] * size_cen[i])
-          / alpha[N_unc + i]);
+          / alpha);
   }
 
   // log_lik
   for(i in 1:N_unc) {
     if(dur_unc[i] == 1) {
-      log_lik[i] <- weibull_cdf_log(dur_unc[i], alpha[i], hold[i]);
+      log_lik[i] <- weibull_cdf_log(dur_unc[i], alpha, hold[i]);
     } else {
-      log_lik[i] <- weibull_log(dur_unc[i], alpha[i], hold[i]);
+      log_lik[i] <- weibull_log(dur_unc[i], alpha, hold[i]);
     }
   }
   for(i in 1:N_cen) {
     log_lik[i + N_unc] <- weibull_ccdf_log(dur_cen[i], 
-        alpha[i + N_unc], hold[i + N_unc]);
+        alpha, hold[i + N_unc]);
   }
 
   // posterior predictive simulations
   for(i in 1:N_unc) {
-    y_tilde[i] <- weibull_rng(alpha[i], hold[i]);
+    y_tilde[i] <- weibull_rng(alpha, hold[i]);
   }
   for(i in 1:N_cen) {
-    y_tilde[i + N_unc] <- weibull_rng(alpha[N_unc + i], hold[i + N_unc]);
+    y_tilde[i + N_unc] <- weibull_rng(alpha, hold[i + N_unc]);
   }
 }
