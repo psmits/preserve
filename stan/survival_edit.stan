@@ -29,6 +29,8 @@ transformed parameters {
   Sigma <- quad_form_diag(Omega, sigma);
 }
 model {
+  vector[N] hold;
+
   alpha_trans ~ normal(0, 1);
 
   // regression coefficients
@@ -45,31 +47,24 @@ model {
     beta[i] ~ multi_normal(mu_prior, Sigma);
   }
 
-  // likelihood / sampling statements
+  for(i in 1:N) {
+    hold[i] <- exp(-(beta[cohort[i], 1] + 
+          beta[cohort[i], 2] * occupy[i] + 
+          beta[cohort[i], 3] * env[i] + 
+          beta[cohort[i], 4] * (env[i]^2) +
+          beta[cohort[i], 5] * leng[i]) / alpha);
+  }
+
+    // likelihood / sampling statements
   for(i in 1:N) {
     if(censored[i] == 0) {
       if(dur[i] == 1) {
-        increment_log_prob(weibull_cdf_log(dur[i], alpha,
-              exp(-(beta[cohort[i], 1] + 
-                  beta[cohort[i], 2] * occupy[i] + 
-                  beta[cohort[i], 3] * env[i] + 
-                  beta[cohort[i], 4] * (env[i]^2) +
-                  beta[cohort[i], 5] * leng[i]) / alpha)));
+        increment_log_prob(weibull_cdf_log(dur[i], alpha, hold[i]));
       } else {
-        increment_log_prob(weibull_log(dur[i], alpha,
-              exp(-(beta[cohort[i], 1] + 
-                  beta[cohort[i], 2] * occupy[i] + 
-                  beta[cohort[i], 3] * env[i] + 
-                  beta[cohort[i], 4] * (env[i]^2) +
-                  beta[cohort[i], 5] * leng[i]) / alpha)));
+        increment_log_prob(weibull_log(dur[i], alpha, hold[i]));
       }
     } else {
-      increment_log_prob(weibull_ccdf_log(dur[i], alpha,
-            exp(-(beta[cohort[i], 1] + 
-                beta[cohort[i], 2] * occupy[i] + 
-                beta[cohort[i], 3] * env[i] + 
-                beta[cohort[i], 4] * (env[i]^2) +
-                beta[cohort[i], 5] * leng[i]) / alpha)));
+      increment_log_prob(weibull_ccdf_log(dur[i], alpha, hold[i]));
     }
   }
 }
