@@ -126,7 +126,7 @@ In the case of the right- and left-censored observations mentioned above, the pr
 
 The scale parameter \(\sigma\) was modeled as a regression following \citet{Kleinbaum2005} with both varying intercept and varying slopes; this is expressed
 \begin{equation}
-  \sigma_{i} = \exp\left(\frac{-\mathbf{X}_{i} B_{j[i]}}{\alpha_{j[i]}}\right)
+  \sigma_{i} = \exp\left(\frac{-\mathbf{X}_{i} B_{j[i]}}{\alpha}\right)
   \label{eq:sigma}
 \end{equation}
 where \(i\) indexes across all observations, \(j[i]\) is the cohort membership of the \(i\)th observation, \(X\) is a \(N \times D\) matrix of covariates along with a column of 1's for the intercept term, and \(B\) is a \(J \times D\) matrix of cohort-specific regression coefficients.
@@ -147,18 +147,7 @@ The elements of \(\mu\) were given independent normally distributed priors. The 
   \label{eq:sigma_prior}
 \end{equation*}
 
-% do i still need this?
-% adds a lot of complexity
-The shape parameter \(\alpha\) was allowed to vary by cohort where \(\log(\alpha_{j}) \sim \mathcal{N}(\alpha^{\prime} + a_{j}, \sigma_{\alpha})\). The effect of origination cohort \(a_{j}\) is modeled a shared as normal distribution such that \(a_{j} \sim \mathcal{N}(0, \sigma_{a})\). \(\alpha\), \(\sigma_{\alpha}\) and \(\sigma_{a}\) were given weakly informative normal and half-Cauchy priors as appropriate: 
-\begin{equation*}
-  \begin{aligned}
-    \alpha^{\prime} &\sim \mathcal{N}(0, 1) \\
-    \sigma_{a} &\sim \mathrm{C^{+}}(1) \\
-    \sigma_{\alpha} &\sim \mathrm{C^{+}}(1). \\
-  \end{aligned}
-  \label{eq:alpha_prior}
-\end{equation*}
-
+The log of the shape parameter \(\alpha\) was given a weakly informative prior \(\log(\alpha) \sim \mathcal{N}(0, 1)\) centered at \(\alpha = 1\), which corresponds to the Law of Constant Extinction \citep{VanValen1973}.
 
 The above model is for all taxa and does not include sampling as a covariate. In order to determine if sampling is acting as a confounding factor in this analysis, an additional model was developed because sampling was only estimated for taxa with a duration of three or more which creates a left-truncated distribution of durations \citep{Klein2003}. The sampling statement and log-probability for a left-truncated Weibull distribution, truncated at time \(Y\) (e.g. three), is
 \begin{equation}
