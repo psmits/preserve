@@ -118,6 +118,8 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
                        table(x[, bins])})
 
+  rsamp <- laply(taxon.occur, function(x) sum(x) / length(x))
+
   taxon.gap <- c()
   for(ii in seq(length(taxon.occur))) {
     tm <- names(taxon.occur[[ii]])  # stage names
@@ -268,6 +270,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
   sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]
   sepkoski.data$gap <- taxon.gap[match(sepkoski.data$genus, names(taxon.gap))]
+  sepkoski.data$rsamp <- rsamp[match(sepkoski.data$genus, names(rsamp))]
   sepkoski.data
 }
 

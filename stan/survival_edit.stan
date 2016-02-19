@@ -11,6 +11,7 @@ data {
   real occupy[N];  // range leng
   real env[N];  // number of epicontinental occ
   real leng[N];  // body leng
+  real relab[N];
 }
 parameters {
   real alpha_trans;
@@ -55,7 +56,7 @@ model {
           beta[cohort[i], 5] * leng[i]) / alpha);
   }
 
-    // likelihood / sampling statements
+  // likelihood / sampling statements
   for(i in 1:N) {
     if(censored[i] == 0) {
       if(dur[i] == 1) {
@@ -90,8 +91,7 @@ generated quantities {
         log_lik[i] <- weibull_log(dur[i], alpha, hold[i]);
       }
     } else {
-      log_lik[i] <- weibull_ccdf_log(dur[i], 
-          alpha, hold[i]);
+      log_lik[i] <- weibull_ccdf_log(dur[i], alpha, hold[i]);
     }
   }
 

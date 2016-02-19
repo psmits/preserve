@@ -6,7 +6,8 @@ for f in $FILES;
 do
   for i in `seq 1 4`;
   do
-    /home/psmits/preserve/stan/survival_edit sample num_samples=50000 num_warmup=50000 thin=50 \
+    /home/psmits/preserve/stan/survival_edit \
+      sample num_samples=50000 num_warmup=50000 thin=50 \
       init=0 \
       id=$i \
       data file=$f \
@@ -15,7 +16,8 @@ do
   wait
   for i in `seq 1 4`;
   do
-    /home/psmits/preserve/stan/survival_impute sample num_samples=50000 num_warmup=50000 thin=50 \
+    /home/psmits/preserve/stan/survival_impute_constant \
+      sample num_samples=50000 num_warmup=50000 thin=50 \
       init=0 \
       id=$i \
       data file=$f \
@@ -28,7 +30,8 @@ for f in $FILES;
 do
   for i in `seq 1 4`;
   do
-    /home/psmits/preserve/stan/survival_highgrade sample num_samples=50000 num_warmup=50000 thin=50 \
+    /home/psmits/preserve/stan/survival_highgrade \
+      sample num_samples=50000 num_warmup=50000 thin=50 \
       init=0 \
       id=$i \
       data file=$f \
