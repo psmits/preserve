@@ -20,10 +20,11 @@ parameters {
   real alpha_trans;
 
   // regression coefficients
-  vector[6] mu_prior;
-  vector[6] beta[O];  // cohort coef 
-  corr_matrix[6] Omega;
-  vector<lower=0>[6] sigma; 
+  vector[5] mu_prior;
+  vector[5] beta[O];  // cohort coef 
+  real delta;
+  corr_matrix[5] Omega;
+  vector<lower=0>[5] sigma; 
 
   vector[4] gamma;
   real samp_imp[N_imp];  // imputed sampling values
@@ -31,7 +32,7 @@ parameters {
 }
 transformed parameters {
   real<lower=0> alpha;
-  cov_matrix[6] Sigma;
+  cov_matrix[5] Sigma;
 
   real<lower=0,upper=1> phi[N];  // beta mean
   real alp[N];
@@ -79,7 +80,7 @@ model {
   mu_prior[3] ~ normal(0, 1);
   mu_prior[4] ~ normal(1, 1);
   mu_prior[5] ~ normal(0, 1);
-  mu_prior[6] ~ normal(0, 1);
+  delta ~ normal(0, 1);
 
   for(i in 1:O) {
     beta[i] ~ multi_normal(mu_prior, Sigma);
@@ -103,7 +104,7 @@ model {
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
           beta[cohort[i], 5] * leng[i] + 
-          beta[cohort[i], 6] * samp[i])/ alpha);
+          delta * samp[i])/ alpha);
   }
 
   // likelihood / sampling statements
@@ -130,7 +131,7 @@ generated quantities {
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
           beta[cohort[i], 5] * leng[i] +
-          beta[cohort[i], 6] * samp[i]) / alpha);
+          delta * samp[i]) / alpha);
   }
 
   // log_lik

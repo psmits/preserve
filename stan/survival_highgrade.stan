@@ -15,14 +15,16 @@ parameters {
   real alpha_trans;
 
   // regression coefficients
-  vector[3] mu_prior;
-  vector[3] beta[O];  // cohort coef 
-  corr_matrix[3] Omega;
-  vector<lower=0>[3] sigma; 
+  vector[2] mu_prior;
+  vector[2] beta[O];  // cohort coef 
+  corr_matrix[2] Omega;
+  vector<lower=0>[2] sigma; 
+
+  real delta;
 }
 transformed parameters {
   real<lower=0> alpha;  // individual shape
-  cov_matrix[3] Sigma;
+  cov_matrix[2] Sigma;
 
   alpha <- exp(alpha_trans);
   Sigma <- quad_form_diag(Omega, sigma);
@@ -37,10 +39,8 @@ model {
   sigma ~ cauchy(0, 1);
   mu_prior[1] ~ normal(0, 5);
   mu_prior[2] ~ normal(-1, 1);
-  mu_prior[3] ~ normal(0, 1);
-  // mu_prior[7] ~ normal(0, 1);
-  // interaction w/ range?
 
+  delta ~ normal(0, 1);
 
   for(i in 1:O) {
     beta[i] ~ multi_normal(mu_prior, Sigma);
@@ -49,7 +49,7 @@ model {
   for(i in 1:N) {
     hold[i] <- exp(-(beta[cohort[i], 1] + 
           beta[cohort[i], 2] * occupy[i] + 
-          beta[cohort[i], 3] * samp[i]) / alpha);
+          delta * samp[i]) / alpha);
   }
 
   // likelihood / sampling statements
@@ -71,7 +71,7 @@ generated quantities {
   for(i in 1:N) {
     hold[i] <- exp(-(beta[cohort[i], 1] +
           beta[cohort[i], 2] * occupy[i] +
-          beta[cohort[i], 3] * samp[i])/ alpha);
+          delta * samp[i])/ alpha);
   }
 
   // log_lik

@@ -1,20 +1,17 @@
 data {
   int N;  // number of samples
   int O;  // origination cohort
-  int N_obs;  // number observations will fully observed covariates
-  int N_imp;  // number observations without fully observed covariates
-  
-  real<lower=0> dur[N];  // duration
 
-  int censored[N];  // 1 == censored, 0 == uncensored
-  int inclusion[N];  // 1 == fully observed, 0 == not observed
- 
-  int cohort[N];
-  real occupy[N];
-  real env[N];
-  real leng[N];
+  real<lower=0> dur[N];  // duration of uncensored obs
 
-  real samp_obs[N_obs];  // observed sampling values
+  int censored[N];
+  int inclusion[N];
+
+  int cohort[N];  // cohort membership
+  real occupy[N];  // range leng
+  real env[N];  // number of epicontinental occ
+  real leng[N];  // body leng
+  real relab[N];
 }
 parameters {
   real alpha_trans;
@@ -22,54 +19,21 @@ parameters {
   // regression coefficients
   vector[5] mu_prior;
   vector[5] beta[O];  // cohort coef 
-  real delta;
   corr_matrix[5] Omega;
   vector<lower=0>[5] sigma; 
 
-  vector[4] gamma;
-  real samp_imp[N_imp];  // imputed sampling values
-  real<lower=0.1> lambda;  // beta total count
+  real delta;
 }
 transformed parameters {
-  real<lower=0> alpha;
+  real<lower=0> alpha;  // individual shape
   cov_matrix[5] Sigma;
 
-  real<lower=0,upper=1> phi[N];  // beta mean
-  real alp[N];
-  real bet[N];
-  
-  real samp[N];
-  
-  // parameter transformation
-  for(n in 1:N) {
-    alp[n] <- lambda * phi[n];
-    bet[n] <- lambda * (1 - phi[n]);
-  }
-  
-  // other misc transformations
   alpha <- exp(alpha_trans);
   Sigma <- quad_form_diag(Omega, sigma);
-
-  // combining data and parameters
-  for(n in 1:N) {
-    if(inclusion[n] == 1) {
-      samp[n] <- samp_obs[n];
-    } else {
-      samp[n] <- samp_imp[n];
-    }
-  }
-
-  // predict mean of inclusion function
-  for(n in 1:N) {
-    phi[n] <- gamma[1] + 
-      gamma[2] * occupy[n] + 
-      gamma[3] * env[n] + 
-      gamma[4] * leng[n];
-  }
 }
 model {
   vector[N] hold;
-  
+
   alpha_trans ~ normal(0, 1);
 
   // regression coefficients
@@ -80,22 +44,11 @@ model {
   mu_prior[3] ~ normal(0, 1);
   mu_prior[4] ~ normal(1, 1);
   mu_prior[5] ~ normal(0, 1);
+
   delta ~ normal(0, 1);
 
   for(i in 1:O) {
     beta[i] ~ multi_normal(mu_prior, Sigma);
-  }
-
-  // both estimate values of alp and bet (phi and lambda) for observed
-  // then impute unobserved
-  lambda ~ pareto(0.1, 1.5);
-  gamma ~ normal(0, 1);
-  for(n in 1:N) {
-    if(inclusion[n] == 1) {
-      samp_obs[n] ~ beta(alp[n], bet[n]);
-    } else {
-      samp_imp[n] ~ beta(alp[n], bet[n]);
-    }
   }
 
   for(i in 1:N) {
@@ -104,7 +57,7 @@ model {
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
           beta[cohort[i], 5] * leng[i] + 
-          delta * samp[i])/ alpha);
+          delta * relab[i]) / alpha);
   }
 
   // likelihood / sampling statements
@@ -130,8 +83,8 @@ generated quantities {
           beta[cohort[i], 2] * occupy[i] +
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
-          beta[cohort[i], 5] * leng[i] +
-          delta * samp[i]) / alpha);
+          beta[cohort[i], 5] * leng[i] + 
+          delta * relab[i]) / alpha);
   }
 
   // log_lik
@@ -152,3 +105,4 @@ generated quantities {
     y_tilde[i] <- weibull_rng(alpha, hold[i]);
   }
 }
+

@@ -16,7 +16,17 @@ do
   wait
   for i in `seq 1 4`;
   do
-    /home/psmits/preserve/stan/survival_impute_constant \
+    /home/psmits/preserve/stan/survival_relab \
+      sample num_samples=50000 num_warmup=50000 thin=50 \
+      init=0 \
+      id=$i \
+      data file=$f \
+      output file=/home/psmits/preserve/data/mcmc_out/faun_relab_${i}.csv &
+  done
+  wait
+  for i in `seq 1 4`;
+  do
+    /home/psmits/preserve/stan/survival_impute \
       sample num_samples=50000 num_warmup=50000 thin=50 \
       init=0 \
       id=$i \
