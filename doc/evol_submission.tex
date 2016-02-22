@@ -108,6 +108,12 @@ where \(v\) is the percent of the distribution defined in equation \ref{eq:envpr
 
 Body size, measured as shell length, was sourced directly from \citet{Payne2014}. These measurements were made from brachiopod taxa figured in the \textit{Treatise on Invertebrate Paleontology} \citep{Brunton2007}.
 
+% multiple things going on now
+%   cor gap and rel abundance
+%   using relative abundance as measure of sampling
+% if wanting to use gap statistic
+%   imputed model
+%   truncated model
 The sampling record for individual taxa was calculated using the standard gap statistic \citep{Foote1996e,Foote2000}. The gap statistic is calculated as the number of stages in which the taxon was sampled minus two divided by the duration of the taxon minus two. Subtracting two from both the numerator and denominator is because the first and last appearance stages are by definition sampled. The minimum duration for which a gap statistic can be calculated is three stages. Sampling was only included as a covariate in the truncated model, described later.
 
 Prior to analysis, geographic range was logit transformed and body size was natural-log transformed; both of these transformations make these variables defined for the entire real line. All covariates were then standardized by subtracting the mean from all values and dividing by twice its standard deviation, which follows \citet{Gelman2007}. This standardization means that all regression coefficients are comparable as the expected change per 1-unit change in the rescaled covariates. \(D\) is defined as the total number of covariate effects included in the model plus one for the intercept term.
@@ -129,7 +135,7 @@ The scale parameter \(\sigma\) was modeled as a regression following \citet{Klei
   \sigma_{i} = \exp\left(\frac{-\mathbf{X}_{i} B_{j[i]}}{\alpha}\right)
   \label{eq:sigma}
 \end{equation}
-where \(i\) indexes across all observations, \(j[i]\) is the cohort membership of the \(i\)th observation, \(X\) is a \(N \times D\) matrix of covariates along with a column of 1's for the intercept term, and \(B\) is a \(J \times D\) matrix of cohort-specific regression coefficients.
+where \(i\) indexes across all observations where \(i = 1, \dots, n\) where \(n\) is the total number of observations, \(j[i]\) is the cohort membership of the \(i\)th observation where \(j = 1, \dots, J\) where \(J\) is the total number of cohorts, \(X\) is a \(N \times D\) matrix of covariates along with a column of 1's for the intercept term, and \(B\) is a \(J \times D\) matrix of cohort-specific regression coefficients.
 
 Each of the rows of matrix \(B\) are modeled as realizations from a multivariate normal distribution with length \(D\) location vector \(\mu\) and \(J \times J\) covariance matrix \(\Sigma\): \(B_{j} \sim \mathrm{MVN}(\mu, \Sigma)\). The coviariance matrix was then decomposed into a length \(J\) vector of scales \(\tau\) and a \(J \times J\) correlation matrix \(\Omega\), defined \(\Sigma = \mathrm{diag}(\tau) \Omega \mathrm{diag}(\tau)\) where ``diag'' indicates a diagonal matrix.
 
@@ -167,6 +173,8 @@ For this left-truncated model, I've excluded one observation that is right-censo
 
 The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 steps each, split half warm-up and half sampling and thinned to every 10th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
+% edit, relab, and impute can all be compared using WAIC/PSIS-LOO
+%   highgrade cannot
 %The fit of the above model (the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling as a covariate, or both constant \(\alpha\) and no sampling covariate. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling (PSIS-LOO) \citep{Vehtari2015}. Both of these are estimates of the out-of-sample predictive accuracy or the expected quality of fit of the model to new data. 
 %
 %WAIC is a more fully Bayesian alternative to AIC or DIC \citep{Watanabe2010a,Gelman2013d}; comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. Note that BIC is not an estimate of out-of-sample predictive accuracy \citep{Gelman2013d}. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.

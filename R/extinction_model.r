@@ -1,6 +1,4 @@
 library(rstan)
-library(arm)
-library(parallel)
 library(stringr)
 library(ppcor)
 source('../R/gts.r')
@@ -64,18 +62,27 @@ data <- list(dur = short.data$duration,
 inclusion <- short.data$duration > 2
 
 data$samp_obs <- short.data$gap[inclusion]
+
+data$obs_ord <- which(inclusion)
+data$imp_ord <- which(!inclusion)
+
 data$N <- num.samp
 data$O <- num.orig
 data$N_obs <- length(data$samp_obs)
 data$N_imp <- data$N - data$N_obs
 data$inclusion <- inclusion * 1
 
+num <- data$samp_obs * (length(data$samp_obs) - 1) + 0.5
+data$samp_obs <- num / length(data$samp_obs)
+
 with(data, {stan_rdump(list = c('N', 
                                 'O',
                                 'N_obs', 'N_imp',
+                                'dur', 
                                 'censored', 
                                 'inclusion',
-                                'dur', 
+                                'obs_ord',
+                                'imp_ord',
                                 'cohort',
                                 'occupy',
                                 'env', 
@@ -83,6 +90,7 @@ with(data, {stan_rdump(list = c('N',
                                 'relab',
                                 'samp_obs'),
                        file = '../data/data_dump/impute_info.data.R')})
+
 
 
 # high graded model
@@ -105,7 +113,7 @@ env.odds <- rescale(prob.epi)
 corner <- high.grade$duration == 3 & high.grade$censored == 1
 high.grade <- high.grade[!corner, ]
 
-data <- list(duration = high.grade$duration, 
+data <- list(dur = high.grade$duration, 
              censored = high.grade$censored,
              cohort = con.orig, 
              occupy = rescale(logit(high.grade$occupy)),

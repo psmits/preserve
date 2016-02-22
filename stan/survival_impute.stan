@@ -8,13 +8,15 @@ data {
 
   int censored[N];  // 1 == censored, 0 == uncensored
   int inclusion[N];  // 1 == fully observed, 0 == not observed
+  int obs_ord[N_obs];
+  int imp_ord[N_imp];
  
   int cohort[N];
   real occupy[N];
   real env[N];
   real leng[N];
 
-  real samp_obs[N_obs];  // observed sampling values
+  real<lower=0,upper=1> samp_obs[N_obs];  // observed sampling values
 }
 parameters {
   real alpha_trans;
@@ -27,7 +29,7 @@ parameters {
   vector<lower=0>[5] sigma; 
 
   vector[4] gamma;
-  real samp_imp[N_imp];  // imputed sampling values
+  real<lower=0,upper=1> samp_imp[N_imp];  // imputed sampling values
   real<lower=0.1> lambda;  // beta total count
 }
 transformed parameters {
@@ -35,10 +37,23 @@ transformed parameters {
   cov_matrix[5] Sigma;
 
   real<lower=0,upper=1> phi[N];  // beta mean
-  real alp[N];
-  real bet[N];
+  real<lower=0> alp[N];
+  real<lower=0> bet[N];
+  real<lower=0,upper=1> samp[N];
   
-  real samp[N];
+  // other misc transformations
+  alpha <- exp(alpha_trans);
+  Sigma <- quad_form_diag(Omega, sigma);
+
+  // predict mean of inclusion function
+  for(n in 1:N) {
+    phi[n] <- inv_logit(gamma[1] + 
+        gamma[2] * occupy[n]);
+    //phi[n] <- inv_logit(gamma[1] + 
+    //    gamma[2] * occupy[n] + 
+    //    gamma[3] * env[n] + 
+    //    gamma[4] * leng[n]);
+  }
   
   // parameter transformation
   for(n in 1:N) {
@@ -46,26 +61,9 @@ transformed parameters {
     bet[n] <- lambda * (1 - phi[n]);
   }
   
-  // other misc transformations
-  alpha <- exp(alpha_trans);
-  Sigma <- quad_form_diag(Omega, sigma);
-
   // combining data and parameters
-  for(n in 1:N) {
-    if(inclusion[n] == 1) {
-      samp[n] <- samp_obs[n];
-    } else {
-      samp[n] <- samp_imp[n];
-    }
-  }
-
-  // predict mean of inclusion function
-  for(n in 1:N) {
-    phi[n] <- gamma[1] + 
-      gamma[2] * occupy[n] + 
-      gamma[3] * env[n] + 
-      gamma[4] * leng[n];
-  }
+  samp[obs_ord] <- samp_obs;
+  samp[imp_ord] <- samp_imp;
 }
 model {
   vector[N] hold;
@@ -90,13 +88,9 @@ model {
   // then impute unobserved
   lambda ~ pareto(0.1, 1.5);
   gamma ~ normal(0, 1);
-  for(n in 1:N) {
-    if(inclusion[n] == 1) {
-      samp_obs[n] ~ beta(alp[n], bet[n]);
-    } else {
-      samp_imp[n] ~ beta(alp[n], bet[n]);
-    }
-  }
+  samp_obs ~ beta(alp[obs_ord], bet[obs_ord]);
+  samp_imp ~ beta(alp[imp_ord], bet[imp_ord]);
+  // this is creating a log(0) situation...
 
   for(i in 1:N) {
     hold[i] <- exp(-(beta[cohort[i], 1] + 

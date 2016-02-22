@@ -122,13 +122,19 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
 
   taxon.gap <- c()
   for(ii in seq(length(taxon.occur))) {
-    tm <- names(taxon.occur[[ii]])  # stage names
-    om <- gts %in% tm  # true false list
-    dm <- taxon.age[ii, 2] - 2
-    taxon.gap[ii] <- (sum(om) - 2) / dm
+    if(!(taxon.age[ii, 1] %in% survivors)) {
+      tm <- names(taxon.occur[[ii]])  # stage names
+      om <- gts %in% tm  # true false list
+      dm <- taxon.age[ii, 2] - 2
+      taxon.gap[ii] <- (sum(om) - 2) / dm
+    } else {
+      tm <- names(taxon.occur[[ii]])
+      om <- gts %in% tm
+      dm <- (max(which(gts %in% tm)) - which(gts %in% cuts))
+      taxon.gap[ii] <- (sum(om) - 1) / dm
+    }
   }
   names(taxon.gap) <- names(taxon.occur)
-
 
 
   # this is about geographic range size
