@@ -82,6 +82,17 @@ size <- c(data$size)
 duration <- c(data$dur)
 
 
+# data distributions would be cool, specifically in the case of the imputation
+samp.df <- data.frame(inc = data$inclusion, samp = colMeans(wei.fit$samp))
+samp.gg <- ggplot(samp.df, aes(x = samp, fill = factor(inc))) 
+samp.gg <- samp.gg + geom_histogram()
+samp.gg <- samp.gg + scale_fill_manual(values = c('grey', 'black'))
+
+raw.samp <- ggplot(data.frame(x = data$samp_obs), aes(x = x))
+raw.samp <- raw.samp + geom_histogram()
+
+
+
 # lets make survival curves
 # HERE
 condition <- (data$censored == 0) * 1

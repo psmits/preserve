@@ -85,16 +85,19 @@ env.odds <- rescale(prob.epi)
 
 oo <- log(sepkoski.data$occupy)
 sd(oo)
+(max(oo) - min(oo)) / sd(oo)
 
 sd(prob.epi)
 
 tt <- (abs((wei.fit$mu_prior[, 2] * 2 * sd(oo))) - wei.fit$delta) > 0
-et <- (abs((wei.fit$mu_prior[, 4] * 2 * sd(prob.epi))) - wei.fit$delta) < 0
+et <- (abs((wei.fit$mu_prior[, 3] * 2 * sd(prob.epi))) - wei.fit$delta) < 0
 sum(tt) / length(tt)
 sum(et) / length(et)
 
+et <- (abs((wei.fit$beta[, 17, 3] * 2 * sd(prob.epi))) - wei.fit$delta) > 0
+sum(et) / length(et)
+# cohort 16 17 33
 
-(max(oo) - min(oo)) / sd(oo)
 
 
 # waic, loo comparison table
