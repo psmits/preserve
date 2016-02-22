@@ -72,6 +72,7 @@ data$N_obs <- length(data$samp_obs)
 data$N_imp <- data$N - data$N_obs
 data$inclusion <- inclusion * 1
 
+# suggested by betareg manual, which has the citation
 num <- data$samp_obs * (length(data$samp_obs) - 1) + 0.5
 data$samp_obs <- num / length(data$samp_obs)
 
@@ -115,7 +116,7 @@ high.grade <- high.grade[!corner, ]
 
 data <- list(dur = high.grade$duration, 
              censored = high.grade$censored,
-             cohort = con.orig, 
+             cohort = con.orig[!corner], 
              occupy = rescale(logit(high.grade$occupy)),
              samp = rescale(high.grade$gap))
 

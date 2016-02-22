@@ -34,62 +34,73 @@ sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
                            cuts = 'Chang',
                            bot = 'Trem')
 
-data <- read_rdump('../data/data_dump/fauna_info.data.R')
+data <- read_rdump('../data/data_dump/impute_info.data.R')
 
 pat <- 'faun_'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 ids <- rep(1:(length(outs) / 4), each = 4)
 outs <- split(outs, ids)
 
-wfit <- llply(outs, read_stan_csv)
+wfit <- llply(outs[-1], read_stan_csv)
 log.liks <- llply(wfit, extract_log_lik)
 
 # this will need to be updated with number of models
 loo.est <- llply(log.liks, loo)
-loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], 
-                          loo.est[[3]], loo.est[[4]])
+loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], loo.est[[3]])
 
 # this will need to be updated with number of models
 waic.est <- llply(log.liks, waic)
-waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], 
-                           waic.est[[3]], waic.est[[4]])
-
-
+waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], waic.est[[3]])
 
 best <- str_extract(names(which.max(waic.table[, ncol(waic.table)])), '[0-9]')
 best <- as.numeric(best)
 
 wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
 # this will need to be updated with number of models
-npred <- ifelse(best %in% c(2, 3), 5, 6)
+npred <- 5
 
 
+# environmental preference
+prob.epi <- qbeta(sepkoski.data$epi / (sepkoski.data$epi + sepkoski.data$off), 
+                  sepkoski.data$epi.bck + 1, sepkoski.data$off.bck + 1)
+env.odds <- rescale(prob.epi)
 # start asking questions and making tables
 
 
-# partial correlation between duration, occupancy, preservation
-par.cor <- data.frame(dur = sepkoski.data$duration, 
-                      oc = rescale(logit(sepkoski.data$occupy)), 
-                      gp = rescale(sepkoski.data$gap))
-cor.mat <- cor(par.cor)            # correlation matrix
-pcor.mat <- pcor(par.cor)$estimate  # partial correlation matrix
+## partial correlation between duration, occupancy, preservation
+#par.cor <- data.frame(dur = sepkoski.data$duration, 
+#                      oc = rescale(logit(sepkoski.data$occupy)), 
+#                      gp = rescale(sepkoski.data$gap))
+#cor.mat <- cor(par.cor)            # correlation matrix
+#pcor.mat <- pcor(par.cor)$estimate  # partial correlation matrix
+#
+#n <- c('duration', 'geographic range', 'gap ratio')
+#rownames(cor.mat) <- colnames(cor.mat) <- n
+#rownames(pcor.mat) <- colnames(pcor.mat) <- n
+#diag(cor.mat) <- diag(pcor.mat) <- NA
+#cor.tex <- xtable(cor.mat, label = 'tab:corr')
+#pcor.tex <- xtable(pcor.mat, label = 'tab:pcor')
+#print.xtable(cor.tex, file = '../doc/covariate_cor.tex')
+#print.xtable(pcor.tex, file = '../doc/covariate_pcor.tex')
 
-n <- c('duration', 'geographic range', 'gap ratio')
-rownames(cor.mat) <- colnames(cor.mat) <- n
-rownames(pcor.mat) <- colnames(pcor.mat) <- n
-diag(cor.mat) <- diag(pcor.mat) <- NA
-cor.tex <- xtable(cor.mat, label = 'tab:corr')
-pcor.tex <- xtable(pcor.mat, label = 'tab:pcor')
-print.xtable(cor.tex, file = '../doc/covariate_cor.tex')
-print.xtable(pcor.tex, file = '../doc/covariate_pcor.tex')
+oo <- log(sepkoski.data$occupy)
+sd(oo)
 
+sd(prob.epi)
+
+tt <- (abs((wei.fit$mu_prior[, 2] * 2 * sd(oo))) - wei.fit$delta) > 0
+et <- (abs((wei.fit$mu_prior[, 4] * 2 * sd(prob.epi))) - wei.fit$delta) < 0
+sum(tt) / length(tt)
+sum(et) / length(et)
+
+
+(max(oo) - min(oo)) / sd(oo)
 
 
 # waic, loo comparison table
 comparison.tab <- data.frame(waic = waic.table[, 1], looic = loo.table[, 1])
-comparison.tab <- comparison.tab[c(2, 1, 3, 4), ]
-rownames(comparison.tab) <- c('constant alpha', 'constant alpha, no sampling',
-                              'no sampling', 'full model')
+#comparison.tab <- comparison.tab[c(2, 1, 3, 4), ]
+rownames(comparison.tab) <- c('imputed', 'relative abundance', 'no sampling')
 comparison.tex <- xtable(comparison.tab, label = 'tab:comparison')
 print.xtable(comparison.tex, file = '../doc/comparison_table.tex')
 
@@ -108,11 +119,22 @@ param.est <- rbind(data.frame(p = name.mu[1:npred],
                               m = apply(wei.fit$sigma, 2, mean), 
                               s = apply(wei.fit$sigma, 2, sd),
                               qa = t(apply(wei.fit$sigma, 2, 
-                                     function(x) quantile(x, qq)))))
+                                     function(x) quantile(x, qq)))),
+                   data.frame(p = 'delta',
+                              m = mean(wei.fit$delta),
+                              s = sd(wei.fit$delta),
+                              qa = t(quantile(wei.fit$delta, qq))),
+                   data.frame(p = 'alpha',
+                              m = mean(wei.fit$alpha),
+                              s = sd(wei.fit$alpha),
+                              qa = t(quantile(wei.fit$alpha, qq))))
+
+param.tex <- xtable(param.est, label = 'tab:param')
+print.xtable(param.tex, file = '../doc/table_param.tex')
 
 
 # tail probabilities
-p.r <- 1 - (pnorm(0, wei.fit$mu_prior[, 1], wei.fit$sigma[, 1]))
+p.r <- 1 - (pnorm(0, wei.fit$mu_prior[, 2], wei.fit$sigma[, 2]))
 mean(p.r)
 sd(p.r)
 
@@ -123,7 +145,6 @@ sd(p.v)
 p.v2 <- (pnorm(0, wei.fit$mu_prior[, 4], wei.fit$sigma[, 4]))
 mean(p.v2)
 sd(p.v2)
-
 
 
 # inflection point is defined - (beta_v) / 2(beta_v2)
@@ -145,7 +166,7 @@ inf.cohort[6:15]
 
 
 # probabilty of negative correlation term
-cor.int.range <- sum((wei.fit$Omega[, 1, 4] < 0)) / 4000
+cor.int.range <- sum((wei.fit$Omega[, 1, 2] < 0)) / 4000
 cor.int.env <- sum((wei.fit$Omega[, 1, 3] < 0)) / 4000
 cor.range.env <- sum((wei.fit$Omega[, 2, 3] > 0)) / 4000
 

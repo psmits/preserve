@@ -32,37 +32,33 @@ sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
                            cuts = 'Chang',
                            bot = 'Trem')
 
-data <- read_rdump('../data/data_dump/fauna_info.data.R')
+data <- read_rdump('../data/data_dump/impute_info.data.R')
 
 pat <- 'faun_'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 ids <- rep(1:(length(outs) / 4), each = 4)
 outs <- split(outs, ids)
 
-wfit <- read_stan_csv(outs[[3]])
-#wfit <- llply(outs, read_stan_csv)
-#log.liks <- llply(wfit, extract_log_lik)
+wfit <- llply(outs[-1], read_stan_csv)
+log.liks <- llply(wfit, extract_log_lik)
 
-## this will need to be updated with number of models
-#loo.est <- llply(log.liks, loo)
-#loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], 
-#                          loo.est[[3]], loo.est[[4]])
-#
-## this will need to be updated with number of models
-#waic.est <- llply(log.liks, waic)
-#waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], 
-#                           waic.est[[3]], waic.est[[4]])
-#
-#best <- str_extract(names(which.max(waic.table[, ncol(waic.table)])), '[0-9]')
-#best <- as.numeric(best)
+# this will need to be updated with number of models
+loo.est <- llply(log.liks, loo)
+loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], loo.est[[3]])
 
-#wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
-wei.fit <- rstan::extract(wfit, permuted = TRUE)
+# this will need to be updated with number of models
+waic.est <- llply(log.liks, waic)
+waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], waic.est[[3]])
+
+best <- str_extract(names(which.max(waic.table[, ncol(waic.table)])), '[0-9]')
+best <- as.numeric(best)
+
+wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
+#wei.fit <- rstan::extract(wfit, permuted = TRUE)
 wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 1000), ]
 
 # this will need to be updated with number of models
 #npred <- ifelse(best %in% c(2, 3), 5, 6)  # 
-best <- 3
 npred <- 5
 
 
@@ -79,17 +75,16 @@ theme_update(axis.text = element_text(size = 10),
 
 # data setup
 # HERE
-coh <- c(data$cohort_unc, data$cohort_cen)
-gro <- c(data$group_unc, data$group_cen)
-rage <- c(data$occupy_unc, data$occupy_cen)
-envs <- c(data$env_unc, data$env_cen)
-size <- c(data$size_unc, data$size_cen)
-duration <- c(data$dur_unc, data$dur_cen)
+coh <- c(data$cohort)
+rage <- c(data$occupy)
+envs <- c(data$env)
+size <- c(data$size)
+duration <- c(data$dur)
 
 
 # lets make survival curves
 # HERE
-condition <- c(rep(1, data$N_unc), rep(0, data$N_cen))
+condition <- (data$censored == 0) * 1
 condition[duration == 1 & condition == 1] <- 2
 
 emp.surv <- survfit(Surv(time = duration, time2 = duration, 
@@ -362,7 +357,7 @@ quad.mean <- function(x, mcoef) {
 
 
 # HERE
-env.d <- c(data$env_unc, data$env_cen)
+env.d <- c(data$env)
 val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
 quadval <- list()
 for(ii in seq(length(sam))) {
@@ -376,7 +371,7 @@ meanquad <- data.frame(env = val, resp = quad.mean(val, mcoef))
 # add rug showing observed
 #   this addition would overpower the big, by cohort graph
 # HERE
-env.obs <- data.frame(env = c(data$env_unc, data$env_cen))
+env.obs <- data.frame(env = data$env)
 
 mustache <- ggplot(quadframe, aes(x = env, y = resp, group = sim))
 mustache <- mustache + geom_line(alpha = 1 / 100)

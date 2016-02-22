@@ -48,11 +48,9 @@ transformed parameters {
   // predict mean of inclusion function
   for(n in 1:N) {
     phi[n] <- inv_logit(gamma[1] + 
-        gamma[2] * occupy[n]);
-    //phi[n] <- inv_logit(gamma[1] + 
-    //    gamma[2] * occupy[n] + 
-    //    gamma[3] * env[n] + 
-    //    gamma[4] * leng[n]);
+        gamma[2] * occupy[n] + 
+        gamma[3] * env[n] + 
+        gamma[4] * leng[n]);
   }
   
   // parameter transformation
