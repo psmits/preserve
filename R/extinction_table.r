@@ -89,6 +89,15 @@ sd(oo)
 
 sd(prob.epi)
 
+td <- apply(wei.fit$samp, 1, sd)
+
+dd <- wei.fit$delta * 2 * td
+
+sum(abs(wei.fit$mu_prior[, 2]) > dd) / length(dd)
+sum(abs(wei.fit$mu_prior[, 3]) > dd) / length(dd)
+sum(abs(wei.fit$mu_prior[, 4]) > dd) / length(dd)
+
+
 tt <- (abs((wei.fit$mu_prior[, 2] * 2 * sd(oo))) - wei.fit$delta) > 0
 et <- (abs((wei.fit$mu_prior[, 3] * 2 * sd(prob.epi))) - wei.fit$delta) < 0
 sum(tt) / length(tt)

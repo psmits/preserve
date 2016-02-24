@@ -55,7 +55,7 @@ best <- as.numeric(best)
 
 wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
 #wei.fit <- rstan::extract(wfit, permuted = TRUE)
-wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 1000), ]
+wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 100), ]
 
 # this will need to be updated with number of models
 #npred <- ifelse(best %in% c(2, 3), 5, 6)  # 
@@ -122,7 +122,7 @@ sim.surv <- wei.surv
 surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
 surv.plot <- surv.plot + geom_line(data = sim.surv, 
                                    aes(x = time, y = surv, group = group),
-                                   colour = 'black', alpha = 0.01)
+                                   colour = 'black', alpha = 0.05)
 surv.plot <- surv.plot + geom_line(colour = 'blue')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
@@ -137,8 +137,8 @@ ggsave(surv.plot, filename = '../doc/figure/survival_curves.pdf',
 surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
 surv.plot <- surv.plot + geom_line(data = sim.surv, 
                                    aes(x = time, y = surv, group = group),
-                                   colour = 'black', alpha = 0.01)
-surv.plot <- surv.plot + geom_line(colour = 'grey')
+                                   colour = 'black', alpha = 0.05)
+surv.plot <- surv.plot + geom_line(colour = 'black')
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
                               y = 'Pr(t < T)')
@@ -267,8 +267,8 @@ efbeta.h <- Map(function(x) data.frame(efbeta.h[[x]],
                                        time = x, 
                                        pred = seq(npred)), seq(data$O))
 efbeta.df <- Reduce(rbind, efbeta.h)
-too <- c('beta[0]', 'beta[r]', 'beta[v]', 'beta[v^2]', 'beta[m]', 
-         'beta[s]')[seq(npred)]
+too <- c('beta^0', 'beta^r', 'beta^v', 'beta^v^2', 'beta^m', 
+         'delta')[seq(npred)]
 efbeta.df$pred <- mapvalues(efbeta.df$pred, 
                             from = seq(npred), 
                             to = too)
@@ -346,7 +346,6 @@ if(!(best %in% c(1, 2))) {
 
 
 # environmental effect
-sam <- sample(nrow(wei.fit$lp__), 1000)
 quad <- function(x, sam) {
   bet <- wei.fit$mu_prior[sam, 1]
   bet <- bet + (wei.fit$mu_prior[sam, 3] * x) + (wei.fit$mu_prior[sam, 4] * x^2)
@@ -367,6 +366,7 @@ quad.mean <- function(x, mcoef) {
 }
 
 
+sam <- sample(nrow(wei.fit$lp__), 1000)
 # HERE
 env.d <- c(data$env)
 val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
@@ -391,7 +391,7 @@ mustache <- mustache + geom_line(data = meanquad,
                                  colour = 'blue')
 mustache <- mustache + geom_rug(data = env.obs,
                                 mapping = aes(x = env, y = NULL, group = NULL),
-                                sides = 'b', alpha = 0.1)
+                                sides = 'b', alpha = 0.05)
 mustache <- mustache + labs(x = 'Environmental preference (v)', 
                             y = expression(paste('log(', sigma, ')')))
 ggsave(mustache, filename = '../doc/figure/env_effect.pdf',

@@ -27,12 +27,12 @@ my.plotcorr <- function (corr, outline = FALSE, col = "grey", upper.panel = c("e
     collabs <- 1:coldim
   #rowlabs <- as.character(rowlabs)
   #collabs <- as.character(collabs)
-  collabs <- c(expression(beta[0]), expression(beta[r]), 
-               expression(beta[v]), expression(beta[v^2]), 
-               expression(beta[m]), expression(beta[s]))
-  rowlabs <- c(expression(beta[intercept]), expression(beta[range]), 
-               expression(beta[preference]), expression(beta[curvature]), 
-               expression(beta[size]), expression(beta[sampling]))
+  collabs <- c(expression(beta^0), expression(beta^r), 
+               expression(beta^v), expression(beta^v^2), 
+               expression(beta^m), expression(beta^s))
+  rowlabs <- c(expression(beta^intercept), expression(beta^range), 
+               expression(beta^preference), expression(beta^curvature), 
+               expression(beta^size), expression(beta^sampling))
   collabs <- collabs[seq(npred)]
   rowlabs <- rowlabs[seq(npred)]
   col <- rep(col, length = length(corr))
