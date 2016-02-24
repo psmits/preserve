@@ -443,8 +443,8 @@ cohmust <- cohmust + geom_line(data = meanquad,
                                mapping = aes(x = env,
                                              y = resp,
                                              group = NULL),
-                               colour = 'darkgrey')
-cohmust <- cohmust + geom_line(alpha = 1 / 100, colour = 'blue')
+                               colour = 'black', size = 1.5)
+cohmust <- cohmust + geom_line(alpha = 1 / 10, colour = 'blue')
 cohmust <- cohmust + facet_wrap(~ coh, switch = 'x', ncol = 7)
 cohmust <- cohmust + theme(axis.text = element_text(size = 6),
                            strip.text = element_text(size = 6))
