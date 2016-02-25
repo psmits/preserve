@@ -1,22 +1,18 @@
-Chance of fossil preservation
------------------------------
-
-Taxon ranges through T stages. Each stage has X occurrences of taxon.
-X ~ Pois(\lambda).
-
-Set this up hierarchically. Each taxon is in a group (genus in order). Each
-group is part of a larger group (order in class). Final level is the super group
-(class in hard-part inverts).
-
-Overdispersed Poisson is Negative Binomial (Gamma mixed with Poisson).
-
-
 Brachiopod genus duration
 -------------------------
 
-Fully Bayesian hierarchical model.
+Fully Bayesian hierarchical model of brachiopod genus duration.
 
+data -- all data files that are used in this analysis. note the PBDB data file
+is not included because it is 330MB (it includes more than just
+brachiopods).
 
+doc -- all documentation associated with this analysis.
 
-Brachiopod spatial diversification
-----------------------------------
+R -- all R scripts associated with this analysis. key files are extinction\_\*.
+
+src -- bash scripts used to automate this analysis.
+
+stan -- stan code and compiled programs (Ubunutu linux) for this analysis. key
+file is survival\_impute.
+

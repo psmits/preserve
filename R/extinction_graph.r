@@ -123,7 +123,7 @@ surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
 surv.plot <- surv.plot + geom_line(data = sim.surv, 
                                    aes(x = time, y = surv, group = group),
                                    colour = 'black', alpha = 0.05)
-surv.plot <- surv.plot + geom_line(colour = 'blue')
+surv.plot <- surv.plot + geom_line(colour = 'blue', size = 1.2)
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
                               y = 'Pr(t < T)')
@@ -138,7 +138,7 @@ surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
 surv.plot <- surv.plot + geom_line(data = sim.surv, 
                                    aes(x = time, y = surv, group = group),
                                    colour = 'black', alpha = 0.05)
-surv.plot <- surv.plot + geom_line(colour = 'black')
+surv.plot <- surv.plot + geom_line(colour = 'black', size = 1.2)
 surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
                               y = 'Pr(t < T)')
