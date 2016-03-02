@@ -83,13 +83,23 @@ duration <- c(data$dur)
 
 
 # data distributions would be cool, specifically in the case of the imputation
-samp.df <- data.frame(inc = data$inclusion, samp = colMeans(wei.fit$samp))
-samp.gg <- ggplot(samp.df, aes(x = samp, fill = factor(inc))) 
-samp.gg <- samp.gg + geom_histogram()
-samp.gg <- samp.gg + scale_fill_manual(values = c('grey', 'black'))
 
-raw.samp <- ggplot(data.frame(x = data$samp_obs), aes(x = x))
-raw.samp <- raw.samp + geom_histogram()
+ss <- sample(length(wei.fit$lp__), 12)
+impres <- data.frame(melt(wei.fit$samp[ss, ]), rep(data$inclusion, each = 12))
+names(impres) <- c('sim', 'var', 'value', 'inc')
+imp.gg <- ggplot(impres, aes(x = value, fill = factor(inc)))
+imp.gg <- imp.gg + geom_histogram(bins = 10)
+imp.gg <- imp.gg + facet_wrap( ~ sim)
+imp.gg <- imp.gg + scale_fill_manual(values = c('grey', 'black'),
+                                     name = 'Data source',
+                                     labels = c('Imputed', 'Observed'))
+imp.gg <- imp.gg + labs(x = 'Gap statistic', y = 'Count')
+imp.gg <- imp.gg + theme(strip.text = element_blank(),
+                         strip.background = element_blank(),
+                         legend.title = element_text(size = 10),
+                         legend.text = element_text(size = 8))
+ggsave(imp.gg, filename = '../doc/figure/imputation_compare.pdf',
+       width = 8, height = 4, dpi = 600)
 
 
 
@@ -446,8 +456,8 @@ cohmust <- cohmust + geom_line(data = meanquad,
                                colour = 'black', size = 1.5)
 cohmust <- cohmust + geom_line(alpha = 1 / 10, colour = 'blue')
 cohmust <- cohmust + facet_wrap(~ coh, switch = 'x', ncol = 7)
-cohmust <- cohmust + theme(axis.text = element_text(size = 6),
-                           strip.text = element_text(size = 6))
+cohmust <- cohmust + theme(axis.text = element_text(size = 8),
+                           strip.text = element_text(size = 8))
 cohmust <- cohmust + labs(x = 'Environmental preference (v)',
                           y = expression(paste('log(', sigma, ')')))
 ggsave(cohmust, filename = '../doc/figure/env_cohort.pdf',
