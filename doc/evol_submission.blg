@@ -6,42 +6,42 @@ Database file #1: newbib.bib
 Database file #2: packages.bib
 You've used 104 entries,
             2892 wiz_defined-function locations,
-            1261 strings with 20612 characters,
-and the built_in function-call counts, 58290 in all, are:
-= -- 5041
-> -- 2428
-< -- 79
-+ -- 809
-- -- 702
-* -- 3806
-:= -- 9456
-add.period$ -- 316
+            1259 strings with 20438 characters,
+and the built_in function-call counts, 59263 in all, are:
+= -- 5156
+> -- 2436
+< -- 77
++ -- 810
+- -- 704
+* -- 3898
+:= -- 9558
+add.period$ -- 317
 call.type$ -- 104
 change.case$ -- 745
-chr.to.int$ -- 101
+chr.to.int$ -- 102
 cite$ -- 104
-duplicate$ -- 4215
-empty$ -- 4469
-format.name$ -- 976
-if$ -- 11736
-int.to.chr$ -- 4
+duplicate$ -- 4244
+empty$ -- 4568
+format.name$ -- 979
+if$ -- 11954
+int.to.chr$ -- 3
 int.to.str$ -- 1
-missing$ -- 845
+missing$ -- 854
 newline$ -- 527
-num.names$ -- 416
-pop$ -- 1576
+num.names$ -- 418
+pop$ -- 1575
 preamble$ -- 1
 purify$ -- 650
 quote$ -- 0
-skip$ -- 1404
+skip$ -- 1416
 stack$ -- 0
-substring$ -- 3215
-swap$ -- 1826
-text.length$ -- 4
+substring$ -- 3460
+swap$ -- 1856
+text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 906
 warning$ -- 0
-while$ -- 481
+while$ -- 488
 width$ -- 0
-write$ -- 1347
+write$ -- 1350

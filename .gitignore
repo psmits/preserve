@@ -4,3 +4,4 @@ data/mcmc_out/*
 *.hpp
 *.rdata
 doc/*letter*
+doc/review*
