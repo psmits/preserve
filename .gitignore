@@ -3,3 +3,4 @@ data/mcmc_out/*
 *.cpp
 *.hpp
 *.rdata
+doc/*letter*
