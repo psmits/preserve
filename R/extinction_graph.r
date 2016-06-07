@@ -177,13 +177,13 @@ ggsave(point.plot, filename = '../doc/figure/quantile.pdf',
 est.shotgun <- data.frame(obs = duration, 
                           sim = colMeans(wei.fit$hold))
 
-shot.plot <- ggplot(est.shotgun, aes(x = obs, y = sim))
+shot.plot <- ggplot(est.shotgun, aes(x = sim, y = obs))
 shot.plot <- shot.plot + stat_function(fun = function(x) x, 
                                        lty = 'dashed', 
                                        colour = 'darkgrey')
 shot.plot <- shot.plot + geom_point(alpha = 0.5)
-shot.plot <- shot.plot + labs(x = 'Observed duration (t)',
-                              y = expression(tilde(sigma)))
+shot.plot <- shot.plot + labs(x = expression(tilde(sigma)),
+                              y = 'Observed duration (t)')
 ggsave(shot.plot, filename = '../doc/figure/shotgun.pdf',
        width = 6, height = 5, dpi = 600)
 
