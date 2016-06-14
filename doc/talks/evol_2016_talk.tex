@@ -64,7 +64,7 @@
 \begin{frame}
   \frametitle{Intensity and selectivity}
   \begin{center}
-    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/base_hypo}
+    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/intensity_selectivity_base}
   \end{center}
 \end{frame}
 
@@ -93,7 +93,7 @@
 \begin{frame}
   \frametitle{Hypothesis of range size, extinction risk and intensity}
   \begin{center}
-    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/range_hypo}
+    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/intensity_selectivity_no_clue}
   \end{center}
 \end{frame}
 
@@ -108,36 +108,17 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Hypothesis of effect of environmental preference}
+  \frametitle{Hypothesis of effect environmental preference and intensity}
   \begin{center}
-    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/env_hypo}
+    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/intensity_selectivity_no_clue}
   \end{center}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Hypotheses of effect of environmental breadth}
+  \frametitle{Hypotheses of effect of environmental breadth and intensity}
   \begin{center}
-    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/selection_breadth}
+    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/intensity_selectivity_curvature}
   \end{center}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Hypothesis of relationship environmental breadth with extinction intensity}
-  \begin{center}
-    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/cur_hypo}
-  \end{center}
-\end{frame}
-
-
-
-\begin{frame}
-  \begin{block}{New measure of taxon's environmental affinity}
-    (\# epicontinental / total \# occurrences) is what quantile of the distribution of all other background occurrences Beta(\(\alpha\), \(\beta\)).
-    \begin{itemize}
-      \item \(\alpha\) is the \# epicontinental background occurrences (+ 1).
-      \item \(\beta\) is the \# open ocean background (+ 1).
-    \end{itemize}
-  \end{block}
 \end{frame}
 
 \begin{frame}
@@ -154,7 +135,6 @@
     \scriptsize{Note: Beta distribution parameterized in terms of mean \(\phi\) and total count \(\lambda\). \\Also, this presentation excludes final (hyper)priors.}
   \end{block}
 \end{frame}
-
 
 \begin{frame}
   \frametitle{Hierarchical survival model}
@@ -178,13 +158,6 @@
       \end{center}
     \end{column}
   \end{columns}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Inspecting the imputations}
-  \begin{center}
-    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio=true]{figure/imputation_compare}
-  \end{center}
 \end{frame}
 
 
@@ -271,6 +244,41 @@
       \end{center}
     \end{column}
   \end{columns}
+\end{frame}
+
+\appendix
+
+\begin{frame}
+  \begin{block}{New measure of taxon's environmental affinity}
+    (\# epicontinental / total \# occurrences) is what quantile of the distribution of all other background occurrences Beta(\(\alpha\), \(\beta\)).
+    \begin{itemize}
+      \item \(\alpha\) is the \# epicontinental background occurrences (+ 1).
+      \item \(\beta\) is the \# open ocean background (+ 1).
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Sampling statement for the joint posterior probability}
+
+  \small{
+    \begin{align*}
+      y_{i, t} &\sim \text{Weibull}(\sigma_{i, t}, \alpha) \\
+      \log(\sigma_{i, t}) &= \frac{X_{i}B_{j[i], t} + \delta s_{i}}{\alpha} \\
+      B_{j} &\sim \text{MVN}(\mu, \Sigma) \\
+      \Sigma &= \text{diag}(\tau) \Omega \text{diag}(\tau) \\
+      s_{i} &\sim \text{Beta}(\phi_{i}, \lambda) \\
+      \phi_{i} &= \text{logit}^{-1}(W_{i}\gamma) \\
+    \end{align*}
+  }
+  \scriptsize{Note: Calculation of log probability of right and left censored observations is modified from the above. Also, presentation excludes final (hyper)priors.}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inspecting the imputations}
+  \begin{center}
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio=true]{figure/imputation_compare}
+  \end{center}
 \end{frame}
 
 \end{document}
