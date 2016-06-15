@@ -50,10 +50,8 @@ loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], loo.est[[3]])
 waic.est <- llply(log.liks, waic)
 waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], waic.est[[3]])
 
-best <- str_extract(names(which.max(waic.table[, ncol(waic.table)])), '[0-9]')
-best <- as.numeric(best)
 
-wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
+wei.fit <- rstan::extract(wfit[[1]], permuted = TRUE)
 #wei.fit <- rstan::extract(wfit, permuted = TRUE)
 wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 100), ]
 
@@ -182,8 +180,10 @@ shot.plot <- shot.plot + stat_function(fun = function(x) x,
                                        lty = 'dashed', 
                                        colour = 'darkgrey')
 shot.plot <- shot.plot + geom_point(alpha = 0.5)
-shot.plot <- shot.plot + labs(x = expression(tilde(sigma)),
+shot.plot <- shot.plot + labs(x = 'Estimated duration approx. (t)',
                               y = 'Observed duration (t)')
+#shot.plot <- shot.plot + labs(x = expression(tilde(sigma)),
+#                              y = 'Observed duration (t)')
 ggsave(shot.plot, filename = '../doc/figure/shotgun.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -277,8 +277,10 @@ efbeta.h <- Map(function(x) data.frame(efbeta.h[[x]],
                                        time = x, 
                                        pred = seq(npred)), seq(data$O))
 efbeta.df <- Reduce(rbind, efbeta.h)
-too <- c('beta^0', 'beta^r', 'beta^v', 'beta^v^2', 'beta^m', 
+too <- c('intensity', 'range', 'env_pref', 'env_curv', 'size', 
          'delta')[seq(npred)]
+#too <- c('beta^0', 'beta^r', 'beta^v', 'beta^v^2', 'beta^m', 
+#         'delta')[seq(npred)]
 efbeta.df$pred <- mapvalues(efbeta.df$pred, 
                             from = seq(npred), 
                             to = too)
@@ -307,51 +309,51 @@ efbeta.plot <- efbeta.plot + geom_ribbon(data = ef.df,
 efbeta.plot <- efbeta.plot + geom_line(data = ef.df, 
                                        mapping = aes(y = X50.),
                                        alpha = 0.5)
-efbeta.plot <- efbeta.plot + labs(x = 'Time (My)', y = 'Parameter estimates')
+efbeta.plot <- efbeta.plot + labs(x = 'Time (My)', y = 'Effect estimate for...')
 efbeta.plot <- efbeta.plot + scale_x_reverse()
 ggsave(efbeta.plot, filename = '../doc/figure/cohort_series.pdf',
        width = 7.5, height = 10, dpi = 600)
 
 
 
-# if best != 1
-if(!(best %in% c(1, 2))) {
-  #efalrange <- c(mean = mean(wei.fit$alpha_mu), 
-  #               quantile(wei.fit$alpha_mu, c(0.1, 0.25, 0.5, 0.75, 0.9)))
-  #scalrange <- rbind(mean = colMeans(wei.fit$sigma), 
-  #                   apply(wei.fit$sigma, 2, function(x) 
-  #                         quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
-  #rbind(t(efalrange), t(scalrange))
-  #### TODO start here to finish a table with above!
-
-  efalcoh <- rbind(mean = colMeans(wei.fit$alpha_cohort),
-                   apply(wei.fit$alpha_cohort, 2, function(x) 
-                         quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
-  efalcoh <- exp(median(wei.fit$alpha_mu) + efalcoh)
-
-  efalcoh.df <- data.frame(cbind(t(efalcoh), time = seq(data$O)))
-  efalcoh.df$time <- mapvalues(efalcoh.df$time, seq(33), lump[5:(5+33-1), 3])
-
-  al.h <- c(exp(quantile(wei.fit$alpha_mu, c(0.1, 0.5, 0.9))))
-  al.df <- data.frame(rbind(al.h, al.h), 
-                      time = c(max(efalcoh.df$time), min(efalcoh.df$time)))
-
-  efalcoh.plot <- ggplot(efalcoh.df, aes(x = time, y = X50.))
-  efalcoh.plot <- efalcoh.plot + geom_pointrange(mapping = aes(ymin = X10., 
-                                                               ymax = X90.),
-                                                 fatten = 2)
-  efalcoh.plot <- efalcoh.plot + geom_ribbon(data = al.df, 
-                                             mapping = aes(ymin = X10.,
-                                                           ymax = X90.),
-                                             alpha = 0.2)
-  efalcoh.plot <- efalcoh.plot + geom_line(data = al.df, 
-                                           mapping = aes(ymin = X50.),
-                                           alpha = 0.5)
-  efalcoh.plot <- efalcoh.plot + geom_hline(yintercept = 1, colour = 'darkgrey')
-  efalcoh.plot <- efalcoh.plot + scale_x_reverse()
-  ggsave(efalcoh.plot, filename = '../doc/figure/shape_series.pdf',
-         width = 12.5, height = 10, dpi = 600)
-}
+## if best != 1
+#if(!(best %in% c(1, 2))) {
+#  #efalrange <- c(mean = mean(wei.fit$alpha_mu), 
+#  #               quantile(wei.fit$alpha_mu, c(0.1, 0.25, 0.5, 0.75, 0.9)))
+#  #scalrange <- rbind(mean = colMeans(wei.fit$sigma), 
+#  #                   apply(wei.fit$sigma, 2, function(x) 
+#  #                         quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
+#  #rbind(t(efalrange), t(scalrange))
+#  #### TODO start here to finish a table with above!
+#
+#  efalcoh <- rbind(mean = colMeans(wei.fit$alpha_cohort),
+#                   apply(wei.fit$alpha_cohort, 2, function(x) 
+#                         quantile(x, c(0.1, 0.25, 0.5, 0.75, 0.9))))
+#  efalcoh <- exp(median(wei.fit$alpha_mu) + efalcoh)
+#
+#  efalcoh.df <- data.frame(cbind(t(efalcoh), time = seq(data$O)))
+#  efalcoh.df$time <- mapvalues(efalcoh.df$time, seq(33), lump[5:(5+33-1), 3])
+#
+#  al.h <- c(exp(quantile(wei.fit$alpha_mu, c(0.1, 0.5, 0.9))))
+#  al.df <- data.frame(rbind(al.h, al.h), 
+#                      time = c(max(efalcoh.df$time), min(efalcoh.df$time)))
+#
+#  efalcoh.plot <- ggplot(efalcoh.df, aes(x = time, y = X50.))
+#  efalcoh.plot <- efalcoh.plot + geom_pointrange(mapping = aes(ymin = X10., 
+#                                                               ymax = X90.),
+#                                                 fatten = 2)
+#  efalcoh.plot <- efalcoh.plot + geom_ribbon(data = al.df, 
+#                                             mapping = aes(ymin = X10.,
+#                                                           ymax = X90.),
+#                                             alpha = 0.2)
+#  efalcoh.plot <- efalcoh.plot + geom_line(data = al.df, 
+#                                           mapping = aes(ymin = X50.),
+#                                           alpha = 0.5)
+#  efalcoh.plot <- efalcoh.plot + geom_hline(yintercept = 1, colour = 'darkgrey')
+#  efalcoh.plot <- efalcoh.plot + scale_x_reverse()
+#  ggsave(efalcoh.plot, filename = '../doc/figure/shape_series.pdf',
+#         width = 12.5, height = 10, dpi = 600)
+#}
 
 
 
@@ -359,19 +361,19 @@ if(!(best %in% c(1, 2))) {
 quad <- function(x, sam) {
   bet <- wei.fit$mu_prior[sam, 1]
   bet <- bet + (wei.fit$mu_prior[sam, 3] * x) + (wei.fit$mu_prior[sam, 4] * x^2)
-  if(!(best %in% 1:2)) {
-    -(bet) / exp(wei.fit$alpha_mu[sam])  # depends on if alpha varies by cohort
-  } else {
+  #if(!(best %in% 1:2)) {
+  #  -(bet) / exp(wei.fit$alpha_mu[sam])  # depends on if alpha varies by cohort
+  #} else {
     -(bet) / exp(wei.fit$alpha_trans[sam])  # depends on if alpha varies by cohort
-  }
+  #}
 }
 quad.mean <- function(x, mcoef) {
-  if(!(best %in% 1:2)) {
-    -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / exp(mean(wei.fit$alpha_mu[sam]))
-  } else {
+  #if(!(best %in% 1:2)) {
+  #  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / exp(mean(wei.fit$alpha_mu[sam]))
+  #} else {
     -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / 
       exp(mean(wei.fit$alpha_trans[sam]))
-  }
+  #}
   # depends on if alpha varies by cohort
 }
 
@@ -402,7 +404,8 @@ mustache <- mustache + geom_line(data = meanquad,
 mustache <- mustache + geom_rug(data = env.obs,
                                 mapping = aes(x = env, y = NULL, group = NULL),
                                 sides = 'b', alpha = 0.05)
-mustache <- mustache + labs(x = 'Environmental preference (v)', 
+mustache <- mustache + labs(x = 'Environmental preference \n
+                            (open-ocean <--> epicontinental)', 
                             y = expression(paste('log(', sigma, ')')))
 ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
        width = 6, height = 5, dpi = 600)
@@ -411,12 +414,12 @@ ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
 # by cohort
 sam <- sample(nrow(wei.fit$lp__), 100)
 bet.coh <- wei.fit$beta[sam, , c(1, 3, 4)]
-if(!(best %in% 1:2)) {
-  alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
-                   x + wei.fit$alpha_mu[sam])
-} else {
+#if(!(best %in% 1:2)) {
+#  alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
+#                   x + wei.fit$alpha_mu[sam])
+#} else {
   alp.coh <- wei.fit$alpha_trans[sam]
-}
+#}
 val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
 dat <- cbind(1, val, val^2)
 
@@ -425,11 +428,11 @@ for(ii in seq(data$O)) {
   h <- list()
   for(jj in seq(length(val))) {
     # all posterior estimates for env value of dat[1, ]
-    if(!(best %in% 1:2)) {
-      h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[, ii])
-    } else {
+    #if(!(best %in% 1:2)) {
+    #  h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[, ii])
+    #} else {
       h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii])
-    }
+    #}
   }
   coh.est[[ii]] <- h
 }
@@ -437,6 +440,8 @@ for(ii in seq(data$O)) {
 # massage into shape
 #   val, resp (V2), sim, coh
 stg.name <- as.character(lump[5:(5+33-1), 4])
+stg.name <- Reduce(c, Map(function(x, y) paste0(y, '. ', x), 
+                          stg.name, seq(length(stg.name))))
 coh.map <- list()
 for(jj in seq(data$O)) {
   h <- Map(function(x, y) {
@@ -447,6 +452,8 @@ for(jj in seq(data$O)) {
 }
 coh.df <- Reduce(rbind, coh.map)
 
+coh.df.short <- coh.df[coh.df$coh %in% c('14. Emsian', '15. Eifelian', 
+                                         '16. Givetian', '17. Frasnian'), ]
 
 cohmust <- ggplot(coh.df, aes(x = val, y = V2, group = sim))
 cohmust <- cohmust + geom_line(data = meanquad,
@@ -459,6 +466,10 @@ cohmust <- cohmust + facet_wrap(~ coh, switch = 'x', ncol = 7)
 cohmust <- cohmust + theme(axis.text = element_text(size = 8),
                            strip.text = element_text(size = 8))
 cohmust <- cohmust + labs(x = 'Environmental preference (v)',
-                          y = expression(paste('log(', sigma, ')')))
+                          y = 'log(Estimated duration approx. in t)')
+                          #y = expression(paste('log(', sigma, ')')))
 ggsave(cohmust, filename = '../doc/figure/env_cohort.pdf',
        width = 7.5, height = 8, dpi = 600)
+cohmust.short <- cohmust %+% coh.df.short
+ggsave(cohmust.short, filename = '../doc/figure/env_cohort_short.pdf',
+       width = 10, height = 5, dpi = 600)

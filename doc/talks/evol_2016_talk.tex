@@ -51,6 +51,9 @@
   \end{alertblock}
 \end{frame}
 
+% exapnd this biologically, not paleontologically
+% why is this interesting?
+
 \begin{frame}
   \begin{alertblock}{Questions and analysis}
     \begin{itemize}
@@ -71,7 +74,7 @@
 \begin{frame}
   \frametitle{Analysis of post-Cambrian Paleozoic brachiopod genus durations}
   \begin{itemize}
-    \item stage as time unit; duration measured in stages
+    \item stage as time unit; duration measured in stages (2-5 My each)
     \item multiple emergent traits analyzed
       \begin{itemize}
         \item geographic range
@@ -91,49 +94,19 @@
 
 
 \begin{frame}
-  \frametitle{Hypothesis of range size, extinction risk and intensity}
-  \begin{center}
-    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/intensity_selectivity_no_clue}
-  \end{center}
-\end{frame}
-
-
-\begin{frame}
   \frametitle{Hypotheses of effect of environmental preference}
   \begin{quote}
     When related phyla die out \dots more specialized phyla tend to become extinct before less specialized. This phenomenon is also far from universal, but it is so common that it does deserve recognition as a rule or principle in evolutionary studies: \textbf{the rule of the survival of the relatively unspecialized.}
 
-    \attrib{\footnotesize{Simpson, 1944, \em{Tempo and Mode of Evolution}, p. 143}}
+    \attrib{\footnotesize{Simpson, 1944, \em{Tempo and Mode in Evolution}, p. 143}}
   \end{quote}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Hypothesis of effect environmental preference and intensity}
+  \frametitle{Hypothesis of effect of environmental preference}
   \begin{center}
-    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/intensity_selectivity_no_clue}
+    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/selection_breadth}
   \end{center}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Hypotheses of effect of environmental breadth and intensity}
-  \begin{center}
-    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/intensity_selectivity_curvature}
-  \end{center}
-\end{frame}
-
-\begin{frame}
-  \begin{block}{Measure of sampling and imputed values}
-    Sampling is measured as the gap statistic \(r\): \\(number of bins with an occurrence - 2) / (duration in bins - 2)
-
-    Can only be estimated for taxa with duration of three or more. \\Have to impute (e.g. fill-in) the values for all other taxa \(r^{\ast}\).
-    \begin{align*}
-      s &\sim \text{Beta}(\phi, \lambda) \\
-      \phi &= \text{logit}^{-1}(W\gamma) \\
-      s^{\ast} &\sim \text{Beta}(\phi^{\ast}, \lambda) \\
-      \phi^{\ast} &= \text{logit}^{-1}(W^{\ast}\gamma) \\
-    \end{align*}
-    \scriptsize{Note: Beta distribution parameterized in terms of mean \(\phi\) and total count \(\lambda\). \\Also, this presentation excludes final (hyper)priors.}
-  \end{block}
 \end{frame}
 
 \begin{frame}
@@ -174,6 +147,14 @@
 
   \begin{center}
     \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/env_effect}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Change in effect of environment between cohorts}
+
+  \begin{center}
+    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/env_cohort_short}
   \end{center}
 \end{frame}
 
@@ -258,6 +239,23 @@
   \end{block}
 \end{frame}
 
+
+\begin{frame}
+  \begin{block}{Measure of sampling and imputed values}
+    Sampling is measured as the gap statistic \(r\): \\(number of bins with an occurrence - 2) / (duration in bins - 2)
+
+    Can only be estimated for taxa with duration of three or more. \\Have to impute (e.g. fill-in) the values for all other taxa \(r^{\ast}\).
+    \begin{align*}
+      s &\sim \text{Beta}(\phi, \lambda) \\
+      \phi &= \text{logit}^{-1}(W\gamma) \\
+      s^{\ast} &\sim \text{Beta}(\phi^{\ast}, \lambda) \\
+      \phi^{\ast} &= \text{logit}^{-1}(W^{\ast}\gamma) \\
+    \end{align*}
+    \scriptsize{Note: Beta distribution parameterized in terms of mean \(\phi\) and total count \(\lambda\). \\Also, this presentation excludes final (hyper)priors.}
+  \end{block}
+\end{frame}
+
+
 \begin{frame}
   \frametitle{Sampling statement for the joint posterior probability}
 
@@ -274,11 +272,13 @@
   \scriptsize{Note: Calculation of log probability of right and left censored observations is modified from the above. Also, presentation excludes final (hyper)priors.}
 \end{frame}
 
+
 \begin{frame}
   \frametitle{Inspecting the imputations}
   \begin{center}
     \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio=true]{figure/imputation_compare}
   \end{center}
 \end{frame}
+
 
 \end{document}
