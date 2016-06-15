@@ -19,12 +19,6 @@
 \setbeamercolor{block title alerted}{fg=white,bg=darkgray}
 \setbeamercolor{block body alerted}{fg=black,bg=lightgray}
 
-%\AtBeginSection[]
-%{
-%  \begin{frame}
-%    \tableofcontents[currentsection]
-%  \end{frame}
-%}
 
 \title{How macroecology affects macroevolution}
 \subtitle{the interplay between extinction intensity and trait-dependent extinction in brachiopods}
@@ -44,6 +38,26 @@
 \end{frame}
 
 \begin{frame}
+  \begin{block}{Selection on species traits}
+    \begin{itemize}
+      \item Extinction is second only to speciation in describing the diversifiction process \\(Raup 1994 \textit{PNAS}, Stanley 1975 \textit{PNAS}).
+      \item A species with a beneficial trait should persist for longer, on average, than a species without that beneficial trait \\(Jablonski 2008 \textit{Paleobio}, Rabosky and McCune 2010 \textit{TREE}).
+      \item Taxon survival an aspect of \alert{taxon fitness} \\(Cooper 1984 \textit{J. Theo. Biol.}, Palmer and Feldman 2012 \textit{PLoS One}).
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{Trait-dependent extinction}
+    \begin{itemize}
+      \item two major approaches: \alert{phylogenetic comparative} and \alert{paleobiological}
+      \item difficult to estimate from phylogenies alone \\(Rabosky 2010 \textit{Evolution}, Liow et al \textit{Syst Biol}, Quental and Marshall 2008 \textit{Evolution})
+      \item fossil record is (imperfect) observation of time, speciation, extinction
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
   \begin{alertblock}{Observation}
     At K/Pg mass extinction, biological traits (except geographic range) have no effect on \alert{bivalve} taxonomic survival.
 
@@ -51,15 +65,11 @@
   \end{alertblock}
 \end{frame}
 
-% exapnd this biologically, not paleontologically
-% why is this interesting?
-
 \begin{frame}
   \begin{alertblock}{Questions and analysis}
     \begin{itemize}
       \item How do the effect of emergent traits on duration (\alert{extinction selectivity}) vary with expected duration (\alert{extinction intensity}) and each other?
-      \item What is the relationship between environmental affinity and duration wrt specialists versus generalists?
-      \item \textbf{Approach:} hierarchical Bayesian survival model, \\varying intercepts and slopes, Weibull distribution, \\imputed gap statistic for taxa with duration \(< 3\).
+      \item \textbf{Approach:} hierarchical Bayesian survival model; \\effect estimates vary with origination cohort; \\correlation btw effects modeled.
     \end{itemize}
   \end{alertblock}
 \end{frame}
@@ -69,6 +79,13 @@
   \begin{center}
     \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/intensity_selectivity_base}
   \end{center}
+\end{frame}
+
+\begin{frame}
+  \includegraphics[width = 0.45\textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/Brachiopod_fossil}
+  \includegraphics[width = 0.45\textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/Burmirhynchionella_decorata_brachial_CRF}
+
+  \tiny{\attrib{ComputerHotline, wikimedia CC BY 2.5; Dwergenpaartje, wikimedia CC BY-SA 3.0}}
 \end{frame}
 
 \begin{frame}
@@ -85,7 +102,7 @@
           \begin{itemize}
             \item from Payne et al from the \textit{Treatise on Invertebrate Paleontology}
           \end{itemize}
-        \item environmental preference (x, x\(^2\))
+        \item environmental preference (v, v\(^2\))
         \item gap statistic as measure of sampling (Foote and Raup 1996 \textit{Paleobio})
       \end{itemize}
     \item factors vary by cohort (except gap statistic)
@@ -115,24 +132,6 @@
     \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/simple_model}
   \end{center}
 \end{frame}
-
-
-\begin{frame}
-  \frametitle{Model adequacy}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \begin{center}
-        \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio=true]{figure/survival_curves}
-      \end{center}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{center}
-        \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio=true]{figure/shotgun}
-      \end{center}
-    \end{column}
-  \end{columns}
-\end{frame}
-
 
 \begin{frame}
   \frametitle{Change in trait effects between cohorts}
@@ -217,6 +216,7 @@
       \begin{itemize}
         \item {\footnotesize{Stewart Edie, \\Elizabeth Sander, \\Laura Southcott, \\Courtney Stepien}}
         \item {\footnotesize{David Bapst, \\Ben Frable, \\\textbf{Arnold Miller}, \\Peter Wagner}}
+        \item {\footnotesize{UChicago CEB, Sandy Carlson }}
       \end{itemize}
 
       \vspace*{0.05\textheight}
@@ -228,6 +228,22 @@
 \end{frame}
 
 \appendix
+
+\begin{frame}
+  \frametitle{Model adequacy}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio=true]{figure/survival_curves}
+      \end{center}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio=true]{figure/shotgun}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
 
 \begin{frame}
   \begin{block}{New measure of taxon's environmental affinity}
