@@ -40,9 +40,8 @@
 \begin{frame}
   \begin{block}{Selection on species traits}
     \begin{itemize}
-      \item Extinction is second only to speciation in describing the diversifiction process \\(Raup 1994 \textit{PNAS}, Stanley 1975 \textit{PNAS}).
-      \item A species with a beneficial trait should persist for longer, on average, than a species without that beneficial trait \\(Jablonski 2008 \textit{Paleobio}, Rabosky and McCune 2010 \textit{TREE}).
-      \item Taxon survival an aspect of \alert{taxon fitness} \\(Cooper 1984 \textit{J. Theo. Biol.}, Palmer and Feldman 2012 \textit{PLoS One}).
+      \item A species with a beneficial trait should persist for longer, on average, than a species without that beneficial trait \\{\footnotesize{(Jablonski 2008 \textit{Paleobio}, Rabosky and McCune 2010 \textit{TREE}).}}
+      \item Taxon survival an aspect of \alert{taxon fitness} \\{\footnotesize{(Cooper 1984 \textit{J. Theo. Biol.}, Palmer and Feldman 2012 \textit{PLoS One}).}}
     \end{itemize}
   \end{block}
 \end{frame}
@@ -50,9 +49,10 @@
 \begin{frame}
   \begin{block}{Trait-dependent extinction}
     \begin{itemize}
+      \item Extinction is second only to speciation in shaping diversity \\{\footnotesize{(Raup 1994 \textit{PNAS}, Stanley 1975 \textit{PNAS}).}}
       \item two major approaches: \alert{phylogenetic comparative} and \alert{paleobiological}
-      \item difficult to estimate from phylogenies alone \\(Rabosky 2010 \textit{Evolution}, Liow et al \textit{Syst Biol}, Quental and Marshall 2008 \textit{Evolution})
-      \item fossil record is (imperfect) observation of time, speciation, extinction
+      \item difficult to estimate from phylogenies alone \\{\footnotesize{(Rabosky 2010 \textit{Evolution}, Liow et al 2010 \textit{Syst Biol}, Quental and Marshall 2008 \textit{Evolution}).}}
+      \item fossil record is (imperfect) observation of extinction
     \end{itemize}
   \end{block}
 \end{frame}
@@ -68,7 +68,7 @@
 \begin{frame}
   \begin{alertblock}{Questions and analysis}
     \begin{itemize}
-      \item How do the effect of emergent traits on duration (\alert{extinction selectivity}) vary with expected duration (\alert{extinction intensity}) and each other?
+      \item How do the effect of emergent traits on duration (\alert{extinction selectivity}) vary with expected duration (\alert{extinction intensity})?
       \item \textbf{Approach:} hierarchical Bayesian survival model; \\effect estimates vary with origination cohort; \\correlation btw effects modeled.
     \end{itemize}
   \end{alertblock}
@@ -82,6 +82,7 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Brachiopods}
   \includegraphics[width = 0.45\textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/Brachiopod_fossil}
   \includegraphics[width = 0.45\textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/Burmirhynchionella_decorata_brachial_CRF}
 
@@ -89,24 +90,32 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Analysis of post-Cambrian Paleozoic brachiopod genus durations}
+  \frametitle{Post-Cambrian Paleozoic brachiopod genera and covariates}
   \begin{itemize}
+    \item time range approx. 488-252 Mya.
     \item stage as time unit; duration measured in stages (2-5 My each)
-    \item multiple emergent traits analyzed
+    \item multiple emergent traits analyzed; estimates vary by origination cohort
       \begin{itemize}
         \item geographic range
-          \begin{itemize}
-            \item transformed using \textbf{JADE} fo biased sampling \\(Chao et al. 2015 \textit{Ecology})
-          \end{itemize}
         \item body size
-          \begin{itemize}
-            \item from Payne et al from the \textit{Treatise on Invertebrate Paleontology}
-          \end{itemize}
         \item environmental preference (v, v\(^2\))
-        \item gap statistic as measure of sampling (Foote and Raup 1996 \textit{Paleobio})
       \end{itemize}
-    \item factors vary by cohort (except gap statistic)
+    \item gap statistic as measure of sampling {\footnotesize{(Foote and Raup 1996 \textit{Paleobio})}} \\imputed for taxa with short durations
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Hypothesis of effect of geographic range}
+  \begin{center}
+    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/geo_range_1}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Hypothesis of effect of geographic range}
+  \begin{center}
+    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/geo_range_2}
+  \end{center}
 \end{frame}
 
 
@@ -120,13 +129,6 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Hypothesis of effect of environmental preference}
-  \begin{center}
-    \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/selection_breadth}
-  \end{center}
-\end{frame}
-
-\begin{frame}
   \frametitle{Hierarchical survival model}
   \begin{center}
     \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/simple_model}
@@ -134,7 +136,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Change in trait effects between cohorts}
+  \frametitle{Variation in trait effects between cohorts}
 
   \begin{center}
     \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio = true]{figure/cohort_series}
@@ -187,8 +189,8 @@
 \begin{frame}
   \begin{alertblock}{Macroevolutionary process}
     \begin{itemize}
-      \item As extinction risk decreases, the differences between taxa matter less.
       \item Magnitude of effect of geographic range and environmental preference increase with extinction intensity.
+      \item As extinction risk decreases, the differences between taxa matter less.
     \end{itemize}
   \end{alertblock}
 \end{frame}
@@ -275,17 +277,34 @@
 \begin{frame}
   \frametitle{Sampling statement for the joint posterior probability}
 
-  \small{
-    \begin{align*}
-      y_{i, t} &\sim \text{Weibull}(\sigma_{i, t}, \alpha) \\
-      \log(\sigma_{i, t}) &= \frac{X_{i}B_{j[i], t} + \delta s_{i}}{\alpha} \\
-      B_{j} &\sim \text{MVN}(\mu, \Sigma) \\
-      \Sigma &= \text{diag}(\tau) \Omega \text{diag}(\tau) \\
-      s_{i} &\sim \text{Beta}(\phi_{i}, \lambda) \\
-      \phi_{i} &= \text{logit}^{-1}(W_{i}\gamma) \\
-    \end{align*}
-  }
-  \scriptsize{Note: Calculation of log probability of right and left censored observations is modified from the above. Also, presentation excludes final (hyper)priors.}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{align*}
+        y_{i, t} &\sim \text{Weibull}(\sigma_{i, t}, \alpha) \\
+        \log(\sigma_{i, t}) &= \frac{X_{i}B_{j[i], t} + \delta s_{i}}{\alpha} \\
+        B_{j} &\sim \text{MVN}(\mu, \Sigma) \\
+        \Sigma &= \text{diag}(\tau) \Omega \text{diag}(\tau) \\
+        s_{i} &\sim \text{Beta}(\phi_{i}, \lambda) \\
+        \phi_{i} &= \text{logit}^{-1}(W_{i}\gamma) \\
+      \end{align*}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{align*}
+        \mu_{intensity} &\sim \mathcal{N}(0, 5) \\
+        \mu_{range} &\sim \mathcal{N}(-1, 1) \\
+        \mu_{env pref} &\sim \mathcal{N}(0, 1) \\
+        \mu_{env curve} &\sim \mathcal{N}(1, 1) \\
+        \mu_{size} &\sim \mathcal{N}(0, 1) \\
+        \delta &\sim \mathcal{N}(0, 1) \\
+        \tau &\sim \text{C}^{+}(1) \\
+        \Omega &\sim \text{LKJ}(1) \\
+        \lambda &\sim \text{Pareto}(0.1, 1.5) \\
+        \gamma &\sim \mathcal{N}(0, 1) \\
+      \end{align*}
+    \end{column}
+  \end{columns}
+
+  \scriptsize{Note: Calculation of log probability of right and left censored observations is modified from the above}
 \end{frame}
 
 

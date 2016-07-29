@@ -472,5 +472,6 @@ cohmust <- cohmust + labs(x = 'Environmental preference (v)',
 ggsave(cohmust, filename = '../doc/figure/env_cohort.pdf',
        width = 7.5, height = 8, dpi = 600)
 cohmust.short <- cohmust %+% coh.df.short
+cohmust.short <- cohmust.short + theme(strip.text = element_text(size = 12)
 ggsave(cohmust.short, filename = '../doc/figure/env_cohort_short.pdf',
        width = 10, height = 5, dpi = 600)
