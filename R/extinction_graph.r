@@ -395,107 +395,116 @@ quad.mean <- function(x, y, mcoef) {
 
 
 sam <- sample(nrow(wei.fit$lp__), 1000)
-# HERE
-env.d <- c(data$env)
 rang <- c(data$occupy)
-val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
-val2 <- quantile(rang, c(0.2, 0.5, 0.8))
-quadval <- list()
-for(ii in seq(length(sam))) {
-  quadval[[ii]] <- data.frame(env = val, 
-                              resp = quad(val, y = val2[1], sam[ii]), 
-                              sim = ii)
-}
-quadframe <- Reduce(rbind, quadval)
+val2 <- quantile(rang, c(0.2, 0.5, 0.8)) # very important variable for all plots that follow!
+# need to loop through each value and make a diff plot for each
 
-mcoef <- colMeans(wei.fit$mu_prior[sam, ])[c(1, 2, 3, 4, 5, 6)]
-meanquad <- data.frame(env = val, 
-                       resp = quad.mean(val, y = val2[1], mcoef))
+for(zz in seq(length(val2))) {
 
-# add rug showing observed
-#   this addition would overpower the big, by cohort graph
-# HERE
-env.obs <- data.frame(env = data$env)
-
-mustache <- ggplot(quadframe, aes(x = env, y = resp, group = sim))
-mustache <- mustache + geom_line(alpha = 1 / 100)
-mustache <- mustache + geom_line(data = meanquad,
-                                 mapping = aes(group = NULL),
-                                 colour = 'blue')
-mustache <- mustache + geom_rug(data = env.obs,
-                                mapping = aes(x = env, y = NULL, group = NULL),
-                                sides = 'b', alpha = 0.05)
-mustache <- mustache + labs(x = 'Environmental preference\n(open-ocean <--> epicontinental)', 
-                            y = 'log(approx. expected duration in t)')
-#y = expression(paste('log(', sigma, ')')))
-mustache <- mustache + theme(axis.title.x = element_text(hjust = 0.5))
-ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
-       width = 6, height = 5, dpi = 600)
-
-
-#### TODO and TEST
-# by cohort
-sam <- sample(nrow(wei.fit$lp__), 100)
-bet.coh <- wei.fit$beta[sam, , c(1, 2, 3, 4, 5, 6)]
-#if(!(best %in% 1:2)) {
-#  alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
-#                   x + wei.fit$alpha_mu[sam])
-#} else {
-alp.coh <- wei.fit$alpha_trans[sam]
-#}
-val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
-dat <- cbind(1, val2[2], val, val^2, val * val2[2], val^2 * val[2])
-
-coh.est <- list()
-for(ii in seq(data$O)) {
-  h <- list()
-  for(jj in seq(length(val))) {
-    # all posterior estimates for env value of dat[1, ]
-    #if(!(best %in% 1:2)) {
-    #  h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[, ii])
-    #} else {
-    h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii])
-    #}
+  # HERE
+  env.d <- c(data$env)
+  val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
+  quadval <- list()
+  for(ii in seq(length(sam))) {
+    quadval[[ii]] <- data.frame(env = val, 
+                                resp = quad(val, y = val2[zz], sam[ii]), 
+                                sim = ii)
   }
-  coh.est[[ii]] <- h
+  quadframe <- Reduce(rbind, quadval)
+
+  mcoef <- colMeans(wei.fit$mu_prior[sam, ])[c(1, 2, 3, 4, 5, 6)]
+  meanquad <- data.frame(env = val, 
+                         resp = quad.mean(val, y = val2[zz], mcoef))
+
+  # add rug showing observed
+  #   this addition would overpower the big, by cohort graph
+  # HERE
+  env.obs <- data.frame(env = data$env)
+
+  mustache <- ggplot(quadframe, aes(x = env, y = resp, group = sim))
+  mustache <- mustache + geom_line(alpha = 1 / 100)
+  mustache <- mustache + geom_line(data = meanquad,
+                                   mapping = aes(group = NULL),
+                                   colour = 'blue')
+  mustache <- mustache + geom_rug(data = env.obs,
+                                  mapping = aes(x = env, y = NULL, group = NULL),
+                                  sides = 'b', alpha = 0.05)
+  mustache <- mustache + labs(x = 'Environmental preference\n(open-ocean <--> epicontinental)', 
+                              y = 'log(approx. expected duration in t)')
+  #y = expression(paste('log(', sigma, ')')))
+  mustache <- mustache + theme(axis.title.x = element_text(hjust = 0.5))
+  ggsave(mustache, filename = paste0('../doc/figure/env_effect_', zz, '.pdf'),
+                                     width = 6, height = 5, dpi = 600)
+
+
+
+
+  # by cohort
+  sam <- sample(nrow(wei.fit$lp__), 100)
+  bet.coh <- wei.fit$beta[sam, , c(1, 2, 3, 4, 5, 6)]
+  #if(!(best %in% 1:2)) {
+  #  alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
+  #                   x + wei.fit$alpha_mu[sam])
+  #} else {
+  alp.coh <- wei.fit$alpha_trans[sam]
+  #}
+  val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
+  dat <- cbind(1, val2[zz], val, val^2, val * val2[zz], val^2 * val[2])
+
+  coh.est <- list()
+  for(ii in seq(data$O)) {
+    h <- list()
+    for(jj in seq(length(val))) {
+      # all posterior estimates for env value of dat[1, ]
+      #if(!(best %in% 1:2)) {
+      #  h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[, ii])
+      #} else {
+      h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii])
+      #}
+    }
+    coh.est[[ii]] <- h
+  }
+
+  # massage into shape
+  #   val, resp (V2), sim, coh
+  stg.name <- as.character(lump[5:(5+33-1), 4])
+  stg.name <- Reduce(c, Map(function(x, y) paste0(y, '. ', x), 
+                            stg.name, seq(length(stg.name))))
+  coh.map <- list()
+  for(jj in seq(data$O)) {
+    h <- Map(function(x, y) {
+               cbind(val = x, resp = coh.est[[jj]][[y]], sim = seq(100))}, 
+               x = val, y = seq(length(val)))
+    h <- Reduce(rbind, h)
+    coh.map[[jj]] <- data.frame(h, coh = stg.name[jj])
+  }
+  coh.df <- Reduce(rbind, coh.map)
+
+  coh.df.short <- coh.df[coh.df$coh %in% c('14. Emsian', '15. Eifelian', 
+                                           '16. Givetian', '17. Frasnian'), ]
+
+  cohmust <- ggplot(coh.df, aes(x = val, y = V2, group = sim))
+  cohmust <- cohmust + geom_line(data = meanquad,
+                                 mapping = aes(x = env,
+                                               y = resp,
+                                               group = NULL),
+                                 colour = 'black', size = 1.5)
+  cohmust <- cohmust + geom_line(alpha = 1 / 10, colour = 'blue')
+  cohmust <- cohmust + facet_wrap(~ coh, strip.position = 'bottom', ncol = 7)
+  cohmust <- cohmust + theme(axis.text = element_text(size = 8),
+                             strip.text = element_text(size = 8))
+  cohmust <- cohmust + labs(x = 'Environmental preference (v)',
+                            y = 'log(approx. expected duration in t)')
+  #y = expression(paste('log(', sigma, ')')))
+  ggsave(cohmust, 
+         filename = paste0('../doc/figure/env_cohort_', zz, '.pdf'),
+         width = 7.5, height = 8, dpi = 600)
+  ggsave(cohmust, 
+         filename = paste0('../doc/figure/env_cohort_wide_', zz, '.pdf'),
+         width = 9.5, height = 8, dpi = 600)
+  cohmust.short <- cohmust %+% coh.df.short
+  cohmust.short <- cohmust.short + theme(strip.text = element_text(size = 12))
+  ggsave(cohmust.short, 
+         filename = paste0('../doc/figure/env_cohort_short_', zz, '.pdf'),
+         width = 10, height = 5, dpi = 600)
 }
-
-# massage into shape
-#   val, resp (V2), sim, coh
-stg.name <- as.character(lump[5:(5+33-1), 4])
-stg.name <- Reduce(c, Map(function(x, y) paste0(y, '. ', x), 
-                          stg.name, seq(length(stg.name))))
-coh.map <- list()
-for(jj in seq(data$O)) {
-  h <- Map(function(x, y) {
-           cbind(val = x, resp = coh.est[[jj]][[y]], sim = seq(1000))}, 
-           x = val, y = seq(length(val)))
-  h <- Reduce(rbind, h)
-  coh.map[[jj]] <- data.frame(h, coh = stg.name[jj])
-}
-coh.df <- Reduce(rbind, coh.map)
-
-coh.df.short <- coh.df[coh.df$coh %in% c('14. Emsian', '15. Eifelian', 
-                                         '16. Givetian', '17. Frasnian'), ]
-
-cohmust <- ggplot(coh.df, aes(x = val, y = V2, group = sim))
-cohmust <- cohmust + geom_line(data = meanquad,
-                               mapping = aes(x = env,
-                                             y = resp,
-                                             group = NULL),
-                               colour = 'black', size = 1.5)
-cohmust <- cohmust + geom_line(alpha = 1 / 10, colour = 'blue')
-cohmust <- cohmust + facet_wrap(~ coh, switch = 'x', ncol = 7)
-cohmust <- cohmust + theme(axis.text = element_text(size = 8),
-                           strip.text = element_text(size = 8))
-cohmust <- cohmust + labs(x = 'Environmental preference (v)',
-                          y = 'log(approx. expected duration in t)')
-#y = expression(paste('log(', sigma, ')')))
-ggsave(cohmust, filename = '../doc/figure/env_cohort.pdf',
-       width = 7.5, height = 8, dpi = 600)
-ggsave(cohmust, filename = '../doc/figure/env_cohort_wide.pdf',
-       width = 9.5, height = 8, dpi = 600)
-cohmust.short <- cohmust %+% coh.df.short
-cohmust.short <- cohmust.short + theme(strip.text = element_text(size = 12))
-ggsave(cohmust.short, filename = '../doc/figure/env_cohort_short.pdf',
-       width = 10, height = 5, dpi = 600)
