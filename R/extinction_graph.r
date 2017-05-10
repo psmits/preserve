@@ -39,37 +39,46 @@ outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 ids <- rep(1:(length(outs) / 4), each = 4)
 outs <- split(outs, ids)
 
-wfit <- llply(outs[-1], read_stan_csv)
-log.liks <- llply(wfit, extract_log_lik)
-
-# this will need to be updated with number of models
-loo.est <- llply(log.liks, loo)
-loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], loo.est[[3]])
-
-# this will need to be updated with number of models
-waic.est <- llply(log.liks, waic)
-waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], waic.est[[3]])
-
-
-wei.fit <- rstan::extract(wfit[[1]], permuted = TRUE)
-#wei.fit <- rstan::extract(wfit, permuted = TRUE)
+wfit <- read_stan_csv(outs[[2]])
+wei.fit <- rstan::extract(wfit, permuted = TRUE)
 wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 100), ]
+#wfit <- llply(outs[-1], read_stan_csv)
+#log.liks <- llply(wfit, extract_log_lik)
+#
+## this will need to be updated with number of models
+#loo.est <- llply(log.liks, loo)
+#loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], loo.est[[3]])
+#
+## this will need to be updated with number of models
+#waic.est <- llply(log.liks, waic)
+#waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], waic.est[[3]])
+#
+#wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 100), ]
 
 # this will need to be updated with number of models
 #npred <- ifelse(best %in% c(2, 3), 5, 6)  # 
-npred <- 5
+npred <- 7
+
+
+#########################
 
 
 #
 theme_set(theme_bw())
 cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
          '#0072B2', '#D55E00', '#CC79A7')
-theme_update(axis.text = element_text(size = 10),
-             axis.title = element_text(size = 15),
-             legend.text = element_text(size = 15),
-             legend.title = element_text(size = 15),
+#theme_update(axis.text = element_text(size = 10),
+#             axis.title = element_text(size = 15),
+#             legend.text = element_text(size = 15),
+#             legend.title = element_text(size = 15),
+#             legend.key.size = unit(1, 'cm'),
+#             strip.text = element_text(size = 18))
+theme_update(axis.text = element_text(size = 15),
+             axis.title = element_text(size = 20),
+             legend.text = element_text(size = 20),
+             legend.title = element_text(size = 20),
              legend.key.size = unit(1, 'cm'),
-             strip.text = element_text(size = 18))
+             strip.text = element_text(size = 20))
 
 # data setup
 # HERE
@@ -219,7 +228,7 @@ get.covcor <- function(stanfit, npred) {
   out <- list(cor.median, cor.mean, cor.10, cor.90, 
               cov.median, cov.mean, cov.10, cov.90)
   out <- llply(out, function(x) {
-               nn <- c('i', 'r', 'e', 'e2', 'm', 's')
+               nn <- c('i', 'r', 'e', 'e2', 'rxe', 'rxe2', 'm', 's')
                nn <- nn[seq(npred)]
                rownames(x) <- colnames(x) <- nn
                x})
@@ -277,7 +286,7 @@ efbeta.h <- Map(function(x) data.frame(efbeta.h[[x]],
                                        time = x, 
                                        pred = seq(npred)), seq(data$O))
 efbeta.df <- Reduce(rbind, efbeta.h)
-too <- c('intensity', 'range', 'env_pref', 'env_curv', 'size', 
+too <- c('intensity', 'range', 'env_pref', 'env_curv', 'rxe', 'rxe2', 'size', 
          'delta')[seq(npred)]
 #too <- c('beta^0', 'beta^r', 'beta^v', 'beta^v^2', 'beta^m', 
 #         'delta')[seq(npred)]
@@ -313,6 +322,8 @@ efbeta.plot <- efbeta.plot + labs(x = 'Time (My)', y = 'Effect estimate for...')
 efbeta.plot <- efbeta.plot + scale_x_reverse()
 ggsave(efbeta.plot, filename = '../doc/figure/cohort_series.pdf',
        width = 7.5, height = 10, dpi = 600)
+ggsave(efbeta.plot, filename = '../doc/figure/cohort_series_wide.pdf',
+       width = 12, height = 10, dpi = 600)
 
 
 
@@ -356,40 +367,50 @@ ggsave(efbeta.plot, filename = '../doc/figure/cohort_series.pdf',
 #}
 
 
-
+# these are possible values/partially counter factual statements
 # environmental effect
-quad <- function(x, sam) {
+quad <- function(x, y, sam) {
   bet <- wei.fit$mu_prior[sam, 1]
-  bet <- bet + (wei.fit$mu_prior[sam, 3] * x) + (wei.fit$mu_prior[sam, 4] * x^2)
+  bet <- bet + (wei.fit$mu_prior[sam, 2] * y) +
+         (wei.fit$mu_prior[sam, 3] * x) + 
+         (wei.fit$mu_prior[sam, 4] * x^2) +
+         (wei.fit$mu_prior[sam, 5] * (x * y)) + 
+         (wei.fit$mu_prior[sam, 6] * (x^2 * y))
   #if(!(best %in% 1:2)) {
   #  -(bet) / exp(wei.fit$alpha_mu[sam])  # depends on if alpha varies by cohort
   #} else {
     -(bet) / exp(wei.fit$alpha_trans[sam])  # depends on if alpha varies by cohort
   #}
 }
-quad.mean <- function(x, mcoef) {
+quad.mean <- function(x, y, mcoef) {
   #if(!(best %in% 1:2)) {
   #  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / exp(mean(wei.fit$alpha_mu[sam]))
   #} else {
-    -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / 
-      exp(mean(wei.fit$alpha_trans[sam]))
-  #}
-  # depends on if alpha varies by cohort
+  -(mcoef[1] + (mcoef[2] * y) + (mcoef[3] * x) + (mcoef[4] * x^2) + 
+    (mcoef[5] * (x * y)) + (mcoef[6] * (x^2 * y))) / 
+     exp(mean(wei.fit$alpha_trans[sam]))
+     #}
+     # depends on if alpha varies by cohort
 }
 
 
 sam <- sample(nrow(wei.fit$lp__), 1000)
 # HERE
 env.d <- c(data$env)
+rang <- c(data$occupy)
 val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
+val2 <- quantile(rang, c(0.2, 0.5, 0.8))
 quadval <- list()
 for(ii in seq(length(sam))) {
-  quadval[[ii]] <- data.frame(env = val, resp = quad(val, sam[ii]), sim = ii)
+  quadval[[ii]] <- data.frame(env = val, 
+                              resp = quad(val, y = val2[1], sam[ii]), 
+                              sim = ii)
 }
 quadframe <- Reduce(rbind, quadval)
 
-mcoef <- colMeans(wei.fit$mu_prior[sam, ])[c(1, 3, 4)]
-meanquad <- data.frame(env = val, resp = quad.mean(val, mcoef))
+mcoef <- colMeans(wei.fit$mu_prior[sam, ])[c(1, 2, 3, 4, 5, 6)]
+meanquad <- data.frame(env = val, 
+                       resp = quad.mean(val, y = val2[1], mcoef))
 
 # add rug showing observed
 #   this addition would overpower the big, by cohort graph
@@ -406,23 +427,24 @@ mustache <- mustache + geom_rug(data = env.obs,
                                 sides = 'b', alpha = 0.05)
 mustache <- mustache + labs(x = 'Environmental preference\n(open-ocean <--> epicontinental)', 
                             y = 'log(approx. expected duration in t)')
-                            #y = expression(paste('log(', sigma, ')')))
+#y = expression(paste('log(', sigma, ')')))
 mustache <- mustache + theme(axis.title.x = element_text(hjust = 0.5))
 ggsave(mustache, filename = '../doc/figure/env_effect.pdf',
        width = 6, height = 5, dpi = 600)
 
 
+#### TODO and TEST
 # by cohort
 sam <- sample(nrow(wei.fit$lp__), 100)
-bet.coh <- wei.fit$beta[sam, , c(1, 3, 4)]
+bet.coh <- wei.fit$beta[sam, , c(1, 2, 3, 4, 5, 6)]
 #if(!(best %in% 1:2)) {
 #  alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
 #                   x + wei.fit$alpha_mu[sam])
 #} else {
-  alp.coh <- wei.fit$alpha_trans[sam]
+alp.coh <- wei.fit$alpha_trans[sam]
 #}
 val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
-dat <- cbind(1, val, val^2)
+dat <- cbind(1, val2[2], val, val^2, val * val2[2], val^2 * val[2])
 
 coh.est <- list()
 for(ii in seq(data$O)) {
@@ -432,7 +454,7 @@ for(ii in seq(data$O)) {
     #if(!(best %in% 1:2)) {
     #  h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[, ii])
     #} else {
-      h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii])
+    h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii])
     #}
   }
   coh.est[[ii]] <- h
@@ -468,10 +490,12 @@ cohmust <- cohmust + theme(axis.text = element_text(size = 8),
                            strip.text = element_text(size = 8))
 cohmust <- cohmust + labs(x = 'Environmental preference (v)',
                           y = 'log(approx. expected duration in t)')
-                          #y = expression(paste('log(', sigma, ')')))
+#y = expression(paste('log(', sigma, ')')))
 ggsave(cohmust, filename = '../doc/figure/env_cohort.pdf',
        width = 7.5, height = 8, dpi = 600)
+ggsave(cohmust, filename = '../doc/figure/env_cohort_wide.pdf',
+       width = 9.5, height = 8, dpi = 600)
 cohmust.short <- cohmust %+% coh.df.short
-cohmust.short <- cohmust.short + theme(strip.text = element_text(size = 12)
+cohmust.short <- cohmust.short + theme(strip.text = element_text(size = 12))
 ggsave(cohmust.short, filename = '../doc/figure/env_cohort_short.pdf',
        width = 10, height = 5, dpi = 600)

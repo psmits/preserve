@@ -10,16 +10,23 @@ functions {
    * @return log probability of occurrence time
    */
   real pert_log(real y, real start, real end, real mid, real l) {
-    real a1;
-    real a2;
+    real a;
+    real b;
     real d;
 
-    a1 = 1 + l * (mid - start) / (end - start);
-    a2 = 1 + l * (end - mid) / (end - start);
-    d = (y - start)^(a1 - 1) * (end - y)^(a2 - 1) / exp(lbeta(a1, a2)) / 
-        (end - start)^(a1 + a2 - 1);
+    a = ((mid - end) * l) / (start - end);
+    b = ((start - mid) * l) / (start - end);
+    d = (((start - end)^(-1 - l)) * ((start - y)^a) * (-end + y)^b) /
+      ((tgamma(a + 1) * tgamma(b + 1)) / (tgamma(a + b + 2)));
 
     return log(d);
+  
+  }
+  real scale_to_one(real y, real start, real end) {
+    real y_rescale;
+     y_rescale = ((end - start) * (y - start)) / (end - start);
+
+     return(y_rescale);
   }
 }
 data {
@@ -32,7 +39,8 @@ data {
   vector[S] fad;  // species first appearance date
   vector[S] lad;  // species last appearance date
 
-  int censored[N];
+  int censored[S];
+  real end_times;
   
   real occupy[N];
   real env[N];
@@ -74,6 +82,9 @@ model {
   vector[N] dur;
   vector[N] scale; // scale of weibull for end - start
   int cohort[S];
+  vector[S] mu;
+  vector[S] v;
+  vector[S] w;
  
   // log absolute derivative of theta_raw .* d
   for(ss in 1:S) { // jacobian adjustment is just a constant
@@ -81,6 +92,8 @@ model {
     target += (log(fabs(lad[ss])));
   }
   
+
+  // priors in general
   shape ~ lognormal(0, 0.3);
 
   // regression coefficients
@@ -95,7 +108,9 @@ model {
   for(i in 1:O) {
     beta[i] ~ multi_normal(mu_prior, Sigma);
   }
-  
+
+
+  // regression statement
   for(i in 1:S) {
     scale[i] = exp(-(beta[cohort[i], 1] + 
           beta[cohort[i], 2] * occupy[i] + 
@@ -103,21 +118,45 @@ model {
           beta[cohort[i], 4] * (env[i]^2) +
           beta[cohort[i], 5] * leng[i])/ shape);
   }
-
-  for(i in 1:S) {
-    if((start[i] <= cohort_start[i]) && 
-       (start[i] > cohort_end[i])) {
-      cohort[i] = i;
-    }
-  }
-
-
-  dur = end - start;
+  
+  // the prior on start and end is the lifetime distribution
+  dur = start - end;  // numbers head towards 0
   // this is the meat of the whole operation
   target += weibull_lpdf(dur | shape, scale);
 
 
+
+  // assign cohort based on estimated start date
+  for(i in 1:S) {
+    for(j in 1:O) {
+      if((start[i] <= cohort_start[j]) && 
+          (start[i] > cohort_end[j])) {
+        cohort[i] = j;
+      }
+    }
+  }
+ 
+  // conversions to make beta distribution
+  for(i in 1:S) {
+    mu[i] = (start[i] + mid[i] + end[i]) / 2;
+    v[i] = ((mu[i] - start[i]) * (2 * mid[i] - start[i] - end[i])) / 
+      ((mid[i] - mu[i]) * (end[i] - start[i]));
+    w[i] = (v[i] * (end[i] - mu[i])) / (mu[i] - start[i]);
+  }
+
+  // "likelihood" of each observation, based on what species it is
   for(n in 1:N) {
     y[n] ~ pert(start[sp[n]], end[sp[n]], mid[sp[n]], 4);
+  }
+  
+  // for those that are censored, need that last observation saying so
+  for(s in 1:S) {
+    if(censored[s] == 1) {
+      {
+        real big_e;
+        big_e = scale_to_one(end_times, start[s], end[s]);
+        big_e ~ pert(start[s], end[s], mid[s], 4);
+      }
+    }
   }
 }

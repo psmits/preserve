@@ -1,6 +1,5 @@
 library(rstan)
 library(stringr)
-library(ppcor)
 source('../R/gts.r')
 source('../R/jade.r')
 source('../R/mung.r')

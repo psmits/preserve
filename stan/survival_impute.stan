@@ -3,7 +3,7 @@ data {
   int O;  // origination cohort
   int N_obs;  // number observations will fully observed covariates
   int N_imp;  // number observations without fully observed covariates
-  
+
   real<lower=0> dur[N];  // duration
 
   int censored[N];  // 1 == censored, 0 == uncensored
@@ -22,19 +22,19 @@ parameters {
   real alpha_trans;
 
   // regression coefficients
-  vector[5] mu_prior;
-  vector[5] beta[O];  // cohort coef 
-  real delta;
-  corr_matrix[5] Omega;
-  vector<lower=0>[5] sigma; 
+  vector[7] mu_prior;
+  vector[7] beta[O];  // cohort coef 
+  corr_matrix[7] Omega;
+  vector<lower=0>[7] sigma; 
 
+  real delta;
   vector[4] gamma;
   real<lower=0,upper=1> samp_imp[N_imp];  // imputed sampling values
   real<lower=0.1> lambda;  // beta total count
 }
 transformed parameters {
   real<lower=0> alpha;
-  cov_matrix[5] Sigma;
+  cov_matrix[7] Sigma;
 
   real<lower=0,upper=1> phi[N];  // beta mean
   real<lower=0> alp[N];
@@ -42,12 +42,12 @@ transformed parameters {
   real<lower=0,upper=1> samp[N];
   
   // other misc transformations
-  alpha <- exp(alpha_trans);
-  Sigma <- quad_form_diag(Omega, sigma);
+  alpha = exp(alpha_trans);
+  Sigma = quad_form_diag(Omega, sigma);
 
   // predict mean of inclusion function
   for(n in 1:N) {
-    phi[n] <- inv_logit(gamma[1] + 
+    phi[n] = inv_logit(gamma[1] + 
         gamma[2] * occupy[n] + 
         gamma[3] * env[n] + 
         gamma[4] * leng[n]);
@@ -55,13 +55,13 @@ transformed parameters {
   
   // parameter transformation
   for(n in 1:N) {
-    alp[n] <- lambda * phi[n];
-    bet[n] <- lambda * (1 - phi[n]);
+    alp[n] = lambda * phi[n];
+    bet[n] = lambda * (1 - phi[n]);
   }
   
   // combining data and parameters
-  samp[obs_ord] <- samp_obs;
-  samp[imp_ord] <- samp_imp;
+  samp[obs_ord] = samp_obs;
+  samp[imp_ord] = samp_imp;
 }
 model {
   vector[N] hold;
@@ -76,6 +76,8 @@ model {
   mu_prior[3] ~ normal(0, 1);
   mu_prior[4] ~ normal(1, 1);
   mu_prior[5] ~ normal(0, 1);
+  mu_prior[6] ~ normal(0, 1);
+  mu_prior[7] ~ normal(0, 1);
   delta ~ normal(0, 1);
 
   for(i in 1:O) {
@@ -91,11 +93,13 @@ model {
   // this is creating a log(0) situation...
 
   for(i in 1:N) {
-    hold[i] <- exp(-(beta[cohort[i], 1] + 
+    hold[i] = exp(-(beta[cohort[i], 1] + 
           beta[cohort[i], 2] * occupy[i] + 
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
-          beta[cohort[i], 5] * leng[i] + 
+          beta[cohort[i], 5] * (occupy[i] * env[i]) +
+          beta[cohort[i], 6] * (occupy[i] * (env[i]^2)) +
+          beta[cohort[i], 7] * leng[i] +
           delta * samp[i])/ alpha);
   }
 
@@ -103,12 +107,12 @@ model {
   for(i in 1:N) {
     if(censored[i] == 0) {
       if(dur[i] == 1) {
-        increment_log_prob(weibull_cdf_log(dur[i], alpha, hold[i]));
+        target += weibull_lcdf(dur[i] | alpha, hold[i]);
       } else {
-        increment_log_prob(weibull_log(dur[i], alpha, hold[i]));
+        target += weibull_lpdf(dur[i] | alpha, hold[i]);
       }
     } else {
-      increment_log_prob(weibull_ccdf_log(dur[i], alpha, hold[i]));
+      target += weibull_lccdf(dur[i] | alpha, hold[i]);
     }
   }
 }
@@ -118,11 +122,13 @@ generated quantities {
   vector[N] hold;
 
   for(i in 1:N) {
-    hold[i] <- exp(-(beta[cohort[i], 1] +
+    hold[i] = exp(-(beta[cohort[i], 1] +
           beta[cohort[i], 2] * occupy[i] +
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
-          beta[cohort[i], 5] * leng[i] +
+          beta[cohort[i], 5] * (occupy[i] * env[i]) +
+          beta[cohort[i], 6] * (occupy[i] * (env[i]^2)) +
+          beta[cohort[i], 7] * leng[i] + 
           delta * samp[i]) / alpha);
   }
 
@@ -130,17 +136,17 @@ generated quantities {
   for(i in 1:N) {
     if(censored[i] == 0) {
       if(dur[i] == 1) {
-        log_lik[i] <- weibull_cdf_log(dur[i], alpha, hold[i]);
+        log_lik[i] = weibull_lcdf(dur[i] | alpha, hold[i]);
       } else {
-        log_lik[i] <- weibull_log(dur[i], alpha, hold[i]);
+        log_lik[i] = weibull_lpdf(dur[i] | alpha, hold[i]);
       }
     } else {
-      log_lik[i] <- weibull_ccdf_log(dur[i], alpha, hold[i]);
+      log_lik[i] = weibull_lccdf(dur[i] | alpha, hold[i]);
     }
   }
 
   // posterior predictive simulations
   for(i in 1:N) {
-    y_tilde[i] <- weibull_rng(alpha, hold[i]);
+    y_tilde[i] = weibull_rng(alpha, hold[i]);
   }
 }
