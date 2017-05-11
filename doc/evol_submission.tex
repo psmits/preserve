@@ -49,17 +49,26 @@
 
 \section{Introduction}
 
-Extinction is one half of the diversification process \citep{Raup1994,Stanley1979,Stanley1975}, second only to speciation or origination; it can also be the ultimate manifestation of selection as a taxon with a beneficial trait should persist for longer on average than a taxon without that beneficial trait \citep{Rabosky2010b,Jablonski2008a,Raup1994,Stanley1975}. 
+Extinction is one half of the diversification process \citep{Raup1994,Stanley1979,Stanley1975}, second only to speciation or origination; it can also be the ultimate manifestation of selection as a taxon with a beneficial trait should persist for longer on average than a taxon without that beneficial trait \citep{Rabosky2010b,Jablonski2008a,Raup1994,Stanley1975}. Species duration is a measure of species fitness CITATION, and trait-associated differences in fitness is the hallmark of (species) selection CITATION.
+
+\citet{Jablonski1986} observed that for bivalves at the end Cretaceous mass extinction event, previous trait-associated differences in survival no longer mattered except for the case of geographic range. Based on this evidence, \citet{Jablonski1986} proposed the idea of "macroevolutionary modes" and that mass extinction and background extinction are fundamentally different processes. However, based on estimates of extinction rates over time, there is no evidence of there being two or more "types" of extinction \citep{Wang2003}. Instead, extinction rates for marine invertebrates form a unimodal distribution where estimates of extinction rate/intensity show continuous variation.
+
+The apparent disconnect between the theory of macroevolutionary modes and the observation of continuous variation in extinction rates implies the possibility of a relationship between the strength of selection (extinction \textbf{intensity}) and the association between of traits and differences in fitness (extinction \textbf{selectivity}) CITATION PAYNE. As extinction intensity increases, what happens to extinction selectivity? How do trait-associated differences in fitness change as average extinction rate changes over time?
+
+Here I model brachiopod taxon durations because trait based differences in extinction risk should manifest as differences in taxon durations CITATION. Brachiopods are an ideal group for this study as they are are well known for having an exceptionally complete fossil record \citep{Foote1996e,Foote2000a}. I focus on the brachiopod record from the post-Cambrian Paleozoic, from the start of the Ordovician (approximately 485 My) through the end Permian (approximately 252 My) as this represents the time of greatest global brachiopod diversity \citep{Alroy2010} resulting in a large sample size.
+
+The analysis of taxon durations, or time from origination to extinction, falls under the purview of survival analysis, a field of applied statistics commonly used in health care and engineering \citep{Klein2003} but has a long history in paleontology \citep{Simpson1944,Simpson1953,VanValen1973,VanValen1979,Smits2015,Crampton2016}. I adopt a hierarchical modeling approach \citep{Gelman2007,Gelman2013d}, which represents both a conceptual and statistical unification of the paleontological dynamic and cohort survival analytic approaches \citep{VanValen1973,VanValen1979,Raup1978,Raup1975,Foote1988,Baumiller1993,Simpson2006,Crampton2016,Ezard2012b}. 
+
+In order to test for an association between extinction intensity and extinction selectivity, both extinction rate and trait-based differences in extinction rate have to be estimated. Payne/Wang approach is to estimate this separately for each time point and then compare. My approach is to write one model to estimate all of this simultaneously and take advantage of Bayesian things like partial pooling and regularization to smooth over issues of small sample sizes and weak effects. Mine has the overall advantage of putting everything on the same scale and more easily comparable. I also get probabilities at the end which are so much easier to read than p-values.
+
+
+
+
+
+Additionally, in order to test the proposed macroevolutionary mechanism behind the \citet{Jablonski1986} scenario; not only do the taxon trait effects needs to be modeled, but the correlation between trait effects need to be modeled as well. 
 
 While estimation of both trait-dependent speciation and extinction rates from phylogenies of extant taxa has grown dramatically \citep{Maddison2007,Fitzjohn2010,Goldberg2011a,Goldberg2005,Rabosky2013,Stadler2013b,Stadler2011a,Stadler2013a}, there are two major ways to estimate trait-dependent extinction: analysis of phylogenies, and analysis of the fossil record. These two directions, phylogenetic comparative and paleobiological, are complementary and intertwined in the field of macroevolution \citep{Rabosky2010b,Jablonski2008a,Hunt2014a}. In the case of extinction, analysis of the fossil record has the distinct advantage over phylogenies of only extant taxa because extinction is observable; this means that extinction rate is possible to estimate \citep{Rabosky2010a,Quental2009,Liow2010a}. The approach used here is thus complementary to the analysis of trait-dependent extinction based on a phylogeny.
 
-\citet{Jablonski1986} observed that for bivalves at the end Cretaceous mass extinction event, the effects of some biological traits on taxonomic survival decreased. However, this pattern was not the case for the effect of geographic range on survival \citep{Jablonski1986,Payne2007}. There are multiple possible macroevolutionary mechanisms which may underlie this pattern: the effect of geographic range on survival remains constant and those of other biological traits decrease, the effect of geographic range on survival increases and those of other biological traits stay constant, or the effects of all traits decrease potentially by different degrees.
-
-While \citet{Jablonski1986} phrased his conclusions in terms of background versus mass extinction, these states are not distinguishable in terms of extinction rate alone; my analysis treats the time period analyzed as part of the same continuum \citep{Wang2003,Payne2007,Simpson2009}. Additionally, in order to test the proposed macroevolutionary mechanism behind the \citet{Jablonski1986} scenario; not only do the taxon trait effects needs to be modeled, but the correlation between trait effects need to be modeled as well. 
-
-Here I model brachiopod taxon durations because trait based differences in extinction risk should manifest as differences in taxon durations. Brachiopods are an ideal group for this study as they are are well known for having an exceptionally complete fossil record \citep{Foote1996e,Foote2000a}. I focus on the brachiopod record from the post-Cambrian Paleozoic, from the start of the Ordovician (approximately 485 My) through the end Permian (approximately 252 My) as this represents the time of greatest global brachiopod diversity \citep{Alroy2010} meaning a large sample size for this analysis.
-
-The analysis of taxon durations, or time from origination to extinction, falls under the purview of survival analysis, a field of applied statistics commonly used in health care and engineering \citep{Klein2003} but has a long history in paleontology \citep{Simpson1944,Simpson1953,VanValen1973,VanValen1979,Crampton2016}. I adopt a hierarchical modeling approach \citep{Gelman2007,Gelman2013d}, which represents both a conceptual and statistical unification of the paleontological dynamic and cohort survival analytic approaches \citep{VanValen1973,VanValen1979,Raup1978,Raup1975,Foote1988,Baumiller1993,Simpson2006,Crampton2016,Ezard2012b}. 
 
 \subsection{Factors affecting brachiopod survival}
 
@@ -92,7 +101,7 @@ Fossil occurrences were analyzed at the genus level which is common for paleobio
 
 Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to individual fossils themselves but instead fossils are assigned to a geological interval which represents some temporal range. In this analysis, stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage (e.g. the final stage of the study interval) were right censored at the Changhsingian; genera with a duration of only one stage were left censored \citep{Klein2003}. How the likelihood of censored observations is calculated is detailed in section \ref{sec:model}.
 
-The covariates of duration included in this analysis are geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), body size (\(m\)), and sampling (\(s\)).
+The covariates of duration included in this analysis are geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), the statistical interactions between geographic range size and environmental preference (\(r \times v, r \times v^{2}\)), body size (\(m\)), and sampling (\(s\)). The interaction terms are important to include because of the known multidirectional relationship between geographic range, environmental preference, and duration CITATION.
 
 Geographic range was calculated as relative occupancy corrected for incomplete sampling. First, the paleolatitude-paleolongitude coordinates for all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}. For each stage, the total number of occupied grid cells was calculated. Then, for each temporal bin, the relative occurrence probability of the observed taxa was calculated using the \uppercase{jade} method developed by \citet{Chao2015a}. This method accounts for the fact that taxa with an occupancy of 0 cannot be observed which means that occupancy follows a truncated Binomial distribution. This correction is critical when comparing occupancies from different times with different geographic sampling. Finally, for each genus, the mean relative occurrence probability was calculated as the average of that genus' occurrence probabilities for all stages it was sampled to yield relative occupancy, my proxy for geographic range.
 
@@ -144,6 +153,8 @@ The elements of \(\mu\) were given independent normally distributed priors. The 
     \mu^{r} &\sim \mathcal{N}(-1, 1) \\
     \mu^{v} &\sim \mathcal{N}(0, 1) \\
     \mu^{v^{2}} &\sim \mathcal{N}(1, 1) \\
+    \mu^{r \times v} &\sim \mathcal{N}(0, 1) \\
+    \mu^{r \times v^{2}} &\sim \mathcal{N}(1, 1) \\
     \mu^{m} &\sim \mathcal{N}(0, 1) \\
     \tau &\sim \mathrm{C^{+}}(1) \\
     \Omega &\sim \text{LKJ}(2).
@@ -156,7 +167,7 @@ The log of the shape parameter \(\alpha\) was given a weakly informative prior \
 \subsection{Imputation of sampling probability}
 \label{sec:impute}
 % Unknown values were estimated from the results of that beta regression.
-The vector sampling \(s\) has two parts: the observed part \(s^{o}\), and the unobserved part \(s^{u}\). Of the 1130 total observations, 539 have a duration of 3 or more and have an observed gap statistic. The gap statistic for the remaining 591 observations was imputed. As stated above, the unobserved part is the imputed, or filled in, based on the observed part \(s^{o}\). Because sampling varies between 0 and 1, I chose to model it as a Beta regression with matrix \(W\) being a \(N \times (D - 1)\) matrix of covariates (i.e. geographic range size, environmental preference, body size) as predictors of sampling; this assumes that the sampling value for all taxa come from the same distribution. Importantly, I make no assumptions of causal structure. 
+The vector sampling \(s\) has two parts: the observed part \(s^{o}\), and the unobserved part \(s^{u}\). Of the 1130 total observations, 539 have a duration of 3 or more and have an observed gap statistic. The gap statistic for the remaining 591 observations was imputed. As stated above, the unobserved part is the imputed, or filled in, based on the observed part \(s^{o}\). Because sampling varies between 0 and 1, I chose to model it as a Beta regression with matrix \(W\) being a \(N \times (D - 3)\) matrix of covariates (i.e. geographic range size, environmental preference, body size; no interactions) as predictors of sampling; this assumes that the sampling value for all taxa come from the same distribution. Importantly, I make no assumptions of causal structure. 
 
 Predicting sampling probability using the other covariate that are then included in the model of duration is acceptable and appropriate in the case of imputation where the sample goal is accurate prediction \citep{Rubin1996,Gelman2007}. Not including these covariates can lead to biased estimates of the imputed variable; if the covariates themselves are related, not including them will bias this correlation towards zero which then leads to improper imputation and inference \citep{Rubin1996}.
 
@@ -185,34 +196,8 @@ The next step is to then estimate \(s^{u} | s^{o}, X^{o}, X^{u}, \gamma\), the p
 \end{equation}
 
 
-%The above model is for all taxa and does not include sampling as a covariate. In order to determine if sampling is acting as a confounding factor in this analysis, an additional model was developed because sampling was only estimated for taxa with a duration of three or more which creates a left-truncated distribution of durations \citep{Klein2003}. The sampling statement and log-probability for a left-truncated Weibull distribution, truncated at time \(Y\) (e.g. three), is
-%\begin{equation}
-%  \begin{aligned}
-%    p(y | \theta) &= \frac{\mathrm{Weibull}(y, \alpha, \sigma)}{1 - \mathrm{Weibull}_{cdf}(Y, \alpha, \sigma)} \\
-%    &= \frac{\mathrm{Weibull}(y, \alpha, \sigma)}{\mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)} \\
-%    \log(p(y | \theta)) &= \log(\mathrm{Weibull}(y, \alpha, \sigma)) - \log(\mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)).
-%  \end{aligned}
-%  \label{eq:trunc}
-%\end{equation}
-%Note that cdf stands for cumulative distribution function and ccdf is the complementary cumulative distribution function.
-%
-%The definition of \(\sigma\) (Eq. \ref{eq:sigma}) is then updated so that \(X\), the matrix of covariates, and \(B\), the matrix of regression coefficients, now include an additional column for the sampling estimates and the cohort-specific effects of sampling. This addition then modifies the dimensions of \(\mu\) and \(\Sigma\); the new group-level effect of \(\mu^{s}\) is given a weakly informative prior: \(\mu^{s} \sim \mathcal{N}(0, 1)\).
-%
-%For this left-truncated model, I've excluded one observation that is right-censored with a duration equal to the truncation time; the second line of equation \ref{eq:trunc} becomes \(p(y | \theta) = \mathrm{Weibull}_{ccdf}(y, \alpha, \sigma) / \mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)\) which yields a log-probability of 0.
-
-
 \subsection{Posterior inference and posterior predictive checks}
 The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 steps each, split half warm-up and half sampling and thinned to every 10th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
-
-% edit, relab, and impute can all be compared using WAIC/PSIS-LOO
-%   highgrade cannot
-%The fit of the above model (the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling as a covariate, or both constant \(\alpha\) and no sampling covariate. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling (PSIS-LOO) \citep{Vehtari2015}. Both of these are estimates of the out-of-sample predictive accuracy or the expected quality of fit of the model to new data. 
-%
-%WAIC is a more fully Bayesian alternative to AIC or DIC \citep{Watanabe2010a,Gelman2013d}; comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. Note that BIC is not an estimate of out-of-sample predictive accuracy \citep{Gelman2013d}. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
-%
-%PSIS-LOO is similar to WAIC in that it is an approxmiation of out-of-sample predictive accuracy except its calculation is completely different \citep{Vehtari2015,Vehtari2015a}. Models comparison is done using a leave-one-out crossvalidation information criterion (LOOIC), which is simply the PSIS-LOO estimate multiplied by -2 so that it is on the deviance scale. As with WAIC, models with lower values of LOOIC are expected to have a greater out-of-sample predictive accuracy than models with greater values.
-%
-%Calcuations of WAIC and PSIS-LOO for a model fit using Stan were done using the R package ``loo'' \citep{loo}. See \citet{Vehtari2015a} for detailed explinations of the calucations for both WAIC and PSIS-LOO.
 
 Model adequacy was evaluated using a couple of posterior predictive checks. Posterior predictive checks are a means for understanding model fit or adequacy where the basic idea is that replicated data sets simulated from the fitted model should be similar to the original data and systematic differences between the simulations and observations indicate weaknesses of the model fit \citep{Gelman2013d}. For both approaches used here, each posterior predictive datasets were generated from a unique draw from the posterior distribution of each parameter. The two posterior predictive checks used in this analysis are a comparison of a non-parametric estimate of the survival function \(S(t)\) from the empirical dataset to the non-parametric estimates of \(S(t)\) from the 100 posterior predictive datasets, and comparison of the observed genus durations to the average posterior predictive estimate of \(\log(\sigma)\) (Eq. \ref{eq:sigma}). The former is to see if simulated data has a similar survival pattern to the observed, while the latter is to see if the model systematically over- or under- estimates taxon survival.
 
