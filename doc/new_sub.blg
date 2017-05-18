@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: new_sub.aux
+The style file: evolution.bst
+Database file #1: newbib.bib
+Database file #2: packages.bib
+Warning--I didn't find a database entry for "Stadler2011"
+Warning--I didn't find a database entry for "stan-manual:2014"
+You've used 98 entries,
+            2892 wiz_defined-function locations,
+            1235 strings with 19708 characters,
+and the built_in function-call counts, 56074 in all, are:
+= -- 4868
+> -- 2328
+< -- 72
++ -- 773
+- -- 674
+* -- 3693
+:= -- 9043
+add.period$ -- 299
+call.type$ -- 98
+change.case$ -- 706
+chr.to.int$ -- 97
+cite$ -- 98
+duplicate$ -- 4016
+empty$ -- 4313
+format.name$ -- 933
+if$ -- 11312
+int.to.chr$ -- 2
+int.to.str$ -- 1
+missing$ -- 810
+newline$ -- 497
+num.names$ -- 394
+pop$ -- 1492
+preamble$ -- 1
+purify$ -- 616
+quote$ -- 0
+skip$ -- 1338
+stack$ -- 0
+substring$ -- 3254
+swap$ -- 1759
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 852
+warning$ -- 0
+while$ -- 460
+width$ -- 0
+write$ -- 1273
+(There were 2 warnings)

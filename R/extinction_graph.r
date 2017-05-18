@@ -393,13 +393,12 @@ quad.mean <- function(x, y, mcoef) {
      # depends on if alpha varies by cohort
 }
 
-
-sam <- sample(nrow(wei.fit$lp__), 1000)
 rang <- c(data$occupy)
 val2 <- quantile(rang, c(0.2, 0.5, 0.8)) # very important variable for all plots that follow!
 # need to loop through each value and make a diff plot for each
 
 for(zz in seq(length(val2))) {
+  sam <- sample(nrow(wei.fit$lp__), 1000)
 
   # HERE
   env.d <- c(data$env)
