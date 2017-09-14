@@ -396,6 +396,7 @@ quad.mean <- function(x, y, mcoef) {
 rang <- c(data$occupy)
 val2 <- quantile(rang, c(0.2, 0.5, 0.8)) # very important variable for all plots that follow!
 # need to loop through each value and make a diff plot for each
+type <- c('low', 'med', 'high')
 
 for(zz in seq(length(val2))) {
   sam <- sample(nrow(wei.fit$lp__), 1000)
@@ -432,7 +433,7 @@ for(zz in seq(length(val2))) {
                               y = 'log(approx. expected duration in t)')
   #y = expression(paste('log(', sigma, ')')))
   mustache <- mustache + theme(axis.title.x = element_text(hjust = 0.5))
-  ggsave(mustache, filename = paste0('../doc/figure/env_effect_', zz, '.pdf'),
+  ggsave(mustache, filename = paste0('../doc/figure/env_effect_', type[zz], '.pdf'),
                                      width = 6, height = 5, dpi = 600)
 
 
@@ -496,14 +497,14 @@ for(zz in seq(length(val2))) {
                             y = 'log(approx. expected duration in t)')
   #y = expression(paste('log(', sigma, ')')))
   ggsave(cohmust, 
-         filename = paste0('../doc/figure/env_cohort_', zz, '.pdf'),
+         filename = paste0('../doc/figure/env_cohort_', type[zz], '.pdf'),
          width = 7.5, height = 8, dpi = 600)
   ggsave(cohmust, 
-         filename = paste0('../doc/figure/env_cohort_wide_', zz, '.pdf'),
+         filename = paste0('../doc/figure/env_cohort_wide_', type[zz], '.pdf'),
          width = 9.5, height = 8, dpi = 600)
   cohmust.short <- cohmust %+% coh.df.short
   cohmust.short <- cohmust.short + theme(strip.text = element_text(size = 12))
   ggsave(cohmust.short, 
-         filename = paste0('../doc/figure/env_cohort_short_', zz, '.pdf'),
+         filename = paste0('../doc/figure/env_cohort_short_', type[zz], '.pdf'),
          width = 10, height = 5, dpi = 600)
 }
