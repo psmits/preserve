@@ -166,6 +166,8 @@ transformed parameters {
   real<lower=0> bet[N];
   real<lower=0,upper=1> samp[N];
   
+  vector[N] hold;  // actual scale param for weibull
+  
   // other misc transformations
   alpha = exp(alpha_trans);
   Sigma = quad_form_diag(Omega, sigma);
@@ -187,9 +189,20 @@ transformed parameters {
   // combining data and parameters
   samp[obs_ord] = samp_obs;
   samp[imp_ord] = samp_imp;
+  
+  // accumulate scale parameter
+  for(i in 1:N) {
+    hold[i] = exp(-(beta[cohort[i], 1] + 
+          beta[cohort[i], 2] * occupy[i] + 
+          beta[cohort[i], 3] * env[i] + 
+          beta[cohort[i], 4] * (env[i]^2) +
+          beta[cohort[i], 5] * (occupy[i] * env[i]) +
+          beta[cohort[i], 6] * (occupy[i] * (env[i]^2)) +
+          beta[cohort[i], 7] * leng[i] +
+          delta * samp[i])/ alpha);
+  }
 }
 model {
-  vector[N] hold;
   
   alpha_trans ~ normal(0, 1);
 
@@ -217,16 +230,6 @@ model {
   samp_imp ~ beta(alp[imp_ord], bet[imp_ord]);
   // this is creating a log(0) situation...
 
-  for(i in 1:N) {
-    hold[i] = exp(-(beta[cohort[i], 1] + 
-          beta[cohort[i], 2] * occupy[i] + 
-          beta[cohort[i], 3] * env[i] + 
-          beta[cohort[i], 4] * (env[i]^2) +
-          beta[cohort[i], 5] * (occupy[i] * env[i]) +
-          beta[cohort[i], 6] * (occupy[i] * (env[i]^2)) +
-          beta[cohort[i], 7] * leng[i] +
-          delta * samp[i])/ alpha);
-  }
 
   // likelihood / sampling statements
   for(i in 1:N) {
@@ -240,36 +243,25 @@ model {
 generated quantities {
   vector[N] log_lik;
   vector[N] y_tilde;
-  vector[N] hold;
   vector[N] survival_est;
   vector[N] hazard_est;
   real o;
 
   for(i in 1:N) {
-    hold[i] = exp(-(beta[cohort[i], 1] +
-          beta[cohort[i], 2] * occupy[i] +
-          beta[cohort[i], 3] * env[i] + 
-          beta[cohort[i], 4] * (env[i]^2) +
-          beta[cohort[i], 5] * (occupy[i] * env[i]) +
-          beta[cohort[i], 6] * (occupy[i] * (env[i]^2)) +
-          beta[cohort[i], 7] * leng[i] + 
-          delta * samp[i]) / alpha);
-  }
 
-  // log_lik
-  for(i in 1:N) {
+    // survival probability and hazard "rate"
     survival_est[i] = discrete_weibull_survival(dur[i], alpha, hold[i]);
     hazard_est[i] = discrete_weibull_hazard(dur[i], alpha, hold[i]);
+   
+    // log-likelihood calculation
     if(censored[i] == 0) {
       log_lik[i] = discrete_weibull_lpmf(dur[i] | alpha, hold[i]);
     } else {
       o = 1 - exp(-((dur[i] + 1) / alpha) ^ hold[i]);
       log_lik[i] = log(1 - o);
     }
-  }
-
-  // posterior predictive simulations
-  for(i in 1:N) {
+    
+    // posterior predictive simulations
     y_tilde[i] = discrete_weibull_rng(alpha, hold[i]);
   }
 }
