@@ -6,7 +6,7 @@ for f in $FILES;
 do
   for i in `seq 1 4`;
   do
-    ../stan/survival_impute \
+    ../stan/survival_disc_weibull \
       sample num_samples=5000 num_warmup=5000 thin=5 \
       id=$i \
       init=0 \
