@@ -85,6 +85,43 @@ functions {
 
     return o;
   }
+
+  /**
+   * Quantile function for discrete Weibull distribution
+   * 
+   * @param p real value 0 <= p <= 1
+   * @param alpha scale parameter > 0
+   * @param beta scale parameter > 0
+   * @return quantile value from discrete weibull distribution 
+   */
+  real discrete_weibull_quantile(real p, real alpha, real beta) {
+    real o;
+    real q;
+
+    q = exp(-(alpha) ^ (-(beta)));
+
+    o = ceil((log(1 - p) / log(q)) ^ (1 / beta));
+
+    return o;
+  }
+
+  /**
+   * RNG function for discrete Weibull distribution
+   * 
+   * @param alpha scale parameter > 0
+   * @param beta scale parameter > 0
+   * @return random value from discrete weibull distribution 
+   */
+  real discrete_weibull_rng(real alpha, real beta) {
+    real o;
+    real u;
+
+    u = uniform_rng(0, 1);
+
+    o = discrete_weibull_quantile(u, alpha, beta);
+
+    return o;
+  }
 }
 data {
   int N;  // number of samples
@@ -200,37 +237,39 @@ model {
     }
   }
 }
-//generated quantities {
-//  vector[N] log_lik;
-//  vector[N] y_tilde;
-//  vector[N] hold;
-//
-//  for(i in 1:N) {
-//    hold[i] = exp(-(beta[cohort[i], 1] +
-//          beta[cohort[i], 2] * occupy[i] +
-//          beta[cohort[i], 3] * env[i] + 
-//          beta[cohort[i], 4] * (env[i]^2) +
-//          beta[cohort[i], 5] * (occupy[i] * env[i]) +
-//          beta[cohort[i], 6] * (occupy[i] * (env[i]^2)) +
-//          beta[cohort[i], 7] * leng[i] + 
-//          delta * samp[i]) / alpha);
-//  }
-//
-//  // log_lik
-//  for(i in 1:N) {
-//    if(censored[i] == 0) {
-//      if(dur[i] == 1) {
-//        log_lik[i] = weibull_lcdf(dur[i] | alpha, hold[i]);
-//      } else {
-//        log_lik[i] = weibull_lpdf(dur[i] | alpha, hold[i]);
-//      }
-//    } else {
-//      log_lik[i] = weibull_lccdf(dur[i] | alpha, hold[i]);
-//    }
-//  }
-//
-//  // posterior predictive simulations
-//  for(i in 1:N) {
-//    y_tilde[i] = weibull_rng(alpha, hold[i]);
-//  }
-//}
+generated quantities {
+  vector[N] log_lik;
+  vector[N] y_tilde;
+  vector[N] hold;
+  vector[N] survival_est;
+  vector[N] hazard_est;
+  real o;
+
+  for(i in 1:N) {
+    hold[i] = exp(-(beta[cohort[i], 1] +
+          beta[cohort[i], 2] * occupy[i] +
+          beta[cohort[i], 3] * env[i] + 
+          beta[cohort[i], 4] * (env[i]^2) +
+          beta[cohort[i], 5] * (occupy[i] * env[i]) +
+          beta[cohort[i], 6] * (occupy[i] * (env[i]^2)) +
+          beta[cohort[i], 7] * leng[i] + 
+          delta * samp[i]) / alpha);
+  }
+
+  // log_lik
+  for(i in 1:N) {
+    survival_est[i] = discrete_weibull_survival(dur[i], alpha, hold[i]);
+    hazard_est[i] = discrete_weibull_hazard(dur[i], alpha, hold[i]);
+    if(censored[i] == 0) {
+      log_lik[i] = discrete_weibull_lpmf(dur[i] | alpha, hold[i]);
+    } else {
+      o = 1 - exp(-((dur[i] + 1) / alpha) ^ hold[i]);
+      log_lik[i] = log(1 - o);
+    }
+  }
+
+  // posterior predictive simulations
+  for(i in 1:N) {
+    y_tilde[i] = discrete_weibull_rng(alpha, hold[i]);
+  }
+}
