@@ -6,12 +6,25 @@ for f in $FILES;
 do
   for i in `seq 1 4`;
   do
-    ../stan/survival_disc_weibull \
-      sample num_samples=5000 num_warmup=5000 thin=5 \
+    ../stan/survival_geometric \
+      sample num_samples=1000 num_warmup=1000 thin=1 \
       id=$i \
       init=0 \
       data file=$f \
-      output file=../data/mcmc_out/faun_impute_${i}.csv &
+      output file=../data/mcmc_out/faun_geometric_${i}.csv &
+  done
+  wait
+done
+for f in $FILES;
+do
+  for i in `seq 1 4`;
+  do
+    ../stan/survival_disc_weibull \
+      sample num_samples=1000 num_warmup=1000 thin=5 \
+      id=$i \
+      init=0 \
+      data file=$f \
+      output file=../data/mcmc_out/faun_dweibull_${i}.csv &
   done
   wait
 done

@@ -147,10 +147,10 @@ parameters {
   real alpha_trans;
 
   // regression coefficients
-  vector[7] mu_prior;
-  vector[7] beta[O];  // cohort coef 
-  corr_matrix[7] Omega;
-  vector<lower=0>[7] sigma; 
+  vector[6] mu_prior;
+  vector[6] beta[O];  // cohort coef 
+  corr_matrix[6] Omega;
+  vector<lower=0>[6] sigma; 
 
   real delta;
   vector[4] gamma;
@@ -159,7 +159,7 @@ parameters {
 }
 transformed parameters {
   real<lower=0> alpha;
-  cov_matrix[7] Sigma;
+  cov_matrix[6] Sigma;
 
   real<lower=0,upper=1> phi[N];  // beta mean
   real<lower=0> alp[N];
@@ -192,19 +192,18 @@ transformed parameters {
   
   // accumulate scale parameter
   for(i in 1:N) {
-    hold[i] = exp(-(beta[cohort[i], 1] + 
+    hold[i] = exp(beta[cohort[i], 1] + 
           beta[cohort[i], 2] * occupy[i] + 
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
           beta[cohort[i], 5] * (occupy[i] * env[i]) +
-          beta[cohort[i], 6] * (occupy[i] * (env[i]^2)) +
-          beta[cohort[i], 7] * leng[i] +
-          delta * samp[i])/ alpha);
+          beta[cohort[i], 6] * leng[i] +
+          delta * samp[i]);
   }
 }
 model {
   
-  alpha_trans ~ normal(0, 1);
+  alpha_trans ~ normal(0, 0.5);
 
   // regression coefficients
   Omega ~ lkj_corr(2);
@@ -213,9 +212,8 @@ model {
   mu_prior[2] ~ normal(-1, 1);
   mu_prior[3] ~ normal(0, 1);
   mu_prior[4] ~ normal(1, 1);
-  mu_prior[5] ~ normal(0, 1);
-  mu_prior[6] ~ normal(0, 1);
-  mu_prior[7] ~ normal(0, 1);
+  mu_prior[5] ~ normal(0, 0.5);
+  mu_prior[6] ~ normal(0, 0.5);
   delta ~ normal(0, 1);
 
   for(i in 1:O) {
@@ -245,22 +243,23 @@ generated quantities {
   vector[N] y_tilde;
   vector[N] survival_est;
   vector[N] hazard_est;
-  real o;
 
   for(i in 1:N) {
-
     // survival probability and hazard "rate"
     survival_est[i] = discrete_weibull_survival(dur[i], alpha, hold[i]);
     hazard_est[i] = discrete_weibull_hazard(dur[i], alpha, hold[i]);
-   
+
     // log-likelihood calculation
-    if(censored[i] == 0) {
-      log_lik[i] = discrete_weibull_lpmf(dur[i] | alpha, hold[i]);
-    } else {
-      o = 1 - exp(-((dur[i] + 1) / alpha) ^ hold[i]);
-      log_lik[i] = log(1 - o);
+    {
+      real o;
+      if(censored[i] == 0) {
+        log_lik[i] = discrete_weibull_lpmf(dur[i] | alpha, hold[i]);
+      } else {
+        o = 1 - exp(-((dur[i] + 1) / alpha) ^ hold[i]);
+        log_lik[i] = log(1 - o);
+      }
     }
-    
+
     // posterior predictive simulations
     y_tilde[i] = discrete_weibull_rng(alpha, hold[i]);
   }

@@ -36,12 +36,12 @@ data <- read_rdump('../data/data_dump/impute_info.data.R')
 
 pat <- 'faun_'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
+
 ids <- rep(1:(length(outs) / 4), each = 4)
 outs <- split(outs, ids)
 
-wfit <- read_stan_csv(outs[[2]])
+wfit <- read_stan_csv(outs[[1]])
 wei.fit <- rstan::extract(wfit, permuted = TRUE)
-wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 100), ]
 #wfit <- llply(outs[-1], read_stan_csv)
 #log.liks <- llply(wfit, extract_log_lik)
 #
@@ -111,27 +111,26 @@ ggsave(imp.gg, filename = '../doc/figure/imputation_compare.pdf',
 
 
 # lets make survival curves
-# HERE
+# non-parametric estimate of the survival curve just given durations
+#   some durations are left-censored
 condition <- (data$censored == 0) * 1
-condition[duration == 1 & condition == 1] <- 2
+emp.surv <- survfit(Surv(time = duration, event = condition, type = 'left') ~ 1)
+emp.surv <- data.frame(time = emp.surv$time, surv = emp.surv$surv, 
+                       lower = emp.surv$lower, upper = emp.surv$upper)
 
-emp.surv <- survfit(Surv(time = duration, time2 = duration, 
-                         event = condition, type = 'interval') ~ 1)
-emp.surv <- data.frame(cbind(time = emp.surv$time, surv = emp.surv$surv))
-emp.surv <- rbind(c(0, 1), emp.surv)
-
-# weibull model
+# i have two ways of estimating the survival functions from posterior
+#   actual S(t) estimates
+#   estimated durations under discrete Weibull
+wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 100), ]
 wei.surv <- apply(wr, 1, function(x) survfit(Surv(x) ~ 1))
 wei.surv <- llply(wei.surv, function(x) {
                   y <- data.frame(time = x$time, surv = x$surv)
-                  y <- rbind(c(0, 1), y[-nrow(y), ])
                   y})
 wei.surv <- Reduce(rbind, Map(function(x, y) {
                               x$group <- y
                               x}, 
                               x = wei.surv, 
                               y = seq(length(wei.surv))))
-wei.surv$label <- 'Weibull'
 # naming/legacy code issue
 sim.surv <- wei.surv
 
@@ -141,12 +140,14 @@ surv.plot <- surv.plot + geom_line(data = sim.surv,
                                    aes(x = time, y = surv, group = group),
                                    colour = 'black', alpha = 0.05)
 surv.plot <- surv.plot + geom_line(colour = 'blue', size = 1.2)
-surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration) + 2))
+surv.plot <- surv.plot + geom_ribbon(mapping = aes(ymin = lower, ymax = upper), 
+                                     fill = 'blue', size = 1.2, alpha = 0.3)
+surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration)))
 surv.plot <- surv.plot + labs(x = 'Duration (t)', 
                               y = 'Pr(t < T)')
 surv.plot <- surv.plot + theme(axis.title = element_text(size = 25))
-surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans(),
-                                            breaks = c(0.01, 0.1, 0.5, 1))
+#surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans(),
+#                                            breaks = c(0.01, 0.1, 0.5, 1))
 ggsave(surv.plot, filename = '../doc/figure/survival_curves.pdf',
        width = 6, height = 5, dpi = 600)
 
@@ -375,7 +376,7 @@ quad <- function(x, y, sam) {
          (wei.fit$mu_prior[sam, 3] * x) + 
          (wei.fit$mu_prior[sam, 4] * x^2) +
          (wei.fit$mu_prior[sam, 5] * (x * y)) + 
-         (wei.fit$mu_prior[sam, 6] * (x^2 * y))
+         #(wei.fit$mu_prior[sam, 6] * (x^2 * y))
   #if(!(best %in% 1:2)) {
   #  -(bet) / exp(wei.fit$alpha_mu[sam])  # depends on if alpha varies by cohort
   #} else {
@@ -387,8 +388,8 @@ quad.mean <- function(x, y, mcoef) {
   #  -(mcoef[1] + (mcoef[2] * x) + (mcoef[3] * x^2)) / exp(mean(wei.fit$alpha_mu[sam]))
   #} else {
   -(mcoef[1] + (mcoef[2] * y) + (mcoef[3] * x) + (mcoef[4] * x^2) + 
-    (mcoef[5] * (x * y)) + (mcoef[6] * (x^2 * y))) / 
-     exp(mean(wei.fit$alpha_trans[sam]))
+    (mcoef[5] * (x * y)) #+ (mcoef[6] * (x^2 * y))
+  ) / exp(mean(wei.fit$alpha_trans[sam]))
      #}
      # depends on if alpha varies by cohort
 }
@@ -399,7 +400,8 @@ val2 <- quantile(rang, c(0.2, 0.5, 0.8)) # very important variable for all plots
 type <- c('low', 'med', 'high')
 
 for(zz in seq(length(val2))) {
-  sam <- sample(nrow(wei.fit$lp__), 1000)
+  #sam <- sample(nrow(wei.fit$lp__), 1000)
+  sam <- sample(length(wei.fit$lp__))
 
   # HERE
   env.d <- c(data$env)
