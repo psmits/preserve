@@ -72,7 +72,6 @@ transformed parameters {
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
           beta[cohort[i], 5] * (occupy[i] * env[i]) +
-          //beta[cohort[i], 6] * (occupy[i] * (env[i]^2)) +
           beta[cohort[i], 6] * leng[i] +
           delta * samp[i])/ alpha);
   }

@@ -223,10 +223,10 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   efbeta.df <- Reduce(rbind, efbeta.h)
   if(npred == 6) {
     too <- c('intensity', 'range', 'env_pref', 'env_curv', 
-             'rxe', 'rxe2', 'size', 'delta')[seq(npred)]
+             'rxe', 'size', 'delta')[seq(npred)]
   } else if(npred == 5) {
-    too <- c('intensity', 'range', 'env_pref', 'env_curv', 'rxe', 'size', 
-             'delta')[seq(npred)]
+    too <- c('intensity', 'range', 'env_pref', 'env_curv', 
+             'size', 'delta')[seq(npred)]
   }
   #too <- c('beta^0', 'beta^r', 'beta^v', 'beta^v^2', 'beta^m', 
   #         'delta')[seq(npred)]
@@ -274,20 +274,20 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   quad <- function(x, y, sam, npred) {
     bet <- wei.fit$mu_prior[sam, 1]
     if(npred == 6) {
-      bet <- bet + (wei.fit$mu_prior[sam, 2] * y) +
-        (wei.fit$mu_prior[sam, 3] * x) + 
-        (wei.fit$mu_prior[sam, 4] * x^2) +
-        (wei.fit$mu_prior[sam, 5] * (x * y))
+      bet <- -(bet + (wei.fit$mu_prior[sam, 2] * y) +
+               (wei.fit$mu_prior[sam, 3] * x) + 
+               (wei.fit$mu_prior[sam, 4] * x^2) +
+               (wei.fit$mu_prior[sam, 5] * (x * y)))
     } else if (npred == 5) {
-      bet <- bet + (wei.fit$mu_prior[sam, 2] * y) +
-        (wei.fit$mu_prior[sam, 3] * x) + 
-        (wei.fit$mu_prior[sam, 4] * x^2)
+      bet <- -(bet + (wei.fit$mu_prior[sam, 2] * y) +
+               (wei.fit$mu_prior[sam, 3] * x) + 
+               (wei.fit$mu_prior[sam, 4] * x^2))
     }
     # + (wei.fit$mu_prior[sam, 6] * (x^2 * y))
     #if(!(best %in% 1:2)) {
     #  -(bet) / exp(wei.fit$alpha_mu[sam])  # depends on if alpha varies by cohort
     #} else {
-    -(bet) / exp(wei.fit$alpha_trans[sam])  # depends on if alpha varies by cohort
+    bet / wei.fit$alpha[sam]  # depends on if alpha varies by cohort
     #}
   }
   quad.mean <- function(x, y, mcoef, npred) {
@@ -300,7 +300,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
     } else if(npred == 5) {
       bet <- -(mcoef[1] + (mcoef[2] * y) + (mcoef[3] * x) + (mcoef[4] * x^2))
     }
-    bet / exp(mean(wei.fit$alpha_trans[sam]))
+    bet / mean(wei.fit$alpha[sam])
   }
 
   rang <- c(data$occupy)
@@ -364,7 +364,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
     sam2 <- sam[1:100]
     if(npred == 6) {
       bet.coh <- wei.fit$beta[sam2, , c(1, 2, 3, 4, 5)]
-    } else if(nrped == 5) {
+    } else if(npred == 5) {
       bet.coh <- wei.fit$beta[sam2, , c(1, 2, 3, 4)]
     }
     #if(!(best %in% 1:2)) {

@@ -47,45 +47,55 @@ sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
 
 data <- read_rdump('../data/data_dump/impute_info.data.R')
 
-pat <- 'faun_'
+pat <- 'surv_'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 
 ids <- rep(1:(length(outs) / 4), each = 4)
 outs <- split(outs, ids)
 
-#log.liks <- llply(wfit, extract_log_lik)
-## this will need to be updated with number of models
-#loo.est <- llply(log.liks, loo)
-#loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], loo.est[[3]])
-#
-## this will need to be updated with number of models
-#waic.est <- llply(log.liks, waic)
-#waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], waic.est[[3]])
+# simple comparison of fits
+fits <- llply(outs, read_stan_csv)
+log.lik <- llply(fits, extract_log_lik)
+loo.est <- llply(log.lik, loo)
+waic.est <- llply(log.lik, waic)
+
+# comparison tables
+loo.tab <- loo::compare(loo.est[[1]], loo.est[[2]], 
+                        loo.est[[3]], loo.est[[4]])
+waic.tab <- loo::compare(waic.est[[1]], waic.est[[2]], 
+                         waic.est[[3]], waic.est[[4]])
+mn <- c('continuous Weibull \\nw/o interaction', 
+        'continuous Weibull \\nw/ interaction', 
+        'discrete Weibull \\nw/o interaction',
+        'discrete Weibull \\nw/ interaction')
+rownames(loo.tab) <- rownames(waic.tab) <- mn
 
 
 # move on to the plots
+# all the plots for all the models
+# allows full comparison between model fits and estimates
 
 # plots for when there is interaction
 npred <- 6
 # continuous weibull
-wfit <- read_stan_csv(outs[[3]])
-wei.fit <- rstan::extract(wfit, permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, npred = npred, name = 'cweib')
+wei.fit <- rstan::extract(fits[[2]], permuted = TRUE)
+posterior.plots(data = data, wei.fit = wei.fit, 
+                npred = npred, name = 'cweib_inter')
 
 # discrete weibull
-wfit <- read_stan_csv(outs[[1]])
-wei.fit <- rstan::extract(wfit, permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, npred = npred, name = 'dweib')
+wei.fit <- rstan::extract(fits[[4]], permuted = TRUE)
+posterior.plots(data = data, wei.fit = wei.fit, 
+                npred = npred, name = 'dweib_inter')
 
 
-## plots for when there is no interaction
-#npred <- 5
-## continuous weibull
-#wfit <- read_stan_csv(outs[[3]])
-#wei.fit <- rstan::extract(wfit, permuted = TRUE)
-#posterior.plots(data = data, wei.fit = wei.fit, npred = npred, name = 'cweib')
-#
-## discrete weibull
-#wfit <- read_stan_csv(outs[[3]])
-#wei.fit <- rstan::extract(wfit, permuted = TRUE)
-#posterior.plots(data = data, wei.fit = wei.fit, npred = npred, name = 'dweib')
+# plots for when there is no interaction
+npred <- 5
+# continuous weibull
+wei.fit <- rstan::extract(fits[[1]], permuted = TRUE)
+posterior.plots(data = data, wei.fit = wei.fit, 
+                npred = npred, name = 'cweib_base')
+
+# discrete weibull
+wei.fit <- rstan::extract(fits[[3]], permuted = TRUE)
+posterior.plots(data = data, wei.fit = wei.fit, 
+                npred = npred, name = 'dweib_base')
