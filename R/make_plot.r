@@ -377,7 +377,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
     if(npred == 6) {
       dat <- cbind(1, val2[zz], val, val^2, val * val2[zz])
     } else if(npred == 5) {
-      dat <- cbind(1, val2[zz], val, val^2,)
+      dat <- cbind(1, val2[zz], val, val^2)
     }
 
     coh.est <- list()

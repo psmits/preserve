@@ -64,10 +64,10 @@ loo.tab <- loo::compare(loo.est[[1]], loo.est[[2]],
                         loo.est[[3]], loo.est[[4]])
 waic.tab <- loo::compare(waic.est[[1]], waic.est[[2]], 
                          waic.est[[3]], waic.est[[4]])
-mn <- c('continuous Weibull \\nw/o interaction', 
-        'continuous Weibull \\nw/ interaction', 
-        'discrete Weibull \\nw/o interaction',
-        'discrete Weibull \\nw/ interaction')
+mn <- c('continuous Weibull w/ interaction', 
+        'continuous Weibull w/o interaction', 
+        'discrete Weibull w/ interaction',
+        'discrete Weibull w/o interaction')
 rownames(loo.tab) <- rownames(waic.tab) <- mn
 
 

@@ -1,0 +1,262 @@
+\begin{thebibliography}{46}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+
+\bibitem[{Alexander(1977)}]{Alexander1977}
+Alexander, R.~R., 1977.
+\newblock {Generic longevity of articulate brachiopods in relation to the mode
+  of stabilization on the substrate}.
+\newblock Palaeogeography, Palaeoclimatology, Palaeoecology 21:209--226.
+
+\bibitem[{Alroy(2010)}]{Alroy2010}
+Alroy, J., 2010.
+\newblock {The Shifting Balance of Diversity Among Major Marine Animal Groups}.
+\newblock Science 329:1191--1194.
+
+\bibitem[{Baumiller(1993)}]{Baumiller1993}
+Baumiller, T.~K., 1993.
+\newblock {Survivorship analysis of Paleozoic Crinoidea: effect of filter
+  morphology on evolutionary rates}.
+\newblock Paleobiology 19:304--321.
+
+\bibitem[{Cooper(1984)}]{Cooper1984}
+Cooper, W.~S., 1984.
+\newblock {Expected time to extinction and the concept of fundamental fitness}.
+\newblock Journal of Theoretical Biology 107:603--629.
+
+\bibitem[{Felsenstein(1985)}]{Felsenstein1985b}
+Felsenstein, J., 1985.
+\newblock {Phylogenies and the comparative method}.
+\newblock American Naturalist 125:1--15.
+
+\bibitem[{Foote(1988)}]{Foote1988}
+Foote, M., 1988.
+\newblock {Survivorship analysis of Cambrian and Ordovician Trilobites}.
+\newblock Paleobiology 14:258--271.
+
+\bibitem[{Foote(2000)}]{Foote2000a}
+---{}---{}---, 2000.
+\newblock {Origination and extinction components of taxonomic diversity:
+  Paleozoic and post-Paleozoic dynamics}.
+\newblock Paleobiology 26:578--605.
+
+\bibitem[{Foote and Miller(2013)}]{Foote2013}
+Foote, M. and A.~I. Miller, 2013.
+\newblock {Determinants of early survival in marine animal genera}.
+\newblock Paleobiology 39:171--192.
+
+\bibitem[{Gelman et~al.(2013)Gelman, Carlin, Stern, Dunson, Vehtari, and
+  Rubin}]{Gelman2013d}
+Gelman, A., J.~B. Carlin, H.~S. Stern, D.~B. Dunson, A.~Vehtari, and D.~B.
+  Rubin, 2013.
+\newblock {Bayesian data analysis}.
+\newblock 3 ed. Chapman and Hall, Boca Raton, FL.
+
+\bibitem[{Gelman and Hill(2007)}]{Gelman2007}
+Gelman, A. and J.~Hill, 2007.
+\newblock {Data Analysis using Regression and Multilevel/Hierarchical Models}.
+\newblock Cambridge University Press, New York, NY.
+
+\bibitem[{Harnik et~al.(2013)Harnik, Simpson, and Payne}]{Harnik2013}
+Harnik, P.~G., C.~Simpson, and J.~L. Payne, 2013.
+\newblock {Long-term differences in extinction risk among the seven forms of
+  rarity}.
+\newblock Proceedings of the Royal Society B: Biological Sciences 282.
+
+\bibitem[{Hijmans(2015)}]{raster}
+Hijmans, R.~J., 2015.
+\newblock raster: Geographic data analysis and modeling.
+\newblock \urlprefix\url{http://CRAN.R-project.org/package=raster}.
+\newblock R package version 2.3-24.
+
+\bibitem[{Hoffman and Gelman(2014)}]{Hoffman2014}
+Hoffman, M.~D. and A.~Gelman, 2014.
+\newblock {The No-U-Turn Sampler: Adaptively Setting Path Lengths in
+  Hamiltonian Monte Carlo}.
+\newblock Journal of Machine Learning Research 15:1351--1381.
+
+\bibitem[{Housworth et~al.(2004)Housworth, Martins, and Lynch}]{Housworth2004}
+Housworth, E.~A., P.~Martins, and M.~Lynch, 2004.
+\newblock {The Phylogenetic Mixed Model}.
+\newblock The American Naturalist 163:84--96.
+
+\bibitem[{Hunt et~al.(2005)Hunt, Roy, and Jablonski}]{Hunt2005b}
+Hunt, G., K.~Roy, and D.~Jablonski, 2005.
+\newblock {Species-level heritability reaffirmed: a comment on "On the
+  heritability of geographic range sizes"}.
+\newblock American Naturalist 166:129--135.
+
+\bibitem[{Jablonski(1986)}]{Jablonski1986}
+Jablonski, D., 1986.
+\newblock {Background and mass extincitons: the alternation of
+  macroevolutionary regimes}.
+\newblock Science 231:129--133.
+
+\bibitem[{Jablonski(1987)}]{Jablonski1987}
+---{}---{}---, 1987.
+\newblock {Heritability at the species level: analysis of geographic ranges of
+  cretaceous mollusks.}
+\newblock Science 238:360--363.
+
+\bibitem[{Jablonski and Roy(2003)}]{Jablonski2003}
+Jablonski, D. and K.~Roy, 2003.
+\newblock {Geographical range and speciation in fossil and living molluscs.}
+\newblock Proceedings. Biological sciences / The Royal Society 270:401--6.
+
+\bibitem[{Johnson(1974)}]{Johnson1974}
+Johnson, J.~G., 1974.
+\newblock {Extinction of Perched Faunas}.
+\newblock Geology 2:479--482.
+
+\bibitem[{Kiessling and Aberhan(2007)}]{Kiessling2007a}
+Kiessling, W. and M.~Aberhan, 2007.
+\newblock {Environmental determinants of marine benthic biodiversity dynamics
+  through Triassic – Jurassic time}.
+\newblock Paleobiology 33:414--434.
+
+\bibitem[{Klein and Moeschberger(2003)}]{Klein2003}
+Klein, J.~P. and M.~L. Moeschberger, 2003.
+\newblock {Survival Analysis: Techniques for Censored and Truncated Data}.
+\newblock 2nd ed. Springer, New York.
+
+\bibitem[{Liow(2004)}]{Liow2004a}
+Liow, L.~H., 2004.
+\newblock {A test of Simpson's "rule of the survival of the relatively
+  unspecialized" using fossil crinoids.}
+\newblock The American naturalist 164:431--43.
+
+\bibitem[{Liow(2007)}]{Liow2007b}
+---{}---{}---, 2007.
+\newblock {Does versatility as measured by geographic range, bathymetric range
+  and morphological variability contribute to taxon longevity?}
+\newblock Global Ecology and Biogeography 16:117--128.
+
+\bibitem[{Lynch(1991)}]{Lynch1991}
+Lynch, M., 1991.
+\newblock {Methods for the analysis of comparative data in evolutionary
+  biology}.
+\newblock Evolution 45:1065--1080.
+
+\bibitem[{Miller and Foote(2009)}]{Miller2009a}
+Miller, A.~I. and M.~Foote, 2009.
+\newblock {Epicontinental seas versus open-ocean settings: the kinetics of mass
+  extinction and origination.}
+\newblock Science 326:1106--9.
+
+\bibitem[{N\"{u}rnberg and Aberhan(2013)}]{Nurnberg2013a}
+N\"{u}rnberg, S. and M.~Aberhan, 2013.
+\newblock {Habitat breadth and geographic range predict diversity dynamics in
+  marine Mesozoic bivalves}.
+\newblock Paleobiology 39:360--372.
+
+\bibitem[{N\"{u}rnberg and Aberhan(2015)}]{Nurnberg2015}
+---{}---{}---, 2015.
+\newblock {Interdependence of specialization and biodiversity in Phanerozoic
+  marine invertebrates.}
+\newblock Nature communications 6:6602.
+
+\bibitem[{Palmer and Feldman(2012)}]{Palmer2012}
+Palmer, M.~E. and M.~W. Feldman, 2012.
+\newblock {Survivability is more fundamental than evolvability.}
+\newblock PloS one 7:e38025.
+
+\bibitem[{Payne and Finnegan(2007)}]{Payne2007}
+Payne, J.~L. and S.~Finnegan, 2007.
+\newblock {The effect of geographic range on extinction risk during background
+  and mass extinction.}
+\newblock Proceedings of the National Academy of Sciences 104:10506--11.
+
+\bibitem[{Payne et~al.(2014)Payne, Heim, Knope, and Mcclain}]{Payne2014}
+Payne, J.~L., N.~A. Heim, M.~L. Knope, and C.~R. Mcclain, 2014.
+\newblock {Metabolic dominance of bivalves predates brachiopod diversity
+  decline by more than 150 million years}.
+\newblock Proceedings of the Royal Society B 281:20133122.
+
+\bibitem[{Peters(2008)}]{Peters2008}
+Peters, S.~E., 2008.
+\newblock {Environmental determinants of extinction selectivity in the fossil
+  record.}
+\newblock Nature 454:626--9.
+
+\bibitem[{Raup(1975)}]{Raup1975}
+Raup, D.~M., 1975.
+\newblock {Taxonomic survivorship curves and Van Valen's Law}.
+\newblock Paleobiology 1:82--96.
+
+\bibitem[{Raup(1978)}]{Raup1978}
+---{}---{}---, 1978.
+\newblock {Cohort Analysis of generic survivorship}.
+\newblock Paleobiology 4:1--15.
+
+\bibitem[{Raup(1991)}]{Raup1991b}
+---{}---{}---, 1991.
+\newblock {Extinction: Bad Genes or Bad Luck?}
+\newblock Norton, New York.
+
+\bibitem[{Raup(1994)}]{Raup1994}
+---{}---{}---, 1994.
+\newblock {The role of extinction in evolution}.
+\newblock Proceedings of the National Academy of Sciences 91:6758--6763.
+
+\bibitem[{{Sepkoski Jr.}(1981)}]{SepkoskiJr.1981a}
+{Sepkoski Jr.}, J.~J., 1981.
+\newblock {A factor analytic description of the Phanerozoic marine fossil
+  record}.
+\newblock Paleobiology 7:36--53.
+
+\bibitem[{Sheehan(2001)}]{Sheehan2001b}
+Sheehan, P., 2001.
+\newblock {The late Ordovician mass extinction}.
+\newblock Annual Review of Earth and Planetary Sciences 29:331--364.
+
+\bibitem[{Simpson(2006)}]{Simpson2006}
+Simpson, C., 2006.
+\newblock {Levels of selection and large-scale morphological trends}.
+\newblock Ph.D. thesis, University of Chicago.
+
+\bibitem[{Simpson and Harnik(2009)}]{Simpson2009}
+Simpson, C. and P.~G. Harnik, 2009.
+\newblock {Assessing the role of abundance in marine bivalve extinction over
+  the post-Paleozoic}.
+\newblock Paleobiology 35:631--647.
+
+\bibitem[{Simpson(1944)}]{Simpson1944}
+Simpson, G.~G., 1944.
+\newblock {Tempo and Mode in Evolution}.
+\newblock Columbia University Press, New York.
+
+\bibitem[{Simpson(1953)}]{Simpson1953}
+---{}---{}---, 1953.
+\newblock {The Major Features of Evolution}.
+\newblock Columbia University Press, New York.
+
+\bibitem[{{Stan Development Team}(2014)}]{2014stan}
+{Stan Development Team}, 2014.
+\newblock Stan: A c++ library for probability and sampling, version 2.5.0.
+\newblock \urlprefix\url{http://mc-stan.org/}.
+
+\bibitem[{{Van Valen}(1973)}]{VanValen1973}
+{Van Valen}, L., 1973.
+\newblock {A new evolutionary law}.
+\newblock Evolutionary Theory 1:1--30.
+
+\bibitem[{{Van Valen}(1979)}]{VanValen1979}
+---{}---{}---, 1979.
+\newblock {Taxonomic survivorship curves}.
+\newblock Evolutionary Theory 4:129--142.
+
+\bibitem[{Vilhena et~al.(2013)Vilhena, Harris, Bergstrom, Maliska, Ward, Sidor,
+  Str\"{o}mberg, and Wilson}]{Vilhena2013}
+Vilhena, D.~A., E.~B. Harris, C.~T. Bergstrom, M.~E. Maliska, P.~D. Ward, C.~A.
+  Sidor, C.~A.~E. Str\"{o}mberg, and G.~P. Wilson, 2013.
+\newblock {Bivalve network reveals latitudinal selectivity gradient at the
+  end-Cretaceous mass extinction.}
+\newblock Scientific Reports 3:1790.
+
+\bibitem[{Wang(2003)}]{Wang2003}
+Wang, S.~C., 2003.
+\newblock {On the continuity of background and mass extinction}.
+\newblock Paleobiology 29:455--467.
+
+\end{thebibliography}
