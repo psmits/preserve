@@ -61,14 +61,18 @@ waic.est <- llply(log.lik, waic)
 
 # comparison tables
 loo.tab <- loo::compare(loo.est[[1]], loo.est[[2]], 
-                        loo.est[[3]], loo.est[[4]])
+                        loo.est[[3]], loo.est[[4]],
+                        loo.est[[5]], loo.est[[6]],
+                        loo.est[[7]], loo.est[[8]])
 waic.tab <- loo::compare(waic.est[[1]], waic.est[[2]], 
-                         waic.est[[3]], waic.est[[4]])
-mn <- c('continuous Weibull w/ interaction', 
-        'continuous Weibull w/o interaction', 
-        'discrete Weibull w/ interaction',
-        'discrete Weibull w/o interaction')
-rownames(loo.tab) <- rownames(waic.tab) <- mn
+                         waic.est[[3]], waic.est[[4]],
+                         waic.est[[5]], waic.est[[6]],
+                         waic.est[[7]], waic.est[[8]])
+#mn <- c('continuous Weibull w/ interaction', 
+#        'continuous Weibull w/o interaction', 
+#        'discrete Weibull w/ interaction',
+#        'discrete Weibull w/o interaction')
+#rownames(loo.tab) <- rownames(waic.tab) <- mn
 
 
 # move on to the plots
@@ -78,24 +82,47 @@ rownames(loo.tab) <- rownames(waic.tab) <- mn
 # plots for when there is interaction
 npred <- 6
 # continuous weibull
-wei.fit <- rstan::extract(fits[[2]], permuted = TRUE)
+wei.fit <- rstan::extract(fits[[4]], permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 
                 npred = npred, name = 'cweib_inter')
 
 # discrete weibull
-wei.fit <- rstan::extract(fits[[4]], permuted = TRUE)
+wei.fit <- rstan::extract(fits[[8]], permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 
                 npred = npred, name = 'dweib_inter')
+
+# continuous exponential
+wei.fit <- rstan::extract(fits[[2]], permuted = TRUE)
+posterior.plots(data = data, wei.fit = wei.fit, 
+                npred = npred, name = 'cexp_inter')
+
+# discrete exponential (geometric)
+wei.fit <- rstan::extract(fits[[6]], permuted = TRUE)
+posterior.plots(data = data, wei.fit = wei.fit, 
+                npred = npred, name = 'dexp_inter')
+
+
+
 
 
 # plots for when there is no interaction
 npred <- 5
 # continuous weibull
-wei.fit <- rstan::extract(fits[[1]], permuted = TRUE)
+wei.fit <- rstan::extract(fits[[3]], permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 
                 npred = npred, name = 'cweib_base')
 
-# discrete weibull
-wei.fit <- rstan::extract(fits[[3]], permuted = TRUE)
+# continuous weibull
+wei.fit <- rstan::extract(fits[[7]], permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 
                 npred = npred, name = 'dweib_base')
+
+# continuous exponential
+wei.fit <- rstan::extract(fits[[1]], permuted = TRUE)
+posterior.plots(data = data, wei.fit = wei.fit, 
+                npred = npred, name = 'cexp_base')
+
+# discrete exponential (geometric)
+wei.fit <- rstan::extract(fits[[5]], permuted = TRUE)
+posterior.plots(data = data, wei.fit = wei.fit, 
+                npred = npred, name = 'dexp_base')

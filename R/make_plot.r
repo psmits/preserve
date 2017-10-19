@@ -283,12 +283,12 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
                (wei.fit$mu_prior[sam, 3] * x) + 
                (wei.fit$mu_prior[sam, 4] * x^2))
     }
-    # + (wei.fit$mu_prior[sam, 6] * (x^2 * y))
-    #if(!(best %in% 1:2)) {
-    #  -(bet) / exp(wei.fit$alpha_mu[sam])  # depends on if alpha varies by cohort
-    #} else {
-    bet / wei.fit$alpha[sam]  # depends on if alpha varies by cohort
-    #}
+    if(is.null(wei.fit$alpha)) {
+      o <- bet
+    } else {
+      o <- bet / wei.fit$alpha[sam]  # depends on if alpha varies by cohort
+    }
+    o
   }
   quad.mean <- function(x, y, mcoef, npred) {
     #if(!(best %in% 1:2)) {
@@ -300,7 +300,12 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
     } else if(npred == 5) {
       bet <- -(mcoef[1] + (mcoef[2] * y) + (mcoef[3] * x) + (mcoef[4] * x^2))
     }
-    bet / mean(wei.fit$alpha[sam])
+    if(is.null(wei.fit$alpha)) {
+      o <- bet
+    } else {
+      o <- bet / mean(wei.fit$alpha[sam])
+    }
+    o
   }
 
   rang <- c(data$occupy)
@@ -384,7 +389,11 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
     for(ii in seq(data$O)) {
       h <- list()
       for(jj in seq(length(val))) {
-        h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii])
+        if(is.null(alp.coh)) {
+          h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ])
+        } else {
+          h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii])
+        }
       }
       coh.est[[ii]] <- h
     }
