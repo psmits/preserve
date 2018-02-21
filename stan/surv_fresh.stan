@@ -12,9 +12,6 @@ parameters {
   real alpha_trans;
 
   vector[K] beta;
-
-  vector[O] c;
-  real<lower=0> sigma_c;
 }
 transformed parameters {
   real<lower=0> alpha;
@@ -24,15 +21,12 @@ transformed parameters {
   alpha = exp(alpha_trans);
   
   // scale parameter
-  sigma[1:N] = exp(X[1:N] * beta + c[cohort]);
+  sigma = exp(X * beta);
 }
 model {
   alpha_trans ~ normal(0, 1);
 
   beta ~ normal(0, 5);
-
-  c ~ normal(0, sigma_c);
-  sigma_c ~ normal(0, 5);
 
   for(i in 1:N) {
     if(status[i] == 0) {
