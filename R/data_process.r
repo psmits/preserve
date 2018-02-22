@@ -11,13 +11,13 @@ library(rgdal)
 library(XML)
 library(maptools)
 
-source('../R/gts.r')
 source('../R/jade.r')
+#source('../R/gts.r')
 #source('../R/mung.r')
 
 # geologicl stage information
 lump.file <- list.files('../data', pattern = 'lump')
-lump <- read.csv(paste0('../data/', lump.file))
+lump <- read_csv(paste0('../data/', lump.file))
 timeframe <- c('Trem', 'Floi', 'Dapi', 'Darr', 'Sand', 'Kati', 'Hirn', 'Ldov', 
                'Wenl', 'Ludl', 'Prid', 'Gedi', 'Sieg', 'Emsi', 'Eife', 'Give', 
                'Fras', 'Fame', 'Tour', 'Vise', 'Serp', 'Bash', 'Mosc', 'Step', 
@@ -26,11 +26,10 @@ timeframe <- c('Trem', 'Floi', 'Dapi', 'Darr', 'Sand', 'Kati', 'Hirn', 'Ldov',
 timecount <- lump[lump[, 2] %in% timeframe, 1]
 
 # raw occurrence data from pbdb
-ff <- read.csv('https://paleobiodb.org/data1.2/occs/list.txt?base_name=Brachiopoda&interval=Ordovician,Permian&show=full', 
-               stringsAsFactors = FALSE)
+ff <- read.csv('https://paleobiodb.org/data1.2/occs/list.txt?base_name=Brachiopoda&interval=Ordovician,Permian&show=full') 
 
 data.file <- list.files('../data', pattern = 'Occs')
-fossil <- read.csv(paste0('../data/', data.file))
+fossil <- read_csv(paste0('../data/', data.file))
 bibr <- fossil
 
 # place nice
@@ -110,60 +109,39 @@ bibr <- group_by(bibr, stagename) %>%
                 off = sum(EO.5.1.2014 == 'O')) %>%
   ungroup()
 
-# i now need to create two data frames
-#   survival data frame
-#     duration
-#     genus identity
-#   longitudinal dataframe
-#     range at time
-#     genus identity
-bibr <- group_by(bibr, occurrences.genus.name) %>% 
-  dplyr::mutate(start = min(stagenum)) %>% 
-  ungroup()
-
-bibr <- dplyr::mutate(bibr, 
-                      id = factor(occurrences.genus.name, 
-                                  levels = unique(occurrences.genus.name)),
-                      id = as.numeric(id))
-bibr <- dplyr::arrange(bibr, id)
-survi <- unique(dplyr::select(bibr, 
-                              id, 
-                              duration, 
-                              survivor)) %>%
-  dplyr::mutate(dead = (!survivor) * 1)
-longi <- dplyr::select(bibr, 
-                       id,
-                       start, 
-                       stagename, 
-                       stagenum, 
-                       chaorange) %>%
-  dplyr::mutate(timing = stagenum - start + 1,
-                scalechaorange = arm::logit(chaorange))
 
 
+# try to move to something closer to continuous time
 # connect to macrostrat
+# first grab all the units collections are from
 uc <- unique(bibr$collection.no)
 fc <- uc[1:(length(uc) / 2)]
 sc <- uc[((length(uc) / 2) + 1):length(uc)]
-furl <- paste0('https://macrostrat.org/api/v2/fossils?cltn_id=', 
+furl <- paste0('https://macrostrat.org/api/v2/units?cltn_id=', 
                paste0(fc, collapse = ','), 
                '&response=long&format=csv')
-strat1 <- read.csv(furl, stringsAsFactors = FALSE)
-furl <- paste0('https://macrostrat.org/api/v2/fossils?cltn_id=', 
+strat1 <- read_csv(furl)
+furl <- paste0('https://macrostrat.org/api/v2/units?cltn_id=', 
                paste0(sc, collapse = ','), 
                '&response=long&format=csv')
-strat2 <- read.csv(furl, stringsAsFactors = FALSE, row.names = NULL)
+strat2 <- read_csv(furl)
 # combine into one
-strat <- dplyr::union(strat1, strat2)
+strat <- dplyr::union(dplyr::select(strat1, -SGp), 
+                      dplyr::select(strat2, -SGp))
 
-# mid point age of unit
-# unit duration
-strat <- dplyr::mutate(strat, 
-                       m_age = map2_dbl(t_age, b_age, ~ mean(Reduce(c, .x, .y))),
-                       duration = abs(t_age - b_age))
+# then grab all the fossils from those units
+furl <- paste0('https://macrostrat.org/api/v2/fossils?unit_id=', 
+               paste0(unique(strat$unit_id), collapse = ','), 
+               '&response=long&format=csv')
+fos <- read_csv(furl)
+# this gives cltn_id
+fos <- dplyr::mutate(fos, collection.no = cltn_id)
+ft <- left_join(bibr, fos)
+ft <- dplyr::filter(ft, 
+                    !is.na(t_age),
+                    !is.na(b_age))
 
-# the goal is connect macrostrat to occurrence information
-# collections are in units with continuous time
-#   1 My bins?
-# assign all occurrences a time
+ft <- dplyr::mutate(ft, 
+                    m_age = map2_dbl(t_age, b_age, ~ mean(Reduce(c, .x, .y))),
+                    duration = abs(t_age - b_age))
 
