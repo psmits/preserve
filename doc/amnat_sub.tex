@@ -1,54 +1,83 @@
-\documentclass{article}
-
-\usepackage{amsmath, amsthm}
-\usepackage{setspace}
-\usepackage{microtype, parskip}
-\usepackage[comma,sort&compress]{natbib}
+\documentclass[11pt]{article}
+\usepackage[sc]{mathpazo} %Like Palatino with extensive math support
+\usepackage{fullpage}
+\usepackage[authoryear,sectionbib,sort]{natbib}
+\linespread{1.7}
+\usepackage[utf8]{inputenc}
 \usepackage{lineno}
-\usepackage{docmute}
-\usepackage{caption, subcaption, multirow, morefloats, rotating}
-\usepackage{wrapfig}
+\usepackage{titlesec}
+\titleformat{\section}[block]{\Large\bfseries\filcenter}{\thesection}{1em}{}
+\titleformat{\subsection}[block]{\Large\itshape\filcenter}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}[block]{\large\itshape}{\thesubsubsection}{1em}{}
+\titleformat{\paragraph}[runin]{\itshape}{\theparagraph}{1em}{}[. ]\renewcommand{\refname}{Literature Cited}
 
-\frenchspacing
+%%%%%%%%%%%%%%%%%%%%%
+% Line numbering
+%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{lineno}
+% Please use line numbering with your initial submission and
+% subsequent revisions. After acceptance, please turn line numbering
+% off by adding percent signs to the lines %\usepackage{lineno} and
+% to %\linenumbers{} and %\modulolinenumbers[3] below.
 
-\doublespacing
+\title{How macroecology affects macroevolution: the interplay between extinction intensity and trait-dependent extinction in brachiopods.
 
-\raggedright
+% This version of the LaTeX template was last updated on
+% January 11, 2018.
+
+%%%%%%%%%%%%%%%%%%%%%
+% Authorship
+%%%%%%%%%%%%%%%%%%%%%
+% Please remove authorship information while your paper is under review,
+% unless you wish to waive your anonymity under double-blind review. You
+% will need to add this information back in to your final files after
+% acceptance.
+
+\author{Peter D. Smits$^{1,\ast}$}
+
+\date{}
 
 \begin{document}
-\linenumbers
-\modulolinenumbers[2]
 
-%\maketitle
+\maketitle
 
-\begin{titlepage}
-  \begin{large}
-    \textbf{Title:} How macroecology affects macroevolution: the interplay between extinction intensity and trait-dependent extinction in brachiopods.
-  \end{large}
+\noindent{} 1. University of California -- Berkeley, Berkeley, California 94720;
 
-  \textbf{Running title:} Trait-dependent extinction in brachiopods
+\noindent{} $\ast$ Corresponding author; e-mail: psmits@berkeley.edu
 
-  \textbf{Author:} Peter D Smits, psmits@uchicago.edu, Committee on Evolutionary Biology, University of Chicago, IL, USA.
+\bigskip
 
-  \textbf{Keywords:} species selection, paleobiology, Bayesian
+\textit{Manuscript elements}: Figure~1, figure~2, table~1, online appendices~A and B (including figure~A1 and figure~A2). Figure~2 is to print in color.
 
-  \textbf{Word count:} \(\approx\) 7000
-  
-  \textbf{Table count:} 1
- 
-  \textbf{Figure count:} 7
+\bigskip
 
-  \textbf{Data archival location:} Zenodo DOI 10.5281/zenodo.46928.
+\textit{Keywords}: species selection, geographic range, environmental preference, paleobiology, Bayesian
 
-\end{titlepage}
+\bigskip
 
-\begin{abstract}
+\textit{Manuscript type}: Article. %Or e-article, note, e-note, natural history miscellany, e-natural history miscellany, comment, reply, invited symposium, or countdown to 150.
+
+\bigskip
+
+\noindent{\footnotesize Prepared using the suggested \LaTeX{} template for \textit{Am.\ Nat.}}
+
+%\linenumbers{}
+%\modulolinenumbers[3]
+
+\newpage{}
+
+\section*{Abstract}
+
   As extinction intensity increases, how do the effects of traits on taxonomic survival change? Does the extinction rate associated with certain traits increase while that of others decreases? Using a hierarchical Bayesian approach, I develop a model of how the effects of biological traits on extinction risk can vary with respect to extinction intensity, origination cohort (i.e. time of origination), and in relation to each other. The emergent traits traits I analyze in relation to their patterns of Paleozoic brachiopod genus durations are geographic range, affinity for epicontinental seas versus open ocean environments, and body size. Additionally, I estimate the effects of environmental generalization versus specialization on taxonomic survival by allowing environmental preference to have a nonlinear effect on duration. My analytical framework eschews the traditional distinction between background and mass extinction, and instead considers extinction intensity as a continuum. I find that the cohort-specific effects of geographic range and environmental preference are negatively correlated with baseline extinction intensity. Additionally, I find support for greater survival of environmental generalists versus specialists in all origination cohorts. These results support the conclusion that for Paleozoic brachiopods, as extinction intensity increases overall extinction selectivity increases.
-\end{abstract}
 
+\newpage{}
 
-\section{Introduction}
+\section*{Introduction}
 
+% The journal does not have numbered sections in the main portion of
+% articles. Please refrain from using section references (à la
+% section~\ref{section:CountingOwlEggs}), and refer to sections by name
+% (e.g. section ``Counting Owl Eggs'').
 Extinction is one half of the diversification process \citep{Raup1994,Stanley1979,Stanley1975}, second only to speciation or origination in shaping changes to diversity; it can also be the ultimate manifestation of selection as a taxon with a beneficial trait should persist for longer on average than a taxon without that beneficial trait \citep{Rabosky2010b,Jablonski2008a,Raup1994,Stanley1975}. Species duration is a measure of species fitness CITATION, and trait-associated differences in fitness is the hallmark of (species) selection CITATION.
 
 \citet{Jablonski1986} observed that for bivalves at the end Cretaceous mass extinction event, previous trait-associated differences in survival no longer mattered except for the case of geographic range. Based on this evidence, \citet{Jablonski1986} proposed the idea of "macroevolutionary modes" and that mass extinction and background extinction are fundamentally different processes. However, based on estimates of extinction rates over time, there is no evidence of there being two or more "types" of extinction \citep{Wang2003}. Instead, extinction rates for marine invertebrates form a unimodal distribution where estimates of extinction rate/intensity show continuous variation.
@@ -67,7 +96,7 @@ The hierarchical Bayesian approach used here involves developing a single model 
 While estimation of both trait-dependent speciation and extinction rates from phylogenies of extant taxa has grown dramatically \citep{Maddison2007,Fitzjohn2010,Goldberg2011a,Goldberg2005,Rabosky2013,Stadler2013b,Stadler2011a,Stadler2013a}, there are two major ways to estimate trait-dependent extinction: analysis of phylogenies, and analysis of the fossil record. These two directions, phylogenetic comparative and paleobiological, are complementary and intertwined in the field of macroevolution \citep{Rabosky2010b,Jablonski2008a,Hunt2014a}. In the case of extinction, analysis of the fossil record has the distinct advantage over phylogenies of only extant taxa because extinction is observable; this means that extinction rate is possible to estimate \citep{Rabosky2010a,Quental2009,Liow2010a}. The approach used here is thus complementary to the analysis of trait-dependent extinction based on a phylogeny.
 
 
-\subsection{Factors affecting brachiopod survival}
+\subsection*{Factors affecting brachiopod survival}
 
 Conceptually, taxon survival can be considered an aspect of ``taxon fitness'' \citep{Cooper1984,Palmer2012}. Traits associated with taxon survival are thus examples of species (or higher-level) selection, as differences in survival are analogous to differences in fitness. The traits analyzed here are all examples of emergent and aggregate traits \citep{Jablonski2008a,Rabosky2010b}; specifically I analyze genus-level traits. Emergent traits are those which are not measurable at a lower level (e.g. species versus individual organism) such as geographic range, or even fossil sampling rate. Aggregate traits, like body size or environmental preference, are the average of a shared trait across all members of a lower level.
 
@@ -85,9 +114,10 @@ It is well known that, given the incompleteness of the fossil record, the observ
 
 
 
-\section{Materials and Methods}
 
-\subsection{Fossil occurrence information}
+
+
+\section*{Methods}
 
 % foote gave me a hand with the taxonomic occurrences
 %   biggest limiting factor is the Payne 2014 body size dataset
@@ -122,7 +152,7 @@ Prior to analysis, geographic range was logit transformed and body size was natu
 
 
 
-\subsection{Details of model}
+\subsection*{Details of model}
 \label{sec:model}
 
 % hierarchical modeling is simply modeling the hyperparameters of a prior distribution
@@ -159,7 +189,7 @@ The elements of \(\mu\) were given independent normally distributed priors. The 
 
 The log of the shape parameter \(\alpha\) was given a weakly informative prior \(\log(\alpha) \sim \mathcal{N}(0, 1)\) centered at \(\alpha = 1\), which corresponds to the Law of Constant Extinction \citep{VanValen1973}.
 
-\subsection{Imputation of sampling probability}
+\subsection*{Imputation of sampling probability}
 \label{sec:impute}
 % Unknown values were estimated from the results of that beta regression.
 The vector sampling \(s\) has two parts: the observed part \(s^{o}\), and the unobserved part \(s^{u}\). Of the 1130 total observations, 539 have a duration of 3 or more and have an observed gap statistic. The gap statistic for the remaining 591 observations was imputed. As stated above, the unobserved part is the imputed, or filled in, based on the observed part \(s^{o}\). Because sampling varies between 0 and 1, I chose to model it as a Beta regression with matrix \(W\) being a \(N \times (D - 1)\) matrix of covariates (i.e. geographic range size, environmental preference, body size) as predictors of sampling; this assumes that the sampling value for all taxa come from the same distribution. Importantly, I make no assumptions of causal structure. 
@@ -207,7 +237,7 @@ The next step is to then estimate \(s^{u} | s^{o}, X^{o}, X^{u}, \gamma\), the p
 %For this left-truncated model, I've excluded one observation that is right-censored with a duration equal to the truncation time; the second line of equation \ref{eq:trunc} becomes \(p(y | \theta) = \mathrm{Weibull}_{ccdf}(y, \alpha, \sigma) / \mathrm{Weibull}_{ccdf}(Y, \alpha, \sigma)\) which yields a log-probability of 0.
 
 
-\subsection{Posterior inference and posterior predictive checks}
+\subsection*{Posterior inference and posterior predictive checks}
 The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 10,000 steps each, split half warm-up and half sampling and thinned to every 10th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
 % edit, relab, and impute can all be compared using WAIC/PSIS-LOO
@@ -227,7 +257,10 @@ Model adequacy was evaluated using a couple of posterior predictive checks. Post
 
 
 
-\section{Results}
+
+
+
+\section*{Results}
 
 Comparison of the posterior predictive estimates of \(S(t)\) to the empirical estimate reveal few obvious biases except for the case of values from the far right tail of observed durations (Fig. \ref{fig:surv}). This result is reinforced by the additional posterior predictive comparison where most estimates are not systematically biased except for a consistent under-estimate of \(\log(\sigma)\) for older taxa (Fig. \ref{fig:shot}). The results of both posterior predictive checks indicate that, for the majority of observations, model fit is generally not biased.
 
@@ -271,7 +304,9 @@ While the effect of sampling appears large compared to the other regression coef
 The Weibull shape parameter \(\alpha\) was found to be approximately 1.36 (\(\pm 0.05\) SD) with a 100\% probability of being greater than 1. This result is not consistent with the Law of Constant Extinction \citep{VanValen1973} and is instead consistent with accelerating extinction risk with taxon age. This may indicate that older taxa are out-competed by younger taxa, a result consistent with some empirical results \citep{Wagner2014b,Quental2013,Smits2015} and (ironically) with a recently proposed Red Queen-like model of evolution \citep{Rosindell2015a}. This results, however, is not consistent with other empirical results \citep{Finnegan2008,Crampton2016} and could potentially be caused by the minimum resolution of the fossil record \citep{Sepkoski1975}. It is thus unclear if a strong biological inference can be made from this result, which means that further work is necessary on the effect of taxon age on extinction risk.
 
 
-\section{Discussion}
+
+
+\section*{Discussion}
 
 The generating observation behind this study was that for bivalves at the end Cretaceous mass extinction event, the only biological trait that was found the affect extinction risk was geographic range while traits that had previously been beneficial had no effect \citep{Jablonski1986}. This observation raises two linked questions: how does the effect of geographic range change with changing extinction intensity, and how does the effect of other biological traits change with changing extinction intensity?
 
@@ -306,20 +341,131 @@ Traits like environmental preference or geographic range \citep{Jablonski1987,Hu
 
 The combination and integration of the phylogenetic comparative and paleontological approaches requires both sources of data, something which is not possible for this analysis because there is no phylogenetic hypothesis for all Paleozoic taxa, something that is frequently the case for marine invertebrates with a good fossil record. When both data sources are available has been possible, however, the analysis can more fully address the questions of interest in macroevolution \citep{Smits2015,Slater2013a,Slater2015b,Simpson2011,Tomiya2013,Slater2012,Raia2013c,Raia2012f,Harnik2014,Fritz2013a}.
 
+\section*{Conclusion}
 % concluding statements
 In summary, patterns of Paleozoic brachiopod survival were analyzed using a fully Bayesian hierarchical survival modelling approach while also eschewing the traditional separation between background and mass extinction. I find that cohort extinction intensity is negatively correlated with both the cohort-specific effects of geographic range and environmental preference. These results imply that as extinction intensity increases (\(\beta^{0}\)) increases, it is expected that both effects will increase in magnitude. However, the change in effect of environmental preference is expected to be greater than the change in the effect of geographic range. Additionally, I find support for greater survival in environmental generalists over specialists in all origination cohorts analyzed; this is consistent with the long standing ``survival of the unspecialized'' hypothesis \citep{Liow2004a,Liow2007b,Simpson1944,Simpson1953,Smits2015,Nurnberg2015,Nurnberg2013a, Baumiller1993}. The results of this analysis support the conclusion that for Paleozoic brachiopods, as extinction intensity increases overall extinction selectivity is expected to increase as well.
 
 
-\section*{Acknowledgements}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%
+% Acknowledgments
+%%%%%%%%%%%%%%%%%%%%%
+% You may wish to remove the Acknowledgments section while your paper 
+% is under review (unless you wish to waive your anonymity under
+% double-blind review) if the Acknowledgments reveal your identity.
+% If you remove this section, you will need to add it back in to your
+% final files after acceptance.
+
+\section*{Acknowledgments}
+
 I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, R. Ree, and G. Slater for helpful discussion during the conception of this study. I'd also like to thank D. Bapst, N. Pierrehumbert and M. Villarosa Garcia for additional comments. An additional thank you to  A. Miller for the epicontinental versus open-ocean assignments. Finally, thank you to the reviewers for their helpful comments that improved this manuscript. This entire study would would not have been possible without the Herculean effort of the many contributors to the Paleobiology Database. In particular, I would like to thank J. Alroy, M. Aberhan, D. Bottjer, M. Clapham, F. F\"{u}rsich, N. Heim, A. Hendy, S. Holland, L. Ivany, W. Kiessling, B. Kr\"{o}ger, A. McGowan, T. Olszewski, P. Novack-Gottshall, M. Patzkowsky, M. Uhen, L. Villier, and P. Wager. This work was supported by a NASA Exobiology grant (NNX10AQ446) to A. Miller and M. Foote. I declare no conflicts of interest. This is Paleobiology Database publication XXX. The code necessary for reproducing these results is avaliable as a Zenodo archive DOI 10.5281/zenodo.46928.
 
+\newpage{}
 
-\clearpage
 
+%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%%%
+% You can either type your references following the examples below, or
+% compile your BiBTeX database and paste the contents of your .bbl file
+% here. The amnatnat.bst style file should work for this---but please
+% let us know if you run into any hitches with it!
+% The list below includes sample journal articles, book chapters, and
+% Dryad references.
 
-\bibliographystyle{evolution}
-\bibliography{newbib,packages}
+\begin{thebibliography}{}
 
+\bibitem[{Cook et~al.(2015)Cook, Collaborator, and Expert}]{CookEtAl2015}
+Cook, O.~E., G.~H. Collaborator, and A.~Q. Expert. 2015.
+\newblock Data from: Template and guidelines for using \LaTeX{} in \textit{The American Naturalist}.
+\newblock American Naturalist, Dryad Digital Repository, http://dx.doi.org/10.5061/dryad.XYZAB.
+
+\bibitem[{Davis et~al.(2011)Davis, Brakora, and Lee}]{DavisEtAl2011}
+Davis, E.~B., K.~A. Brakora, and A.~H. Lee. 2011.
+\newblock Evolution of ruminant headgear: a review.
+\newblock Proceedings of the Royal Society B 278:2857--2865.
+
+\bibitem[{Inglis et~al.(2011)Inglis, Roberts, Gardner, and Buckling}]{Ing11}
+Inglis, R.~F., P.~G. Roberts, A.~Gardner, and A.~Buckling. 2011.
+\newblock Spite and the scale of competition in \textit{Pseudomonas
+  aeruginosa}.
+\newblock American Naturalist 178:276--285.
+
+\bibitem[{Lemod\`{e}le et~al.(2007)Lemodele, Kapitelschreiber, and Exemplar}]{LemKapEx07}
+Lemod\`{e}le, P.-Q., A.~B. Kapitelschreiber, and C.~D.~E. Exemplar. 2007.
+\newblock An exemplary instance of chapters in books.
+\newblock Pages 231--245 \emph{in} J.-P. \'{E}crivain and M.~A. Term\'{e}szettud\'{o}s, eds. Inspiring Instances of Brilliant Writing. Truth Pudding Press, Fond du Lac, WI.
+
+\bibitem[{Xiao et~al.(2015)Xiao, McGlinn, and White}]{Xiao2015}
+Xiao, X., D.~J. McGlinn, and E.~P. White. 2015.
+\newblock A strong test of the maximum entropy theory of ecology.
+\newblock American Naturalist 185:E705--E80.
+
+\end{thebibliography}
+
+\newpage{}
+
+\section*{Tables}
+\renewcommand{\thetable}{\arabic{table}}
+\setcounter{table}{0}
+
+\begin{table}[h]
+\caption{Animals in various cities with equations}
+\label{Table:Okapi}
+\centering
+\begin{tabular}{llc}\hline
+Animal    & City         & Equation \\ \hline
+Dog       & Springfield  & $x+y=z$ \\
+Fox       & Indianapolis & $2x+2y=2z$ \\
+Okapi$^a$ & Chicago      & $x-y<z$ \\
+Badger    & Madison      & $x+2y>z$ \\ \hline
+\end{tabular}
+\bigskip{}
+\\
+{\footnotesize Note: Table titles should be short. Further details should go in a `notes' area after the tabular environment, like this. $^a$ Okapis are not native to Chicago, but they are to be met with in both of the major Chicagoland zoos.}
+\end{table}
+
+\newpage{}
+
+%\section*{Figure legends}
+%
+%\begin{figure}[h!]
+%%\includegraphics{horn-of-okapi}
+%\caption{Figure legends can be longer than the titles of tables. However, they should not be excessively long.}
+%\label{Fig:OkapiHorn}
+%\end{figure}
+%
+%
+%\begin{figure}[h!]
+%%\includegraphics{elegance}
+%\caption{In this way, figure legends can be listed at the end of the document, with references that work, even though the graphic itself should be included for final files after acceptance. Instead, upload the relevant figure files separately to Editorial Manager; Editorial Manager should insert them at the end of the PDF automatically.}
+%\label{Fig:AnotherFigure}
+%\end{figure}
+%
+%\subsection*{Online figure legends}
+%
+%\renewcommand{\thefigure}{A\arabic{figure}}
+%\setcounter{figure}{0}
+%
+%\begin{figure}[h!]
+%%\includegraphics{jumps20m}
+%\caption{\textit{A}, the quick red fox proceeding to jump 20~m straight into the air over not one, but several lazy dogs. \textit{B}, the quick red fox landing gracefully despite the skepticism of naysayers.}
+%\label{Fig:Jumps}
+%\end{figure}
+%
+%\begin{figure}[h!]
+%%\includegraphics{jumps20m}
+%\caption{The quicker the red fox jumps, the likelier it is to land near an okapi. For further details, see \citet{LemKapEx07}.}
+%\label{Fig:JumpsOk}
+%\end{figure}
+%
+%\renewcommand{\thefigure}{B\arabic{figure}}
+%\setcounter{figure}{0}
+%
+%\end{document}
 
 \clearpage
 
@@ -411,4 +557,3 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, R. Ree, and G. Slate
 \end{figure}
 
 \end{document}
-
