@@ -41,23 +41,12 @@ outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 ids <- rep(1:(length(outs) / 4), each = 4)
 outs <- split(outs, ids)
 
-wfit <- llply(outs[-1], read_stan_csv)
-log.liks <- llply(wfit, extract_log_lik)
 
+wfit <- read_stan_csv(outs[[2]])
+log.lik <- extract_log_lik(wfit)
+wei.fit <- rstan::extract(wfit, permuted = TRUE)
 # this will need to be updated with number of models
-loo.est <- llply(log.liks, loo)
-loo.table <- loo::compare(loo.est[[1]], loo.est[[2]], loo.est[[3]])
-
-# this will need to be updated with number of models
-waic.est <- llply(log.liks, waic)
-waic.table <- loo::compare(waic.est[[1]], waic.est[[2]], waic.est[[3]])
-
-best <- str_extract(names(which.max(waic.table[, ncol(waic.table)])), '[0-9]')
-best <- as.numeric(best)
-
-wei.fit <- rstan::extract(wfit[[best]], permuted = TRUE)
-# this will need to be updated with number of models
-npred <- 5
+npred <- 7
 
 
 # environmental preference
@@ -109,18 +98,11 @@ sum(et) / length(et)
 
 
 
-# waic, loo comparison table
-comparison.tab <- data.frame(waic = waic.table[, 1], looic = loo.table[, 1])
-#comparison.tab <- comparison.tab[c(2, 1, 3, 4), ]
-rownames(comparison.tab) <- c('imputed', 'relative abundance', 'no sampling')
-comparison.tex <- xtable(comparison.tab, label = 'tab:comparison')
-print.xtable(comparison.tex, file = '../doc/comparison_table.tex')
-
-
 # mean of all coefficients
 # sd of all coefficients
-name.mu <- c('mu_i', 'mu_r', 'mu_v', 'mu_v2', 'mu_m', 'mu_s')
-name.tau <- c('tau_i', 'tau_r', 'tau_v', 'tau_v2', 'tau_m', 'tau_s')
+name.mu <- c('mu_i', 'mu_r', 'mu_v', 'mu_v2', 'mu_rxv', 'mu_rxv2', 'mu_m', 'mu_s')
+name.tau <- c('tau_i', 'tau_r', 'tau_v', 'tau_v2', 'tau_rxv', 
+              'tau_rxv2', 'tau_m', 'tau_s')
 qq <- c(0.1, 0.5, 0.9)
 param.est <- rbind(data.frame(p = name.mu[1:npred],
                               m = apply(wei.fit$mu_prior, 2, mean), 
@@ -163,29 +145,29 @@ sd(p.v2)
 # probability that average of the parabola defined
 #   log(sigma) = -(mu_i + mu_v * v + mu_v2 * v^2) / alpha
 # midpoint favors epicontinental
-coef.inf <- wei.fit$mu_prior[, 3:4]
-inf.rel <- sum((-(coef.inf[, 1])) / (2 * coef.inf[, 2]) > 0) / 4000
-
-inf.cohort <- inf.low <- inf.hgh <- c()
-
-for(ii in seq(data$O)) {
-  h <- wei.fit$beta[, ii, 3:4]
-  inf.cohort[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0) / 4000
-  inf.low[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0.5) / 4000
-  inf.hgh[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) < (-0.5)) / 4000
-}
-inf.cohort[6:15]
-
-
-# probabilty of negative correlation term
-cor.int.range <- sum((wei.fit$Omega[, 1, 2] < 0)) / 4000
-cor.int.env <- sum((wei.fit$Omega[, 1, 3] < 0)) / 4000
-cor.range.env <- sum((wei.fit$Omega[, 2, 3] > 0)) / 4000
-
-
-
-# but but but
-#   massive difference in the between cohort variances of these two regression coefficients
-#   see param.est table!
-tv.gt.sr <- sum(apply(wei.fit$sigma[, 2:3], 1, function(x) x[2] > x[1])) / 4000
-
+#coef.inf <- wei.fit$mu_prior[, 3:4]
+#inf.rel <- sum((-(coef.inf[, 1])) / (2 * coef.inf[, 2]) > 0) / 4000
+#
+#inf.cohort <- inf.low <- inf.hgh <- c()
+#
+#for(ii in seq(data$O)) {
+#  h <- wei.fit$beta[, ii, 3:4]
+#  inf.cohort[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0) / 4000
+#  inf.low[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) > 0.5) / 4000
+#  inf.hgh[ii] <- sum((-(h[, 1])) / (2 * h[, 2]) < (-0.5)) / 4000
+#}
+#inf.cohort[6:15]
+#
+#
+## probabilty of negative correlation term
+#cor.int.range <- sum((wei.fit$Omega[, 1, 2] < 0)) / 4000
+#cor.int.env <- sum((wei.fit$Omega[, 1, 3] < 0)) / 4000
+#cor.range.env <- sum((wei.fit$Omega[, 2, 3] > 0)) / 4000
+#
+#
+#
+## but but but
+##   massive difference in the between cohort variances of these two regression coefficients
+##   see param.est table!
+#tv.gt.sr <- sum(apply(wei.fit$sigma[, 2:3], 1, function(x) x[2] > x[1])) / 4000
+#
