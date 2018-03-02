@@ -17,7 +17,7 @@ source('../R/jade.r')
 
 # geologicl stage information
 lump.file <- list.files('../data', pattern = 'lump')
-lump <- read_csv(paste0('../data/', lump.file))
+lump <- read.csv(paste0('../data/', lump.file))
 timeframe <- c('Trem', 'Floi', 'Dapi', 'Darr', 'Sand', 'Kati', 'Hirn', 'Ldov', 
                'Wenl', 'Ludl', 'Prid', 'Gedi', 'Sieg', 'Emsi', 'Eife', 'Give', 
                'Fras', 'Fame', 'Tour', 'Vise', 'Serp', 'Bash', 'Mosc', 'Step', 
@@ -29,7 +29,7 @@ timecount <- lump[lump[, 2] %in% timeframe, 1]
 ff <- read.csv('https://paleobiodb.org/data1.2/occs/list.txt?base_name=Brachiopoda&interval=Ordovician,Permian&show=full') 
 
 data.file <- list.files('../data', pattern = 'Occs')
-fossil <- read_csv(paste0('../data/', data.file))
+fossil <- read.csv(paste0('../data/', data.file))
 bibr <- fossil
 
 # place nice
@@ -114,17 +114,17 @@ bibr <- group_by(bibr, stagename) %>%
 # try to move to something closer to continuous time
 # connect to macrostrat
 # first grab all the units collections are from
-uc <- unique(bibr$collection.no)
+uc <- unique(bibr$collections.reference.no)
 fc <- uc[1:(length(uc) / 2)]
 sc <- uc[((length(uc) / 2) + 1):length(uc)]
 furl <- paste0('https://macrostrat.org/api/v2/units?cltn_id=', 
                paste0(fc, collapse = ','), 
                '&response=long&format=csv')
-strat1 <- read_csv(furl)
+strat1 <- read.csv(furl)
 furl <- paste0('https://macrostrat.org/api/v2/units?cltn_id=', 
                paste0(sc, collapse = ','), 
                '&response=long&format=csv')
-strat2 <- read_csv(furl)
+strat2 <- read.csv(furl)
 # combine into one
 strat <- dplyr::union(dplyr::select(strat1, -SGp), 
                       dplyr::select(strat2, -SGp))
@@ -133,9 +133,11 @@ strat <- dplyr::union(dplyr::select(strat1, -SGp),
 furl <- paste0('https://macrostrat.org/api/v2/fossils?unit_id=', 
                paste0(unique(strat$unit_id), collapse = ','), 
                '&response=long&format=csv')
-fos <- read_csv(furl)
+fos <- read.csv(furl)
 # this gives cltn_id
-fos <- dplyr::mutate(fos, collection.no = cltn_id)
+# can now join the two data frames so that 
+# unit info associated with species info
+fos <- dplyr::mutate(fos, collections.reference.no = cltn_id)
 ft <- left_join(bibr, fos)
 ft <- dplyr::filter(ft, 
                     !is.na(t_age),
@@ -144,4 +146,7 @@ ft <- dplyr::filter(ft,
 ft <- dplyr::mutate(ft, 
                     m_age = map2_dbl(t_age, b_age, ~ mean(Reduce(c, .x, .y))),
                     duration = abs(t_age - b_age))
-
+group_by(ft, occurrences.genus.name) %>% 
+  summarize(nocc = n(),
+            ncollec = n_distinct(collections.reference.no),
+            nunit = n_distinct(unit_id))
