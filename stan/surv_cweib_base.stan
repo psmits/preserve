@@ -89,6 +89,9 @@ model {
   mu_prior[5] ~ normal(0, 0.5);
   delta ~ normal(0, 1);
 
+  // this can be improved with non-centered parameterization
+  //   adds parameters
+  //   important of divergent transition issues
   for(i in 1:O) {
     beta[i] ~ multi_normal(mu_prior, Sigma);
   }

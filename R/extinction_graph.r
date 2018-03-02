@@ -15,6 +15,7 @@ source('../R/mung.r')
 source('../R/multiplot.r')
 source('../R/borrow_plotcorr.r')
 source('../R/make_plot.r')
+source('../R/stan_utility.R')
 set.seed(420)
 
 # plotting "rules"
@@ -47,33 +48,13 @@ sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
 
 data <- read_rdump('../data/data_dump/impute_info.data.R')
 
-pat <- 'surv_'
+pat <- 'surv_cweib_base'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 
-ids <- rep(1:(length(outs) / 4), each = 4)
-outs <- split(outs, ids)
 
 # simple comparison of fits
-fits <- llply(outs, read_stan_csv)
-log.lik <- llply(fits, extract_log_lik)
-loo.est <- llply(log.lik, loo)
-waic.est <- llply(log.lik, waic)
-
-# comparison tables
-loo.tab <- loo::compare(loo.est[[1]], loo.est[[2]], 
-                        loo.est[[3]], loo.est[[4]],
-                        loo.est[[5]], loo.est[[6]],
-                        loo.est[[7]], loo.est[[8]])
-waic.tab <- loo::compare(waic.est[[1]], waic.est[[2]], 
-                         waic.est[[3]], waic.est[[4]],
-                         waic.est[[5]], waic.est[[6]],
-                         waic.est[[7]], waic.est[[8]])
-#mn <- c('continuous Weibull w/ interaction', 
-#        'continuous Weibull w/o interaction', 
-#        'discrete Weibull w/ interaction',
-#        'discrete Weibull w/o interaction')
-#rownames(loo.tab) <- rownames(waic.tab) <- mn
-
+fits <- read_stan_csv(outs)
+check_all_diagnostics(fits)
 
 # move on to the plots
 # all the plots for all the models
