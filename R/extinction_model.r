@@ -47,6 +47,7 @@ num.orig <- length(unique(con.orig))
 prob.epi <- qbeta(short.data$epi / (short.data$epi + short.data$off), 
                   short.data$epi.bck + 1, short.data$off.bck + 1)
 env.odds <- rescale(prob.epi)
+short.data$occur <- short.data$epi + short.data$off
 
 
 data <- list(dur = short.data$duration, 
@@ -55,38 +56,23 @@ data <- list(dur = short.data$duration,
              occupy = rescale(logit(short.data$occupy)),
              env = env.odds,
              leng = rescale(log(short.data$size)),
-             relab = rescale(log(short.data$rsamp)))
+             relab = rescale(log(short.data$rsamp)),
+             nocc = rescale(log(short.data$occur)))
 
 
 inclusion <- short.data$duration > 2
 
-data$samp_obs <- short.data$gap[inclusion]
-
-data$obs_ord <- which(inclusion)
-data$imp_ord <- which(!inclusion)
-
 data$N <- num.samp
 data$O <- num.orig
-data$N_obs <- length(data$samp_obs)
-data$N_imp <- data$N - data$N_obs
-data$inclusion <- inclusion * 1
-
-# suggested by betareg manual, which has the citation
-num <- data$samp_obs * (length(data$samp_obs) - 1) + 0.5
-data$samp_obs <- num / length(data$samp_obs)
 
 with(data, {stan_rdump(list = c('N', 
                                 'O',
-                                'N_obs', 'N_imp',
                                 'dur', 
                                 'censored', 
-                                'inclusion',
-                                'obs_ord',
-                                'imp_ord',
                                 'cohort',
                                 'occupy',
                                 'env', 
                                 'leng',
                                 'relab',
-                                'samp_obs'),
+                                'nocc'),
                        file = '../data/data_dump/impute_info.data.R')})
