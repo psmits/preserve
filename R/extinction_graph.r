@@ -60,50 +60,9 @@ check_all_diagnostics(fits)
 # all the plots for all the models
 # allows full comparison between model fits and estimates
 
-# plots for when there is interaction
-npred <- 6
-# continuous weibull
-wei.fit <- rstan::extract(fits[[4]], permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, name = 'cweib_inter')
-
-# discrete weibull
-wei.fit <- rstan::extract(fits[[8]], permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, name = 'dweib_inter')
-
-# continuous exponential
-wei.fit <- rstan::extract(fits[[2]], permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, name = 'cexp_inter')
-
-# discrete exponential (geometric)
-wei.fit <- rstan::extract(fits[[6]], permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, name = 'dexp_inter')
-
-
-
-
-
 # plots for when there is no interaction
 npred <- 5
 # continuous weibull
 wei.fit <- rstan::extract(fits[[3]], permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 
                 npred = npred, name = 'cweib_base')
-
-# continuous weibull
-wei.fit <- rstan::extract(fits[[7]], permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, name = 'dweib_base')
-
-# continuous exponential
-wei.fit <- rstan::extract(fits[[1]], permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, name = 'cexp_base')
-
-# discrete exponential (geometric)
-wei.fit <- rstan::extract(fits[[5]], permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, name = 'dexp_base')
