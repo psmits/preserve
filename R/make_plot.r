@@ -36,7 +36,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   ggsave(ps, filename = paste0('../doc/figure/ppc_err_scatter_avg_',
                                       name, '.pdf'),
          width = 6, height = 5, dpi = 600)
-
+  
   pe <- ppc_ecdf_overlay(data$dur, wei.fit$y_tilde[1:100, ])
   ggsave(pe, filename = paste0('../doc/figure/ppc_ecdf_',
                                       name, '.pdf'),
