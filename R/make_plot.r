@@ -16,21 +16,33 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   ggsave(pm, filename = paste0('../doc/figure/ppc_mean_',
                                       name, '.pdf'),
          width = 6, height = 5, dpi = 600)
+
   pmg <- ppc_stat_grouped(data$dur, wei.fit$y_tilde, 
                           group = data$cohort, 'mean')
   ggsave(pmg, filename = paste0('../doc/figure/ppc_mean_group_',
                                       name, '.pdf'),
-         width = 6, height = 5, dpi = 600)
+         width = 10, height = 8, dpi = 600)
+
   pd <- ppc_dens_overlay(data$dur, wei.fit$y_tilde[1:100, ])
   ggsave(pd, filename = paste0('../doc/figure/ppc_dens_',
                                       name, '.pdf'),
          width = 6, height = 5, dpi = 600)
-  ps <- ppc_scatter_avg(data$dur, wei.fit$y_tilde)
-  ggsave(pd, filename = paste0('../doc/figure/ppc_scatter_avg_',
+  pd <- pd + coord_cartesian(xlim = c(0, 30))
+  ggsave(pd, filename = paste0('../doc/figure/ppc_dens_zoom_',
                                       name, '.pdf'),
          width = 6, height = 5, dpi = 600)
+
+  ps <- ppc_error_scatter_avg(data$dur, wei.fit$y_tilde)
+  ggsave(ps, filename = paste0('../doc/figure/ppc_err_scatter_avg_',
+                                      name, '.pdf'),
+         width = 6, height = 5, dpi = 600)
+
   pe <- ppc_ecdf_overlay(data$dur, wei.fit$y_tilde[1:100, ])
-  ggsave(pd, filename = paste0('../doc/figure/ppc_ecdf_',
+  ggsave(pe, filename = paste0('../doc/figure/ppc_ecdf_',
+                                      name, '.pdf'),
+         width = 6, height = 5, dpi = 600)
+  pe <- pe + coord_cartesian(xlim = c(0, 30))
+  ggsave(pe, filename = paste0('../doc/figure/ppc_ecdf_zoom_',
                                       name, '.pdf'),
          width = 6, height = 5, dpi = 600)
 
