@@ -11,6 +11,7 @@ library(gridBase)
 library(gridExtra)
 library(ellipse)
 library(loo)
+library(bayesplot)
 source('../R/mung.r')
 source('../R/multiplot.r')
 source('../R/borrow_plotcorr.r')
@@ -63,6 +64,6 @@ check_all_diagnostics(fits)
 # plots for when there is no interaction
 npred <- 5
 # continuous weibull
-wei.fit <- rstan::extract(fits[[3]], permuted = TRUE)
+wei.fit <- rstan::extract(fits, permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 
                 npred = npred, name = 'cweib_base')
