@@ -7,9 +7,9 @@ do
   for i in `seq 1 4`;
   do
     ../stan/surv_cweib_base sample \
-      adapt delta=0.99 \
+      adapt delta=0.9999 \
       num_samples=15000 num_warmup=15000 thin=15 \
-      algorithm=hmc engine=nuts max_depth=10 stepsize=1 \
+      algorithm=hmc engine=nuts max_depth=10 stepsize=0.1 \
       id=$i \
       init=0 \
       data file=$f \

@@ -1,4 +1,5 @@
 library(ggplot2)
+library(dplyr)
 library(reshape2)
 library(plyr)
 library(scales)
@@ -46,6 +47,7 @@ sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
                            gts = gts,
                            cuts = 'Chang',
                            bot = 'Trem')
+
 
 data <- read_rdump('../data/data_dump/impute_info.data.R')
 

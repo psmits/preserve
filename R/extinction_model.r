@@ -38,9 +38,12 @@ ss.gen <- ddply(ss, .(occurrences.genus_name), summarize,
 
 num.samp <- nrow(short.data)
 
-con.orig <- match(as.character(short.data$orig), rev(as.character(lump[, 2])))
-con.orig <- mapvalues(con.orig, from = unique(con.orig), 
-                      to = rank(unique(con.orig)))
+# match cohorts
+con.orig <- mapvalues(short.data$orig,
+                      sort(unique(as.character(short.data$orig))),
+                      sort(unique(as.character(lump[5:(5 + 33 - 1), 4]))))
+ordd <- match(con.orig, lump[, 4])
+con.orig <- ordd - 4
 num.orig <- length(unique(con.orig))
 
 # environmental preference
