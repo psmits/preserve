@@ -22,6 +22,18 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   ggsave(pmg, filename = paste0('../doc/figure/ppc_mean_group_',
                                       name, '.pdf'),
          width = 10, height = 8, dpi = 600)
+  
+  pe <- ppc_stat(data$dur, wei.fit$y_tilde, 'median')
+  ggsave(pe, filename = paste0('../doc/figure/ppc_median_',
+                                      name, '.pdf'),
+         width = 6, height = 5, dpi = 600)
+
+  
+  peg <- ppc_stat_grouped(data$dur, wei.fit$y_tilde, 
+                          group = data$cohort, 'median')
+  ggsave(peg, filename = paste0('../doc/figure/ppc_med_group_',
+                                      name, '.pdf'),
+         width = 10, height = 8, dpi = 600)
 
   pd <- ppc_dens_overlay(data$dur, wei.fit$y_tilde[1:100, ])
   ggsave(pd, filename = paste0('../doc/figure/ppc_dens_',
@@ -91,6 +103,11 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
                                   x}, 
                                   x = wei.surv, 
                                   y = seq(length(wei.surv))))
+
+
+
+
+
   # naming/legacy code issue
   sim.surv <- wei.surv
 
@@ -122,11 +139,70 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   surv.plot <- surv.plot + labs(x = 'Duration (t)', 
                                 y = 'Pr(t < T)')
   surv.plot <- surv.plot + theme(axis.title = element_text(size = 25))
-  surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans(),
+  surv.plot <- surv.plot + scale_y_continuous(trans=log_trans(),
                                               breaks = c(0.01, 0.1, 0.5, 1))
   ggsave(surv.plot, filename = paste0('../doc/figure/survival_curves_bw_',
                                       name, '.pdf'),
          width = 6, height = 5, dpi = 600)
+
+  # survival curves by grouping
+  #duration
+  #condition
+  #coh
+  survdat <- data.frame(duration, condition, coh)
+  survdat_g <- split(survdat, survdat$coh)
+  survfit_g <- purrr::map(survdat_g, ~ survfit(Surv(time = .x$duration, 
+                                                    event = .x$condition, 
+                                                    type = 'left') ~ 1))
+  survfit_g <- purrr::map2(survfit_g, names(survfit_g), function(x, y) {
+                             y <- data.frame(time = x$time,
+                                             surv = x$surv, 
+                                             group = y)
+                             y})
+  sfg <- purrr::reduce(survfit_g, rbind)
+  
+  gg <- sample(nrow(wei.fit$y_tilde), 100)
+  wr <- wei.fit$y_tilde[gg, ]
+  wrl <- as.list(as.data.frame(t(wr)))
+  wrl_g <- purrr::map(wrl, function(x) {
+                        a <- split(x, coh)
+                        purrr::map(a, ~ survfit(Surv(.x) ~ 1))})
+  wrl_f <- purrr::map(wrl_g, function(x) {
+                        purrr::map2(x, names(x), function(a, b) {
+                                      y <- data.frame(time = a$time, 
+                                                      surv = a$surv,
+                                                      group = b)
+                                      y})})
+  wrl_f <- purrr::map(wrl_f, ~ purrr::reduce(.x, rbind))
+  wrl_f <- bind_rows(wrl_f, .id = 'sim')
+  wrl_f$group <- as.character(wrl_f$group)
+
+  
+  cn <- as.character(lump[5:(5 + 33 - 1), 4])
+  sfg$group <- plyr::mapvalues(sfg$group,
+                               from = unique(sfg$group),
+                               to = cn)
+  sfg$group <- factor(sfg$group, levels = cn)
+  wrl_f$group <- plyr::mapvalues(wrl_f$group, 
+                                 from = unique(wrl_f$group),
+                                 to = cn)
+  wrl_f$group <- factor(wrl_f$group, levels = cn)
+
+ 
+  # facet-d by group
+  sgg <- ggplot(sfg, aes(x = time, y = surv))
+  sgg <- sgg + geom_line(data = wrl_f, mapping = aes(x = time, y = surv, group = sim), 
+                         alpha = 0.1)
+  sgg <- sgg + geom_line(colour = 'blue')
+  sgg <- sgg + facet_wrap(~ group)
+  sgg <- sgg + coord_cartesian(xlim = c(0, 30))
+  sgg <- sgg + theme(strip.text = element_text(size = 10))
+  ggsave(filename = '../doc/figure/ppc_surv_coh.png', sgg,
+         width = 10.5, height = 8, dpi = 600)
+
+  sgg <- sgg + scale_y_continuous(trans = log_trans())
+  ggsave(filename = '../doc/figure/ppc_surv_coh_log.png', sgg,
+         width = 10.5, height = 8, dpi = 600)
 
 
   # posterior predictive point checks
