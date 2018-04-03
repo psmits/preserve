@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: amnat_sub.aux
+The style file: amnat.bst
+Database file #1: newbib.bib
+Database file #2: packages.bib
+Warning--I didn't find a database entry for "stan-manual:2014"
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 101 entries,
+            3251 wiz_defined-function locations,
+            1306 strings with 20617 characters,
+and the built_in function-call counts, 58250 in all, are:
+= -- 5150
+> -- 2350
+< -- 78
++ -- 796
+- -- 695
+* -- 3848
+:= -- 9552
+add.period$ -- 408
+call.type$ -- 101
+change.case$ -- 734
+chr.to.int$ -- 113
+cite$ -- 101
+duplicate$ -- 4153
+empty$ -- 4362
+format.name$ -- 967
+if$ -- 11669
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 835
+newline$ -- 509
+num.names$ -- 406
+pop$ -- 1549
+preamble$ -- 1
+purify$ -- 635
+quote$ -- 0
+skip$ -- 1361
+stack$ -- 0
+substring$ -- 3388
+swap$ -- 1821
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 879
+warning$ -- 0
+while$ -- 478
+width$ -- 0
+write$ -- 1307
+(There was 1 warning)
