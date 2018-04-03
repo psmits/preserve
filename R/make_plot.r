@@ -11,31 +11,50 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   size <- c(data$size)
   duration <- c(data$dur)
 
+  cn <- as.character(lump[5:(5 + 33 - 1), 4])
+
+  cr <- purrr::map2(cn, seq(length(cn)), ~ paste0(.y, '. ', .x))
+  mvgr <- mapvalues(data$cohort, sort(unique(data$cohort)), cr)
+  mvgr <- factor(mvgr, levels = cr)
 
   pm <- ppc_stat(data$dur, wei.fit$y_tilde, 'mean')
+  pm <- pm + labs(x = 'Duration (geological stages)',
+                  y = 'Frequency')
   ggsave(pm, filename = paste0('../doc/figure/ppc_mean_',
                                       name, '.pdf'),
          width = 6, height = 5, dpi = 600)
 
   pmg <- ppc_stat_grouped(data$dur, wei.fit$y_tilde, 
-                          group = data$cohort, 'mean')
+                          group = mvgr, 'mean',
+                          facet_args = list(switch = 'x'))
+  pmg <- pmg + labs(x = 'Duration (geological stages)',
+                    y = 'Frequency')
+  pmg <- pmg + theme(strip.text = element_text(size = 10))
   ggsave(pmg, filename = paste0('../doc/figure/ppc_mean_group_',
                                       name, '.pdf'),
          width = 10, height = 8, dpi = 600)
   
   pe <- ppc_stat(data$dur, wei.fit$y_tilde, 'median')
+  pe <- pe + labs(x = 'Duration (geological stages)',
+                  y = 'Frequency')
   ggsave(pe, filename = paste0('../doc/figure/ppc_median_',
                                       name, '.pdf'),
          width = 6, height = 5, dpi = 600)
 
   
   peg <- ppc_stat_grouped(data$dur, wei.fit$y_tilde, 
-                          group = data$cohort, 'median')
+                          group = mvgr, 'median',
+                          facet_args = list(switch = 'x'))
+  peg <- peg + labs(x = 'Duration (geological stages)',
+                    y = 'Frequency')
+  peg <- peg + theme(strip.text = element_text(size = 10))
   ggsave(peg, filename = paste0('../doc/figure/ppc_med_group_',
                                       name, '.pdf'),
          width = 10, height = 8, dpi = 600)
 
   pd <- ppc_dens_overlay(data$dur, wei.fit$y_tilde[1:100, ])
+  pd <- pd + labs(x = 'Duration (geological stages)',
+                  y = 'Density')
   ggsave(pd, filename = paste0('../doc/figure/ppc_dens_',
                                       name, '.pdf'),
          width = 6, height = 5, dpi = 600)
@@ -178,15 +197,16 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   wrl_f$group <- as.character(wrl_f$group)
 
   
-  cn <- as.character(lump[5:(5 + 33 - 1), 4])
+  mvg <- levels(mvgr)
+  unique(sfg$group)
   sfg$group <- plyr::mapvalues(sfg$group,
                                from = unique(sfg$group),
-                               to = cn)
-  sfg$group <- factor(sfg$group, levels = cn)
+                               to = mvg)
+  sfg$group <- factor(sfg$group, levels = mvg)
   wrl_f$group <- plyr::mapvalues(wrl_f$group, 
                                  from = unique(wrl_f$group),
-                                 to = cn)
-  wrl_f$group <- factor(wrl_f$group, levels = cn)
+                                 to = mvg)
+  wrl_f$group <- factor(wrl_f$group, levels = mvg)
 
  
   # facet-d by group
@@ -194,9 +214,11 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   sgg <- sgg + geom_line(data = wrl_f, mapping = aes(x = time, y = surv, group = sim), 
                          alpha = 0.1)
   sgg <- sgg + geom_line(colour = 'blue')
-  sgg <- sgg + facet_wrap(~ group)
+  sgg <- sgg + facet_wrap(~ group, switch = 'x')
   sgg <- sgg + coord_cartesian(xlim = c(0, 30))
   sgg <- sgg + theme(strip.text = element_text(size = 10))
+  sgg <- sgg + labs(x = 'Duration (geological stages)', 
+                    y = 'P(T > t)')
   ggsave(filename = '../doc/figure/ppc_surv_coh.png', sgg,
          width = 10.5, height = 8, dpi = 600)
 

@@ -24,12 +24,12 @@ set.seed(420)
 theme_set(theme_bw())
 cbp <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', 
          '#0072B2', '#D55E00', '#CC79A7')
-theme_update(axis.text = element_text(size = 15),
-             axis.title = element_text(size = 20),
-             legend.text = element_text(size = 20),
-             legend.title = element_text(size = 20),
+theme_update(axis.text = element_text(size = 10),
+             axis.title = element_text(size = 15),
+             legend.text = element_text(size = 15),
+             legend.title = element_text(size = 15),
              legend.key.size = unit(1, 'cm'),
-             strip.text = element_text(size = 20))
+             strip.text = element_text(size = 15))
 
 # bring in data files and get them prepped
 data.file <- list.files('../data', pattern = 'Occs')
