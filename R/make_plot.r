@@ -294,9 +294,9 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
                      nn <- nn[seq(npred)]
                      rownames(x) <- colnames(x) <- nn
                      x})
-    } else if(npred == 4) {
+    } else if(npred == 5) {
       out <- llply(out, function(x) {
-                     nn <- c('i', 'r', 'e', 'e2', 's')
+                     nn <- c('i', 'r', 'e', 'e2', 'm', 's')
                      nn <- nn[seq(npred)]
                      rownames(x) <- colnames(x) <- nn
                      x})
@@ -358,9 +358,9 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   if(npred == 6) {
     too <- c('intensity', 'range', 'env_pref', 'env_curv', 
              'rxe', 'size', 'delta')[seq(npred)]
-  } else if(npred == 4) {
+  } else if(npred == 5) {
     too <- c('intensity', 'range', 'env_pref', 'env_curv', 
-             'delta')[seq(npred)]
+             'size', 'delta')[seq(npred)]
   }
   #too <- c('beta^0', 'beta^r', 'beta^v', 'beta^v^2', 'beta^m', 
   #         'delta')[seq(npred)]
@@ -412,7 +412,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
                (wei.fit$mu_prior[sam, 3] * x) + 
                (wei.fit$mu_prior[sam, 4] * x^2) +
                (wei.fit$mu_prior[sam, 5] * (x * y)))
-    } else if (npred == 4) {
+    } else if (npred == 5) {
       bet <- -(bet + (wei.fit$mu_prior[sam, 2] * y) +
                (wei.fit$mu_prior[sam, 3] * x) + 
                (wei.fit$mu_prior[sam, 4] * x^2))
@@ -431,7 +431,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
     if(npred == 6) {
       bet <- -(mcoef[1] + (mcoef[2] * y) + (mcoef[3] * x) + (mcoef[4] * x^2) + 
                (mcoef[5] * (x * y)))
-    } else if(npred == 4) {
+    } else if(npred == 5) {
       bet <- -(mcoef[1] + (mcoef[2] * y) + (mcoef[3] * x) + (mcoef[4] * x^2))
     }
     if(is.null(wei.fit$alpha)) {
@@ -448,7 +448,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
     # very important variable for all plots that follow!
     # need to loop through each value and make a diff plot for each
     type <- c('low', 'med', 'high')
-  } else if(npred == 4) {
+  } else if(npred == 5) {
     val2 <- quantile(rang, 0.5)
     # very important variable for all plots that follow!
     # need to loop through each value and make a diff plot for each
@@ -503,8 +503,8 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
     sam2 <- sam[1:100]
     if(npred == 6) {
       bet.coh <- wei.fit$beta[sam2, , c(1, 2, 3, 4, 5)]
-    } else if(npred == 4) {
-      bet.coh <- wei.fit$beta[sam2, , c(1, 2, 3)]
+    } else if(npred == 5) {
+      bet.coh <- wei.fit$beta[sam2, , c(1, 2, 3, 4)]
     }
     #if(!(best %in% 1:2)) {
     #  alp.coh <- apply(wei.fit$alpha_cohort[sam, ], 2, function(x) 
@@ -515,7 +515,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
     val <- seq(from = min(env.d), to = max(env.d), by = 0.01)
     if(npred == 6) {
       dat <- cbind(1, val2[zz], val, val^2, val * val2[zz])
-    } else if(npred == 4) {
+    } else if(npred == 5) {
       dat <- cbind(1, val2[zz], val, val^2)
     }
 

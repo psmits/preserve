@@ -9,21 +9,23 @@ data {
   int cohort[N];
   real occupy[N];
   real env[N];
+  real leng[N];
+
   real nocc[N];
 }
 parameters {
   real alpha_trans;
 
   // regression coefficients
-  vector[4] mu_prior;
-  vector[4] beta[O];  // cohort coef 
-  corr_matrix[4] Omega;
-  vector<lower=0>[4] sigma; 
+  vector[5] mu_prior;
+  vector[5] beta[O];  // cohort coef 
+  corr_matrix[5] Omega;
+  vector<lower=0>[5] sigma; 
   real delta;  // effect of abundance
 }
 transformed parameters {
   real<lower=0> alpha;
-  cov_matrix[4] Sigma;
+  cov_matrix[5] Sigma;
 
   vector[N] hold;
   
@@ -37,7 +39,7 @@ transformed parameters {
           beta[cohort[i], 2] * occupy[i] + 
           beta[cohort[i], 3] * env[i] + 
           beta[cohort[i], 4] * (env[i]^2) +
-          //beta[cohort[i], 5] * leng[i] +
+          beta[cohort[i], 5] * leng[i] +
           delta * nocc[i])/ alpha);
   }
 }
@@ -51,6 +53,7 @@ model {
   mu_prior[2] ~ normal(-1, 1);
   mu_prior[3] ~ normal(0, 1);
   mu_prior[4] ~ normal(1, 1);
+  mu_prior[5] ~ normal(0, 0.5);
 
   delta ~ normal(0, 1);
 

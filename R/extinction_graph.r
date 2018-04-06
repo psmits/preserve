@@ -64,7 +64,7 @@ check_all_diagnostics(fits)
 # allows full comparison between model fits and estimates
 
 # plots for when there is no interaction
-npred <- 4
+npred <- 5
 # continuous weibull
 wei.fit <- rstan::extract(fits, permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 

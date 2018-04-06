@@ -54,7 +54,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
 
   bibr <- bibr[bibr$occurrences.class_name %in% taxon | 
                bibr$occurrences.order_name %in% taxon, ]
-  #bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
+  bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
 
   # gap-iness of each stage
   dd <- split(bibr, bibr[, bins])
@@ -274,7 +274,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   sepkoski.data <- cbind(age.data, fauna)[fauna %in% names(sepkoski), ]
   sepkoski.data$fauna <- as.character(sepkoski.data$fauna)
   sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
-  #sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]
+  sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]
   sepkoski.data$gap <- taxon.gap[match(sepkoski.data$genus, names(taxon.gap))]
   sepkoski.data$rsamp <- rsamp[match(sepkoski.data$genus, names(rsamp))]
   sepkoski.data

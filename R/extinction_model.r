@@ -58,7 +58,7 @@ data <- list(dur = short.data$duration,
              cohort = con.orig, 
              occupy = rescale(logit(short.data$occupy)),
              env = env.odds,
-             #leng = rescale(log(short.data$size)),
+             leng = rescale(log(short.data$size)),
              relab = rescale(log(short.data$rsamp)),
              nocc = rescale(log(short.data$occur)))
 
@@ -75,6 +75,7 @@ with(data, {stan_rdump(list = c('N',
                                 'cohort',
                                 'occupy',
                                 'env', 
+                                'leng',
                                 'relab',
                                 'nocc'),
                        file = '../data/data_dump/impute_info.data.R')})

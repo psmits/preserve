@@ -1,4 +1,5 @@
 library(ggplot2)
+library(dplyr)
 library(reshape2)
 library(plyr)
 library(scales)
@@ -12,7 +13,6 @@ library(gridExtra)
 library(xtable)
 library(ellipse)
 library(loo)
-library(ppcor)
 source('../R/mung.r')
 source('../R/multiplot.r')
 source('../R/borrow_plotcorr.r')
@@ -36,17 +36,15 @@ sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata',
 
 data <- read_rdump('../data/data_dump/impute_info.data.R')
 
-pat <- 'faun_'
+pat <- 'surv_cweib_base'
+
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
-ids <- rep(1:(length(outs) / 4), each = 4)
-outs <- split(outs, ids)
 
-
-wfit <- read_stan_csv(outs[[2]])
+wfit <- read_stan_csv(outs)
 log.lik <- extract_log_lik(wfit)
 wei.fit <- rstan::extract(wfit, permuted = TRUE)
 # this will need to be updated with number of models
-npred <- 7
+npred <- 5
 
 
 # environmental preference
@@ -77,14 +75,6 @@ sd(oo)
 (max(oo) - min(oo)) / sd(oo)
 
 sd(prob.epi)
-
-td <- apply(wei.fit$samp, 1, sd)
-
-dd <- wei.fit$delta * 2 * td
-
-sum(abs(wei.fit$mu_prior[, 2]) > dd) / length(dd)
-sum(abs(wei.fit$mu_prior[, 3]) > dd) / length(dd)
-sum(abs(wei.fit$mu_prior[, 4]) > dd) / length(dd)
 
 
 tt <- (abs((wei.fit$mu_prior[, 2] * 2 * sd(oo))) - wei.fit$delta) > 0
