@@ -94,8 +94,7 @@ The analysis of taxon durations, or time from origination to extinction, falls u
 
 In order to test for an association between extinction intensity and extinction selectivity, both extinction rate and trait-based differences in extinction rate need to be estimated. Previous work has approached this problem by estimating the extinction intensity and selectivity at different time points or for different origination cohorts independently and then comparing those estimates CITATION. I find this approach problematic for a few reasons. First, by treating each time point or cohort as independent the estimates from each model are not relative to each other and they do not represent the greatest compromise across all available data CITATIONS. Second, by treating each time point or cohort as independent any and all post-hoc analyses are at risk of false positive results because of multiple comparisons CITATIONS. Third, post-hoc analysis of correlations between maximum likelihood estimates is much less satisfying or coherent than including those correlations as estimates of the initial model, something that is not possible when each time point or cohort is considered independent CITATION. 
 
-The hierarchical Bayesian approach used here involves developing a single model to estimate all of time points or cohorts simultaneously while also estimating the group averages for all parameter CITATION. By averaging across groups, the analytical advantages of specific prior choices can induce the partial pooling and regularization of parameter estimates which smooths over groups with small sample sizes or weakly estimated effects. Additionally, individual estimates are much more comparable, not only between time points or cohorts, but also relative to the groups average CITATION. This approach is conceptually and analytically similar to mixed-effects modeling but the Bayesian framework allows the use of strongly regularizing priors in order to better constrain parameter estimates.
-
+%The hierarchical Bayesian approach used here involves developing a single model to estimate all of time points or cohorts simultaneously while also estimating the group averages for all parameter CITATION. By averaging across groups, the analytical advantages of specific prior choices can induce the partial pooling and regularization of parameter estimates which smooths over groups with small sample sizes or weakly estimated effects. Additionally, individual estimates are much more comparable, not only between time points or cohorts, but also relative to the groups average CITATION. This approach is conceptually and analytically similar to mixed-effects modeling but the Bayesian framework allows the use of strongly regularizing priors in order to better constrain parameter estimates.
 
 While estimation of both trait-dependent speciation and extinction rates from phylogenies of extant taxa has grown dramatically \citep{Maddison2007,Fitzjohn2010,Goldberg2011a,Goldberg2005,Rabosky2013,Stadler2013b,Stadler2011a,Stadler2013a}, there are two major ways to estimate trait-dependent extinction: analysis of phylogenies, and analysis of the fossil record. These two directions, phylogenetic comparative and paleobiological, are complementary and intertwined in the field of macroevolution \citep{Rabosky2010b,Jablonski2008a,Hunt2014a}. In the case of extinction, analysis of the fossil record has the distinct advantage over phylogenies of only extant taxa because extinction is observable; this means that extinction rate is possible to estimate \citep{Rabosky2010a,Quental2009,Liow2010a}. The approach used here is thus complementary to the analysis of trait-dependent extinction based on a phylogeny.
 
@@ -117,6 +116,22 @@ Body size, measured as shell length, is also considered as a trait that may pote
 It is well known that, given the incompleteness of the fossil record, the observed duration of a taxon is an underestimate of that taxon's true duration \citep{Solow1997,Wagner2013a,Wang2004,Liow2010b,Alroy2014a,Foote1996e}. Because of this, the concern is that a taxon's observed duration may reflect its relative chance of being sampled and not any of the effects of the covariates of interest. In this case, for sampling to be a confounding factor there must be consistent relationship between the quality of sampling of a taxon and its apparent duration (e.g. greater sampling, longer duration). If there is no relationship between sampling and duration then interpretation can be made clearly; while observed durations are obviously truncated true durations, a lack of a relationship would indicate that the amount and form of this truncation is not a major determinant of the taxon's apparent duration. By including sampling as a covariate in the model, this effect can be quantified and can be taken into account when interpreting the estimates of the effects of the other covariates.
 
 
+%\begin{table}[h]
+%  \centering
+%  \caption{Primary analytical questions tested using this model}
+%  \begin{tabular}{l l l}
+%    Question & Possible results and explanation & Sources
+%    \hline
+%    Relationship between geographic range and duration & positive relationship (predicted), no relationship, negative relationship (unlikely) & \\
+%    Relationship between environmental preference and duration & non-linear concave down (predicted), linear with slope != 0, linear with slope == 0 (unlikely) & \\
+%    Correlation between average cohort duration and effect of geographic range on duration & positive correlation (duration inc, effect inc), negative correlation (duration inc, effect desc) & \\
+%    Correlation between average cohort duration and environmental preference (linear term) & & \\
+%    Correlation between average cohort duration and environmental preference (squared term) & & \\
+%    Correlation between effect of geographic range and effect of environmental preference (linear term) & & \\
+%    Correlation between effect of geographic range and effect of environmental preference (squared term) & & \\
+%  \end{tabular}
+%  \label{tab:hypo}
+%\end{table}
 
 
 
@@ -125,14 +140,14 @@ It is well known that, given the incompleteness of the fossil record, the observ
 
 % foote gave me a hand with the taxonomic occurrences
 %   biggest limiting factor is the Payne 2014 body size dataset
-The brachiopod dataset analyzed here was sourced from the Paleobiology Database (http://www.paleodb.org) which was then filtered based on taxonomic (Rhychonelliformea: Rhynchonellata, Chileata, Obolellida, Kutorginida, Strophomenida, Spiriferida), temporal (post-Cambrian Paleozoic), stratigraphic, and other occurrence information used in this analysis. Analyzed occurrences were restricted to those with paleolatitude and paleolongitude coordinates, assignment to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. Epicontinental versus open-ocean assignments for each fossil occurrence are partially based on those from \citet{Miller2009a}, with additional occurrences assigned similarly (Miller and Foote, personal communication). These filtering criteria are very similar to those from \citet{Foote2013} with an additional constraint of being present in the body size data set from \citet{Payne2014}. In total, there 1130 were genera included in the dataset.
+The brachiopod dataset analyzed here was sourced from the Paleobiology Database (http://www.paleodb.org) which was then filtered based on taxonomic (Rhychonelliformea: Rhynchonellata, Chileata, Obolellida, Kutorginida, Strophomenida, Spiriferida), temporal (post-Cambrian Paleozoic), stratigraphic, and other occurrence information used in this analysis. Analyzed occurrences were restricted to those with paleolatitude and paleolongitude coordinates, have been assigned to either epicontinental or open-ocean environment, and belonging to a genus present in the body size dataset \citep{Payne2014}. Epicontinental versus open-ocean assignments for each fossil occurrence are partially based on those from \citet{Miller2009a}, with additional occurrences assigned similarly (Miller and Foote, personal communication). These filtering criteria are very similar to those from \citet{Foote2013} with an additional constraint of being present in the body size data set from \citet{Payne2014}. In total, there 1130 were genera included in the dataset.
 
 % justification of using genus level versus specific
 Fossil occurrences were analyzed at the genus level which is common for paleobiological, macroevolutionary and macroecological studies of marine invertebrates \citep{Alroy2010,Foote2013,Harnik2013,Kiessling2007a,Miller2009a,Nurnberg2013a,Nurnberg2015,Payne2007,Simpson2009,Vilhena2013}. While species diversity dynamics are frequently of much greater interest than those of higher taxa (though see \citealt{Foote2014b,Hoehn2015}), the nature of the fossil record makes accurate, precise, and consistent taxonomic assignments at the species level difficult for all occurrences. As such, the choice to analyze genera as opposed to species was in order to assure a minimum level of confidence and accuracy in the data analyzed here.
 
 Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to individual fossils themselves but instead fossils are assigned to a geological interval which represents some temporal range. In this analysis, stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage (e.g. the final stage of the study interval) were right censored at the Changhsingian; genera with a duration of only one stage were left censored \citep{Klein2003}. How the likelihood of censored observations is calculated is detailed in section \ref{sec:model}.
 
-The covariates of duration included in this analysis are geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), body size (\(m\)), and sampling (\(s\)).
+The covariates of duration included in this analysis are geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), shell length (\(m\)) and sampling (\(s\)).
 
 Geographic range was calculated as relative occupancy corrected for incomplete sampling. First, the paleolatitude-paleolongitude coordinates for all occurrences were projected onto an equal-area cylindrical map projection. Each occurrence was then assigned to one of the cells from a 70 \(\times\) 34 regular raster grid placed on the map. Each grid cell represents approximately 250,000 km\(^{2}\). The map projection and regular lattice were made using shape files from http://www.naturalearthdata.com/ and the \texttt{raster} package for R \citep{raster}. For each stage, the total number of occupied grid cells was calculated. Then, for each temporal bin, the relative occurrence probability of the observed taxa was calculated using the \uppercase{jade} method developed by \citet{Chao2015a}. This method accounts for the fact that taxa with an occupancy of 0 cannot be observed which means that occupancy follows a truncated Binomial distribution. This correction is critical when comparing occupancies from different times with different geographic sampling. Finally, for each genus, the mean relative occurrence probability was calculated as the average of that genus' occurrence probabilities for all stages it was sampled to yield relative occupancy, my proxy for geographic range.
 
@@ -148,11 +163,13 @@ where \(v\) is the percent of the distribution defined in equation \ref{eq:envpr
 
 Body size, measured as shell length, was sourced directly from \citet{Payne2014}. These measurements were made from brachiopod taxa figured in the \textit{Treatise on Invertebrate Paleontology} \citep{Brunton2007}.
 
+To control for the effect of incomplete sampling on species duration, the number of samples of each genus over their duration was used as a covariate. This measure is a simple proxy of differences in fossilization between genera that has been used before CITATION. the basic assumption of using this measure is that more abundant taxa may have more precise estimate of their duration while species with low abundance may have unduly truncated durations. By including this covariate as a predictor in this model, the hope is to help mitigate the effect of the incompleteness of the fossil record when estimating ecological differences in duration. The effect of sampling was assumed constant through time. 
+
 %The sampling probability for individual taxa was calculated using the standard gap statistic \citep{Foote1996e,Foote2000}. The gap statistic is calculated as the number of stages in which the taxon was sampled minus two divided by the duration of the taxon minus two. Subtracting two from both the numerator and denominator is because the first and last appearance stages are by definition sampled. Because taxa that were right censored only include a first appearance, one was subtracted from the numerator and denominator instead of two.
 
 %The minimum duration for which a gap statistic can be calculated is three stages, so I chose the impute the gap statistic for all observations with a duration less than 3. Imputation is the ``filling in'' of missing observations based on the observed values \citep{Rubin1996,Gelman2007}. This is fairly straight forward in a Bayesian framework because both covariates and parameters are considered random variables, meaning that the missing values of sampling can be modeled as coming from some probability distribution. The model for imputing sampling probability is described in section \ref{sec:impute}.
 
-Prior to analysis, geographic range was logit transformed and body size was natural-log transformed; both of these transformations make these variables defined for the entire real line. Sampling probability was transformed as \((s (n - 1) + 0.5) / n\) where \(n\) is the sample size as recommended by \citet{Smithson2006}; this serves to slightly shrink the range of the data so that there are no values of 0 or 1. All covariates except for sampling were standardized by subtracting the mean from all values and dividing by twice its standard deviation, which follows \citet{Gelman2007}. This standardization means that the associated regression coefficients are comparable as the expected change per 1-unit change in the rescaled covariates. Finally, \(D\) is defined as the total number of covariates, excluding sampling, plus one for the intercept term.
+Prior to analysis, geographic range was logit transformed and the number of samples was natural-log transformed; both of these transformations make these variables defined for the entire real line. Sampling probability was transformed as \((s (n - 1) + 0.5) / n\) where \(n\) is the sample size as recommended by \citet{Smithson2006}; this serves to slightly shrink the range of the data so that there are no values of 0 or 1. All covariates except for sampling were standardized by subtracting the mean from all values and dividing by twice its standard deviation, which follows \citet{Gelman2007}. This standardization means that the associated regression coefficients are comparable as the expected change per 1-unit change in the rescaled covariates. Finally, \(D\) is defined as the total number of covariates, excluding sampling, plus one for the intercept term.
 
 
 
@@ -184,7 +201,8 @@ The elements of \(\mu\) were given independent normally distributed priors. The 
     \mu^{r} &\sim \mathcal{N}(-1, 1) \\
     \mu^{v} &\sim \mathcal{N}(0, 1) \\
     \mu^{v^{2}} &\sim \mathcal{N}(1, 1) \\
-    \mu^{m} &\sim \mathcal{N}(0, 1) \\
+    \mu^{m} &\sim \mathcal{N}(0, 0.5) \\
+    \delta &\sim \mathcal{N}(1) \\
     \tau &\sim \mathrm{C^{+}}(1) \\
     \Omega &\sim \text{LKJ}(2).
   \end{aligned}
@@ -254,7 +272,11 @@ The joint posterior was approximated using a Markov-chain Monte Carlo routine th
 %
 %Calcuations of WAIC and PSIS-LOO for a model fit using Stan were done using the R package ``loo'' \citep{loo}. See \citet{Vehtari2015a} for detailed explinations of the calucations for both WAIC and PSIS-LOO.
 
-Model adequacy was evaluated using a couple of posterior predictive checks. Posterior predictive checks are a means for understanding model fit or adequacy where the basic idea is that replicated data sets simulated from the fitted model should be similar to the original data and systematic differences between the simulations and observations indicate weaknesses of the model fit \citep{Gelman2013d}. For both approaches used here, each posterior predictive datasets were generated from a unique draw from the posterior distribution of each parameter. The two posterior predictive checks used in this analysis are a comparison of a non-parametric estimate of the survival function \(S(t)\) from the empirical dataset to the non-parametric estimates of \(S(t)\) from the 100 posterior predictive datasets, and comparison of the observed genus durations to the average posterior predictive estimate of \(\log(\sigma)\) (Eq. \ref{eq:sigma}). The former is to see if simulated data has a similar survival pattern to the observed, while the latter is to see if the model systematically over- or under- estimates taxon survival.
+Model adequacy was evaluated using a series of posterior predictive checks. Posterior predictive checks are a means for understanding model fit or adequacy. The concept of model adequacy is that if our model is an adequate descriptor of the observed data, then data simulated from the posterior predictive distribution should be similar to the observed given the same covariates, etc. \citep{Gelman2013d}. Posterior predictive checks can take many forms but the basic idea is to compare some property of the empirical data to that property estimated from each of the simultaed datasets. Additionally, for structured datasets like the one analyzed here, the fit of the model to different parts of the data can be assessed, which in turn can reveal a great deal if the model has good fit to some aspects of data but not others; it is in these scenarios when knowledge about the biology, geology, and paleoenvironment becomes important in order to explain what unmodeled processes might lead to these discrepancies between our data and the model \citep{Gelman2013d}.
+
+After the model was fit to the data, 100 datasets were simulated from the posterior predictive distribution of the model. The types of posterior predictive tests used in this analysis fall into two categories: comparison of observed mean genus duration to a distribution of mean genus duration estimates from the posterior simulations, comparison of a non-parameteric estimate of the survival function from the observed data to estimates of that same survival function from the simulations. These posterior predictive tests were done for the entire data and for each of the origination cohorts.
+
+
 
 % everything is on zenodo if you want to reproduce this entire analysis
 % All code necessary to reproduce this analysis are available through an archived Zenodo repository DOI URL.
@@ -265,6 +287,52 @@ Model adequacy was evaluated using a couple of posterior predictive checks. Post
 
 
 \section*{Results}
+
+
+% outline of new results section
+% two parts
+%   posterior preditive checks and assessing model adequacy
+%   testing biological hypotheses about extinction intensity and selectivity
+% posterior predictive checks and assessing model adequacy
+%   for discussion
+%     if our model fits the data, then the posterior predictive distrubution should look similar to the observed data.
+%     if our model fails to recapitulate the data then our model is an insuffcient descriptor of the data generating process.
+%     what can happen is that model adequately describes some parts of the data and not others
+%       what is interesting about the poorly fit data?
+%       what is the unmodeled knowledge or properties of the poorly fit data?
+%       this is where things get interesting and new hypotheses can be generated
+%   for methods
+%     forms
+%       test statistic (observed value vs sim values) vs distribution (observed data vs simulated data)
+%       overall vs by origination cohort
+%   testing biological hypotheses about extinction intensity and selectivity
+%     ("if yes, if no" stuff could techically go in introducation as table. "these are important/relevant hypotheses that will be tested. here are the possible outcomes and possible explinations for those outcomes (with citations)")
+%     geographic range
+%       as range inc, duration inc? P(average effect > 0)
+%         if yes:
+%         if no:
+%       could any cohort have reverse (range inc, duration desc)? P(any cohort effect < 0)
+%         if yes:
+%         if no:
+%     environmental preference
+%       two parts, hard to seperate; calculate on parabola
+%       concave down?
+%         if yes:
+%         if no:
+%       apex of curve favor epicontinental environments or open-ocean?
+%         if yes:
+%         if no:
+%     correlation
+%       as cohort's average duration inc, does cohort's average effect of geographic range inc? P(correlation > 0)
+%         if yes:
+%         if no:
+%       as cohort's average duration inc, does cohort's average effect of favoring epi inc? P(correlation > 0)
+%         if yes:
+%         if no:
+%       as cohort's average duration inc, does cohort's average curvature of the relationship inc? P(correlation > 0)
+%         if yes:
+%         if no:
+
 
 Comparison of the posterior predictive estimates of \(S(t)\) to the empirical estimate reveal few obvious biases except for the case of values from the far right tail of observed durations (Fig. \ref{fig:surv}). This result is reinforced by the additional posterior predictive comparison where most estimates are not systematically biased except for a consistent under-estimate of \(\log(\sigma)\) for older taxa (Fig. \ref{fig:shot}). The results of both posterior predictive checks indicate that, for the majority of observations, model fit is generally not biased.
 
