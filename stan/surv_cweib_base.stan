@@ -71,11 +71,11 @@ model {
   // likelihood / sampling statements
   for(i in 1:N) {
     if(censored[i] == 0) {
-      if(dur[i] == 1) {
-        target += weibull_lcdf(dur[i] | alpha, hold[i]);
-      } else {
+      //if(dur[i] == 1) {
+      //  target += weibull_lcdf(dur[i] | alpha, hold[i]);
+      //} else {
         target += weibull_lpdf(dur[i] | alpha, hold[i]);
-      }
+      //}
     } else {
       target += weibull_lccdf(dur[i] | alpha, hold[i]);
     }
@@ -88,11 +88,11 @@ generated quantities {
   // log_lik
   for(i in 1:N) {
     if(censored[i] == 0) {
-      if(dur[i] == 1) {
-        log_lik[i] = weibull_lcdf(dur[i] | alpha, hold[i]);
-      } else {
+      //if(dur[i] == 1) {
+      //  log_lik[i] = weibull_lcdf(dur[i] | alpha, hold[i]);
+      //} else {
         log_lik[i] = weibull_lpdf(dur[i] | alpha, hold[i]);
-      }
+      //}
     } else {
       log_lik[i] = weibull_lccdf(dur[i] | alpha, hold[i]);
     }
@@ -101,5 +101,12 @@ generated quantities {
   // posterior predictive simulations
   for(i in 1:N) {
     y_tilde[i] = weibull_rng(alpha, hold[i]);
+    if(censored[i] == 1) {
+      //y_tilde[i] = y_tilde[i] * uniform_rng(0, 1);
+      if(y_tilde[i] > dur[i]) y_tilde[i] = dur[i];
+    }
+    //if(dur[i] == 1 && y_tilde[i] < 1) {
+    //  y_tilde[i] = 1;
+    //}
   }
 }
