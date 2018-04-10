@@ -145,7 +145,7 @@ The brachiopod dataset analyzed here was sourced from the Paleobiology Database 
 % justification of using genus level versus specific
 Fossil occurrences were analyzed at the genus level which is common for paleobiological, macroevolutionary and macroecological studies of marine invertebrates \citep{Alroy2010,Foote2013,Harnik2013,Kiessling2007a,Miller2009a,Nurnberg2013a,Nurnberg2015,Payne2007,Simpson2009,Vilhena2013}. While species diversity dynamics are frequently of much greater interest than those of higher taxa (though see \citealt{Foote2014b,Hoehn2015}), the nature of the fossil record makes accurate, precise, and consistent taxonomic assignments at the species level difficult for all occurrences. As such, the choice to analyze genera as opposed to species was in order to assure a minimum level of confidence and accuracy in the data analyzed here.
 
-Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to individual fossils themselves but instead fossils are assigned to a geological interval which represents some temporal range. In this analysis, stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage (e.g. the final stage of the study interval) were right censored at the Changhsingian; genera with a duration of only one stage were left censored \citep{Klein2003}. How the likelihood of censored observations is calculated is detailed in section \ref{sec:model}.
+Genus duration was calculated as the number of geologic stages from first appearance to last appearance, inclusive. Durations were based on geologic stages as opposed to millions of years because of the inherently discrete nature of the fossil record; dates are not assigned to individual fossils themselves but instead fossils are assigned to a geological interval which represents some temporal range. In this analysis, stages are effectively irreducible temporal intervals in which taxa may occur. Genera with a last occurrence in or after Changhsingian stage (e.g. the final stage of the study interval) were right censored at the Changhsingian. How the likelihood of censored observations is calculated is detailed in section \ref{sec:model}.
 
 The covariates of duration included in this analysis are geographic range size (\(r\)), environmental preference (\(v, v^{2}\)), shell length (\(m\)) and sampling (\(s\)).
 
@@ -183,7 +183,7 @@ Hierarchical modelling is a statistical approach which explicitly takes into acc
 
 Genus durations were assumed to follow a Weibull distribution which allows for age-dependent extinction \citep{Klein2003}: \(y \sim \mathrm{Weibull}(\alpha, \sigma)\). The Weibull distribution has two parameters: scale \(\sigma\), and shape \(\alpha\). When \(\alpha = 1\), \(\sigma\) is equal to the expected duration of any taxon. \(\alpha\) is a measure of the effect of age on extinction risk where values greater than 1 indicate that extinction risk increases with age, and values less than 1 indicate that extinction risk decreases with age. Note that the Weibull distribution is equivalent to the exponential distribution when \(\alpha = 1\). 
 
-In the case of the right- and left-censored observations mentioned above, the probability of those observations has a different calculation \citep{Klein2003}. For right-censored observations, the likelihood is calculated \(p(y | \theta) = 1 - F(y) = S(y)\) where \(F(y)\) is the cumulative distribution function. In contrast, the likelihood of a left-censored observation is calculated \(p(y | \theta) = F(y)\).
+In the case of the right-censored observations mentioned above, the probability of those observations has a different calculation \citep{Klein2003}. For right-censored observations, the likelihood is calculated \(p(y | \theta) = 1 - F(y) = S(y)\) where \(F(y)\) is the cumulative distribution function. %In contrast, the likelihood of a left-censored observation is calculated \(p(y | \theta) = F(y)\).
 
 The scale parameter \(\sigma\) was modeled as a regression following \citet{Kleinbaum2005} with both varying intercept and varying slopes and the effect of sampling; this is expressed
 \begin{equation}
@@ -260,23 +260,25 @@ The log of the shape parameter \(\alpha\) was given a weakly informative prior \
 
 
 \subsection*{Posterior inference and posterior predictive checks}
-The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 40,000 steps, split half warm-up and half sampling and thinned to every 20th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}.
 
-% edit, relab, and impute can all be compared using WAIC/PSIS-LOO
-%   highgrade cannot
-%The fit of the above model (the ``full'' model) was compared to the fits of three other sub-models: constant \(\alpha\) across cohorts, no sampling as a covariate, or both constant \(\alpha\) and no sampling covariate. These models were compared for predicted out-of-sample predictive accuracy using both the widely-applicable information criterion (WAIC) and leave-one-out cross-validation estimated via Pareto-smoothed importance sampling (PSIS-LOO) \citep{Vehtari2015}. Both of these are estimates of the out-of-sample predictive accuracy or the expected quality of fit of the model to new data. 
-%
-%WAIC is a more fully Bayesian alternative to AIC or DIC \citep{Watanabe2010a,Gelman2013d}; comparisons of WAIC values are useful for better understanding the effect of model complexity on out-of-sample predictive accuracy. Note that BIC is not an estimate of out-of-sample predictive accuracy \citep{Gelman2013d}. The calculation of WAIC used here corresponds to the ``WAIC 2'' formulation recommended by \citet{Gelman2013d}. Lower values of WAIC indicate greater expected out-of-sample predictive accuracy than higher values.
-%
-%PSIS-LOO is similar to WAIC in that it is an approxmiation of out-of-sample predictive accuracy except its calculation is completely different \citep{Vehtari2015,Vehtari2015a}. Models comparison is done using a leave-one-out crossvalidation information criterion (LOOIC), which is simply the PSIS-LOO estimate multiplied by -2 so that it is on the deviance scale. As with WAIC, models with lower values of LOOIC are expected to have a greater out-of-sample predictive accuracy than models with greater values.
-%
-%Calcuations of WAIC and PSIS-LOO for a model fit using Stan were done using the R package ``loo'' \citep{loo}. See \citet{Vehtari2015a} for detailed explinations of the calucations for both WAIC and PSIS-LOO.
+The joint posterior was approximated using a Markov-chain Monte Carlo routine that is a variant of Hamiltonian Monte Carlo called the No-U-Turn Sampler \citep{Hoffman2014} as implemented in the probabilistic programming language Stan \citep{2014stan}. The posterior distribution was approximated from four parallel chains run for 40,000 steps, split half warm-up and half sampling and thinned to every 20th sample for a total of 4000 posterior samples. Chain convergence was assessed via the scale reduction factor \(\hat{R}\) where values close to 1 (\(\hat{R} < 1.1\)) indicate approximate convergence. Convergence means that the chains are approximately stationary and the samples are well mixed \citep{Gelman2013d}. After the model was fit to the data, 100 datasets were simulated from the posterior predictive distribution of the model. These simulations were used to test for adequacy of model fit as described below.
+
+% simulating 
+%  have to be equal to or less than what we actually observed
+%  probably have poor fit to the censored observations
+Survival analysis is complicated by censored observations where the ultimate time of extinction for some taxa could not be observed during the study window.
+
+% lets try fully observed vs fully observed + censored?
+
 
 Model adequacy was evaluated using a series of posterior predictive checks. Posterior predictive checks are a means for understanding model fit or adequacy. The concept of model adequacy is that if our model is an adequate descriptor of the observed data, then data simulated from the posterior predictive distribution should be similar to the observed given the same covariates, etc. \citep{Gelman2013d}. Posterior predictive checks can take many forms but the basic idea is to compare some property of the empirical data to that property estimated from each of the simultaed datasets. Additionally, for structured datasets like the one analyzed here, the fit of the model to different parts of the data can be assessed, which in turn can reveal a great deal if the model has good fit to some aspects of data but not others; it is in these scenarios when knowledge about the biology, geology, and paleoenvironment becomes important in order to explain what unmodeled processes might lead to these discrepancies between our data and the model \citep{Gelman2013d}.
 
-After the model was fit to the data, 100 datasets were simulated from the posterior predictive distribution of the model. The types of posterior predictive tests used in this analysis fall into two categories: comparison of observed mean genus duration to a distribution of mean genus duration estimates from the posterior simulations, comparison of a non-parameteric estimate of the survival function from the observed data to estimates of that same survival function from the simulations. These posterior predictive tests were done for the entire data and for each of the origination cohorts.
 
+The types of posterior predictive tests used in this analysis fall into two categories: comparison of observed mean and median genus duration to a distribution of mean and median genus duration estimates from the posterior simulations, comparison of a non-parameteric estimate of the survival function from the observed data to estimates of that same survival function from the simulations. 
 
+The survival function describes the probability of a taxon persisting given that it has survived up to time \(t\); this is expressed \(P(T > t)\) because \(T\) is the true extinction time of the species and \(t\) is some arbitrary time of observation and we are estimting that probability that \(t\) is less than \(T\). It is important to note, however, that the survival function does not reflect density of observations unlike e.g. histograms. Instead, this posterior predictive check reflects the model's ability to predict genus survival.
+
+These posterior predictive tests were done for the entire data and for each of the origination cohorts.
 
 % everything is on zenodo if you want to reproduce this entire analysis
 % All code necessary to reproduce this analysis are available through an archived Zenodo repository DOI URL.
@@ -288,7 +290,7 @@ After the model was fit to the data, 100 datasets were simulated from the poster
 
 \section*{Results}
 
-
+\subsection*{Model adequacy and posterior predictive checks}
 % outline of new results section
 % two parts
 %   posterior preditive checks and assessing model adequacy
@@ -305,6 +307,83 @@ After the model was fit to the data, 100 datasets were simulated from the poster
 %     forms
 %       test statistic (observed value vs sim values) vs distribution (observed data vs simulated data)
 %       overall vs by origination cohort
+
+
+% total group
+
+Comparisons between the observed distribution of durations to the distrubtions of 100 simulated datasets reveals the heterogeneous fit of the model to the data (Fig. \ref{fig:dens_overlay_zoom}). The two major aspects of misfit that are observable are at at durations between 1-3 stages and 8-9 stages. In both of these cases, the observed distribution is effectively left-shifted e.g. the shared peak from the 100 simulated datasets is at 1 while that from the observed is at 2. However, our goal of our model is estimating the expected duration of a genus given its covariate information. While the model estimates are not exact, it is possible that our model fits the ``middle'' of our data well but does poorly towards the tails. 
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_dens_zoom_cweib_base}
+  \caption{ Comparison of the distribution of the observed data (black) to 100 simulated distributions (blue). This is a close-up view of the bulk of the distribution which shows the more subtle aspects of (mis)fit between the data and the model. }
+  \label{fig:dens_overlay_zoom}
+\end{figure}
+
+
+Comparisons between the survival functions estimated from the empirical data and from 100 simulated datasets further expands the picture of model (mis)fit (Fig. \ref{fig:surv}). The survival curves of the 100 simulated datasets are very close to the survival function estimated from the empirical data for very short durations and high durations. For intermediate durations (\(\sim\)4-20 stages), our estimates are right shifted meaning that our estimated survival probabilities are possibly too high. What is interesting about this misfit is that the functions from empirical datasets and from the simulated datasets diverge when genera have a less than 50\% probability of surviving.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/survival_curves_cweib_base}
+  \caption{Comparison of the empirical estimate of \(S(t)\) (highlighted) versus estimates from 100 posterior predictive data sets (black). \(S(t)\) corresponds to the probability that the age of a genus \(t\) is less than the genus' ultimate duration \(T\). }
+  \label{fig:surv}
+\end{figure}
+
+In addition to distributional comparisons, model adequacy at the total data level was assessed through comparison of the mean and median of the observed data to those from simulated data sets. While the previous posterior predictive checks have focused on the heterogeneity of model (mis)fit to the entire distribution of the data, assessment of the models ability to predict specific summary statistics appears adequate (Fig. \ref{fig:ppc_mean,fig:ppc_median}). The principle goal of this model is to obtain adequate prediction of how a taxon's expected duration for a given set of ecological covariates, as such the seemingly adequate fit of our model to average taxon duration is reassuring (Fig. \ref{fig:ppc_mean}). Additionally, given the skewness of the observed taxon durations (Fig. \ref{fig:dens_overlay_zoom}, the ability for the model to recapitulate the median observed taxon duration is notable.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_mean_cweib_base}
+  \caption{ Comparison of the observed mean genus duration (black vertical line) to a distribution of means estimated from 100 simulated datasets (blue). Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
+  \label{fig:ppc_mean}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_median_cweib_base}
+  \caption{ Comparison of the observed median genus duration (black vertical line) to a distribution of medians estimated from 100 simulated datasets (blue). Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
+  \label{fig:ppc_median}
+\end{figure}
+
+When considered together, all of the above posterior predictive checks indicate weak, but approximately adequate model fit for key questions such as expected taxon duration (Fig. \ref{fig:ppc_mean}). However, there is obviously heterogeneity in model fit because, while the model can recapitulate some aspects of the observed data (Fig. \ref{fig:ppc_mean,fig:ppc_median}), there are obvious discrepancies between the model and the data (Fig. \ref{fig:dens_overlay_zoom,fig:surv}). By performing the same posterior predictive tests for each of the origination cohorts, it may be possible to get a better picture of the source of model misfit.
+
+
+When the posterior predictive tests are visualized for each of the origination cohorts, a complex picture of heterogeneous model fit begins to emerge. Comparison between the empirical survival functions estimated for each cohort to those estimated from the simulated datasets reveals the degree of heterogeneity in model fit (Fig. \ref{fig:surv_group}, as some origination cohorts appear to be very well fit by the model (e.g. Darwillian, Ludlow, Lochkovian, Kungarian, etc.) while others are very poorly fit by the model (e.g. Asselian, Bashkirian, Moscovian, Stephanian, etc.). The poverty of model fit to these cohorts may indicate that these origination cohorts are undergoing a different extinction process whose aspects are unmodeled in this analysis. However, for those cohorts where our model recapitulates the empirical survival function indicates approximately adequate fit and that our model may be capturing some of the processes underlying taxon extinction.
+
+% by origination cohort
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_surv_coh}
+  \caption{Comparison of the empirical estimate of \(S(t)\) (highlighted) versus estimates from 100 posterior predictive data sets (black) for each of the origination cohorts. \(S(t)\) corresponds to the probability that the age of a genus \(t\) is less than the genus' ultimate duration \(T\). By comparing the fit of the model to the individual cohorts, when and where the model (mis)fits is more observable. }
+  \label{fig:surv_group}
+\end{figure}
+
+The summary statistic based posterior predictive checks reveal a similar pattern of heterogeneity previously observed. For nearly every origination cohort, the model is able to approximately recapitulate the observed mean duration (Fig. \ref{fig:group_mean}). There are a few exceptions to this pattern; for example, the model overestimates the mean taxon duration for the Sakmarian, Artinskian, and Wordian. 
+
+In comparison, the model has a much more heterogeneous adequacy of fit to origination cohort median taxon duration (Fig. \ref{fig:group_median}). This result stands in contrast to the models adequacy in predicting the overall median taxon duration (Fig. \ref{fig:ppc_median}). Cohorts with notably inadequate model predictions are the Hirnantian, Emsian, Eifelian, Giventian, Asselian, Sakmarian, Roadian, among others. Interestingly, model misfit is in both directions, with some cohorts underestimating median duration while others overestimate median duration.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_mean_group_cweib_base}
+  \caption{ Comparison of the observed mean genus duration (black vertical line) to a distribution of means estimated from 100 simulated datasets (blue) for each of the origination cohorts. Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
+  \label{fig:group_mean}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_med_group_cweib_base}
+  \caption{ Comparison of the observed median genus duration (black vertical line) to a distribution of medians estimated from 100 simulated datasets (blue) for each of the origination cohorts. Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
+  \label{fig:group_median}
+\end{figure}
+
+
+
+
+
+
+
+
 %   testing biological hypotheses about extinction intensity and selectivity
 %     ("if yes, if no" stuff could techically go in introducation as table. "these are important/relevant hypotheses that will be tested. here are the possible outcomes and possible explinations for those outcomes (with citations)")
 %     geographic range
@@ -334,7 +413,6 @@ After the model was fit to the data, 100 datasets were simulated from the poster
 %         if no:
 
 
-Comparison of the posterior predictive estimates of \(S(t)\) to the empirical estimate reveal few obvious biases except for the case of values from the far right tail of observed durations (Fig. \ref{fig:surv}). This result is reinforced by the additional posterior predictive comparison where most estimates are not systematically biased except for a consistent under-estimate of \(\log(\sigma)\) for older taxa (Fig. \ref{fig:shot}). The results of both posterior predictive checks indicate that, for the majority of observations, model fit is generally not biased.
 
 The cohort-level estimate of the effect of geographic range size indicates that as a taxon's geographic range increases, that taxon's duration is expected to increase (Table \ref{tab:param}). Given the estimates of \(\mu^{r}\) and \(\tau^{r}\), there is a less than 3.7\% (\(\pm 0.04\%\) SD) probability that this relationships would be reversed (\(\mathrm{Pr}\mathcal{N}(\mu^{r}, \tau^{r}) > 0)\)). The between-cohort variance \(\tau^{r}\) is the lowest of all the regression coefficients (Table \ref{tab:param}).
 
@@ -574,63 +652,6 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, R. Ree, and G. Slate
 
 
 \clearpage
-
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/survival_curves_cweib_base}
-  \caption{Comparison of the empirical estimate of \(S(t)\) (highlighted) versus estimates from 100 posterior predictive data sets (black). \(S(t)\) corresponds to the probability that the age of a genus \(t\) is less than the genus' ultimate duration \(T\). The vertical axis is log10 transformed.}
-  \label{fig:surv}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_surv_coh}
-  \caption{ }
-  \label{fig:surv_group}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_dens_cweib_base}
-  \caption{ }
-  \label{fig:dens_overlay}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_dens_zoom_cweib_base}
-  \caption{ }
-  \label{fig:dens_overlay_zoom}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_mean_cweib_base}
-  \caption{ }
-  \label{fig:ppc_mean}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_mean_group_cweib_base}
-  \caption{ }
-  \label{fig:group_mean}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_median_cweib_base}
-  \caption{ }
-  \label{fig:ppc_median}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_med_group_cweib_base}
-  \caption{ }
-  \label{fig:group_median}
-\end{figure}
 
 
 
