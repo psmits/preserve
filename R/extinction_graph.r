@@ -16,6 +16,7 @@ library(bayesplot)
 source('../R/mung.r')
 source('../R/multiplot.r')
 source('../R/borrow_plotcorr.r')
+source('../R/plot_foo.r')
 source('../R/make_plot.r')
 source('../R/stan_utility.R')
 set.seed(420)
@@ -54,7 +55,6 @@ data <- read_rdump('../data/data_dump/impute_info.data.R')
 pat <- 'surv_cweib_base'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 
-
 # simple comparison of fits
 fits <- read_stan_csv(outs)
 check_all_diagnostics(fits)
@@ -69,3 +69,22 @@ npred <- 5
 wei.fit <- rstan::extract(fits, permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 
                 npred = npred, name = 'cweib_base')
+
+
+pat <- 'surv_cweib_cens'
+outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
+
+# simple comparison of fits
+fits <- read_stan_csv(outs)
+check_all_diagnostics(fits)
+
+# move on to the plots
+# all the plots for all the models
+# allows full comparison between model fits and estimates
+
+# plots for when there is no interaction
+npred <- 5
+# continuous weibull
+wei.fit <- rstan::extract(fits, permuted = TRUE)
+posterior.plots(data = data, wei.fit = wei.fit, 
+                npred = npred, name = 'cweib_cens')
