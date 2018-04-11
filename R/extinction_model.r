@@ -5,44 +5,37 @@ source('../R/jade.r')
 source('../R/mung.r')
 
 data.file <- list.files('../data', pattern = 'Occs')
-fossil <- read.csv(paste0('../data/', data.file))
+fossil <- read_csv(paste0('../data/', data.file))
 bibr <- fossil
 
 lump.file <- list.files('../data', pattern = 'lump')
-lump <- read.csv(paste0('../data/', lump.file))
+lump <- read_csv(paste0('../data/', lump.file))
 
-payne <- read.table('../data/payne_bodysize/Occurrence_PaleoDB.txt',
-                    header = TRUE, stringsAsFactors = FALSE)
+payne <- read_tsv('../data/payne_bodysize/Occurrence_PaleoDB.txt')
 
 taxon = c('Rhynchonellata', 'Strophomenata', 'Chileata', 'Obolellata', 
           'Kutorginata', 'Spiriferida', 'Spiriferinida')
 bins = 'StageNewOrdSplitNoriRhae20Nov2013'
-gts = rev(as.character(lump[, 2]))
+gts = rev(c(lump[, 2])[[1]])
 cuts = 'Chang'
 bot = 'Trem'
 short.data <- sort.data(bibr, payne, taxon = taxon,
                         bins = bins,
-                        gts = rev(as.character(lump[, 2])),
+                        gts = gts,
                         cuts = cuts,
                         bot = bot)
 
-ss <- bibr[bibr$occurrences.genus_name %in% short.data$genus, ]
-ss <- unique(ss[, c('occurrences.genus_name', 'occurrences.species_name')])
-ss <- ss[order(ss[, 1]), ]
-ss <- ss[!(str_detect(ss[, 2], 'sp') | str_detect(ss[, 2], '[A-Z]')), ]
-ss.gen <- ddply(ss, .(occurrences.genus_name), summarize, 
-                o <- length(occurrences.species_name))
 
-# imputed model
 # now just setup the data
-
 num.samp <- nrow(short.data)
 
 # match cohorts
+
 con.orig <- mapvalues(short.data$orig,
                       sort(unique(as.character(short.data$orig))),
-                      sort(unique(as.character(lump[5:(5 + 33 - 1), 4]))))
-ordd <- match(con.orig, lump[, 4])
+                      sort(unique(c(lump[5:(5 + 33 - 1), 4])[[1]])))
+con.orig <- as.character(con.orig)
+ordd <- match(con.orig, c(lump[, 4])[[1]])
 con.orig <- ordd - 4
 num.orig <- length(unique(con.orig))
 
@@ -61,9 +54,6 @@ data <- list(dur = short.data$duration,
              leng = rescale(log(short.data$size)),
              relab = rescale(log(short.data$rsamp)),
              nocc = rescale(log(short.data$occur)))
-
-
-inclusion <- short.data$duration > 2
 
 data$N <- num.samp
 data$O <- num.orig

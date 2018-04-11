@@ -3,7 +3,12 @@
 source('../R/multiplot.r')
 source('../R/borrow_plotcorr.r')
 source('../R/plot_foo.r')
-posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
+posterior.plots <- function(data, 
+                            wei.fit, 
+                            npred, 
+                            lump, 
+                            name = 'cweib', 
+                            left = FALSE) {
   # data setup
   # HERE
   coh <- c(data$cohort)
@@ -12,8 +17,8 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   size <- c(data$size)
   duration <- c(data$dur)
 
-  cn <- as.character(lump[5:(5 + 33 - 1), 4]) # time unit names
-  cr <- purrr::map2(cn, seq(length(cn)), ~ paste0(.y, '. ', .x)) # give number
+  cn <- lump[5:(5 + 33 - 1), 4] # time unit names
+  cr <- purrr::map2_chr(cn, seq(length(cn)), ~ paste0(.y, '. ', .x)) # give number
   mvgr <- mapvalues(data$cohort, sort(unique(data$cohort)), cr)
   mvgr <- factor(mvgr, levels = cr) 
 
@@ -36,9 +41,18 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   # non-parametric estimate of the survival curve just given durations
   #   some durations are right-censored
   condition <- (data$censored == 0) * 1
-  emp.surv <- survfit(Surv(time = duration, 
-                           event = condition, 
-                           type = 'right') ~ 1)
+  duration1 <- ifelse(condition == 1 & duration == 1, NA, duration)
+  duration2 <- ifelse(condition == 0, NA, duration)
+
+  if(!left) {
+    emp.surv <- survfit(Surv(time = duration, 
+                             event = condition, 
+                             type = 'right') ~ 1)
+  } else if(left) {
+    emp.surv <- survfit(Surv(time = duration1, 
+                             time2 = duration2,
+                             type = 'interval2') ~ 1)
+  }
   emp.surv <- data.frame(time = emp.surv$time, surv = emp.surv$surv, 
                          lower = emp.surv$lower, upper = emp.surv$upper)
 
@@ -46,7 +60,19 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   #   actual S(t) estimates
   #   estimated durations under discrete Weibull
   wr <- wei.fit$y_tilde[sample(nrow(wei.fit$y_tilde), 100), ]
-  wei.surv <- apply(wr, 1, function(x) survfit(Surv(x, event = condition) ~ 1))
+  if(!left) {
+    wei.surv <- apply(wr, 1, function(x) 
+                      survfit(Surv(x, event = condition) ~ 1))
+  } else if(left) {
+    wei.surv <- apply(wr, 1, function(x)  {
+                        duration1 <- ifelse(condition == 1 & duration == 1, 
+                                            NA, x)
+                        duration2 <- ifelse(condition == 0, NA, x)
+                        survfit(Surv(time = duration1, 
+                                     time2 = duration2, 
+                                     type = 'interval2') ~ 1)})
+  }
+
   wei.surv <- llply(wei.surv, function(x) {
                       y <- data.frame(time = x$time, surv = x$surv)
                       y})
@@ -83,11 +109,17 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   #duration
   #condition
   #coh
-  survdat <- data.frame(duration, condition, coh)
+  survdat <- data.frame(duration, condition, coh, duration1, duration2)
   survdat_g <- split(survdat, survdat$coh)
-  survfit_g <- purrr::map(survdat_g, ~ survfit(Surv(time = .x$duration, 
-                                                    event = .x$condition, 
-                                                    type = 'right') ~ 1))
+  if(!left) {
+    survfit_g <- purrr::map(survdat_g, ~ survfit(Surv(time = .x$duration, 
+                                                      event = .x$condition, 
+                                                      type = 'right') ~ 1))
+  } else if(left) {
+    survfit_g <- purrr::map(survdat_g, ~ survfit(Surv(time = .x$duration1, 
+                                                      time2 = .x$duration2,
+                                                      type = 'interval2') ~ 1))
+  }
   survfit_g <- purrr::map2(survfit_g, names(survfit_g), function(x, y) {
                              y <- data.frame(time = x$time,
                                              surv = x$surv, 
@@ -95,15 +127,30 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
                              y})
   sfg <- purrr::reduce(survfit_g, rbind)
 
+  # now for the simulations
   gg <- sample(nrow(wei.fit$y_tilde), 100)
   wr <- wei.fit$y_tilde[gg, ]
   wrl <- as.list(as.data.frame(t(wr)))
-  wrl <- purrr::map(wrl, ~ data.frame(time = .x, condition))
-  wrl_g <- purrr::map(wrl, function(x) {
-                        a <- split(x, coh)
-                        purrr::map(a, ~ survfit(Surv(time = .x$time,
-                                                     event = .x$condition)
-                        ~ 1))})
+  if(!left) {
+    wrl <- purrr::map(wrl, ~ data.frame(time = .x, condition))
+    wrl_g <- purrr::map(wrl, function(x) {
+                          a <- split(x, coh)
+                          purrr::map(a, ~ survfit(Surv(time = .x$time,
+                                                       event = .x$condition)
+                          ~ 1))})
+  } else if(left) {
+    wrl <- purrr::map(wrl, function(x) {
+                        dr1 <- ifelse(duration == 1 & condition == 1, NA, x)
+                        dr2 <- ifelse(condition == 0, NA, x)
+                        data.frame(time = dr1, time2 = dr2)})
+    x <- wrl[[1]]
+    wrl_g <- purrr::map(wrl, function(x) {
+                          a <- split(x, coh)
+                          purrr::map(a, ~ survfit(Surv(time = .x$time,
+                                                       time2 = .x$time2,
+                                                       type = 'interval2') 
+                          ~ 1))})
+  }
   wrl_f <- purrr::map(wrl_g, function(x) {
                         purrr::map2(x, names(x), function(a, b) {
                                       y <- data.frame(time = a$time, 
@@ -131,7 +178,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
   sgg <- sgg + geom_line(data = wrl_f, mapping = aes(x = time, y = surv, group = sim), 
                          alpha = 0.1)
   sgg <- sgg + geom_line(colour = 'blue')
-  sgg <- sgg + facet_wrap(~ group, switch = 'x')
+  sgg <- sgg + facet_wrap(~ group, strip.position = 'bottom')
   sgg <- sgg + coord_cartesian(xlim = c(0, 30))
   sgg <- sgg + theme(strip.text = element_text(size = 10))
   sgg <- sgg + labs(x = 'Duration (geological stages)', 
@@ -146,7 +193,7 @@ posterior.plots <- function(data, wei.fit, npred, name = 'cweib') {
 
 
   wei.covcor <- get.covcor(stanfit = wei.fit, npred = npred)
-  
+
   # make a plot of the correlation matrix
   col1 <- colorRampPalette(c("red", "white", "blue"))
   col1<- col1(200)

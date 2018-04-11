@@ -102,7 +102,7 @@ generated quantities {
       //y_tilde[i] = y_tilde[i] * uniform_rng(0, 1);
       if(y_tilde[i] > dur[i]) y_tilde[i] = dur[i];
     }
-    if(dur[i] == 1 && censored[i] != 1 && y_tilde[i] < 1) {
+    if(dur[i] == 1 && censored[i] == 0 && y_tilde[i] < 1) {
       y_tilde[i] = 1;
     }
   }

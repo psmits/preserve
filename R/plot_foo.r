@@ -11,7 +11,7 @@ plot_ppcbasics <- function(wei.fit, data, lump, mvgr, cn, name) {
 
   pmg <- ppc_stat_grouped(duration, wei.fit$y_tilde, 
                           group = mvgr, 'mean',
-                          facet_args = list(switch = 'x'))
+                          facet_args = list(strip.position = 'bottom'))
   pmg <- pmg + labs(x = 'Duration (geological stages)',
                     y = 'Frequency')
   pmg <- pmg + theme(strip.text = element_text(size = 10))
@@ -29,7 +29,7 @@ plot_ppcbasics <- function(wei.fit, data, lump, mvgr, cn, name) {
 
   peg <- ppc_stat_grouped(duration, wei.fit$y_tilde, 
                           group = mvgr, 'median',
-                          facet_args = list(switch = 'x'))
+                          facet_args = list(strip.position = 'bottom'))
   peg <- peg + labs(x = 'Duration (geological stages)',
                     y = 'Frequency')
   peg <- peg + theme(strip.text = element_text(size = 10))
@@ -308,7 +308,8 @@ plot_coveffect <- function(wei.fit, npred, data, lump, name) {
                                                              ymax = X90.),
                                                fatten = 2)
   efbeta.plot <- efbeta.plot + facet_grid(pred ~ .,
-                                          scales = 'free_y', switch = 'y',
+                                          scales = 'free_y', 
+                                          switch = 'y',
                                           labeller = label_parsed)
   efbeta.plot <- efbeta.plot + geom_ribbon(data = ef.df, 
                                            mapping = aes(ymin = X10.,

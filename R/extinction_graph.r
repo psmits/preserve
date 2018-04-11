@@ -1,5 +1,4 @@
-library(ggplot2)
-library(dplyr)
+library(tidyverse)
 library(reshape2)
 library(plyr)
 library(scales)
@@ -32,24 +31,12 @@ theme_update(axis.text = element_text(size = 10),
              legend.key.size = unit(1, 'cm'),
              strip.text = element_text(size = 15))
 
-# bring in data files and get them prepped
-data.file <- list.files('../data', pattern = 'Occs')
-fossil <- read.csv(paste0('../data/', data.file))
-bibr <- fossil
-payne <- read.table('../data/payne_bodysize/Occurrence_PaleoDB.txt',
-                    header = TRUE, stringsAsFactors = FALSE)
-
+# time translation file
 lump.file <- list.files('../data', pattern = 'lump')
 lump <- read.csv(paste0('../data/', lump.file))
 gts <- rev(as.character(lump[, 2]))
 
-sepkoski.data <- sort.data(bibr, payne, taxon = 'Rhynchonellata', 
-                           bins = 'StageNewOrdSplitNoriRhae20Nov2013', 
-                           gts = gts,
-                           cuts = 'Chang',
-                           bot = 'Trem')
-
-
+# data used to fit the model
 data <- read_rdump('../data/data_dump/impute_info.data.R')
 
 pat <- 'surv_cweib_base'
@@ -57,6 +44,9 @@ outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 
 # simple comparison of fits
 fits <- read_stan_csv(outs)
+loglik <- extract_log_lik(fits)
+waic1 <- waic(loglik)
+loo1 <- loo(loglik)
 check_all_diagnostics(fits)
 
 # move on to the plots
@@ -68,14 +58,19 @@ npred <- 5
 # continuous weibull
 wei.fit <- rstan::extract(fits, permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, name = 'cweib_base')
+                npred = npred, lump = lump,
+                name = 'cweib_base')
 
 
+# right censored data form
 pat <- 'surv_cweib_cens'
 outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
 
 # simple comparison of fits
 fits <- read_stan_csv(outs)
+loglik <- extract_log_lik(fits)
+waic2 <- waic(loglik)
+loo2 <- loo(loglik)
 check_all_diagnostics(fits)
 
 # move on to the plots
@@ -87,4 +82,8 @@ npred <- 5
 # continuous weibull
 wei.fit <- rstan::extract(fits, permuted = TRUE)
 posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, name = 'cweib_cens')
+                npred = npred, lump = lump,
+                name = 'cweib_cens', left = TRUE)
+
+tab_waic <- loo::compare(waic1, waic2)
+tab_looic <- loo::compare(loo1, loo2)

@@ -13,7 +13,6 @@ library(rgdal)
 
 source('../R/jade.r')
 source('../R/clean_funcs.r')
-source('../R/gts.r')
 sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya', 
                               'Lingulata'),
                  paleozoic = c('Rhynchonellata', 'Crinoidea', 'Ostracoda', 
@@ -38,50 +37,34 @@ sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya',
 sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', 
                       bins = 'collections.stage', gts = gts,
                       cuts = 'Changhsingian',
-                      bot = 'Tremadocian') {
+                      bot = 'Tremadocian', testing = FALSE) {
 
-  # bibr <- fossil
-  # taxon <- 'Rhynchonellata'; bins <- 'StageNewOrdSplitNoriRhae20Nov2013'
-  # gts <- rev(as.character(lump[, 2])); cuts <- 'Chang'; bot <- 'Trem'
-  # i need to have good bin information, either stage 10my or fr2my
-  bibr[, bins] <- as.character(bibr[, bins])
-  bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
-
-  bibr <- bibr[!is.na(bibr[, bins]), ]
-  bibr <- bibr[!is.na(bibr$EO_5_1_2014), ]
-  bibr <- bibr[!is.na(bibr$collections.paleolngdec), ]
-  bibr <- bibr[!is.na(bibr$collections.paleolatdec), ]
-
-  bibr <- bibr[bibr$occurrences.class_name %in% taxon | 
-               bibr$occurrences.order_name %in% taxon, ]
-  bibr <- bibr[bibr$occurrences.genus_name %in% payne$taxon_name, ]
-
-  # gap-iness of each stage
-  dd <- split(bibr, bibr[, bins])
-  dd <- llply(dd, function(x) unique(x$occurrences.genus_name))
- 
-  mm <- as.character(lump[, 2]) %in% names(dd)
-  mm <- as.character(lump[mm, 2])
-  
-  dd <- dd[names(dd) %in% as.character(lump[, 2])]
-  dd <- dd[names(dd)[match(mm, names(dd))]]
-
-  gap.ratio <- c()  # gap / range through
-  for(ii in seq(from = 1, to = length(dd) - 2)) {
-    # before and after
-    rngthr <- dd[[ii]][dd[[ii]] %in% dd[[ii + 2]]]
-    # in?
-    no.gap <- dd[[ii + 1]][dd[[ii + 1]] %in% rngthr]
-    gap.ratio[ii] <- (length(rngthr) - length(no.gap)) / length(rngthr)
-    gap.ratio[ii] <- ifelse(is.nan(gap.ratio[ii]), 0, gap.ratio[ii])
+  if(testing) {
+    bibr <- fossil
+    taxon <- taxon
+    bins <- bins
+    gts <- gts
+    cuts <- cuts
+    bot <- bot
   }
-  gap.ratio <- data.frame(stg = as.character(names(dd)[seq(length(dd) - 2)]), 
-                          gap.ratio)
-  
+  #i need to have good bin information, either stage 10my or fr2my
+  #bibr[, bins] <- as.character(bibr[, bins])
+  #bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
+
+  bibr <- bibr %>% dplyr::mutate(bin = StageNewOrdSplitNoriRhae20Nov2013)
+
+  bibr <- bibr %>%
+    filter(!is.na(bin),
+           !is.na(EO_5_1_2014),
+           !is.na(collections.paleolngdec),
+           !is.na(collections.paleolatdec),
+           occurrences.class_name %in% taxon |
+             occurrences.order_name %in% taxon,
+           occurrences.genus_name %in% payne$taxon_name)
 
   #
   straight.occ <- dlply(bibr, .(occurrences.genus_name), 
-                        function(x) unique(x[, bins]))
+                        function(x) unique(x$bin))
   # find out which range into the paleozoic
   too.old <- names(which(laply(straight.occ, function(x) 
                                any(which(gts %in% x) > which(gts == bot)))))
@@ -93,22 +76,24 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
 
   # find out which range out of the paleozoic
   straight.occ <- dlply(bibr, .(occurrences.genus_name), 
-                        function(x) unique(x[, bins]))
+                        function(x) unique(x$bin))
   survivors <- names(which(laply(straight.occ, function(x) 
                                  any(which(gts %in% x) < which(gts == cuts)))))
 
   paleozoic <- rev(gts[which(gts == cuts):which(gts == bot)])
-  bibr <- bibr[bibr[, bins] %in% paleozoic, ]
+
+  bibr <- bibr %>%
+    filter(bin %in% paleozoic)
 
   # this section is all about finding duration
-  collec.stage <- table(bibr[, bins])
+  collec.stage <- table(bibr$bin)
   find.dur <- function(x) {
-    mm <- which(gts %in% unique(x[, bins]))
+    mm <- which(gts %in% unique(x$bin))
     max(mm) - min(mm) + 1
   }
   # generic duration
   taxon.age <- ddply(bibr, .(occurrences.genus_name), find.dur)
-  spot.fix <- split(bibr[, bins], bibr$occurrences.genus_name)
+  spot.fix <- split(bibr$bin, bibr$occurrences.genus_name)
   spot.fix <- spot.fix[names(spot.fix) %in% survivors]
   spot.fix <- llply(spot.fix, function(x) 
                     max(which(gts %in% unique(x))) - which(gts %in% cuts) + 1)
@@ -116,25 +101,26 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   taxon.age[taxon.age[, 1] %in% spot.fix[, 2], 2] <- spot.fix[, 1]
 
   taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
-                       table(x[, bins])})
+                       table(x$bin)})
 
   rsamp <- laply(taxon.occur, function(x) sum(x) / length(x))
 
-  taxon.gap <- c()
-  for(ii in seq(length(taxon.occur))) {
-    if(!(taxon.age[ii, 1] %in% survivors)) {
-      tm <- names(taxon.occur[[ii]])  # stage names
-      om <- gts %in% tm  # true false list
-      dm <- taxon.age[ii, 2] - 2
-      taxon.gap[ii] <- (sum(om) - 2) / dm
-    } else {
-      tm <- names(taxon.occur[[ii]])
-      om <- gts %in% tm
-      dm <- (max(which(gts %in% tm)) - which(gts %in% cuts))
-      taxon.gap[ii] <- (sum(om) - 1) / dm
-    }
-  }
-  names(taxon.gap) <- names(taxon.occur)
+  # deprecated
+  #taxon.gap <- c()
+  #for(ii in seq(length(taxon.occur))) {
+  #  if(!(taxon.age[ii, 1] %in% survivors)) {
+  #    tm <- names(taxon.occur[[ii]])  # stage names
+  #    om <- gts %in% tm  # true false list
+  #    dm <- taxon.age[ii, 2] - 2
+  #    taxon.gap[ii] <- (sum(om) - 2) / dm
+  #  } else {
+  #    tm <- names(taxon.occur[[ii]])
+  #    om <- gts %in% tm
+  #    dm <- (max(which(gts %in% tm)) - which(gts %in% cuts))
+  #    taxon.gap[ii] <- (sum(om) - 1) / dm
+  #  }
+  #}
+  #names(taxon.gap) <- names(taxon.occur)
 
 
   # this is about geographic range size
@@ -146,8 +132,9 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
                               proj4string = eq)  # wgs1984.proj
   r <- raster(globe.map, nrows = 70, ncols = 34)
   sp.ras <- rasterize(spatialref, r)
-  bibr$membership <- cellFromXY(sp.ras, xy = bibr[, c('collections.lngdec', 
-                                                      'collections.latdec')])
+  bibr$membership <- with(bibr, { cellFromXY(sp.ras, 
+                                             xy = cbind(collections.lngdec, 
+                                                        collections.latdec))})
 
   # fixes here
   names(bibr)[names(bibr) == bins] <- 'colstage'
@@ -275,7 +262,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   sepkoski.data$fauna <- as.character(sepkoski.data$fauna)
   sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
   sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]
-  sepkoski.data$gap <- taxon.gap[match(sepkoski.data$genus, names(taxon.gap))]
+  #sepkoski.data$gap <- taxon.gap[match(sepkoski.data$genus, names(taxon.gap))]
   sepkoski.data$rsamp <- rsamp[match(sepkoski.data$genus, names(rsamp))]
   sepkoski.data
 }
