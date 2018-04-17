@@ -120,11 +120,14 @@ posterior.plots <- function(data,
                                                       time2 = .x$duration2,
                                                       type = 'interval2') ~ 1))
   }
-  survfit_g <- purrr::map2(survfit_g, names(survfit_g), function(x, y) {
-                             y <- data.frame(time = x$time,
-                                             surv = x$surv, 
-                                             group = y)
-                             y})
+  survfit_g <- purrr::imap(survfit_g, ~ data.frame(time = .x$time,
+                                                   surv = .x$surv, 
+                                                   group = .y))
+#  survfit_g <- purrr::map2(survfit_g, names(survfit_g), function(x, y) {
+#                             y <- data.frame(time = x$time,
+#                                             surv = x$surv, 
+#                                             group = y)
+#                             y})
   sfg <- purrr::reduce(survfit_g, rbind)
 
   # now for the simulations
@@ -152,11 +155,14 @@ posterior.plots <- function(data,
                           ~ 1))})
   }
   wrl_f <- purrr::map(wrl_g, function(x) {
-                        purrr::map2(x, names(x), function(a, b) {
-                                      y <- data.frame(time = a$time, 
-                                                      surv = a$surv,
-                                                      group = b)
-                                      y})})
+                        purrr::imap(x, ~ data.frame(time = .x$time, 
+                                                    surv = .x$surv,
+                                                    group = .y))
+                        #purrr::map2(x, names(x), function(a, b) {
+                        #              y <- data.frame(time = a$time, 
+                        #                              surv = a$surv,
+                        #                              group = b)
+                        #              y})})
   wrl_f <- purrr::map(wrl_f, ~ purrr::reduce(.x, rbind))
   wrl_f <- bind_rows(wrl_f, .id = 'sim')
   wrl_f$group <- as.character(wrl_f$group)
