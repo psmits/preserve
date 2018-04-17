@@ -157,7 +157,7 @@ posterior.plots <- function(data,
   wrl_f <- purrr::map(wrl_g, function(x) {
                         purrr::imap(x, ~ data.frame(time = .x$time, 
                                                     surv = .x$surv,
-                                                    group = .y))
+                                                    group = .y))})
                         #purrr::map2(x, names(x), function(a, b) {
                         #              y <- data.frame(time = a$time, 
                         #                              surv = a$surv,
