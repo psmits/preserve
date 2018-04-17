@@ -44,12 +44,16 @@ print.xtable(param.tex, file = '../doc/table_param_draft.tex')
 
 
 # tail probabilities
-p.r <- 1 - (pnorm(0, wei.fit$mu_prior[, 2], wei.fit$sigma[, 2]))
+p.r <- (pnorm(0, wei.fit$mu_prior[, 2], wei.fit$sigma[, 2]))
 
 p.v <- 1 - (pnorm(0, wei.fit$mu_prior[, 3], wei.fit$sigma[, 3]))
+mean(p.v)
+sd(p.v)
+
 
 p.v2 <- (pnorm(0, wei.fit$mu_prior[, 4], wei.fit$sigma[, 4]))
-
+mean(p.v2)
+sd(p.v2)
 
 # inflection point is defined - (beta_v) / 2(beta_v2)
 # probability that average of the parabola defined
