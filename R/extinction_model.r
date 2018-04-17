@@ -31,9 +31,9 @@ num.samp <- nrow(short.data)
 
 # match cohorts
 
-con.orig <- mapvalues(short.data$orig,
-                      sort(unique(as.character(short.data$orig))),
-                      sort(unique(c(lump[5:(5 + 33 - 1), 4])[[1]])))
+con.orig <- dplyr::mapvalues(short.data$orig,
+                             sort(unique(as.character(short.data$orig))),
+                             sort(unique(c(lump[5:(5 + 33 - 1), 4])[[1]])))
 con.orig <- as.character(con.orig)
 ordd <- match(con.orig, c(lump[, 4])[[1]])
 con.orig <- ordd - 4
