@@ -81,6 +81,7 @@ check_all_diagnostics(fits)
 npred <- 5
 # continuous weibull
 wei.fit <- rstan::extract(fits, permuted = TRUE)
+
 posterior.plots(data = data, wei.fit = wei.fit, 
                 npred = npred, lump = lump,
                 name = 'cweib_cens', left = TRUE)

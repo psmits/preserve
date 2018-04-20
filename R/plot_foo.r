@@ -123,7 +123,6 @@ plot_enveffect <- function(val2, # quantile
                            npred) # number of predictors
 {
   for(zz in seq(length(val2))) {
-    #sam <- sample(nrow(wei.fit$lp__), 1000)
 
     # HERE
     env.d <- c(data$env)
@@ -131,33 +130,46 @@ plot_enveffect <- function(val2, # quantile
     quadval <- list()
     for(ii in seq(length(sam))) {
       quadval[[ii]] <- data.frame(env = val, 
-                                  resp = quad(val, y = val2[zz], 
-                                              sam[ii], npred = npred), 
+                                  resp = exp(quad(val, y = val2[zz], 
+                                                  sam[ii], npred = npred)), 
                                   sim = ii)
     }
     quadframe <- Reduce(rbind, quadval)
 
     mcoef <- colMeans(wei.fit$mu_prior[sam, ])[1:5]
     meanquad <- data.frame(env = val, 
-                           resp = quad.mean(val, y = val2[zz], 
-                                            mcoef, npred = npred,
-                                            sam = sam))
+                           resp = exp(quad.mean(val, y = val2[zz], 
+                                                mcoef, npred = npred,
+                                                sam = sam)))
 
     # add rug showing observed
-    #   this addition would overpower the big, by cohort graph
+    #   this addition could overpower the big, by cohort graph
     # HERE
+    # add cohort to env data for rug
+    stg.name <- as.character(lump[5:(5+33-1), 4])
+    stg.name <- Reduce(c, Map(function(x, y) paste0(y, '. ', x), 
+                              stg.name, seq(length(stg.name))))
+    
     env.obs <- data.frame(env = data$env)
+    env.obs$dur <- data$dur
+    env.obs$coh <- plyr::mapvalues(data$cohort, 
+                                   sort(unique(data$cohort)), 
+                                   stg.name)
+    env.obs$coh <- factor(env.obs$coh, stg.name)
 
     mustache <- ggplot(quadframe, aes(x = env, y = resp, group = sim))
-    mustache <- mustache + geom_line(alpha = 1 / 100)
+    mustache <- mustache + geom_line(alpha = 1 / 400, colour = 'blue')
     mustache <- mustache + geom_line(data = meanquad,
                                      mapping = aes(group = NULL),
+                                     linetype = 'dashed',
                                      colour = 'blue')
-    mustache <- mustache + geom_rug(data = env.obs,
-                                    mapping = aes(x = env, y = NULL, group = NULL),
-                                    sides = 'b', alpha = 0.05)
+    mustache <- mustache + geom_point(data = env.obs,
+                                      mapping = aes(x = env, 
+                                                    y = dur, 
+                                                    group = NULL), 
+                                      alpha = 0.1, colour = 'black')
     mustache <- mustache + labs(x = 'Environmental preference\n(open-ocean <--> epicontinental)', 
-                                y = 'log(approx. expected duration in t)')
+                                y = 'Duration in stages')
     #y = expression(paste('log(', sigma, ')')))
     mustache <- mustache + theme(axis.title.x = element_text(hjust = 0.5))
     ggsave(mustache, filename = paste0('../doc/figure/env_effect_', 
@@ -191,9 +203,9 @@ plot_enveffect <- function(val2, # quantile
       h <- list()
       for(jj in seq(length(val))) {
         if(is.null(alp.coh)) {
-          h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ])
+          h[[jj]] <- exp(-(bet.coh[, ii, ] %*% dat[jj, ]))
         } else {
-          h[[jj]] <- -(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii])
+          h[[jj]] <- exp(-(bet.coh[, ii, ] %*% dat[jj, ]) / exp(alp.coh[ii]))
         }
       }
       coh.est[[ii]] <- h
@@ -201,9 +213,6 @@ plot_enveffect <- function(val2, # quantile
 
     # massage into shape
     #   val, resp (V2), sim, coh
-    stg.name <- as.character(lump[5:(5+33-1), 4])
-    stg.name <- Reduce(c, Map(function(x, y) paste0(y, '. ', x), 
-                              stg.name, seq(length(stg.name))))
     coh.map <- list()
     for(jj in seq(data$O)) {
       h <- Map(function(x, y) {
@@ -214,6 +223,8 @@ plot_enveffect <- function(val2, # quantile
     }
     coh.df <- Reduce(rbind, coh.map)
 
+
+
     coh.df.short <- coh.df[coh.df$coh %in% c('14. Emsian', '15. Eifelian', 
                                              '16. Givetian', '17. Frasnian'), ]
 
@@ -222,13 +233,20 @@ plot_enveffect <- function(val2, # quantile
                                    mapping = aes(x = env,
                                                  y = resp,
                                                  group = NULL),
-                                   colour = 'black', size = 1.5)
+                                   colour = 'darkgrey', 
+                                   size = 1.5,
+                                   linetype = 'dashed')
     cohmust <- cohmust + geom_line(alpha = 1 / 10, colour = 'blue')
+    cohmust <- cohmust + geom_point(data = env.obs,
+                                    mapping = aes(x = env, 
+                                                  y = dur, 
+                                                  group = NULL), 
+                                    alpha = 0.5, colour = 'black')
     cohmust <- cohmust + facet_wrap(~ coh, strip.position = 'bottom', ncol = 7)
     cohmust <- cohmust + theme(axis.text = element_text(size = 8),
                                strip.text = element_text(size = 8))
     cohmust <- cohmust + labs(x = 'Environmental preference (v)',
-                              y = 'log(approx. expected duration in t)')
+                              y = 'Duration in stages')
     #y = expression(paste('log(', sigma, ')')))
     ggsave(cohmust, 
            filename = paste0('../doc/figure/env_cohort_', type[zz], 

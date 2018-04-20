@@ -90,10 +90,10 @@ posterior.plots <- function(data,
   surv.plot <- ggplot(emp.surv, aes(x = time, y = surv))
   surv.plot <- surv.plot + geom_line(data = sim.surv, 
                                      aes(x = time, y = surv, group = group),
-                                     colour = 'black', alpha = 0.05)
-  surv.plot <- surv.plot + geom_line(colour = 'blue', size = 1.2)
+                                     colour = 'blue', alpha = 0.05)
+  surv.plot <- surv.plot + geom_line(colour = 'black', size = 1.2)
   surv.plot <- surv.plot + geom_ribbon(mapping = aes(ymin = lower, ymax = upper), 
-                                       fill = 'blue', size = 1.2, alpha = 0.3)
+                                       fill = 'black', size = 1, alpha = 0.25)
   surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration)))
   surv.plot <- surv.plot + labs(x = 'Duration (t)', 
                                 y = 'Pr(t < T)')
@@ -182,10 +182,10 @@ posterior.plots <- function(data,
   # facet-d by group
   sgg <- ggplot(sfg, aes(x = time, y = surv))
   sgg <- sgg + geom_line(data = wrl_f, mapping = aes(x = time, y = surv, group = sim), 
-                         alpha = 0.1)
-  sgg <- sgg + geom_line(colour = 'blue')
+                         alpha = 0.1, colour = 'blue')
+  sgg <- sgg + geom_line(colour = 'black')
   sgg <- sgg + facet_wrap(~ group, strip.position = 'bottom')
-  sgg <- sgg + coord_cartesian(xlim = c(0, 30))
+  sgg <- sgg + coord_cartesian(xlim = c(-0.5, max(duration)))
   sgg <- sgg + theme(strip.text = element_text(size = 10))
   sgg <- sgg + labs(x = 'Duration (geological stages)', 
                     y = 'P(T > t)')
