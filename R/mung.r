@@ -51,6 +51,8 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   #bibr[, bins] <- as.character(bibr[, bins])
   #bibr$occurrences.genus_name <- as.character(bibr$occurrences.genus_name)
 
+  bibr <- bibr %>% arrange(occurrences.genus_name)
+
   bibr <- bibr %>% dplyr::mutate(bin = StageNewOrdSplitNoriRhae20Nov2013)
 
   bibr <- bibr %>%
@@ -86,11 +88,15 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
     filter(bin %in% paleozoic)
 
   # this section is all about finding duration
-  collec.stage <- table(bibr$bin)
+  obs <- bibr %>%
+    group_by(bin) %>%
+    tally()
+
   find.dur <- function(x) {
     mm <- which(gts %in% unique(x$bin))
     max(mm) - min(mm) + 1
   }
+  
   # generic duration
   taxon.age <- ddply(bibr, .(occurrences.genus_name), find.dur)
   spot.fix <- split(bibr$bin, bibr$occurrences.genus_name)
@@ -103,7 +109,6 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
                        table(x$bin)})
 
-  rsamp <- laply(taxon.occur, function(x) sum(x) / length(x))
 
   # deprecated
   #taxon.gap <- c()
@@ -146,17 +151,27 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   # Chao corrected occupancy
   ncell.stage <- split(ncell, ncell[, 2])
   inc.output <- list()
-  for(ii in seq(length(ncell.stage))) {
-    foo <- c(sum(ncell.stage[[ii]][, 3]), ncell.stage[[ii]][, 3])
-    inc.output[[ii]] <- data.frame(ncell.stage[[ii]][, 1:2], DetInc(foo))
+
+  oo <- list()
+  for(ii in seq(nrow(big.ncell))) {
+    oo[[ii]] <- data.frame(ncell.stage[[ii]][, 1:2], 
+                           rel = ncell.stage[[ii]][, 3] / big.ncell[ii, 2])
   }
-  ncell.fix <- Reduce(rbind, inc.output)
+  oo <- reduce(oo, rbind)
+  
+  #for(ii in seq(length(ncell.stage))) {
+  #  foo <- c(sum(ncell.stage[[ii]][, 3]), ncell.stage[[ii]][, 3])
+  #  inc.output[[ii]] <- data.frame(ncell.stage[[ii]][, 1:2], DetInc(foo))
+  #}
+  #ncell.fix <- Reduce(rbind, inc.output)
 
+  #ncell.bygenus <- split(ncell.fix, ncell.fix$occurrences.genus_name)
+  #occupy <- laply(ncell.bygenus, function(x) mean(x[, 3]))
+  #names(occupy) <- names(ncell.bygenus)
 
-  # raw occupancy
-  ncell.bygenus <- split(ncell.fix, ncell.fix$occurrences.genus_name)
-  occupy <- laply(ncell.bygenus, function(x) mean(x[, 3]))
-  names(occupy) <- names(ncell.bygenus)
+  or <- split(oo, oo$occurrences.genus_name)
+  occupy <- laply(or, function(x) mean(x[, 3]))
+  names(occupy) <- names(or)
 
 
   # want to find the number of epicontinental versus offshore
@@ -178,92 +193,56 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
     onoff[ii, 5] <- off.back
   }
 
-  # the number of collections to offset each observation by 
-  off <- list()
-  for(ii in seq(length(taxon.occur))) {
-    app <- which(gts %in% names(taxon.occur[[ii]]))
-    wh <- gts[seq(min(app), max(app))]
-    off[[ii]] <- collec.stage[names(collec.stage) %in% wh]
+  # find number of occurrences for each genus + bin combo
+  genbin_count <- bibr %>% 
+    group_by(occurrences.genus_name, bin) %>%
+    tally()
+  
+  genbin_count$relcount <- 0
+  for(ii in seq(nrow(obs))) {
+    kk <- genbin_count$bin %in% obs[ii, ]
+    genbin_count$relcount[kk] <- genbin_count$n[kk] / as.numeric(obs[ii, 2])
   }
-  names(off) <- names(taxon.occur)
+ 
+  # num missing occs
+  tn <- split(genbin_count, genbin_count$occurrences.genus_name)
+  tn <- map_dbl(tn, nrow)
+  
+  soo <- seq(length(tn))
+  miss <- map_dbl(soo, ~ taxon.age[.x, 2] - tn[.x])
+  gg <- split(genbin_count, genbin_count$occurrences.genus_name)
 
-  # occurrences for each stage, inclusive, of generic duration
-  for(ii in seq(length(taxon.occur))) {
-    blank <- names(off[[ii]])
-    keep <- rep(0, length(blank))
-    keep[which(blank %in% names(taxon.occur[[ii]]))] <- taxon.occur[[ii]]
-    taxon.occur[[ii]] <- keep
+  relcount <- c()
+  for(ii in seq(length(gg))) {
+    relcount[ii] <- mean(c(rep(0, miss[ii]), gg[[ii]]$relcount))
   }
-  occurs <- lapply(taxon.occur, length)
-
+  names(relcount) <- names(gg)
 
   # average gap percent of stages of taxon duration
   #   those before and after but not during, relative to total before after
 
   # get species duration along with if died in stage at/after mass extinction
-  wh.stage <- llply(off, names)
+  
+  tt <- split(bibr$bin, bibr$occurrences.genus_name)
+  wh.stage <- purrr::map(tt, unique)
   mass.ext <- cuts
   in.mass <- llply(wh.stage, function(x) x %in% mass.ext)
-  censored <- laply(in.mass, function(x) {
-                    o <- c()
-                    if(max(which(x)) == length(x)) {
-                      o <- 1
-                    } else {
-                      o <- 0
-                    }
-                    o})
-  censored[which(names(off) %in% survivors)] <- 1
+  censored <- purrr::map_lgl(in.mass, any) * 1
+  censored[which(names(tt) %in% survivors)] <- 1
 
   orig <- laply(wh.stage, function(x) rev(gts[gts %in% x])[1])
   age.order <- llply(orig, function(x) which(gts %in% x))
-  big.dead <- which(gts %in% mass.ext)
-  regime <- laply(age.order, function(x) 
-                  max(which(x > big.dead)))
-  age.data <- cbind(taxon.age, censored, orig, regime, onoff[, -1])
-  names(age.data) <- c('genus', 'duration', 'censored', 'orig', 'regime', 
+  age.data <- cbind(taxon.age, censored, orig, onoff[, -1])
+  names(age.data) <- c('genus', 'duration', 'censored', 'orig', 
                        'epi', 'off', 'epi.bck', 'off.bck')
+  
+  age.data
   # need to retain the class stuff too
 
-  # split based on class
-  ords <- unique(bibr[, c('class_reassigned', 'occurrences.genus_name')])
-  ords <- ords[!is.na(ords[, 1]), ]
-  ords <- apply(ords, 2, as.character)
-  ords <- data.frame(ords)
-  class.mem <- split(ords, ords[, 1])
-  class.mem <- llply(class.mem, function(x) {
-                     names(taxon.occur) %in% x[, 2]})
-
-  ords <- ords[order(ords[, 1]), ]
-  ords[, 1] <- as.character(ords[, 1])
-
-  occ.gen <- melt(taxon.occur)
-  occ.gen <- occ.gen[occ.gen[, 2] %in% ords[, 2], ]
-
-  off.melt <- melt(off)
-  off.melt <- off.melt[off.melt[, 3] %in% ords[, 2], ]
-
-  ords <- ords[match(occ.gen[, 2], ords[, 2]), ]
-
-  dat.full <- cbind(occ.gen, ords[, 1], offset = off.melt$value)
-  names(dat.full) <- c('count', 'genus', 'order', 'offset')
-
-  # finish up the duration stuff
-  age.data <- age.data[age.data$genus %in% ords[, 2], ]
-  age.data$class <- ords[match(age.data$genus, ords[, 2]), 1]
-
-  # get the subset that corresponds to the sepkoski fauna
-  fauna <- age.data$class
-  ws <- llply(sepkoski, function(x) age.data$class %in% x)
-
-  for(ii in seq(length(ws))) {
-    fauna[ws[[ii]]] <- names(sepkoski)[ii]
-  }
-  sepkoski.data <- cbind(age.data, fauna)[fauna %in% names(sepkoski), ]
-  sepkoski.data$fauna <- as.character(sepkoski.data$fauna)
+  sepkoski.data <- age.data
   sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
   sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]
-  #sepkoski.data$gap <- taxon.gap[match(sepkoski.data$genus, names(taxon.gap))]
-  sepkoski.data$rsamp <- rsamp[match(sepkoski.data$genus, names(rsamp))]
+  sepkoski.data$rsamp <- relcount[match(sepkoski.data$genus, names(relcount))]
   sepkoski.data
 }
 
