@@ -13,14 +13,14 @@ library(rgdal)
 
 source('../R/jade.r')
 source('../R/clean_funcs.r')
-sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya', 
-                              'Lingulata'),
-                 paleozoic = c('Rhynchonellata', 'Crinoidea', 'Ostracoda', 
-                               'Cephalopoda', 'Anthozoa', 'Cyclocystoidea', 
-                               'Asteroidea', 'Ophiuroidea'),
-                 modern = c('Gastropoda', 'Bivalvia', 'Osteichtyes', 
-                            'Malacostraca', 'Echinoidea', 'Gymnolaemata', 
-                            'Demospongea', 'Chondrichthyes'))
+#sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya', 
+#                              'Lingulata'),
+#                 paleozoic = c('Rhynchonellata', 'Crinoidea', 'Ostracoda', 
+#                               'Cephalopoda', 'Anthozoa', 'Cyclocystoidea', 
+#                               'Asteroidea', 'Ophiuroidea'),
+#                 modern = c('Gastropoda', 'Bivalvia', 'Osteichtyes', 
+#                            'Malacostraca', 'Echinoidea', 'Gymnolaemata', 
+#                            'Demospongea', 'Chondrichthyes'))
 
 # sort.data -- prep data for survival analysis
 # start function here, runs all the way to the end of the file
@@ -37,7 +37,8 @@ sepkoski <- list(cambrian = c('Trilobita', 'Polychaeta', 'Tergomya',
 sort.data <- function(bibr, payne, taxon = 'Rhynchonellata', 
                       bins = 'collections.stage', gts = gts,
                       cuts = 'Changhsingian',
-                      bot = 'Tremadocian', testing = FALSE) {
+                      bot = 'Tremadocian', testing = FALSE,
+                      chao.corrected = TRUE) {
 
   if(testing) {
     bibr <- fossil
@@ -96,7 +97,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
     mm <- which(gts %in% unique(x$bin))
     max(mm) - min(mm) + 1
   }
-  
+
   # generic duration
   taxon.age <- ddply(bibr, .(occurrences.genus_name), find.dur)
   spot.fix <- split(bibr$bin, bibr$occurrences.genus_name)
@@ -107,25 +108,25 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   taxon.age[taxon.age[, 1] %in% spot.fix[, 2], 2] <- spot.fix[, 1]
 
   taxon.occur <- dlply(bibr, .(occurrences.genus_name), function(x) {
-                       table(x$bin)})
+                         table(x$bin)})
 
 
   # deprecated
-  #taxon.gap <- c()
-  #for(ii in seq(length(taxon.occur))) {
-  #  if(!(taxon.age[ii, 1] %in% survivors)) {
-  #    tm <- names(taxon.occur[[ii]])  # stage names
-  #    om <- gts %in% tm  # true false list
-  #    dm <- taxon.age[ii, 2] - 2
-  #    taxon.gap[ii] <- (sum(om) - 2) / dm
-  #  } else {
-  #    tm <- names(taxon.occur[[ii]])
-  #    om <- gts %in% tm
-  #    dm <- (max(which(gts %in% tm)) - which(gts %in% cuts))
-  #    taxon.gap[ii] <- (sum(om) - 1) / dm
-  #  }
-  #}
-  #names(taxon.gap) <- names(taxon.occur)
+  taxon.gap <- c()
+  for(ii in seq(length(taxon.occur))) {
+    if(!(taxon.age[ii, 1] %in% survivors)) {
+      tm <- names(taxon.occur[[ii]])  # stage names
+      om <- gts %in% tm  # true false list
+      dm <- taxon.age[ii, 2] - 2
+      taxon.gap[ii] <- (sum(om) - 2) / dm
+    } else {
+      tm <- names(taxon.occur[[ii]])
+      om <- gts %in% tm
+      dm <- (max(which(gts %in% tm)) - which(gts %in% cuts))
+      taxon.gap[ii] <- (sum(om) - 1) / dm
+    }
+  }
+  names(taxon.gap) <- names(taxon.occur)
 
 
   # this is about geographic range size
@@ -147,7 +148,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
                  summarize, tt = length(unique(membership)))
   big.ncell <- ddply(bibr, .(colstage), summarize,
                      total = length(unique(membership)))
-  
+
   # Chao corrected occupancy
   ncell.stage <- split(ncell, ncell[, 2])
   inc.output <- list()
@@ -158,16 +159,16 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
                            rel = ncell.stage[[ii]][, 3] / big.ncell[ii, 2])
   }
   oo <- reduce(oo, rbind)
-  
-  #for(ii in seq(length(ncell.stage))) {
-  #  foo <- c(sum(ncell.stage[[ii]][, 3]), ncell.stage[[ii]][, 3])
-  #  inc.output[[ii]] <- data.frame(ncell.stage[[ii]][, 1:2], DetInc(foo))
-  #}
-  #ncell.fix <- Reduce(rbind, inc.output)
 
-  #ncell.bygenus <- split(ncell.fix, ncell.fix$occurrences.genus_name)
-  #occupy <- laply(ncell.bygenus, function(x) mean(x[, 3]))
-  #names(occupy) <- names(ncell.bygenus)
+  for(ii in seq(length(ncell.stage))) {
+    foo <- c(sum(ncell.stage[[ii]][, 3]), ncell.stage[[ii]][, 3])
+    inc.output[[ii]] <- data.frame(ncell.stage[[ii]][, 1:2], DetInc(foo))
+  }
+  ncell.fix <- Reduce(rbind, inc.output)
+
+  ncell.bygenus <- split(ncell.fix, ncell.fix$occurrences.genus_name)
+  occupy.corrected <- laply(ncell.bygenus, function(x) mean(x[, 3]))
+  names(occupy.corrected) <- names(ncell.bygenus)
 
   or <- split(oo, oo$occurrences.genus_name)
   occupy <- laply(or, function(x) mean(x[, 3]))
@@ -197,17 +198,17 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   genbin_count <- bibr %>% 
     group_by(occurrences.genus_name, bin) %>%
     tally()
-  
+
   genbin_count$relcount <- 0
   for(ii in seq(nrow(obs))) {
     kk <- genbin_count$bin %in% obs[ii, ]
     genbin_count$relcount[kk] <- genbin_count$n[kk] / as.numeric(obs[ii, 2])
   }
- 
+
   # num missing occs
   tn <- split(genbin_count, genbin_count$occurrences.genus_name)
   tn <- map_dbl(tn, nrow)
-  
+
   soo <- seq(length(tn))
   miss <- map_dbl(soo, ~ taxon.age[.x, 2] - tn[.x])
   gg <- split(genbin_count, genbin_count$occurrences.genus_name)
@@ -218,11 +219,7 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   }
   names(relcount) <- names(gg)
 
-  # average gap percent of stages of taxon duration
-  #   those before and after but not during, relative to total before after
-
-  # get species duration along with if died in stage at/after mass extinction
-  
+  # get if died in stage at/after mass extinction
   tt <- split(bibr$bin, bibr$occurrences.genus_name)
   wh.stage <- purrr::map(tt, unique)
   mass.ext <- cuts
@@ -235,14 +232,20 @@ sort.data <- function(bibr, payne, taxon = 'Rhynchonellata',
   age.data <- cbind(taxon.age, censored, orig, onoff[, -1])
   names(age.data) <- c('genus', 'duration', 'censored', 'orig', 
                        'epi', 'off', 'epi.bck', 'off.bck')
-  
+
   age.data
   # need to retain the class stuff too
 
   sepkoski.data <- age.data
-  sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
+  if(chao.corrected) {
+    sepkoski.data$occupy <- unlist(occupy.corrected[match(sepkoski.data$genus, 
+                                                          names(occupy.corrected))])
+  } else if(!chao.corrected) {
+    sepkoski.data$occupy <- unlist(occupy[match(sepkoski.data$genus, names(occupy))])
+  }
   sepkoski.data$size <- payne$size[match(sepkoski.data$genus, payne$taxon_name)]
   sepkoski.data$rsamp <- relcount[match(sepkoski.data$genus, names(relcount))]
+  sepkoski.data$gap <- taxon.gap[match(sepkoski.data$genus, names(taxon.gap))]
   sepkoski.data
 }
 
@@ -293,40 +296,40 @@ space.time <- function(bibr,
 
   north.temp <- bibr$collections.paleolatdec > n.tropic
   north.trop <- bibr$collections.paleolatdec < n.tropic &
-  bibr$collections.paleolatdec > 0
+    bibr$collections.paleolatdec > 0
 
   south.trop <- bibr$collections.paleolatdec > s.tropic &
-  bibr$collections.paleolatdec < 0
+    bibr$collections.paleolatdec < 0
   south.temp <- bibr$collections.paleolatdec < s.tropic
 
   locs <- list(north.temp, north.trop, south.trop, south.temp)
 
   by.loc <- llply(locs, function(x) bibr[x, ])
   occ <- llply(by.loc, function(x) {
-               working <- x[, c('occurrences.genus_name', bins)]
-               names(working) <- c('gen', 'stg')
-               occ <- dcast(working, gen ~ stg)
-               nn <- occ[, 1]
-               occ <- apply(occ[, -1], 2, function(x) {
-                            cc <- x > 0
-                            x[cc] <- 1
-                            x})
-               ord <- gts %in% colnames(occ) 
-               occ <- occ[, rev(gts[ord])]
-               rownames(occ) <- nn
-               occ})
+                 working <- x[, c('occurrences.genus_name', bins)]
+                 names(working) <- c('gen', 'stg')
+                 occ <- dcast(working, gen ~ stg)
+                 nn <- occ[, 1]
+                 occ <- apply(occ[, -1], 2, function(x) {
+                                cc <- x > 0
+                                x[cc] <- 1
+                                x})
+                 ord <- gts %in% colnames(occ) 
+                 occ <- occ[, rev(gts[ord])]
+                 rownames(occ) <- nn
+                 occ})
   occ <- llply(occ, function(x) {
-               if(ncol(x) < length(paleozoic)) {
-                 dummy <- matrix(0, nrow = nrow(x), ncol = length(paleozoic))
-                 ma <- which(paleozoic %in% colnames(x))
-                 for(ii in seq(length(ma))) {
-                   dummy[, ma[ii]] <- x[, ii]
-                 }
-                 rownames(dummy) <- rownames(x)
-                 dummy
-               } else {
-                 x
-               }})  # p/a by geologic unit for zone
+                 if(ncol(x) < length(paleozoic)) {
+                   dummy <- matrix(0, nrow = nrow(x), ncol = length(paleozoic))
+                   ma <- which(paleozoic %in% colnames(x))
+                   for(ii in seq(length(ma))) {
+                     dummy[, ma[ii]] <- x[, ii]
+                   }
+                   rownames(dummy) <- rownames(x)
+                   dummy
+                 } else {
+                   x
+                 }})  # p/a by geologic unit for zone
   occ
 }
 

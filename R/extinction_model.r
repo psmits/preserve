@@ -25,7 +25,6 @@ short.data <- sort.data(bibr, payne, taxon = taxon,
                         cuts = cuts,
                         bot = bot)
 
-
 # now just setup the data
 num.samp <- nrow(short.data)
 
@@ -44,23 +43,49 @@ prob.epi <- qbeta(short.data$epi / (short.data$epi + short.data$off),
 env.odds <- rescale(prob.epi)
 #short.data$occur <- short.data$epi + short.data$off
 
+
+# gap statistic
+# which are missing
+to_impute <- short.data$duration <= 2
+N_imp <- sum(to_impute)
+N_obs <- sum(!to_impute)
+
+gap_obs <- short.data$gap[!to_impute]
+
+gap_obs_order <- which(!to_impute)
+gap_imp_order <- which(to_impute)
+
+
+#(gap_obs * (length(gap_obs) - 1) + 0.5) / length(gap_obs)
+
 data <- list(dur = short.data$duration, 
              censored = short.data$censored,
              cohort = con.orig, 
              occupy = arm::rescale(logit(short.data$occupy)),
              env = env.odds,
              leng = arm::rescale(log(short.data$size)),
-             nocc = arm::rescale(log(short.data$rsamp)))
+             nocc = arm::rescale(logit(short.data$rsamp)),
+             to_impute = to_impute * 1,
+             N_imp = N_imp,
+             N_obs = N_obs,
+             gap_obs = gap_obs,
+             gap_obs_order = gap_obs_order,
+             gap_imp_order = gap_imp_order)
 data$N <- num.samp
 data$O <- num.orig
 
 with(data, {stan_rdump(list = c('N', 
                                 'O',
+                                'N_imp',
+                                'N_obs',
                                 'dur', 
                                 'censored', 
                                 'cohort',
                                 'occupy',
                                 'env', 
                                 'leng',
-                                'nocc'),
+                                'nocc',
+                                'gap_obs',
+                                'gap_obs_order',
+                                'gap_imp_order'),
                        file = '../data/data_dump/impute_info.data.R')})
