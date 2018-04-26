@@ -51,13 +51,13 @@ N_imp <- sum(to_impute)
 N_obs <- sum(!to_impute)
 
 gap_obs <- short.data$gap[!to_impute]
+gap_obs <- (gap_obs * (length(gap_obs) - 1) + 0.5) / length(gap_obs)
 
 gap_obs_order <- which(!to_impute)
 gap_imp_order <- which(to_impute)
 
 
-#(gap_obs * (length(gap_obs) - 1) + 0.5) / length(gap_obs)
-
+# assemble data for stan
 data <- list(dur = short.data$duration, 
              censored = short.data$censored,
              cohort = con.orig, 
