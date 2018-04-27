@@ -26,21 +26,23 @@ short.data <- sort.data(bibr, payne, taxon = taxon,
                         cuts = cuts,
                         bot = bot)
 
-ss <- bibr[bibr$occurrences.genus_name %in% short.data$genus, ]
-ss <- unique(ss[, c('occurrences.genus_name', 'occurrences.species_name')])
-ss <- ss[order(ss[, 1]), ]
-ss <- ss[!(str_detect(ss[, 2], 'sp') | str_detect(ss[, 2], '[A-Z]')), ]
-ss.gen <- ddply(ss, .(occurrences.genus_name), summarize, 
-                o <- length(occurrences.species_name))
+#ss <- bibr[bibr$occurrences.genus_name %in% short.data$genus, ]
+#ss <- unique(ss[, c('occurrences.genus_name', 'occurrences.species_name')])
+#ss <- ss[order(ss[, 1]), ]
+#ss <- ss[!(str_detect(ss[, 2], 'sp') | str_detect(ss[, 2], '[A-Z]')), ]
+#ss.gen <- ddply(ss, .(occurrences.genus_name), summarize, 
+#                o <- length(occurrences.species_name))
 
 # imputed model
 # now just setup the data
+# match cohorts
 
-num.samp <- nrow(short.data)
-
-con.orig <- match(as.character(short.data$orig), rev(as.character(lump[, 2])))
-con.orig <- mapvalues(con.orig, from = unique(con.orig), 
-                      to = rank(unique(con.orig)))
+con.orig <- plyr::mapvalues(short.data$orig,
+                            sort(unique(as.character(short.data$orig))),
+                            sort(as.character(lump[5:(5 + 33 - 1), 4])))
+con.orig <- as.character(con.orig)
+ordd <- match(con.orig, as.character(lump[, 4]))
+con.orig <- ordd - 4
 num.orig <- length(unique(con.orig))
 
 # environmental preference
@@ -65,7 +67,8 @@ data$samp_obs <- short.data$gap[inclusion]
 data$obs_ord <- which(inclusion)
 data$imp_ord <- which(!inclusion)
 
-data$N <- num.samp
+
+data$N <- length(data$dur)
 data$O <- num.orig
 data$N_obs <- length(data$samp_obs)
 data$N_imp <- data$N - data$N_obs
@@ -75,6 +78,8 @@ data$inclusion <- inclusion * 1
 num <- data$samp_obs * (length(data$samp_obs) - 1) + 0.5
 data$samp_obs <- num / length(data$samp_obs)
 
+
+# export for stan
 with(data, {stan_rdump(list = c('N', 
                                 'O',
                                 'N_obs', 'N_imp',

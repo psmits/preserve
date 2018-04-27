@@ -108,11 +108,11 @@ model {
   // likelihood / sampling statements
   for(i in 1:N) {
     if(censored[i] == 0) {
-      //if(dur[i] == 1) {
-      //  target += weibull_lcdf(dur[i] | alpha, hold[i]);
-      //} else {
-      //}
-      target += weibull_lpdf(dur[i] | alpha, hold[i]);
+      if(dur[i] == 1) {
+        target += weibull_lcdf(dur[i] | alpha, hold[i]);
+      } else {
+        target += weibull_lpdf(dur[i] | alpha, hold[i]);
+      }
     } else {
       target += weibull_lccdf(dur[i] | alpha, hold[i]);
     }
@@ -125,11 +125,11 @@ generated quantities {
   // log_lik
   for(i in 1:N) {
     if(censored[i] == 0) {
-      //if(dur[i] == 1) {
-      //  log_lik[i] = weibull_lcdf(dur[i] | alpha, hold[i]);
-      //} else {
-      //}
-      log_lik[i] = weibull_lpdf(dur[i] | alpha, hold[i]);
+      if(dur[i] == 1) {
+        log_lik[i] = weibull_lcdf(dur[i] | alpha, hold[i]);
+      } else {
+        log_lik[i] = weibull_lpdf(dur[i] | alpha, hold[i]);
+      }
     } else {
       log_lik[i] = weibull_lccdf(dur[i] | alpha, hold[i]);
     }
@@ -147,3 +147,4 @@ generated quantities {
     }
   }
 }
+
