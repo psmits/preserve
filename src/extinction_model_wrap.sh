@@ -8,7 +8,7 @@ do
   do
     ../stan/surv_cweib_base sample \
       adapt delta=0.99 \
-      num_samples=5000 num_warmup=5000 thin=5 \
+      num_samples=10000 num_warmup=10000 thin=10 \
       algorithm=hmc engine=nuts max_depth=10 stepsize=1 \
       id=$i \
       init=0 \
@@ -23,7 +23,7 @@ do
   do
     ../stan/surv_cweib_cens sample \
       adapt delta=0.99 \
-      num_samples=5000 num_warmup=5000 thin=5 \
+      num_samples=10000 num_warmup=10000 thin=10 \
       algorithm=hmc engine=nuts max_depth=10 stepsize=1 \
       id=$i \
       init=0 \
