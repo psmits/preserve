@@ -1,51 +1,48 @@
 This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
 Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: amnat_sub.aux
-I couldn't open style file amnat.bst
----line 116 of file amnat_sub.aux
- : \bibstyle{amnat
- :                }
-I'm skipping whatever remains of this command
-I found no style file---while reading file amnat_sub.aux
+The style file: amnat.bst
+Database file #1: newbib.bib
+Database file #2: packages.bib
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 You've used 103 entries,
-            0 wiz_defined-function locations,
-            290 strings with 2699 characters,
-and the built_in function-call counts, 0 in all, are:
-= -- 0
-> -- 0
-< -- 0
-+ -- 0
-- -- 0
-* -- 0
-:= -- 0
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
-chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 0
-format.name$ -- 0
-if$ -- 0
-int.to.chr$ -- 0
-int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 0
-num.names$ -- 0
-pop$ -- 0
-preamble$ -- 0
-purify$ -- 0
+            3251 wiz_defined-function locations,
+            1310 strings with 20663 characters,
+and the built_in function-call counts, 58858 in all, are:
+= -- 5224
+> -- 2317
+< -- 81
++ -- 787
+- -- 683
+* -- 3867
+:= -- 9663
+add.period$ -- 415
+call.type$ -- 103
+change.case$ -- 740
+chr.to.int$ -- 114
+cite$ -- 103
+duplicate$ -- 4195
+empty$ -- 4437
+format.name$ -- 955
+if$ -- 11797
+int.to.chr$ -- 2
+int.to.str$ -- 1
+missing$ -- 840
+newline$ -- 518
+num.names$ -- 414
+pop$ -- 1555
+preamble$ -- 1
+purify$ -- 639
 quote$ -- 0
-skip$ -- 0
+skip$ -- 1384
 stack$ -- 0
-substring$ -- 0
-swap$ -- 0
-text.length$ -- 0
+substring$ -- 3477
+swap$ -- 1832
+text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 0
+type$ -- 897
 warning$ -- 0
-while$ -- 0
+while$ -- 485
 width$ -- 0
-write$ -- 0
-(There were 2 error messages)
+write$ -- 1330

@@ -87,7 +87,7 @@
 % (e.g. section ``Counting Owl Eggs'').
 Extinction is one half of the diversification process \citep{Raup1994,Stanley1979,Stanley1975}, second only to speciation or origination in shaping changes to diversity; it can also be the ultimate manifestation of selection as a taxon with a beneficial trait should persist for longer on average than a taxon without that beneficial trait \citep{Jablonski2008a,Rabosky2010b,Raup1994,Stanley1975}. Species duration is a measure of species fitness \citep{Cooper1984}, and trait-associated differences in fitness is the hallmark of (species) selection \citep{Rabosky2010b}.
 
-\citet{Jablonski1986} observed that for bivalves at the end Cretaceous mass extinction event, previous trait-associated differences in survival no longer mattered except for the case of geographic range. Based on this evidence, \citet{Jablonski1986} proposed the idea of "macroevolutionary modes" and that mass extinction and background extinction are fundamentally different processes. However, based on estimates of extinction rates over time, there is no evidence of there being two or more "types" of extinction \citep{Wang2003}. Instead, extinction rates for marine invertebrates show unimodal continiuous variation> The apparent disconnect between the theory of macroevolutionary modes and the observation of continuous variation in extinction rates implies the possibility of a relationship between the strength of selection (extinction \textbf{intensity}) and the association between of traits and differences in fitness (extinction \textbf{selectivity}) \citep{Payne2016}. As extinction intensity increases, what happens to extinction selectivity? How do trait-associated differences in fitness change as average extinction rate changes over time?
+\citet{Jablonski1986} observed that for bivalves at the end Cretaceous mass extinction event, previous trait-associated differences in survival no longer mattered except for the case of geographic range. Based on this evidence, \citet{Jablonski1986} proposed the idea of "macroevolutionary modes" and that mass extinction and background extinction are fundamentally different processes. However, based on estimates of extinction rates over time, there is no evidence of there being two or more "types" of extinction \citep{Wang2003}. Instead, extinction rates for marine invertebrates show unimodal continiuous variation> The apparent disconnect between the theory of macroevolutionary modes and the observation of continuous variation in extinction rates implies the possibility of a relationship between the strength of selection (extinction intensity) and the association between of traits and differences in fitness (extinction selectivity) \citep{Payne2016}. As extinction intensity increases, what happens to extinction selectivity? How do trait-associated differences in fitness change as average extinction rate changes over time?
 
 Here I develop a statistical model describing the relationship between brachiopod taxon durations and multiple functional taxon traits in order to understand the relationship between extinction intensity and selectivity over time. Trait-dependent differences in extinction risk should be associated with differences in taxon duration \citep{Cooper1984,Rabosky2010b}. Brachiopods are an ideal group for this study as they have an exceptionally complete fossil record \citep{Foote1996e,Foote2000a}. I focus on the brachiopod record from the post-Cambrian Paleozoic, from the start of the Ordovician (approximately 485 My) through the end Permian (approximately 252 My) as this represents the time of greatest global brachiopod diversity \citep{Alroy2010} which results in a large sample size.
 
@@ -160,11 +160,9 @@ Environmental preference was defined as probability of observing the ratio of ep
   \end{aligned}
   \label{eq:envpref}
 \end{equation}
-where \(v\) is the percent of the distribution defined in equation \ref{eq:envpref} less than or equal to \(\theta_{i}\). The Beta distribution is used here because it is a continuous distribution bounded at 0 and 1, which is idea for modeling percentages.
+where \(v\) is the percent of the distribution defined in equation~\ref{eq:envpref} less than or equal to \(\theta_{i}\). The Beta distribution is used here because it is a continuous distribution bounded at 0 and 1, which is idea for modeling percentages.
 
 Body size, measured as shell length, was sourced directly from \citet{Payne2014}. These measurements were made from brachiopod taxa figured in the \textit{Treatise on Invertebrate Paleontology} \citep{Brunton2007}.
-
-%To control for the effect of incomplete sampling on species duration, the number of samples of each genus over their duration was used as a covariate. This measure is a simple proxy of differences in fossilization between genera that has been used before CITATION. the basic assumption of using this measure is that more abundant taxa may have more precise estimate of their duration while species with low abundance may have unduly truncated durations. By including this covariate as a predictor in this model, the hope is to help mitigate the effect of the incompleteness of the fossil record when estimating ecological differences in duration. The effect of sampling was assumed constant through time. 
 
 The sampling probability for individual taxa was calculated using the standard gap statistic \citep{Foote1996e,Foote2000}. The gap statistic is calculated as the number of stages in which the taxon was sampled minus two divided by the duration of the taxon minus two. Subtracting two from both the numerator and denominator is because the first and last appearance stages are by definition sampled. Because taxa that were right censored only include a first appearance, one was subtracted from the numerator and denominator instead of two.
 
@@ -232,7 +230,7 @@ and total count parameter
 \end{equation}
 where \(\alpha\) and \(\beta\) are the characteristic parameters of the Beta distribution \citep{Gelman2013d}.
 
-The next step is to then estimate \(s^{u} | s^{o}, X^{o}, X^{u}, \gamma\), the posterior distribution of which are folded back into \(s\) and used as a covariate of duration (Eq. \ref{eq:sigma}). All the elements of \(\gamma\), and both \(\delta\) (Eq. \ref{eq:sigma}) and \(\lambda\) (Eq. \ref{eq:impute}) were given weakly informative priors as recommended by \citet{StanManual}:
+The next step is to then estimate \(s^{u} | s^{o}, X^{o}, X^{u}, \gamma\), the posterior distribution of which are folded back into \(s\) and used as a covariate of duration (Eq.~\ref{eq:sigma}). All the elements of \(\gamma\), and both \(\delta\) (Eq.~\ref{eq:sigma}) and \(\lambda\) (Eq.~\ref{eq:impute}) were given weakly informative priors as recommended by \citet{StanManual}:
 \begin{equation}
   \begin{aligned}
     \gamma &\sim \mathcal{N}(0, 1) \\
@@ -273,195 +271,76 @@ I first present the results of the multiple posterior predictive checks for the 
 %\subsection*{Model adequacy and posterior predictive checks}
 % total group
 
-Comparisons between the observed distribution of durations to the distrubtions of 100 simulated datasets reveals the relatively good but heterogeneous fit of the model to the data (Fig. \ref{fig:dens_overlay_zoom}). The two major aspects of possible misfit that are observable are at at durations of 1 and 8-9 stages. In both of these cases, the model slightly over-estimates the number of observations with duration of 1 stage, and slightly under-estimates the number of individuals with a duration of 8-9 stages. The goal of this model is estimating the expected duration of a genus given its covariate information. While the model estimates are not exact, it is possible that our model fits the ``middle'' of our data well but does poorly towards the tails. 
+Comparisons between the observed distribution of durations to the distrubtions of 100 simulated datasets reveals the relatively good but heterogeneous fit of the model to the data (Fig.~\ref{fig:dens_overlay_zoom}). The two major aspects of possible misfit that are observable are at at durations of 1 and 8-9 stages. In both of these cases, the model slightly over-estimates the number of observations with duration of 1 stage, and slightly under-estimates the number of individuals with a duration of 8-9 stages. The goal of this model is estimating the expected duration of a genus given its covariate information. While the model estimates are not exact, it is possible that our model fits the ``middle'' of our data well but does poorly towards the tails. 
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_dens_zoom_cweib_cens}
-  \caption{ Comparison of the distribution of the observed data (black) to 100 simulated distributions (blue). This is a close-up view of the bulk of the distribution which shows the more subtle aspects of (mis)fit between the data and the model. }
-  \label{fig:dens_overlay_zoom}
-\end{figure}
+Comparisons between the survival functions estimated from the empirical data and from 100 simulated datasets further expands the picture of model (mis)fit (Fig.~\ref{fig:surv}). The survival curves of the 100 simulated datasets are very similar to the survival function estimated from the empirical data. The major points of potential misfit between the model and the data are underestimated percentage of taxa with duration 1 stage, and an over-estimate of probability of species surviving at least 9-16 stages. Importantly, the major divergence between the observed and estimated applies to taxa with a less than 15\% probability of continuing to surviving. Keep in mind, also, that the survival curve as presented does not depict density of observations as in Fig.~\ref{fig:dens_overlay_zoom}.
 
+In addition to distributional comparisons, model adequacy at the total data level was assessed through comparison of the mean and median of the observed data to those from simulated data sets. While the previous posterior predictive checks have focused on the relatively good but heterogeneous fit of the model to the entire distribution of the data, the fitted model's ability to predict the mean and median of the observed data appears adequate (Fig.~\ref{fig:ppc_mean},~\ref{fig:ppc_median}). Because the principle goal of this model is to obtain adequate prediction of how a taxon's expected duration for a given set of ecological covariates, the seemingly adequate fit of our model to mean taxon duration is reassuring (Fig.~\ref{fig:ppc_mean}). Additionally, given the skewness of the observed taxon durations (Fig.~\ref{fig:dens_overlay_zoom}, the ability for the model to recapitulate the median observed taxon duration is important and points to the overall good fit of the model to the data.
 
-Comparisons between the survival functions estimated from the empirical data and from 100 simulated datasets further expands the picture of model (mis)fit (Fig. \ref{fig:surv}). The survival curves of the 100 simulated datasets are very similar to the survival function estimated from the empirical data. The major points of potential misfit between the model and the data are underestimated percentage of taxa with duration 1 stage, and an over-estimate of probability of species surviving at least 9-16 stages. Importantly, the major divergence between the observed and estimated applies to taxa with a less than 15\% probability of continuing to surviving. Keep in mind, also, that the survival curve as presented does not depict density of observations as in Fig. \ref{fig:dens_overlay_zoom}.
+When considered together, all of the above posterior predictive checks indicate approximately adequate model fit for key questions such as expected taxon duration (Fig.~\ref{fig:ppc_mean}). However, there is obviously heterogeneity in model fit because, while the model can recapitulate some aspects of the observed data (Fig.~\ref{fig:ppc_mean},~\ref{fig:ppc_median}), there are obvious discrepancies between the model and the data (Fig.~\ref{fig:dens_overlay_zoom},~\ref{fig:surv}). By performing the same posterior predictive tests for each of the origination cohorts, it may be possible to get a better picture of the sources of model misfit.
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/survival_curves_cweib_cens}
-  \caption{Comparison of the empirical estimate of \(S(t)\) (highlighted) versus estimates from 100 posterior predictive data sets (black). \(S(t)\) corresponds to the probability that the age of a genus \(t\) is less than the genus' ultimate duration \(T\). }
-  \label{fig:surv}
-\end{figure}
+When the posterior predictive tests are visualized for each of the origination cohorts, a complex picture of model fit emerges. Comparison between the empirical survival functions estimated for each cohort to those estimated from the simulated datasets reveals the degree of heterogeneity in model fit (Fig.~\ref{fig:surv_group}, as some origination cohorts appear to be very well fit by the model (e.g. Tremadoc, Darriwilian Wenlock, Ludlow, Lochkovian, etc.) while others are more poorly fit by the model (e.g. Visean, Bashirian, Moscovian, Stephanian, Roadian, etc.). The poverty of model fit to these cohorts may indicate that these origination cohorts are undergoing a different extinction process whose aspects are unmodeled in this analysis. However, for those cohorts where our model recapitulates the empirical survival function indicates approximately adequate fit and that our model may be capturing some of the processes underlying taxon extinction.
 
+For nearly every origination cohort, the model is able to approximately recapitulate the observed mean duration (Fig.~\ref{fig:group_mean}). The only exceptions to this observed mean is within the tails of the posterior predictive distributions (e.g. Moscovian, Sakmarian, Wordian, etc.). In general, however, posterior predictive distribution of the model is able to adequately estimate the mean duration of nearly all origination cohorts.
 
-In addition to distributional comparisons, model adequacy at the total data level was assessed through comparison of the mean and median of the observed data to those from simulated data sets. While the previous posterior predictive checks have focused on the relatively good but heterogeneous fit of the model to the entire distribution of the data, the fitted model's ability to predict the mean and median of the observed data appears adequate (Fig. \ref{fig:ppc_mean}, \ref{fig:ppc_median}). Because the principle goal of this model is to obtain adequate prediction of how a taxon's expected duration for a given set of ecological covariates, the seemingly adequate fit of our model to mean taxon duration is reassuring (Fig. \ref{fig:ppc_mean}). Additionally, given the skewness of the observed taxon durations (Fig. \ref{fig:dens_overlay_zoom}, the ability for the model to recapitulate the median observed taxon duration is important and points to the overall good fit of the model to the data.
-
-\begin{figure}[ht]
-  \centering
-  \begin{subfigure}{0.4\textwidth}
-    \caption{}
-    \includegraphics[height = 0.5\textheight,width=0.9\textwidth,keepaspectratio=true]{figure/ppc_mean_cweib_cens}
-    \label{fig:ppc_mean}
-  \end{subfigure}
-  \begin{subfigure}{0.4\textwidth}
-    \caption{}
-    \includegraphics[height = 0.5\textheight,width=0.9\textwidth,keepaspectratio=true]{figure/ppc_median_cweib_cens}
-    \label{fig:ppc_median}
-  \end{subfigure}
-  \caption{ Comparison of the (A) observed mean genus duration (black vertical line) to a distribution of means estimated from 100 simulated datasets (blue), and (B) comparison of the observed median genus duration (black vertical line) to a distribution of medians estimated from 100 simulated datasets (blue). Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
-  \label{fig:points}
-\end{figure}
-
-
-When considered together, all of the above posterior predictive checks indicate approximately adequate model fit for key questions such as expected taxon duration (Fig. \ref{fig:ppc_mean}). However, there is obviously heterogeneity in model fit because, while the model can recapitulate some aspects of the observed data (Fig. \ref{fig:ppc_mean}, \ref{fig:ppc_median}), there are obvious discrepancies between the model and the data (Fig. \ref{fig:dens_overlay_zoom}, \ref{fig:surv}). By performing the same posterior predictive tests for each of the origination cohorts, it may be possible to get a better picture of the sources of model misfit.
-
-When the posterior predictive tests are visualized for each of the origination cohorts, a complex picture of model fit emerges. Comparison between the empirical survival functions estimated for each cohort to those estimated from the simulated datasets reveals the degree of heterogeneity in model fit (Fig. \ref{fig:surv_group}, as some origination cohorts appear to be very well fit by the model (e.g. Tremadoc, Darriwilian Wenlock, Ludlow, Lochkovian, etc.) while others are more poorly fit by the model (e.g. Visean, Bashirian, Moscovian, Stephanian, Roadian, etc.). The poverty of model fit to these cohorts may indicate that these origination cohorts are undergoing a different extinction process whose aspects are unmodeled in this analysis. However, for those cohorts where our model recapitulates the empirical survival function indicates approximately adequate fit and that our model may be capturing some of the processes underlying taxon extinction.
-
-% by origination cohort
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_surv_coh}
-  \caption{Comparison of the empirical estimate of \(S(t)\) (highlighted) versus estimates from 100 posterior predictive data sets (black) for each of the origination cohorts. \(S(t)\) corresponds to the probability that the age of a genus \(t\) is less than the genus' ultimate duration \(T\). By comparing the fit of the model to the individual cohorts, when and where the model (mis)fits is more observable. }
-  \label{fig:surv_group}
-\end{figure}
-
-
-For nearly every origination cohort, the model is able to approximately recapitulate the observed mean duration (Fig. \ref{fig:group_mean}). The only exceptions to this observed mean is within the tails of the posterior predictive distributions (e.g. Moscovian, Sakmarian, Wordian, etc.). In general, however, posterior predictive distribution of the model is able to adequately estimate the mean duration of nearly all origination cohorts.
-
-In comparison, the model has a much more heterogeneous fit to each origination cohort's median taxon duration (Fig. \ref{fig:group_median}). The skewness of the distribution underlying (Fig. \ref{fig:dens_overlay_zoom}) means that for some origination cohorts, median duration might be pegged at 1 stage; this means that the posterior predictive distributions for some cohorts can be extremely skewed. The cohorts with notably inadequate poor predictions are the Hirnantian, Priodoli, Emsian, Eifelian, Givetian, Asselian, Sakmarian, Artinskian, Kungarian, and Roadian. The remaining 13 cohorts, however, have decently adequate fit. These results indicate that our model is very good at recapitulate mean taxon duration (Fig. \ref{fig:ppc_mean}, \ref{fig:group_mean}), and it is capable of esimtaing overall median duration and median duration of most origination cohorts (Fig. \ref{fig:ppc_median}, \ref{fig:group_median}).
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_mean_group_cweib_cens}
-  \caption{ Comparison of the observed mean genus duration (black vertical line) to a distribution of means estimated from 100 simulated datasets (blue) for each of the origination cohorts. Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
-  \label{fig:group_mean}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_med_group_cweib_cens}
-  \caption{ Comparison of the observed median genus duration (black vertical line) to a distribution of medians estimated from 100 simulated datasets (blue) for each of the origination cohorts. Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
-  \label{fig:group_median}
-\end{figure}
+In comparison, the model has a much more heterogeneous fit to each origination cohort's median taxon duration (Fig.~\ref{fig:group_median}). The skewness of the distribution underlying (Fig.~\ref{fig:dens_overlay_zoom}) means that for some origination cohorts, median duration might be pegged at 1 stage; this means that the posterior predictive distributions for some cohorts can be extremely skewed. The cohorts with notably inadequate poor predictions are the Hirnantian, Priodoli, Emsian, Eifelian, Givetian, Asselian, Sakmarian, Artinskian, Kungarian, and Roadian. The remaining 13 cohorts, however, have decently adequate fit. These results indicate that our model is very good at recapitulate mean taxon duration (Fig.~\ref{fig:ppc_mean},~\ref{fig:group_mean}), and it is capable of esimtaing overall median duration and median duration of most origination cohorts (Fig.~\ref{fig:ppc_median},~\ref{fig:group_median}).
 
 
 
 
-\clearpage
-\begin{table}[h]
-%\begin{sidewaystable}
-  \centering
-  \caption{Estimates of various parameters in the model used here. These include group-level estimates of the effects of biological traits on brachiopod generic survival, the standard deviation of the between-cohort effects, as well as the estimates of both the effect of sampling \(\delta\) and the Weibull shape parameter \(\alpha\). The mean, standard deviation (SD), 10th, 50th, and 90th quantiles of the marginal posteriors are presented.}
-  \begin{tabular}{ l | l p{2.5cm} r r r r r }
-    \hline
-    type & parameter & effect of & mean & SD & 10\% & 50\% & 90\% \\ 
-    \hline
-    \multirow{5}{*}{Mean} & \(\mu^{i}\) & intercept & -2.34 & 0.14 & -2.52 & -2.34 & -2.16 \\ 
-    & \(\mu^{r}\) & geographic range &  1.19 & 0.21 & 0.93 & 1.19 & 1.45 \\ 
-    & \(\mu^{v}\) & environmental preference &  -0.34 & 0.20 & -0.59 & -0.34 & -0.07 \\ 
-    & \(\mu^{v^{2}}\) & environmental preference\(^{2}\) &  2.15 & 0.30 & 1.76 & 2.15 & 2.53 \\ 
-    & \(\mu^{m}\) & body size & 0.05 & 0.11 & -0.09 & 0.05 & 0.19 \\ 
-    \hline
-    \multirow{5}{*}{Standard deviation} & \(\tau^{i}\) & intercept &  0.51 & 0.11 & 0.38 & 0.50 & 0.65 \\ 
-    & \(\tau^{r}\) & geographic range & 0.77 & 0.17 & 0.55 & 0.75 & 1.00 \\ 
-    & \(\tau^{v}\) & environmental preference & 0.97 & 0.18 & 0.76 & 0.95 & 1.20 \\ 
-    & \(\tau^{v^{2}}\) & environmental preference\(^{2}\) &  1.08 & 0.34 & 0.66 & 1.07 & 1.52 \\ 
-    & \(\tau^{m}\) & body size &  0.41 & 0.11 & 0.27 & 0.41 & 0.56 \\ 
-    \hline
-    \multirow{2}{*}{Other} & \(\delta\) & sampling & -2.77 & 0.15 & -2.97 & -2.77 & -2.58 \\ 
-    & \(\alpha\) & ``time'' & 1.61 & 0.05 & 1.54 & 1.61 & 1.67 \\ 
-    \hline
-  \end{tabular}
-  \label{tab:param}
-\end{table}
-%\end{sidewaystable}
-\clearpage
+The cohort-level estimate of the effect of geographic range size indicates that as a taxon's geographic range increases, that taxon's duration is expected to increase (Table~\ref{tab:param}). Given the estimates of \(\mu^{r}\) and \(\tau^{r}\), there is an approximately 7\% (\(\pm 5\%\) SD) probability that this relationships would be reversed (\(\mathrm{Pr}\mathcal{N}(\mu^{r}, \tau^{r}) > 0)\)). 
 
+Body size is estimated to have a slightly positive estimate, which means that species with greater than average size are expected to have a shorter duration than species with below average size (Table~\ref{tab:param}).
 
+The group-level estimate of the effect of environmental preference is estimated from both \(\mu^{v}\) and \(\mu^{v^{2}}\). The estimate of \(\mu^{v}\) indicates that epicontinental favoring taxa are expected to have a greater duration than open-ocean favoring taxa (Table~\ref{tab:param}). Additionally, given the estimate of between-cohort variance \(\tau^{v}\), there is approximately 36.1\% (\(\pm 8\%\) SD) probability that, for any given cohort, taxa favoring open-ocean environments would have a greater expected duration than taxa favoring epicontinental environments (\(\mathrm{Pr}(\mathcal{N}(\mu^{v}, \tau^{v}) > 0)\)). The estimate of \(\mu^{v^{2}}\) indicates that the overall relationship between environmental preference and \(\log(\sigma)\) is concave down (Fig.~\ref{fig:env_mean}), with only a 3.6\% (\(\pm 4\%\) SD) probability that any given cohort is convex up (\(\mathrm{Pr}(\mathcal{N}(\mu^{v^{2}}, \tau^{v^{2}}) < 0\)).
 
-The cohort-level estimate of the effect of geographic range size indicates that as a taxon's geographic range increases, that taxon's duration is expected to increase (Table \ref{tab:param}). Given the estimates of \(\mu^{r}\) and \(\tau^{r}\), there is an approximately 7\% (\(\pm 5\%\) SD) probability that this relationships would be reversed (\(\mathrm{Pr}\mathcal{N}(\mu^{r}, \tau^{r}) > 0)\)). 
+The cohort-specific estimates of all the regression coefficients demonstrate a lot of between cohort variance, with no obvious long-term trends (Fig.~\ref{fig:cohort_series}). While most cohort-specific estimates are very similar to the overall cohort-level estimate, there are a few notable cohorts for which two or more individual-level parameter estimates diverge greatly from the group-level averages (Fig.~\ref{fig:cohort_series}). What's even more interesting is that for many cohort's for which two or more covariate effect estimates are different from the overall group-level mean are well fit by the model (Fig.~\ref{fig:surv_group},~\ref{fig:group_mean},~\ref{fig:group_median}).
 
-Body size is estimated to have a slightly positive estimate, which means that species with greater than average size are expected to have a shorter duration than species with below average size (Table \ref{tab:param}).
+In chronological order, the Wenlock (433.4-427.4 Mya) is the first origination cohort for which at least two effect estimates diverge from their group-level averages: the effect of the linear aspect of environmental preference \(\beta^{v}\) increases (shifting the parabola left-ward) while the effect of average body size \(\beta^{m}\) decreases meaning that greater than average size is associated with a longer duration than taxa with less than average body sizes (Fig.~\ref{fig:cohort_series}). Additionally, this cohort is well fit by our model (Fig.~\ref{fig:surv_group},~\ref{fig:group_mean},~\ref{fig:group_median}) which allows us to have greater convidence in these results. This cohort is one of the few for which the estimated effect of body size is different from the group-level average.
 
-The group-level estimate of the effect of environmental preference is estimated from both \(\mu^{v}\) and \(\mu^{v^{2}}\). The estimate of \(\mu^{v}\) indicates that epicontinental favoring taxa are expected to have a greater duration than open-ocean favoring taxa (Table \ref{tab:param}). Additionally, given the estimate of between-cohort variance \(\tau^{v}\), there is approximately 36.1\% (\(\pm 8\%\) SD) probability that, for any given cohort, taxa favoring open-ocean environments would have a greater expected duration than taxa favoring epicontinental environments (\(\mathrm{Pr}(\mathcal{N}(\mu^{v}, \tau^{v}) > 0)\)). The estimate of \(\mu^{v^{2}}\) indicates that the overall relationship between environmental preference and \(\log(\sigma)\) is concave down (Fig. \ref{fig:env_mean}), with only a 3.6\% (\(\pm 4\%\) SD) probability that any given cohort is convex up (\(\mathrm{Pr}(\mathcal{N}(\mu^{v^{2}}, \tau^{v^{2}}) < 0\)).
+During the Pragian (410.8-407.6 Mya) there are simultaneous excursions in mean taxon duration or extinction intensity \(\beta^{0}\) and the effect of geographic range on duration \(\beta^{r}\). This cohort has lower than expected extinction intensity \(\beta^{0}\) and greater than expected effect of geographic range \(\beta^{r}\). Additionally, this cohort is well fit by our model (Fig.~\ref{fig:surv_group},~\ref{fig:group_mean},~\ref{fig:group_median}) which increases convidence in these results. %As shown later, this result is interesting because it is opposite of what is expected given the correlations between covariate estimates.
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/env_effect_med_cweib_cens}
-  \caption{The overall expected relationship between environmental affinity \(v_{i}\) and a \(\log(\sigma)\) when r = 0 and m = 0. The 1000 semi-transparent lines corresponds to a single draw from the posterior predictive distribution, while the highlighted line corresponds to the median of the posterior predictive distribution. The overall relationship is concave down with an optimum greater than 0, which means that taxa favoring epicontinental environments are expected to have longer durations than those favoring open-ocean environments. The tick marks along the bottom of the plot correspond to the (rescaled) observed values of environmental preference.}
-  \label{fig:env_mean}
-\end{figure}
+The Emisian (407.6-393.3 Mya) origination cohort is estimated to have greater than average estimate of \(\beta^{0}\), lower than average estimate of \(\beta^{r}\), and a greater than average estimate of \(\beta^{m}\). Additionally, our model has less than adequate fit to this origination cohort as it underestimates the median duration of taxa in that cohort (Fig.~\ref{fig:group_median}), though the model successfully recapitulates mean duration and does a fair job of reproducing the survival function for that cohort (Fig.~\ref{fig:surv_group},~\ref{fig:group_mean})
 
+The effects of the linear and quadratic aspects of environmental preference, \(\beta^{v}\) and \(\beta^{v^{2}}\), for taxa originating in the Frasnian are both divergent from the overall group-level mean. For this cohort, \(\beta^{v}\) is estimated to be less than expected while \(\beta^{v^{2}}\) is estimated to be greater than expected. This result means that the curvature of the relationship increased while the apex was right-shifted from average. Additionally, this origination cohort is well fit by the model (Fig.~\ref{fig:surv_group},~\ref{fig:group_mean},~\ref{fig:group_median}) which increases confidence in interpreting these results.
 
-The cohort-specific estimates of all the regression coefficients demonstrate a lot of between cohort variance, with no obvious long-term trends (Fig. \ref{fig:cohort_series}). While most cohort-specific estimates are very similar to the overall cohort-level estimate, there are a few notable cohorts for which two or more individual-level parameter estimates diverge greatly from the group-level averages (Fig. \ref{fig:cohort_series}). What's even more interesting is that for many cohort's for which two or more covariate effect estimates are different from the overall group-level mean are well fit by the model (Fig. \ref{fig:surv_group}, \ref{fig:group_mean}, \ref{fig:group_median}).
+Taxa originating during the Famennian (372.2-358.9 Mya) were estimated to have a greater than average expected duration than the group-level average (i.e. lower than average \(\beta^{0}\)) as well as lower than average estimate of \(\beta^{v}\) (i.e. right-shifted) (Fig.~\ref{fig:cohort_series}). Finally, this cohort has only moderate quality of fit as the model is able to estimate average cohort duration (Fig.~\ref{fig:group_mean}) but has difficulty reproducing the survival function and median duration (Fig.~\ref{fig:surv_group},~\ref{fig:group_median}), meaning that these excursions from the group-level mean may be driven by the difference in processes underlying extinction of taxa in this origination cohort.
 
-In chronological order, the Wenlock (433.4-427.4 Mya) is the first origination cohort for which at least two effect estimates diverge from their group-level averages: the effect of the linear aspect of environmental preference \(\beta^{v}\) increases (shifting the parabola left-ward) while the effect of average body size \(\beta^{m}\) decreases meaning that greater than average size is associated with a longer duration than taxa with less than average body sizes (Fig. \ref{fig:cohort_series}). Additionally, this cohort is well fit by our model (Fig. \ref{fig:surv_group}, \ref{fig:group_mean}, \ref{fig:group_median}) which allows us to have greater convidence in these results. This cohort is one of the few for which the estimated effect of body size is different from the group-level average.
+Many of the effect estimates for the Sakmarian origination cohort (295.5-290.1 Mya) are divergent from the group-level averages (Fig.~\ref{fig:cohort_series}). Specifically, \(\beta^{0}\) was estimated to be below the group-level average indicating greater average duration than average origination cohort , \(\beta^{r}\) was estimated to be above the group-level average indicating that geographic range has a weaker than normal effect on extinction risk, \(\beta^{v}\) has an above average estimate indicating a left-shifted relationship between environmental preference and duration, and finally \(\beta^{m}\) was estimated to be below the group-level average which means that taxa with greater than average body sizes are expected to have greater durations than taxa originating in that cohort with below average body size. The model does a poor job of reproducing the origination cohort survival curve (Fig.~\ref{fig:surv_group}) while slightly under estimating mean and median durations of the origination cohort (Fig.~\ref{fig:group_mean}).
 
-During the Pragian (410.8-407.6 Mya) there are simultaneous excursions in mean taxon duration or extinction intensity \(\beta^{0}\) and the effect of geographic range on duration \(\beta^{r}\). This cohort has lower than expected extinction intensity \(\beta^{0}\) and greater than expected effect of geographic range \(\beta^{r}\). Additionally, this cohort is well fit by our model (Fig. \ref{fig:surv_group}, \ref{fig:group_mean}, \ref{fig:group_median}) which increases convidence in these results. %As shown later, this result is interesting because it is opposite of what is expected given the correlations between covariate estimates.
-
-The Emisian (407.6-393.3 Mya) origination cohort is estimated to have greater than average estimate of \(\beta^{0}\), lower than average estimate of \(\beta^{r}\), and a greater than average estimate of \(\beta^{m}\). Additionally, our model has less than adequate fit to this origination cohort as it underestimates the median duration of taxa in that cohort (Fig. \ref{fig:group_median}), though the model successfully recapitulates mean duration and does a fair job of reproducing the survival function for that cohort (Fig. \ref{fig:surv_group}, \ref{fig:group_mean})
-
-The effects of the linear and quadratic aspects of environmental preference, \(\beta^{v}\) and \(\beta^{v^{2}}\), for taxa originating in the Frasnian are both divergent from the overall group-level mean. For this cohort, \(\beta^{v}\) is estimated to be less than expected while \(\beta^{v^{2}}\) is estimated to be greater than expected. This result means that the curvature of the relationship increased while the apex was right-shifted from average. Additionally, this origination cohort is well fit by the model (Fig. \ref{fig:surv_group}, \ref{fig:group_mean}, \ref{fig:group_median}) which increases confidence in interpreting these results.
-
-Taxa originating during the Famennian (372.2-358.9 Mya) were estimated to have a greater than average expected duration than the group-level average (i.e. lower than average \(\beta^{0}\)) as well as lower than average estimate of \(\beta^{v}\) (i.e. right-shifted) (Fig. \ref{fig:cohort_series}). Finally, this cohort has only moderate quality of fit as the model is able to estimate average cohort duration (Fig. \ref{fig:group_mean}) but has difficulty reproducing the survival function and median duration (Fig. \ref{fig:surv_group}, \ref{fig:group_median}), meaning that these excursions from the group-level mean may be driven by the difference in processes underlying extinction of taxa in this origination cohort.
-
-Many of the effect estimates for the Sakmarian origination cohort (295.5-290.1 Mya) are divergent from the group-level averages (Fig. \ref{fig:cohort_series}). Specifically, \(\beta^{0}\) was estimated to be below the group-level average indicating greater average duration than average origination cohort , \(\beta^{r}\) was estimated to be above the group-level average indicating that geographic range has a weaker than normal effect on extinction risk, \(\beta^{v}\) has an above average estimate indicating a left-shifted relationship between environmental preference and duration, and finally \(\beta^{m}\) was estimated to be below the group-level average which means that taxa with greater than average body sizes are expected to have greater durations than taxa originating in that cohort with below average body size. The model does a poor job of reproducing the origination cohort survival curve (Fig. \ref{fig:surv_group}) while slightly under estimating mean and median durations of the origination cohort (Fig. \ref{fig:group_mean}).
-
-The Kungarian origination cohort (279.2-272.3 Mya) is the final cohort for which there are at least two effect estimates are divergent from the group-level averages. Both the linear and quadratic aspects of environmental preference on expected duration for taxa in this origination cohort have divergent estimates (Fig. \ref{fig:cohort_series}). \(\beta^{v}\) is estimated to be lower than the group-level average indicating a left-shifted relationship, while \(\beta^{v^{2}}\) is estimated to be greater than the group-level average which indicates an increasing peakedness to the relationship between environmental preference and expected duration. However, the model is able reproduce many aspects of that origination cohort's survival curve but is far from perfect (Fig. \ref{fig:surv_group}). Additionally, the model has a good fit to that cohort's mean duration (Fig. \ref{fig:group_mean}) while also underestimating median taxon duration (Fig. \ref{fig:group_median}).
-
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio=true]{figure/cohort_series_cweib_cens}
-  \caption{Comparison of cohort-specific estimates of \(\beta^{0}\), the effect of geographic range on extinction risk \(\beta^{r}\), the effect of environmental preference \(\beta^{v}\) and \(\beta^{v^{2}}\), and body size \(\beta^{m}\). Points correspond to the median of the cohort-specific estimate, along with 80\% credible intervals. Points are plotted at the midpoint of the cohorts stage of origination in millions of years before present (My). Black, horizontal lines are the overall estimates of covariate effects along with 80\% credible intervals (shaded).}
-  \label{fig:cohort_series}
-\end{figure}
+The Kungarian origination cohort (279.2-272.3 Mya) is the final cohort for which there are at least two effect estimates are divergent from the group-level averages. Both the linear and quadratic aspects of environmental preference on expected duration for taxa in this origination cohort have divergent estimates (Fig.~\ref{fig:cohort_series}). \(\beta^{v}\) is estimated to be lower than the group-level average indicating a left-shifted relationship, while \(\beta^{v^{2}}\) is estimated to be greater than the group-level average which indicates an increasing peakedness to the relationship between environmental preference and expected duration. However, the model is able reproduce many aspects of that origination cohort's survival curve but is far from perfect (Fig.~\ref{fig:surv_group}). Additionally, the model has a good fit to that cohort's mean duration (Fig.~\ref{fig:group_mean}) while also underestimating median taxon duration (Fig.~\ref{fig:group_median}).
 
 
 
 % cohort-specific environmental effect
 %   description of the variation in estimates
 %   mass extinction boundaries
-The cohort-specific relationships between environmental preference and \(\log(\sigma)\) were calculated from the estimates of \(\beta^{0}\), \(\beta^{v}\), and \(\beta^{v^{2}}\) (Fig. \ref{fig:env_cohort}) and reflect how these three parameters act in concert and not just individually (Fig. \ref{fig:cohort_series}). Because of the relationship between \(\beta^{v}\) and \(\beta^{v^{2}}\), it is important to consider than together when drawing conclusions from the model. In many cases, the cohort-specific estimated relationship between environmental preference and duration is approximately equal to the group-level average, but 14 of the 33 analyzed origination cohorts have at least one of these three parameters being noticeably different from the group-level average. 
+The cohort-specific relationships between environmental preference and \(\log(\sigma)\) were calculated from the estimates of \(\beta^{0}\), \(\beta^{v}\), and \(\beta^{v^{2}}\) (Fig.~\ref{fig:env_cohort}) and reflect how these three parameters act in concert and not just individually (Fig.~\ref{fig:cohort_series}). Because of the relationship between \(\beta^{v}\) and \(\beta^{v^{2}}\), it is important to consider than together when drawing conclusions from the model. In many cases, the cohort-specific estimated relationship between environmental preference and duration is approximately equal to the group-level average, but 14 of the 33 analyzed origination cohorts have at least one of these three parameters being noticeably different from the group-level average. 
 %The origination cohorts' for whom the relationship between environmental preference and expected duration that differ the most, visually, from the average relationship are 
 
-The cohort originating in the Tremadocian stage are estimated to have a greater-than average estimate of the linear aspect of environmental preference, \(\beta^{v}\) (Fig. \ref{fig:cohort_series}); this means that the relationship between environmental preference and duration is slightly right-shifted than the average (Fig. \ref{fig:env_cohort}). Additionally, the model adequately recapitulates the empirical survival function along with observed mean and median durations of that cohort (Fig. \ref{fig:surv_group}, \ref{fig:group_mean}, \ref{fig:group_median}). These results indicate that this cohort has a different relationship between environmental preference and duration than the average origination-cohort.
+The cohort originating in the Tremadocian stage are estimated to have a greater-than average estimate of the linear aspect of environmental preference, \(\beta^{v}\) (Fig.~\ref{fig:cohort_series}); this means that the relationship between environmental preference and duration is slightly right-shifted than the average (Fig.~\ref{fig:env_cohort}). Additionally, the model adequately recapitulates the empirical survival function along with observed mean and median durations of that cohort (Fig.~\ref{fig:surv_group},~\ref{fig:group_mean},~\ref{fig:group_median}). These results indicate that this cohort has a different relationship between environmental preference and duration than the average origination-cohort.
 
-The Pragian, Emisian, Moscovian, and Capitanian origination cohorts are all estimated have a different average durations from the group-level average based on their estimates of \(\beta^{0}\) (Fig. \ref{fig:cohort_series}). While the cohort-specific estimates vary from greater-than or less-than average, none of these origination cohorts are estimated to have a simultaneous divergence in the linear or quadratic aspects of environmental preference. This result means that most variation in these cohorts relationships between environmental preference and duration is driven not by changes to actual environmental preference than overall changes in average duration, i.e. extinction intensity (Fig. \ref{fig:env_cohort}). Of these cohorts, the Pragian and Moscovian origination cohorts are estimated to have greater than average species durations (Fig. \ref{fig:cohort_series}), though the Moscovian is extremely poorly fit by this model (Fig. \ref{fig:surv_group}, \ref{fig:group_mean}, \ref{fig:group_median}). In contrast, the Emisian and Capitanian origination cohorts are estimated to have greater-than average estimates of \(\beta^{0}\) indicating greater-than average extinction intensity, as average duration decreases as \(\beta^{0}\) increases (Fig. \ref{fig:cohort_series}). 
+The Pragian, Emisian, Moscovian, and Capitanian origination cohorts are all estimated have a different average durations from the group-level average based on their estimates of \(\beta^{0}\) (Fig.~\ref{fig:cohort_series}). While the cohort-specific estimates vary from greater-than or less-than average, none of these origination cohorts are estimated to have a simultaneous divergence in the linear or quadratic aspects of environmental preference. This result means that most variation in these cohorts relationships between environmental preference and duration is driven not by changes to actual environmental preference than overall changes in average duration, i.e. extinction intensity (Fig.~\ref{fig:env_cohort}). Of these cohorts, the Pragian and Moscovian origination cohorts are estimated to have greater than average species durations (Fig.~\ref{fig:cohort_series}), though the Moscovian is extremely poorly fit by this model (Fig.~\ref{fig:surv_group},~\ref{fig:group_mean},~\ref{fig:group_median}). In contrast, the Emisian and Capitanian origination cohorts are estimated to have greater-than average estimates of \(\beta^{0}\) indicating greater-than average extinction intensity, as average duration decreases as \(\beta^{0}\) increases (Fig.~\ref{fig:cohort_series}). 
 
-The Wenlock, Visean, Serpukhovian, and Asseilian cohorts all have estimates of the linear aspect of environmental preference, \(\beta^{v}\), that are lower than the group-level average. Additionally, this is the only aspect of the relationship between environmental preference and expected taxon duration for these cohorts than is divergent from the group-level means (Fig. \ref{fig:cohort_series}). This change to \(\beta^{v}\) manifests as a left-shifted relationship between environmental preference and duration such that the apex of the relationship is closer to 0 which means that there is no ``advantage'' for favoring either an epicontinental and open-ocean environment; this is slightly different from the group-level average relationship which has an approximate 64\% probability of the apex being right-shifted so that taxa which slightly favor epicontinental environments are expected to have a greater duration than those that favor open-ocean environments (Fig. \ref{fig:env_mean}). Keep in mind, however, there is an apprixmately 96.4\% probability that any cohort would have a concave down relationship between environmental preference and duration which means that taxa which favor purely open-ocean or epicontinental environments are expected to have shorter durations than taxa which can exist in either environment (Fig. \ref{fig:env_cohort}).
+The Wenlock, Visean, Serpukhovian, and Asseilian cohorts all have estimates of the linear aspect of environmental preference, \(\beta^{v}\), that are lower than the group-level average. Additionally, this is the only aspect of the relationship between environmental preference and expected taxon duration for these cohorts than is divergent from the group-level means (Fig.~\ref{fig:cohort_series}). This change to \(\beta^{v}\) manifests as a left-shifted relationship between environmental preference and duration such that the apex of the relationship is closer to 0 which means that there is no ``advantage'' for favoring either an epicontinental and open-ocean environment; this is slightly different from the group-level average relationship which has an approximate 64\% probability of the apex being right-shifted so that taxa which slightly favor epicontinental environments are expected to have a greater duration than those that favor open-ocean environments (Fig.~\ref{fig:env_mean}). Keep in mind, however, there is an apprixmately 96.4\% probability that any cohort would have a concave down relationship between environmental preference and duration which means that taxa which favor purely open-ocean or epicontinental environments are expected to have shorter durations than taxa which can exist in either environment (Fig.~\ref{fig:env_cohort}).
 
-The Famennian and Tournaisian origination cohorts are all estimated to have greater than average estimates of the linear aspect of environmental preference (\(\beta^{v}\)) (Fig. \ref{fig:cohort_series}). These estimates mean that the relationship between environmental preference and duration is right-shifted such that taxa which prefer epicontinental environments over open-ocean are expected to have greater durations than average. Specifically, this means that taxa that can tolerate both open-ocean and epicontinental environments but preferentially occur in epicontinental environments are expected to have greater durations than those that occur equally in these two environments (Fig. \ref{fig:env_cohort}).
+The Famennian and Tournaisian origination cohorts are all estimated to have greater than average estimates of the linear aspect of environmental preference (\(\beta^{v}\)) (Fig.~\ref{fig:cohort_series}). These estimates mean that the relationship between environmental preference and duration is right-shifted such that taxa which prefer epicontinental environments over open-ocean are expected to have greater durations than average. Specifically, this means that taxa that can tolerate both open-ocean and epicontinental environments but preferentially occur in epicontinental environments are expected to have greater durations than those that occur equally in these two environments (Fig.~\ref{fig:env_cohort}).
 
-The Frasnian origination cohort is one of two origination cohorts for which the quadratic aspect of the relationship between environmental preference and duration \(\beta^{v^{2}}\). Additionally, this parameter is the only aspect of environmental preference (or average duration) that is divergent for this cohort (Fig. \ref{fig:cohort_series}). Additionally, this cohort is well fit by the model so confidence in these results may represent aspects of the data generating process.
+The Frasnian origination cohort is one of two origination cohorts for which the quadratic aspect of the relationship between environmental preference and duration \(\beta^{v^{2}}\). Additionally, this parameter is the only aspect of environmental preference (or average duration) that is divergent for this cohort (Fig.~\ref{fig:cohort_series}). Additionally, this cohort is well fit by the model so confidence in these results may represent aspects of the data generating process.
 
-The Sakmarian and Kungarian are the only two origination cohorts for which two of \(\beta^{0}\), \(\beta^{v}\), and \(\beta^{v^{2}}\) are divergent from the group-level averages (Fig. \ref{fig:cohort_series}), though they have very different divergences. As explained earlier, the Sakmarian origination cohort is estimated to have greater-than average \(\beta^{0}\) (increased extinction risk) and a left-shifted relationship between environmental preference and duration (lower-than average estimate of \(\beta^{v}\)), while the Kungarian cohort is characterized by a greater-than average estimate of \(\beta^{v^{2}}\) and a lower-than average estimate of \(beta^{v}\), which translates into a relationship between environmental preference and duration that is both a more peaked than average as well as being more left-shifted than average (Fig. \ref{fig:env_cohort}).
+The Sakmarian and Kungarian are the only two origination cohorts for which two of \(\beta^{0}\), \(\beta^{v}\), and \(\beta^{v^{2}}\) are divergent from the group-level averages (Fig.~\ref{fig:cohort_series}), though they have very different divergences. As explained earlier, the Sakmarian origination cohort is estimated to have greater-than average \(\beta^{0}\) (increased extinction risk) and a left-shifted relationship between environmental preference and duration (lower-than average estimate of \(\beta^{v}\)), while the Kungarian cohort is characterized by a greater-than average estimate of \(\beta^{v^{2}}\) and a lower-than average estimate of \(beta^{v}\), which translates into a relationship between environmental preference and duration that is both a more peaked than average as well as being more left-shifted than average (Fig.~\ref{fig:env_cohort}).
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width = \textwidth,height = 0.8\textheight,keepaspectratio=true]{figure/env_cohort_med_cweib_cens}
-  \caption{Comparison of origination cohort-specific (posterior predictive) estimates of the effect of environmental preference on \(\log(\sigma)\) to the mean overall estimate of the effect of environmental preference. Cohort-specific estimates are from 100 posterior predictive simulations across the range of (transformed and rescaled) observed values of environmental preference. The oldest cohort is in the top-right and younger cohorts proceed left to right, with the youngest cohort being the right-most facet of the last row. Panel names correspond to the name of the stage in which that cohort originated.}
-  \label{fig:env_cohort}
-\end{figure}
-
-Included in this model are also estimates of the correlation between the covariate estimate time-seies, as well as that ofthe intercept (Fig. \ref{fig:cor_posterior}). These estimates allow for testing any hypotheses about the relationship between extinction intensity (the intercept) and extinction selectivity (covariate effects). 
 
 There is an approximately 99.4\% probability that cohort estimates of \(\beta^{0}\) and \(\beta^{r}\) are negatively correlated, with median estimate of correlation being -0.57. This result means that for any cohort, we would expect that if extinction intensity increases (\(\beta^{0}\) increases), the estimated effect of geographic range increases (\(\beta^{r}\) increases). This result is strong evidence for a relationship between intensity and selectivity with respect to geographic range size.
 
 There is an approximate 94.2\% probability that the cohort-specific estimates of \(\beta^{0}\) and \(\beta^{v}\) are negatively correlated; this means that as extinction intensity increases it is expected that epicontinental taxa become more favored over open-ocean environments (i.e. as \(\beta^{0}\) increases, \(\beta^{v}\) decreases). This result is strong evidence for a relationship between intensity and selectivity with respect to the linear aspect of environmnetal preference. 
 
-Correlations between the non-intercept estimates reflect potential similarities in selective pressures between cohorts, however there is only weak evidence of any potential cross-correlations in cohort-specific covariate effects. There is an approximate 57.6\% probability that \(\beta^{r}\) and \(\beta^{v}\) are positively correlated. This lack of cross-correlation may be due in part to the higher between-cohort variance of the effect of environmental preference \(\tau^{v}\) than the very small between-cohort variance in the effect of geographic range \(\tau^{r}\) (Table \ref{tab:param}); the effect of geographic range might simply not vary enough relative to the much noisier environmental preference. 
+Correlations between the non-intercept estimates reflect potential similarities in selective pressures between cohorts, however there is only weak evidence of any potential cross-correlations in cohort-specific covariate effects. There is an approximate 57.6\% probability that \(\beta^{r}\) and \(\beta^{v}\) are positively correlated. This lack of cross-correlation may be due in part to the higher between-cohort variance of the effect of environmental preference \(\tau^{v}\) than the very small between-cohort variance in the effect of geographic range \(\tau^{r}\) (Table~\ref{tab:param}); the effect of geographic range might simply not vary enough relative to the much noisier environmental preference. 
 
 Conversly, There is a 80.4\% probability that estimates of the effect of geographic range (\(\beta^{r}\)) and the quadratic aspect of environmental preference (\(\beta^{v^{2}}\) are positivly correlated; this is weak evidence of a relationship between the effects of these covariates. Thus, as the effect of geographic range increases, we might expect with weak evidence that the peakedness of relationship between environmental preference and duration to increase. However, beccause there is only a 80.4\% probability of a positive correlation, this result cannot interpreted with authority. Instead, this result is an opportunity for future research to understand a potential relationship between geographic range, environmental preferece, and species duration.
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.8\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap_cweib_cens}
-  \caption{Mixed graphical and numerical representation of the correlation matrix \(\Omega\) of variation in cohort-specific covariate estimates. These correlations are between the estimates of the cohort-level effects of covariates, along with intercept/baseline extinction risk. The median estimates of the correlations are presented numerically (upper-triangle) and as idealized ellipses representing that much correlation (lower-triangle). The darkness of the ellipse corresponds to the magnitude of the correlation.}
-  \label{fig:cor_posterior}
-\end{figure}
 
-
-Sampling was found to have a positive effect (negative \(\delta\)) on duration: greater sampling, shorter duration (Table \ref{tab:param}). While potentially counter intuitive, this result is most likely due to some long lived taxa only be sampled in the stages of the first and last appearance. Also, longer lived taxa have more opportunities to not be sampled than shorter lived taxa. These two factors will lead to this result. 
+Sampling was found to have a positive effect (negative \(\delta\)) on duration: greater sampling, shorter duration (Table~\ref{tab:param}). While potentially counter intuitive, this result is most likely due to some long lived taxa only be sampled in the stages of the first and last appearance. Also, longer lived taxa have more opportunities to not be sampled than shorter lived taxa. These two factors will lead to this result. 
 
 The Weibull shape parameter \(\alpha\) was found to be approximately 1.61 (\(\pm 0.05\) SD) with a 100\% probability of being greater than 1. This result is not consistent with the Law of Constant Extinction \citep{VanValen1973} and is instead consistent with accelerating extinction risk with taxon age. This result is consistent with recent empirical results and may be caused by newly originating species have a fundamentally lower risk of extinction compared to species which have already originated \citep{Wagner2014b,Quental2013,Smits2015}. This result is also consistent with a recently proposed nearly-neutral evolution where competition/selection/evolution drives whole communities to increase in average fitness over time while still maintaining constant relative fitness across the community, thus older species are more likely to go extinct because of having a fundamentally lower average fitness than newly originating species \citep{Rosindell2015a}. This results, however, is not consistent with other empirical results from the marine fossil record \citep{Finnegan2008,Crampton2016} and could potentially be caused by the minimum resolution of the fossil record \citep{Sepkoski1975}. It is thus unclear if a strong biological inference can be made from this result, which means that further work is necessary on the effect of taxon age on extinction risk.
 
@@ -485,7 +364,7 @@ I find that as intensity increases (\(\beta^{0}\) decreases), the magnitude of t
 
 %Additionally, the lower between-cohort variance in the effect of geographic range versus that higher between-cohort variance implies that for cohorts with a greater than average extinction intensity, the difference in the effect geographic range and the group-level effect of geographic range is expected to be smaller than the difference between the effect of environmental preference and the group-level effect of environmental preference.
 
-I find consistent support for the ``survival of the unspecialized,'' with respect to epicontinental versus open-ocean environmental preference, as a time-invariant generalization of brachiopod survival \citep{Simpson1944}. Taxa with intermediate environmental preferences are expected to have lower extinction risk than taxa specializing in either epicontinental or open-ocean environments (Fig. \ref{fig:env_mean}), though the curvature of the relationship varies from rather shallow to very peaked (Fig. \ref{fig:env_cohort}). However, this relationship is not symmetric about 0, as taxa favoring epicontinental environments are expected with approximately 75\% probability to have a greater duration than taxa favoring open-ocean environments. This description of environment preference only describes one major aspect of a taxon's environmental context, with factors such as bathymetry and temperature being further descriptors of a taxon's adaptive zone \citep{Nurnberg2013a,Harnik2013,Harnik2011,Heim2011}; inclusion of these factors in future analyses would potentially improve our understanding the extent and complexity of the ``survival of the unspecialized'' hypothesis as it applies to all dimensions of an adaptive zone.
+I find consistent support for the ``survival of the unspecialized,'' with respect to epicontinental versus open-ocean environmental preference, as a time-invariant generalization of brachiopod survival \citep{Simpson1944}. Taxa with intermediate environmental preferences are expected to have lower extinction risk than taxa specializing in either epicontinental or open-ocean environments (Fig.~\ref{fig:env_mean}), though the curvature of the relationship varies from rather shallow to very peaked (Fig.~\ref{fig:env_cohort}). However, this relationship is not symmetric about 0, as taxa favoring epicontinental environments are expected with approximately 75\% probability to have a greater duration than taxa favoring open-ocean environments. This description of environment preference only describes one major aspect of a taxon's environmental context, with factors such as bathymetry and temperature being further descriptors of a taxon's adaptive zone \citep{Nurnberg2013a,Harnik2013,Harnik2011,Heim2011}; inclusion of these factors in future analyses would potentially improve our understanding the extent and complexity of the ``survival of the unspecialized'' hypothesis as it applies to all dimensions of an adaptive zone.
 
 \citet{Hopkins2014a}, in their analysis of niche conservatism and substrate lithological preference in marine invertebrates, found that brachiopods were among the least ``conservative'' groups; taxa were found to easily change substrate preference on short time scales. While substrate preference is not the same as environmental preference (as defined here), a question does arise: are there three classes of environmental preference instead of two? These classes would be taxa with broad tolerance (``true'' generalists), inflexible specialists (``true'' specialists), and flexible but with a narrow tolerance. A flexible taxon is one with a narrow habitat preference at one time, but with preference that changes over time with changing environmental availability. My analysis assumes that traits are constant over the duration of the taxon meaning that this scenario is not detectable; taxa with broad tolerances and flexible taxa with narrow per-stage preference end up being treated the same way. Future work should explore how environmental preference changes over lineage duration in relation to environmental availability to estimate if the generalists--specialists continuum is actually ternary relationship.
 
@@ -539,112 +418,126 @@ I would like to thank K. Angielzcyk, M. Foote, P. D. Polly, R. Ree, and G. Slate
 
 \bibliographystyle{amnat}
 \bibliography{newbib,packages}
-%%%%%%%%%%%%%%%%%%%%%
-% Bibliography
-%%%%%%%%%%%%%%%%%%%%%
-% You can either type your references following the examples below, or
-% compile your BiBTeX database and paste the contents of your .bbl file
-% here. The amnatnat.bst style file should work for this---but please
-% let us know if you run into any hitches with it!
-% The list below includes sample journal articles, book chapters, and
-% Dryad references.
 
-%\begin{thebibliography}{}
-%
-%\bibitem[{Cook et~al.(2015)Cook, Collaborator, and Expert}]{CookEtAl2015}
-%Cook, O.~E., G.~H. Collaborator, and A.~Q. Expert. 2015.
-%\newblock Data from: Template and guidelines for using \LaTeX{} in \textit{The American Naturalist}.
-%\newblock American Naturalist, Dryad Digital Repository, http://dx.doi.org/10.5061/dryad.XYZAB.
-%
-%\bibitem[{Davis et~al.(2011)Davis, Brakora, and Lee}]{DavisEtAl2011}
-%Davis, E.~B., K.~A. Brakora, and A.~H. Lee. 2011.
-%\newblock Evolution of ruminant headgear: a review.
-%\newblock Proceedings of the Royal Society B 278:2857--2865.
-%
-%\bibitem[{Inglis et~al.(2011)Inglis, Roberts, Gardner, and Buckling}]{Ing11}
-%Inglis, R.~F., P.~G. Roberts, A.~Gardner, and A.~Buckling. 2011.
-%\newblock Spite and the scale of competition in \textit{Pseudomonas
-%  aeruginosa}.
-%\newblock American Naturalist 178:276--285.
-%
-%\bibitem[{Lemod\`{e}le et~al.(2007)Lemodele, Kapitelschreiber, and Exemplar}]{LemKapEx07}
-%Lemod\`{e}le, P.-Q., A.~B. Kapitelschreiber, and C.~D.~E. Exemplar. 2007.
-%\newblock An exemplary instance of chapters in books.
-%\newblock Pages 231--245 \emph{in} J.-P. \'{E}crivain and M.~A. Term\'{e}szettud\'{o}s, eds. Inspiring Instances of Brilliant Writing. Truth Pudding Press, Fond du Lac, WI.
-%
-%\bibitem[{Xiao et~al.(2015)Xiao, McGlinn, and White}]{Xiao2015}
-%Xiao, X., D.~J. McGlinn, and E.~P. White. 2015.
-%\newblock A strong test of the maximum entropy theory of ecology.
-%\newblock American Naturalist 185:E705--E80.
-%
-%\end{thebibliography}
-%
-%\newpage{}
-%
-%\section*{Tables}
-%\renewcommand{\thetable}{\arabic{table}}
-%\setcounter{table}{0}
-%
-%\begin{table}[h]
-%\caption{Animals in various cities with equations}
-%\label{Table:Okapi}
-%\centering
-%\begin{tabular}{llc}\hline
-%Animal    & City         & Equation \\ \hline
-%Dog       & Springfield  & $x+y=z$ \\
-%Fox       & Indianapolis & $2x+2y=2z$ \\
-%Okapi$^a$ & Chicago      & $x-y<z$ \\
-%Badger    & Madison      & $x+2y>z$ \\ \hline
-%\end{tabular}
-%\bigskip{}
-%\\
-%{\footnotesize Note: Table titles should be short. Further details should go in a `notes' area after the tabular environment, like this. $^a$ Okapis are not native to Chicago, but they are to be met with in both of the major Chicagoland zoos.}
-%\end{table}
-%
-%\newpage{}
-%
-%\section*{Figure legends}
-%
-%\begin{figure}[h!]
-%%\includegraphics{horn-of-okapi}
-%\caption{Figure legends can be longer than the titles of tables. However, they should not be excessively long.}
-%\label{Fig:OkapiHorn}
-%\end{figure}
-%
-%
-%\begin{figure}[h!]
-%%\includegraphics{elegance}
-%\caption{In this way, figure legends can be listed at the end of the document, with references that work, even though the graphic itself should be included for final files after acceptance. Instead, upload the relevant figure files separately to Editorial Manager; Editorial Manager should insert them at the end of the PDF automatically.}
-%\label{Fig:AnotherFigure}
-%\end{figure}
-%
-%\subsection*{Online figure legends}
-%
-%\renewcommand{\thefigure}{A\arabic{figure}}
-%\setcounter{figure}{0}
-%
-%\begin{figure}[h!]
-%%\includegraphics{jumps20m}
-%\caption{\textit{A}, the quick red fox proceeding to jump 20~m straight into the air over not one, but several lazy dogs. \textit{B}, the quick red fox landing gracefully despite the skepticism of naysayers.}
-%\label{Fig:Jumps}
-%\end{figure}
-%
-%\begin{figure}[h!]
-%%\includegraphics{jumps20m}
-%\caption{The quicker the red fox jumps, the likelier it is to land near an okapi. For further details, see \citet{LemKapEx07}.}
-%\label{Fig:JumpsOk}
-%\end{figure}
-%
-%\renewcommand{\thefigure}{B\arabic{figure}}
-%\setcounter{figure}{0}
-%
-%\end{document}
+\newpage
 
+\section*{Tables}
+\renewcommand{\thetable}{\arabic{table}}
+\setcounter{table}{0}
+
+\begin{table}[ht!]
+  \caption{Estimates of group-level and invariant parameter values for the fitted model analyzed here. }
+  \label{tab:param}
+  \begin{centering}
+    \scalebox{0.9}{
+      \begin{tabular}{ l | l p{2.5cm} r r r r r }
+        Category & Parameter & Effect of\dots & Mean & SD & 10\% & 50\% & 90\% \\ 
+        \multirow{5}{*}{Mean} & \(\mu^{i}\) & intercept & -2.34 & 0.14 & -2.52 & -2.34 & -2.16 \\ 
+        & \(\mu^{r}\) & geographic range &  1.19 & 0.21 & 0.93 & 1.19 & 1.45 \\ 
+        & \(\mu^{v}\) & environmental preference &  -0.34 & 0.20 & -0.59 & -0.34 & -0.07 \\ 
+        & \(\mu^{v^{2}}\) & environmental preference\(^{2}\) &  2.15 & 0.30 & 1.76 & 2.15 & 2.53 \\ 
+        & \(\mu^{m}\) & body size & 0.05 & 0.11 & -0.09 & 0.05 & 0.19 \\ 
+        \multirow{5}{*}{Standard deviation} & \(\tau^{i}\) & intercept &  0.51 & 0.11 & 0.38 & 0.50 & 0.65 \\ 
+        & \(\tau^{r}\) & geographic range & 0.77 & 0.17 & 0.55 & 0.75 & 1.00 \\ 
+        & \(\tau^{v}\) & environmental preference & 0.97 & 0.18 & 0.76 & 0.95 & 1.20 \\ 
+        & \(\tau^{v^{2}}\) & environmental preference\(^{2}\) &  1.08 & 0.34 & 0.66 & 1.07 & 1.52 \\ 
+        & \(\tau^{m}\) & body size &  0.41 & 0.11 & 0.27 & 0.41 & 0.56 \\ 
+        \multirow{2}{*}{Other} & \(\delta\) & sampling & -2.77 & 0.15 & -2.97 & -2.77 & -2.58 \\ 
+        & \(\alpha\) & ``time'' & 1.61 & 0.05 & 1.54 & 1.61 & 1.67 \\ 
+      \end{tabular}
+    }
+  \end{centering}
+  \bigskip{}
+  \\
+  {\footnotesize{Note: These parameters are the group-level estimates of the effects of biological traits on brachiopod generic survival, the standard deviation of the between-cohort effects, as well as the estimates of both the effect of sampling \(\delta\) and the Weibull shape parameter \(\alpha\). The mean, standard deviation (SD), 10th, 50th, and 90th quantiles of the marginal posteriors are presented.}}
+\end{table}
 \clearpage
 
 
+\newpage{}
 
 
+\section*{Figure legends}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_dens_zoom_cweib_cens}
+  \caption{ Comparison of the distribution of the observed data (black) to 100 simulated distributions (blue). This is a close-up view of the bulk of the distribution which shows the more subtle aspects of (mis)fit between the data and the model. }
+  \label{fig:dens_overlay_zoom}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/survival_curves_cweib_cens}
+  \caption{Comparison of the empirical estimate of \(S(t)\) (highlighted) versus estimates from 100 posterior predictive data sets (black). \(S(t)\) corresponds to the probability that the age of a genus \(t\) is less than the genus' ultimate duration \(T\). }
+  \label{fig:surv}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \begin{subfigure}{0.4\textwidth}
+    \caption{}
+    \includegraphics[height = 0.5\textheight,width=0.9\textwidth,keepaspectratio=true]{figure/ppc_mean_cweib_cens}
+    \label{fig:ppc_mean}
+  \end{subfigure}
+  \begin{subfigure}{0.4\textwidth}
+    \caption{}
+    \includegraphics[height = 0.5\textheight,width=0.9\textwidth,keepaspectratio=true]{figure/ppc_median_cweib_cens}
+    \label{fig:ppc_median}
+  \end{subfigure}
+  \caption{ Comparison of the (A) observed mean genus duration (black vertical line) to a distribution of means estimated from 100 simulated datasets (blue), and (B) comparison of the observed median genus duration (black vertical line) to a distribution of medians estimated from 100 simulated datasets (blue). Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
+  \label{fig:points}
+\end{figure}
+
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_surv_coh}
+  \caption{Comparison of the empirical estimate of \(S(t)\) (highlighted) versus estimates from 100 posterior predictive data sets (black) for each of the origination cohorts. \(S(t)\) corresponds to the probability that the age of a genus \(t\) is less than the genus' ultimate duration \(T\). By comparing the fit of the model to the individual cohorts, when and where the model (mis)fits is more observable. }
+  \label{fig:surv_group}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_mean_group_cweib_cens}
+  \caption{ Comparison of the observed mean genus duration (black vertical line) to a distribution of means estimated from 100 simulated datasets (blue) for each of the origination cohorts. Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
+  \label{fig:group_mean}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/ppc_med_group_cweib_cens}
+  \caption{ Comparison of the observed median genus duration (black vertical line) to a distribution of medians estimated from 100 simulated datasets (blue) for each of the origination cohorts. Model fit is evaluated by the similarity between the observed and the estimated, where good fit is demonstrated by the vertical line being ``within'' the simulated distribution. }
+  \label{fig:group_median}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/env_effect_med_cweib_cens}
+  \caption{The overall expected relationship between environmental affinity \(v_{i}\) and a \(\log(\sigma)\) when r = 0 and m = 0. The 1000 semi-transparent lines corresponds to a single draw from the posterior predictive distribution, while the highlighted line corresponds to the median of the posterior predictive distribution. The overall relationship is concave down with an optimum greater than 0, which means that taxa favoring epicontinental environments are expected to have longer durations than those favoring open-ocean environments. The tick marks along the bottom of the plot correspond to the (rescaled) observed values of environmental preference.}
+  \label{fig:env_mean}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width = \textwidth,height = 0.7\textheight,keepaspectratio=true]{figure/cohort_series_cweib_cens}
+  \caption{Comparison of cohort-specific estimates of \(\beta^{0}\), the effect of geographic range on extinction risk \(\beta^{r}\), the effect of environmental preference \(\beta^{v}\) and \(\beta^{v^{2}}\), and body size \(\beta^{m}\). Points correspond to the median of the cohort-specific estimate, along with 80\% credible intervals. Points are plotted at the midpoint of the cohorts stage of origination in millions of years before present (My). Black, horizontal lines are the overall estimates of covariate effects along with 80\% credible intervals (shaded).}
+  \label{fig:cohort_series}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width = \textwidth,height = 0.7\textheight,keepaspectratio=true]{figure/env_cohort_med_cweib_cens}
+  \caption{Comparison of origination cohort-specific (posterior predictive) estimates of the effect of environmental preference on \(\log(\sigma)\) to the mean overall estimate of the effect of environmental preference. Cohort-specific estimates are from 100 posterior predictive simulations across the range of (transformed and rescaled) observed values of environmental preference. The oldest cohort is in the top-right and younger cohorts proceed left to right, with the youngest cohort being the right-most facet of the last row. Panel names correspond to the name of the stage in which that cohort originated.}
+  \label{fig:env_cohort}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.7\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap_cweib_cens}
+  \caption{Mixed graphical and numerical representation of the correlation matrix \(\Omega\) of variation in cohort-specific covariate estimates. These correlations are between the estimates of the cohort-level effects of covariates, along with intercept/baseline extinction risk. The median estimates of the correlations are presented numerically (upper-triangle) and as idealized ellipses representing that much correlation (lower-triangle). The darkness of the ellipse corresponds to the magnitude of the correlation.}
+  \label{fig:cor_posterior}
+\end{figure}
 
 
 
