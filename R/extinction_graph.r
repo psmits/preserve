@@ -12,7 +12,6 @@ library(gridExtra)
 library(ellipse)
 library(loo)
 library(bayesplot)
-source('../R/mung.r')
 source('../R/multiplot.r')
 source('../R/borrow_plotcorr.r')
 source('../R/plot_foo.r')
@@ -47,7 +46,7 @@ fits <- read_stan_csv(outs)
 loglik <- extract_log_lik(fits)
 waic1 <- waic(loglik)
 loo1 <- loo(loglik)
-check_all_diagnostics(fits)
+check_all_diagnostics(fits, max_depth = 15)
 
 # move on to the plots
 # all the plots for all the models
@@ -71,7 +70,7 @@ fits <- read_stan_csv(outs)
 loglik <- extract_log_lik(fits)
 waic2 <- waic(loglik)
 loo2 <- loo(loglik)
-check_all_diagnostics(fits)
+check_all_diagnostics(fits, max_depth = 15)
 
 # move on to the plots
 # all the plots for all the models
