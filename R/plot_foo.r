@@ -37,6 +37,15 @@ plot_ppcbasics <- function(wei.fit, data, lump, mvgr, cn, name) {
                                 name, '.pdf'),
          width = 10, height = 8, dpi = 600)
 
+  # combine point estimate graphs
+  pm <- pm + labs(title = 'A.')
+  pe <- pe + labs(title = 'A.')
+  temp <- paste0('../doc/figure/ppc_points_', name)
+  png(filename = temp, width = 850, height = 450)
+  grid.arrange(pm, pe, ncol = 2)
+  dev.off()
+
+
   pd <- ppc_dens_overlay(duration, wei.fit$y_tilde[1:100, ])
   pd <- pd + labs(x = 'Duration (geological stages)',
                   y = 'Density')
