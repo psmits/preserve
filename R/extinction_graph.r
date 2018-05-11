@@ -38,27 +38,27 @@ gts <- rev(as.character(lump[, 2]))
 # data used to fit the model
 data <- read_rdump('../data/data_dump/impute_info.data.R')
 
-pat <- 'surv_cweib_base'
-outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
-
-# simple comparison of fits
-fits <- read_stan_csv(outs)
-loglik <- extract_log_lik(fits)
-waic1 <- waic(loglik)
-loo1 <- loo(loglik)
-check_all_diagnostics(fits, max_depth = 15)
-
-# move on to the plots
-# all the plots for all the models
-# allows full comparison between model fits and estimates
-
-# plots for when there is no interaction
-npred <- 5
-# continuous weibull
-wei.fit <- rstan::extract(fits, permuted = TRUE)
-posterior.plots(data = data, wei.fit = wei.fit, 
-                npred = npred, lump = lump,
-                name = 'cweib_base')
+#pat <- 'surv_cweib_base'
+#outs <- list.files('../data/mcmc_out', pattern = pat, full.names = TRUE)
+#
+## simple comparison of fits
+#fits <- read_stan_csv(outs)
+#loglik <- extract_log_lik(fits)
+#waic1 <- waic(loglik)
+#loo1 <- loo(loglik)
+#check_all_diagnostics(fits, max_depth = 15)
+#
+## move on to the plots
+## all the plots for all the models
+## allows full comparison between model fits and estimates
+#
+## plots for when there is no interaction
+#npred <- 5
+## continuous weibull
+#wei.fit <- rstan::extract(fits, permuted = TRUE)
+#posterior.plots(data = data, wei.fit = wei.fit, 
+#                npred = npred, lump = lump,
+#                name = 'cweib_base')
 
 
 # right censored data form
@@ -85,5 +85,5 @@ posterior.plots(data = data, wei.fit = wei.fit,
                 npred = npred, lump = lump,
                 name = 'cweib_cens', left = TRUE)
 
-tab_waic <- loo::compare(waic1, waic2)
-tab_looic <- loo::compare(loo1, loo2)
+#tab_waic <- loo::compare(waic1, waic2)
+#tab_looic <- loo::compare(loo1, loo2)

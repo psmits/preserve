@@ -39,7 +39,7 @@ plot_ppcbasics <- function(wei.fit, data, lump, mvgr, cn, name) {
 
   # combine point estimate graphs
   pm <- pm + labs(title = 'A.')
-  pe <- pe + labs(title = 'A.')
+  pe <- pe + labs(title = 'B.')
   temp <- paste0('../doc/figure/ppc_points_', name)
   png(filename = temp, width = 850, height = 450)
   grid.arrange(pm, pe, ncol = 2)
@@ -254,6 +254,7 @@ plot_enveffect <- function(val2, # quantile
     cohmust <- cohmust + facet_wrap(~ coh, strip.position = 'bottom', ncol = 7)
     cohmust <- cohmust + theme(axis.text = element_text(size = 8),
                                strip.text = element_text(size = 8))
+    cohmust <- cohmust + scale_y_continuous(limits = c(0, 50))
     cohmust <- cohmust + labs(x = 'Environmental preference (v)',
                               y = 'Duration in stages')
     #y = expression(paste('log(', sigma, ')')))
