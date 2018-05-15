@@ -96,7 +96,7 @@ posterior.plots <- function(data,
                                        fill = 'black', size = 1, alpha = 0.25)
   surv.plot <- surv.plot + coord_cartesian(xlim = c(-0.5, max(duration)))
   surv.plot <- surv.plot + labs(x = 'Duration (t)', 
-                                y = 'Pr(t < T)')
+                                y = 'Pr(T >= t)')
   surv.plot <- surv.plot + theme(axis.title = element_text(size = 25))
   #surv.plot <- surv.plot + scale_y_continuous(trans=log10_trans(),
   #                                            breaks = c(0.01, 0.1, 0.5, 1))
@@ -188,7 +188,7 @@ posterior.plots <- function(data,
   sgg <- sgg + coord_cartesian(xlim = c(-0.5, max(duration)))
   sgg <- sgg + theme(strip.text = element_text(size = 10))
   sgg <- sgg + labs(x = 'Duration (geological stages)', 
-                    y = 'P(T > t)')
+                    y = 'P(T >= t)')
   ggsave(filename = '../doc/figure/ppc_surv_coh.png', sgg,
          width = 10.5, height = 8, dpi = 600)
 
