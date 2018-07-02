@@ -78,10 +78,14 @@ data$inclusion <- inclusion * 1
 num <- data$samp_obs * (length(data$samp_obs) - 1) + 0.5
 data$samp_obs <- num / length(data$samp_obs)
 
+data$K <- 5
+data$L <- 1
 
 # export for stan
 with(data, {stan_rdump(list = c('N', 
                                 'O',
+                                'K',
+                                'L',
                                 'N_obs', 'N_imp',
                                 'dur', 
                                 'censored', 
