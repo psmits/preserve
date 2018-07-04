@@ -251,7 +251,7 @@ plot_enveffect <- function(val2, # quantile
                                                   y = dur, 
                                                   group = NULL), 
                                     alpha = 0.5, colour = 'black')
-    cohmust <- cohmust + facet_wrap(~ coh, strip.position = 'bottom', ncol = 7)
+    cohmust <- cohmust + facet_wrap(~ coh, strip.position = 'bottom', ncol = 6)
     cohmust <- cohmust + theme(axis.text = element_text(size = 8),
                                strip.text = element_text(size = 8))
     cohmust <- cohmust + scale_y_continuous(limits = c(0, 50))
