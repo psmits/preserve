@@ -1,4 +1,4 @@
-\begin{thebibliography}{105}
+\begin{thebibliography}{107}
 \providecommand{\natexlab}[1]{#1}
 
 \bibitem[{Alexander(1977)}]{Alexander1977}
@@ -42,6 +42,13 @@ Crampton, J.~S., R.~A. Cooper, P.~M. Sadler, and M.~Foote. 2016.
 \newblock {Greenhouse--icehouse transition in the Late Ordovician marks a step
   change in extinction regime in the marine plankton}.
 \newblock Proceedings of the National Academy of Sciences 113:1498--1503.
+
+\bibitem[{Eronen et~al.(2011)Eronen, Evans, Fortelius, and
+  Jernvall}]{Eronen2011a}
+Eronen, J.~T., A.~R. Evans, M.~Fortelius, and J.~Jernvall. 2011.
+\newblock {Genera Are Often Better Than Species for Detecting Evolutionary
+  Change in the Fossil Record: a Reply To Salesa Et Al.}
+\newblock Evolution 65:1514--1516.
 
 \bibitem[{Ezard et~al.(2012)Ezard, Pearson, Aze, and Purvis}]{Ezard2012b}
 Ezard, T. H.~G., P.~N. Pearson, T.~Aze, and A.~Purvis. 2012.
@@ -100,6 +107,13 @@ Foote, M. 1988.
 \newblock {Environmental controls on geographic range size in marine animal
   genera}.
 \newblock Paleobiology 40:440--458.
+
+\bibitem[{Foote et~al.(2007)Foote, Crampton, Beu, Marshall, Cooper, Maxwell,
+  and Matcham}]{Foote2007}
+Foote, M., J.~S. Crampton, A.~G. Beu, B.~a. Marshall, R.~a. Cooper, P.~a.
+  Maxwell, and I.~Matcham. 2007.
+\newblock {Rise and fall of species occupancy in Cenozoic fossil mollusks.}
+\newblock Science (New York, N.Y.) 318:1131--1134.
 
 \bibitem[{Foote and Miller(2013)}]{Foote2013}
 Foote, M., and A.~I. Miller. 2013.
@@ -215,20 +229,27 @@ Jablonski, D. 1986.
   cretaceous mollusks.}
 \newblock Science 238:360--363.
 
-\bibitem[{Jablonski(2007)}]{Jablonski2007}
----{}---{}---. 2007.
-\newblock {Scale and hierarchy in macroevolution}.
-\newblock Palaeontology 50:87--109.
-
 \bibitem[{Jablonski(2008)}]{Jablonski2008a}
 ---{}---{}---. 2008.
 \newblock {Species Selection: Theory and Data}.
 \newblock Annual Review of Ecology, Evolution, and Systematics 39:501--524.
 
+\bibitem[{Jablonski and Finarelli(2009)}]{Jablonski2009}
+Jablonski, D., and J.~A. Finarelli. 2009.
+\newblock {Congruence of morphologically-defined genera with molecular
+  phylogenies}.
+\newblock Proceedings of the National Academy of Sciences 106:8262--8266.
+
 \bibitem[{Jablonski and Roy(2003)}]{Jablonski2003}
 Jablonski, D., and K.~Roy. 2003.
 \newblock {Geographical range and speciation in fossil and living molluscs.}
 \newblock Proceedings of the Royal Society B: Biological Sciences 270:401--406.
+
+\bibitem[{Jernvall and Fortelius(2002)}]{Jernvall2002}
+Jernvall, J., and M.~Fortelius. 2002.
+\newblock {Common mammals drive the evolutionary increase of hypsodonty in the
+  Neogene.}
+\newblock Nature 417:538--540.
 
 \bibitem[{Johnson(1974)}]{Johnson1974}
 Johnson, J.~G. 1974.
@@ -404,11 +425,6 @@ Raup, D.~M. 1975.
 \newblock {Cohort Analysis of generic survivorship}.
 \newblock Paleobiology 4:1--15.
 
-\bibitem[{Raup(1991)}]{Raup1991b}
----{}---{}---. 1991.
-\newblock {Extinction: Bad Genes or Bad Luck?}
-\newblock Norton, New York.
-
 \bibitem[{Raup(1994)}]{Raup1994}
 ---{}---{}---. 1994.
 \newblock {The role of extinction in evolution}.
@@ -426,6 +442,12 @@ Ritterbush, K.~A., and M.~Foote. 2017.
 Rosindell, J., L.~J. Harmon, and R.~S. Etienne. 2015.
 \newblock {Unifying ecology and macroevolution with individual-based theory.}
 \newblock Ecology Letters 18:472--482.
+
+\bibitem[{{Roy D. {\&} Valentine, I. W.}(1996)}]{Roy1996}
+{Roy D. {\&} Valentine, I. W.}, K.~J. 1996.
+\newblock {Higher taxa in biodiversity studies: Patterns from eastern pacific
+  marine molluscs.}
+\newblock Phil. Trans. R. Soc., Londo B 351:1605--1613.
 
 \bibitem[{Royle and Dorazio(2008)}]{Royle2008}
 Royle, J.~A., and R.~M. Dorazio. 2008.
@@ -501,12 +523,6 @@ Slater, G.~J., L.~J. Harmon, and M.~E. Alfaro. 2012.
 \newblock {Integrating fossils with molecular phylogenies improves inference of
   trait evolution}.
 \newblock Evolution 66:3931--3944.
-
-\bibitem[{Smiley(2018)}]{Smiley2018}
-Smiley, T.~M. 2018.
-\newblock {Detecting diversification rates in relation to preservation and
-  tectonic history from simulated fossil records}.
-\newblock Paleobiology 44:1--24.
 
 \bibitem[{Smithson and Verkuilen(2006)}]{Smithson2006}
 Smithson, M., and J.~Verkuilen. 2006.
