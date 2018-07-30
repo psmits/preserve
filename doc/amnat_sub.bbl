@@ -1,4 +1,4 @@
-\begin{thebibliography}{103}
+\begin{thebibliography}{105}
 \providecommand{\natexlab}[1]{#1}
 
 \bibitem[{Alexander(1977)}]{Alexander1977}
@@ -88,6 +88,12 @@ Foote, M. 1988.
 \newblock {Origination and extinction components of taxonomic diversity:
   Paleozoic and post-Paleozoic dynamics}.
 \newblock Paleobiology 26:578--605.
+
+\bibitem[{Foote(2001)}]{Foote2001}
+---{}---{}---. 2001.
+\newblock {Inferring temporal patterns of preservation, origination, and
+  extinction from taxonomic survivorship analysis}.
+\newblock Paleobiology 27:602--630.
 
 \bibitem[{Foote(2014)}]{Foote2014b}
 ---{}---{}---. 2014.
@@ -496,6 +502,12 @@ Slater, G.~J., L.~J. Harmon, and M.~E. Alfaro. 2012.
   trait evolution}.
 \newblock Evolution 66:3931--3944.
 
+\bibitem[{Smiley(2018)}]{Smiley2018}
+Smiley, T.~M. 2018.
+\newblock {Detecting diversification rates in relation to preservation and
+  tectonic history from simulated fossil records}.
+\newblock Paleobiology 44:1--24.
+
 \bibitem[{Smithson and Verkuilen(2006)}]{Smithson2006}
 Smithson, M., and J.~Verkuilen. 2006.
 \newblock {A better lemon squeezer? Maximum-likelihood regression with
@@ -538,11 +550,6 @@ Stanley, S.~M. 1975.
 \newblock {A theory of evolution above the species level}.
 \newblock Proceedings of the National Academy of Sciences 72:646--650.
 
-\bibitem[{Stanley(1979)}]{Stanley1979}
----{}---{}---. 1979.
-\newblock {Macroevolution: pattern and process}.
-\newblock W. H. Freeman, San Francisco.
-
 \bibitem[{Team(2017)}]{StanManual}
 Team, S.~D. 2017.
 \newblock {Stan Modeling Language Users Guide and Reference Manual}.
@@ -552,6 +559,11 @@ Tomiya, S. 2013.
 \newblock {Body Size and Extinction Risk in Terrestrial Mammals Above the
   Species Level}.
 \newblock The American Naturalist 182:196--214.
+
+\bibitem[{Tutz and Schmid(2016)}]{Tutz2016}
+Tutz, G., and M.~Schmid. 2016.
+\newblock {Modeling discrete time-to-event data}.
+\newblock Springer International Publishing, Switzerland.
 
 \bibitem[{{Van Valen}(1973)}]{VanValen1973}
 {Van Valen}, L. 1973.
