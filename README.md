@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.46928.svg)](http://dx.doi.org/10.5281/zenodo.46928)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1402252.svg)](https://doi.org/10.5281/zenodo.1402252)
 
 
 Brachiopod genus duration
