@@ -237,7 +237,7 @@ The survival function describes the probability of a taxon persisting given that
 
 
 % everything is on zenodo if you want to reproduce this entire analysis
-All code necessary to reproduce this analysis are available through an archived Zenodo repository DOI https://zenodo.org/record/1402252.
+All code necessary to reproduce this analysis are available through an archived Zenodo repository DOI https://zenodo.org/record/1402252. Additionally, this project is hosted at https://github.com/psmits/preserve.
 
 
 
@@ -258,7 +258,6 @@ Comparisons between the observed distribution of durations to the distributions 
   \caption{ Comparison of the distribution of the observed data (black) to 100 simulated distributions (blue). This is a close-up view of the bulk of the distribution which shows the more subtle aspects of (mis)fit between the data and the model. }
   \label{fig:dens_overlay_zoom}
 \end{figure}
-
 
 The similarity of the empirical data and from 100 simulated datasets provides a more nuanced picture of model adequacy (Fig.~\ref{fig:surv}). The survival curves of the 100 simulated datasets are very similar to the survival function estimated from the empirical data. The major points of misfit between the model and the data are taxa with duration 1 stage, and taxa with a duration at least 10-13 stages. The major divergence between the observed and the estimated applies to taxa with a less than 15\% probability of continuing to survive. 
 
@@ -344,14 +343,16 @@ A larger than average geographic range is expected to have a positive effect on 
 
 Body size measured as valve length is estimated to have no effect on duration for most of the post-Cambrian Paleozoic (Table~\ref{tab:param}).
 
-The group-level relationship between effect of environmental preference and duration is estimated from \(\mu^{v}\) and \(\mu^{v^{2}}\). The estimate of \(\mu^{v}\) indicates that taxa which slightly prefer epicontinental environments to open-ocean environments are expected to have a greater duration than open-ocean favoring taxa (Table~\ref{tab:param}). Additionally, given the estimate of between-cohort variance \(\tau^{v}\), there is approximately 18.1\% (\(\pm 7.5\%\) SD) probability that, for any given cohort, taxa which favor open-ocean environments would have a greater expected duration than taxa which favor epicontinental environments (\(\mathrm{Pr}(\mathcal{N}(\mu^{v}, \tau^{v}) > 0)\)). The estimate of \(\mu^{v^{2}}\) indicates that the overall relationship between environmental preference and \(\log(\sigma)\) is concave-down (Fig.~\ref{fig:env_mean}), with only a 2.5\% (\(\pm 2.9\%\) SD) probability that any given cohort is convex up (\(\mathrm{Pr}(\mathcal{N}(\mu^{v^{2}}, \tau^{v^{2}}) < 0\)).
-
-  \begin{figure}[ht]
+\clearpage
+\begin{figure}[ht]
   \centering
   \includegraphics[height = 0.5\textheight,width=\textwidth,keepaspectratio=true]{figure/env_effect_med_cweib_cens}
   \caption{The overall expected relationship between environmental affinity \(v_{i}\) and a \(\log(\sigma)\) when r = 0 and m = 0. The 1000 semi-transparent lines corresponds to a single draw from the posterior predictive distribution, while the highlighted line corresponds to the median of the posterior predictive distribution. The overall relationship demonstrates a greater durations among environmental generalists than specialists. Additionally, because the apex of is rightward from 0, taxa favoring epicontinental environments are expected to have a slightly longer durations than those favoring open-ocean environments. The tick marks along the bottom of the plot correspond to the (rescaled) observed values of environmental preference.}
   \label{fig:env_mean}
 \end{figure}
+
+
+The group-level relationship between effect of environmental preference and duration is estimated from \(\mu^{v}\) and \(\mu^{v^{2}}\). The estimate of \(\mu^{v}\) indicates that taxa which slightly prefer epicontinental environments to open-ocean environments are expected to have a greater duration than open-ocean favoring taxa (Table~\ref{tab:param}). Additionally, given the estimate of between-cohort variance \(\tau^{v}\), there is approximately 18.1\% (\(\pm 7.5\%\) SD) probability that, for any given cohort, taxa which favor open-ocean environments would have a greater expected duration than taxa which favor epicontinental environments (\(\mathrm{Pr}(\mathcal{N}(\mu^{v}, \tau^{v}) > 0)\)). The estimate of \(\mu^{v^{2}}\) indicates that the overall relationship between environmental preference and \(\log(\sigma)\) is concave-down (Fig.~\ref{fig:env_mean}), with only a 2.5\% (\(\pm 2.9\%\) SD) probability that any given cohort is convex up (\(\mathrm{Pr}(\mathcal{N}(\mu^{v^{2}}, \tau^{v^{2}}) < 0\)).
 
 %The cohort-specific estimates of all the regression coefficients demonstrate a lot of between cohort variance with no obvious long-term trends (Fig.~\ref{fig:cohort_series}). While most cohort-specific estimates are very similar to the overall cohort-level estimate, there are a few notable cohorts for which two or more individual-level parameter estimates diverge greatly from the group-level averages (Fig.~\ref{fig:cohort_series}). 
 
@@ -371,18 +372,19 @@ The cohort-specific relationships between environmental preference and \(\log(\s
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width = \textwidth,height = 0.7\textheight,keepaspectratio=true]{figure/cohort_series_cweib_cens}
-  \caption{Comparison of cohort-specific estimates of \(\beta^{0}\), the effect of geographic range on extinction risk \(\beta^{r}\), the effect of environmental preference \(\beta^{v}\) and \(\beta^{v^{2}}\), and body size \(\beta^{m}\). Points correspond to the median of the cohort-specific estimate, along with 80\% credible intervals. Points are plotted at the midpoint of the cohorts stage of origination in millions of years before present (My). Black, horizontal lines are the overall estimates of covariate effects along with 80\% credible intervals (shaded).}
-  \label{fig:cohort_series}
-\end{figure}
-
-\begin{figure}[ht]
-  \centering
   \includegraphics[width = \textwidth,height = 0.7\textheight,keepaspectratio=true]{figure/env_cohort_med_cweib_cens}
   \caption{Comparison of origination cohort-specific (posterior predictive) estimates of the effect of environmental preference on \(\log(\sigma)\) to the mean overall estimate of the effect of environmental preference. Cohort-specific estimates are from 100 posterior predictive simulations across the range of (transformed and rescaled) observed values of environmental preference. The oldest cohort is in the top-left and younger cohorts proceed left to right, with the youngest cohort being the right-most facet of the last row. Panel names correspond to the name of the stage in which that cohort originated.}
   \label{fig:env_cohort}
 \end{figure}
+\clearpage
 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width = \textwidth,height = 0.7\textheight,keepaspectratio=true]{figure/cohort_series_cweib_cens}
+  \caption{Comparison of cohort-specific estimates of \(\beta^{0}\), the effect of geographic range on extinction risk \(\beta^{r}\), the effect of environmental preference \(\beta^{v}\) and \(\beta^{v^{2}}\), and body size \(\beta^{m}\). Points correspond to the median of the cohort-specific estimate, along with 80\% credible intervals. Points are plotted at the midpoint of the cohorts stage of origination in millions of years before present (My). Black, horizontal lines are the overall estimates of covariate effects along with 80\% credible intervals (shaded).}
+  \label{fig:cohort_series}
+\end{figure}
+\clearpage
 
 
 %The Wenlock, Asseilian, and Sakmarian cohorts all have estimates of the linear aspect of environmental preference, \(\beta^{v}\), that are greater than the group-level average. Additionally, this is the only aspect of the relationship between environmental preference and expected taxon duration for these cohorts than is divergent from the group-level means (Fig.~\ref{fig:cohort_series}). These estimates mean that the relationship between environmental preference and duration is right-shifted such that taxa which prefer epicontinental environments over open-ocean are expected to have greater durations than average. Specifically, this means that taxa that can tolerate open-ocean and epicontinental environments but preferentially occur in epicontinental environments are expected to have greater durations than those that occur equally in these two environments (Fig.~\ref{fig:env_cohort}).
@@ -397,18 +399,20 @@ The cohort-specific relationships between environmental preference and \(\log(\s
 
 There is an approximately 90.4\% probability that cohort estimates of \(\beta^{0}\) and \(\beta^{r}\) are negatively correlated, with median estimate of correlation being -0.35 (Fig. \ref{fig:cor_posterior}). This result means that for any cohort, we would expect that if extinction intensity increases (\(\beta^{0}\) increases), the effect of geographic range on duration increases (\(\beta^{r}\) decreases). This result is strong evidence for a relationship between intensity and selectivity with respect to geographic range size.
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[height = 0.7\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap_cweib_cens}
-  \caption{Mixed graphical and numerical representation of the correlation matrix \(\Omega\) of variation in cohort-specific covariate estimates. These correlations are between the estimates of the cohort-level effects of covariates, along with intercept/baseline extinction risk. The median estimates of the correlations are presented numerically (upper-triangle) and as idealized ellipses representing that much correlation (lower-triangle). The darkness of the ellipse corresponds to the magnitude of the correlation.}
-  \label{fig:cor_posterior}
-\end{figure}
 
 I estimate a 97.9\% probability that the cohort-specific estimates of \(\beta^{0}\) and \(\beta^{v}\) are negatively correlated, with a median correlation of -0.49 (Fig. \ref{fig:cor_posterior}). This result means that as extinction intensity increases it is expected that epicontinental taxa become more favored over open-ocean environments (i.e. as \(\beta^{0}\) increases, \(\beta^{v}\) decreases). This result is strong evidence for a relationship between intensity and selectivity with respect to the linear aspect of environmental preference. 
 
 Correlations between the non-intercept estimates reflect potential similarities in selective pressures between cohorts, however there is only weak evidence of any potential cross-correlations in cohort-specific covariate effects(Fig. \ref{fig:cor_posterior}). There is an approximate 31.2\% probability that \(\beta^{r}\) and \(\beta^{v}\) are positively correlated. This lack of cross-correlation may be due in part to the higher between-cohort variance of the effect of environmental preference \(\tau^{v}\) compared to the very small between-cohort variance in the effect of geographic range \(\tau^{r}\) (Table~\ref{tab:param}); the effect of geographic range might simply not vary enough relative to environmental preference. 
 
 Conversely, there is a 74.6\% probability that estimates of the effect of geographic range (\(\beta^{r}\)) and the quadratic aspect of environmental preference (\(\beta^{v^{2}}\)) are positively correlated; this is weak evidence of a relationship between the effects of these covariates (Fig. \ref{fig:cor_posterior}). Thus, as the effect of geographic range increases, we might expect the peakedness of relationship between environmental preference and duration to increase. However, because there is only a 74.6\% probability of a positive correlation, this result cannot interpreted with authority. Instead, this result is an opportunity for future research to further explore the potential relationship between geographic range, environmental preference, and species duration.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[height = 0.7\textheight,width=\textwidth,keepaspectratio=true]{figure/wei_cor_heatmap_cweib_cens}
+  \caption{Mixed graphical and numerical representation of the correlation matrix \(\Omega\) of variation in cohort-specific covariate estimates. These correlations are between the estimates of the cohort-level effects of covariates, along with intercept/baseline extinction risk. The median estimates of the correlations are presented numerically (upper-triangle) and as idealized ellipses representing that much correlation (lower-triangle). The darkness of the ellipse corresponds to the magnitude of the correlation.}
+  \label{fig:cor_posterior}
+\end{figure}
+\clearpage
 
 Sampling was found to have a negative effect (positive \(\delta\)) on duration: greater sampling, shorter duration (Table~\ref{tab:param}). While potentially counter-intuitive, this result is most likely due to some long lived taxa only be sampled in the stages of it's first and last appearance. Also, longer lived taxa have more opportunities to evade sampling than shorter lived taxa. These two factors will lead to this result. 
 
