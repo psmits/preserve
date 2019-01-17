@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.6.8)  22 AUG 2018 15:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.6.8)  22 AUG 2018 16:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -658,6 +658,10 @@ LaTeX Font Info:    Try loading font information for OT1+zplm on input line 46.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1zplm.fd
 File: ot1zplm.fd 2002/09/08 Fontinst v1.914 font definitions for OT1/zplm.
 )
+
+LaTeX Warning: No \author given.
+
+
 Overfull \hbox (10.50581pt too wide) in paragraph at lines 58--59
 []\OT1/pplx/m/it/10.95 Keywords\OT1/pplx/m/n/10.95 : species se-lec-tion, ge-o-
 graphic range, en-vi-ron-men-tal pref-er-ence, pa-le-o-bi-ol-ogy, Bayesian 
@@ -720,11 +724,11 @@ LaTeX Warning: Text page 37 contains only floats.
 
 ] [39] [40] [41] (./amnat_sub.aux) ) 
 Here is how much of TeX's memory you used:
- 5154 strings out of 492982
- 74351 string characters out of 6134897
- 135124 words of memory out of 5000000
+ 5151 strings out of 492982
+ 74334 string characters out of 6134897
+ 135121 words of memory out of 5000000
  8592 multiletter control sequences out of 15000+600000
- 39176 words of font info for 103 fonts, out of 8000000 for 9000
+ 38003 words of font info for 100 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  36i,12n,39p,1784b,431s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dv
@@ -739,7 +743,7 @@ onts/type1/public/mathpazo/fplmri.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palati
 no/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplri8a.p
 fb>
-Output written on amnat_sub.pdf (41 pages, 191188 bytes).
+Output written on amnat_sub.pdf (41 pages, 190575 bytes).
 PDF statistics:
  183 PDF objects out of 1000 (max. 8388607)
  127 compressed objects within 2 object streams
